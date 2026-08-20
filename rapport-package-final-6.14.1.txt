@@ -19,6 +19,6 @@
 
 Archive : /home/ubuntu/partikulier2/partikulier-6.14.1.zip
 Taille  : 535K
-SHA-256 : a1ffa39f6b9ba2d8dcc63442a17bcd1339f2a267bc8d7b032f8d8331d169429b
+SHA-256 : 1c355937f97d00d92a2b36b3a68226c89212408a8c3d8cc261d91603eaf7bbda
 
 Pensez à ajouter l'entrée de changelog dans theme/readme.txt.

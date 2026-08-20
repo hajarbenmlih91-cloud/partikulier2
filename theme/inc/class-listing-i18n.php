@@ -345,6 +345,37 @@ class Partikulier_Listing_I18n {
 	}
 
 	/**
+	 * Garantit les clés consommées par les générateurs, y compris pour les
+	 * anciennes annonces dont certains champs optionnels n'existent pas.
+	 *
+	 * @param array $values Données partiellement normalisées.
+	 * @return array
+	 */
+	private static function normalize_values( $values ) {
+		$defaults = array(
+			'action'          => '',
+			'role'            => '',
+			'type'            => '',
+			'city'            => '',
+			'district'        => '',
+			'surface'         => 0,
+			'price'           => 0,
+			'bedrooms'        => '',
+			'living_rooms'    => '',
+			'bathrooms'       => '',
+			'floor'           => '',
+			'garage'          => 'Non',
+			'elevator'         => 'Non',
+			'vis_a_vis'       => 'Non',
+			'terrace'         => 'Non',
+			'terrace_surface' => 0,
+			'sunshine'        => '',
+		);
+
+		return wp_parse_args( is_array( $values ) ? $values : array(), $defaults );
+	}
+
+	/**
 	 * Libelle du couchage dans la langue voulue.
 	 *
 	 * @param array  $v    Donnees normalisees.
@@ -392,6 +423,7 @@ class Partikulier_Listing_I18n {
 	 * @return string
 	 */
 	public static function title( $v, $lang ) {
+		$v     = self::normalize_values( $v );
 		$lex   = self::lex( $lang );
 		$type  = self::is_studio( $v ) ? $lex['studio'] : self::type_label( $v['type'], $lang );
 		$title = $type;
@@ -426,6 +458,7 @@ class Partikulier_Listing_I18n {
 	 * @return string
 	 */
 	public static function description( $v, $lang ) {
+		$v     = self::normalize_values( $v );
 		$lex   = self::lex( $lang );
 		$type  = self::is_studio( $v ) ? $lex['studio'] : self::type_label( $v['type'], $lang );
 		$place = self::place_in( Partikulier_Listing_Preview::place_label( $v ), $lang );
@@ -517,6 +550,7 @@ class Partikulier_Listing_I18n {
 	 * @return string
 	 */
 	public static function meta_description( $v, $lang ) {
+		$v     = self::normalize_values( $v );
 		$lex   = self::lex( $lang );
 		$type  = self::is_studio( $v ) ? $lex['studio'] : self::type_label( $v['type'], $lang );
 		$place = self::place_in( Partikulier_Listing_Preview::place_label( $v ), $lang );

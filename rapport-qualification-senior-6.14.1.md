@@ -114,7 +114,7 @@ Le script `scripts/migrate-polylang-source-meta.php` est idempotent et possède 
 
 Les audits ont identifié un cas que la simple présence des langues FR/EN/AR ne couvre pas : Polylang éjecte une ancienne auto-traduction lorsqu’un administrateur lie une traduction manuelle dans la même langue. L’ancienne auto peut alors rester publiée hors du groupe source.
 
-Le module `theme/inc/class-listing-translations.php` contient désormais `reconcile_orphans( $apply )`. Il retrouve la source via `_pk_translation_source`, lit le groupe Polylang actuel de la source, compare la langue de l’auto à l’ID actuellement associé et passe uniquement l’auto remplacée en `draft`. Aucune suppression et aucun `NOT EXISTS` global ne sont utilisés.
+Le module `theme/inc/class-listing-translations.php` contient `reconcile_orphans( $apply )`. Il retrouve la source via `_pk_translation_source`, lit le groupe Polylang actuel de la source, compare la langue de l’auto à l’ID actuellement associé et passe uniquement l’auto remplacée en `draft`. Aucune suppression et aucun `NOT EXISTS` global ne sont utilisés. Depuis le correctif final, le hook `save_post_{post_type}` programme `reconcile_orphans( true )` sur `shutdown` : la réconciliation est donc effective après une édition, tout en restant ciblée sur les orphelines démontrées.
 
 Le test E2E décisif `scripts/test-polylang-sync-e2e.php` appelle le vrai `Partikulier_Listing_Translations::sync()` et a produit :
 
@@ -125,7 +125,7 @@ source_lang EN/AR    : fr
 auto seule            : publish
 invalid legacy meta  : invalid_source_meta
 remplacement manuel  : dry-run draft
-apply                 : auto EN draft, manuel EN publish
+hook save_post        : auto EN draft, manuel EN publish
 résultat              : PASS
 ```
 
@@ -162,4 +162,4 @@ wp --path=wp eval-file scripts/test-polylang-auto-only.php
 PK_APPLIQUER=1 wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
 ```
 
-Le lot D est validé sur la sandbox pour le flux réel `sync()`, le scénario auto seule, le remplacement manuel, le rejet des métadonnées invalides et la migration dry-run/apply. En production, la migration reste une opération à exécuter en priorité, en dry-run puis après sauvegarde.
+Le lot D est validé sur la sandbox pour le flux réel `sync()`, le scénario auto seule, le remplacement manuel, le rejet des métadonnées invalides, la migration dry-run/apply et l’application automatique déclenchée par `save_post`. Le test E2E final ne produit aucun warning/notice/deprecated PHP lié à `living_rooms`, `sunshine` ou `class-listing-i18n.php`, car les générateurs normalisent désormais toutes les clés optionnelles absentes. En production, la migration historique reste une opération à exécuter en priorité, en dry-run puis après sauvegarde.

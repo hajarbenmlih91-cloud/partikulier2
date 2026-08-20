@@ -7,7 +7,7 @@
  *
  * Le test crée une famille temporaire FR/EN/AR, vérifie qu'une auto seule reste
  * publiée, remplace l'EN par une annonce manuelle, puis vérifie que l'ancienne
- * auto est détectée et passe en brouillon avec --apply.
+ * auto est détectée et passe automatiquement en brouillon après save_post.
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	fwrite( STDERR, "WordPress n'est pas chargé. Utilisez wp eval-file.\n" );
@@ -148,12 +148,15 @@ $orphan_rows = array_values( array_filter( $dry_run, static function ( $row ) us
 } ) );
 $assert( ! empty( $orphan_rows ), 'Le vrai flux de remplacement ne détecte pas l’auto EN orpheline.' );
 
-$apply_rows = Partikulier_Listing_Translations::reconcile_orphans( true );
-$applied_rows = array_values( array_filter( $apply_rows, static function ( $row ) use ( $auto_id ) {
-	return isset( $row['auto_id'] ) && (int) $row['auto_id'] === $auto_id && ! empty( $row['applied'] );
+// Déclenche une vraie écriture du post manuel : le hook save_post programme
+// alors l’application automatique ciblée sur shutdown.
+wp_update_post( array( 'ID' => $manual_id, 'post_title' => 'E2E MANUAL EN UPDATED ' . $source_id ), true );
+do_action( 'shutdown' );
+$automatic_rows = Partikulier_Listing_Translations::orphan_report();
+$automatic_drafts = array_values( array_filter( $automatic_rows, static function ( $row ) use ( $auto_id ) {
+	return isset( $row['auto_id'] ) && (int) $row['auto_id'] === $auto_id && 'draft' === ( $row['action'] ?? '' );
 } ) );
-$assert( ! empty( $applied_rows ), 'La réconciliation --apply n’a pas appliqué le brouillon.' );
-$assert( 'draft' === get_post_status( $auto_id ), 'L’auto orpheline n’est pas passée en brouillon.' );
+$assert( 'draft' === get_post_status( $auto_id ), 'Le hook automatique n’a pas mis l’auto orpheline en brouillon.' );
 $assert( 'publish' === get_post_status( $manual_id ), 'La traduction manuelle EN n’est pas restée publiée.' );
 
 $result = array(
@@ -167,8 +170,9 @@ $result = array(
 	'group_after_manual' => $after_manual,
 	'metadata'           => $metadata,
 	'auto_only_report'   => $auto_only_report,
-	'dry_run'            => $dry_run,
-	'apply'              => $apply_rows,
+		'dry_run'            => $dry_run,
+		'automatic_report'   => $automatic_rows,
+		'apply'              => $automatic_drafts,
 	'final_status'       => array(
 		'auto_en'   => get_post_status( $auto_id ),
 		'manual_en' => get_post_status( $manual_id ),

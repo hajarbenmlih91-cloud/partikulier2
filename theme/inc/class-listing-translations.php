@@ -67,7 +67,10 @@ class Partikulier_Listing_Translations {
 		}
 		do_action( 'pk_translation_reconciliation_scheduled' );
 		add_action( 'shutdown', static function () {
-			self::reconcile_orphans( false );
+			// Application automatique ciblée : seules les autos dont le groupe
+			// Polylang révèle une remplaçante manuelle sont mises en brouillon.
+			// Les autos seules restent publiées ; aucune suppression n'est faite.
+			self::reconcile_orphans( true );
 		}, 99 );
 	}
 

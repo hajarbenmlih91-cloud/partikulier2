@@ -1,0 +1,57 @@
+{
+    "passed": true,
+    "failures": [],
+    "source_id": 127,
+    "auto_id": 128,
+    "dry_run": {
+        "mode": "dry-run",
+        "total_auto": 2,
+        "repaired": 1,
+        "valid": 1,
+        "irreparable_or_ambiguous": 0,
+        "rows": [
+            {
+                "auto_id": 128,
+                "action": "repair_source_meta",
+                "legacy_value": "fr",
+                "source_id": 127,
+                "source_lang": "fr",
+                "applied": false
+            },
+            {
+                "auto_id": 87,
+                "action": "already_valid",
+                "source_id": 7
+            }
+        ],
+        "destructive": false
+    },
+    "apply": {
+        "mode": "apply",
+        "total_auto": 2,
+        "repaired": 1,
+        "valid": 1,
+        "irreparable_or_ambiguous": 0,
+        "rows": [
+            {
+                "auto_id": 128,
+                "action": "repair_source_meta",
+                "legacy_value": "fr",
+                "source_id": 127,
+                "source_lang": "fr",
+                "applied": true
+            },
+            {
+                "auto_id": 87,
+                "action": "already_valid",
+                "source_id": 7
+            }
+        ],
+        "destructive": false
+    },
+    "meta_after": {
+        "source": "127",
+        "legacy": "fr",
+        "source_lang": "fr"
+    }
+}

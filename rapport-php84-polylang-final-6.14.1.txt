@@ -1,0 +1,2 @@
+E2E: PASS
+PHP warnings grep: PASS (aucun warning/notice/deprecated lié à i18n)
