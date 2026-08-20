@@ -1,16 +1,22 @@
 {
-  "name": "partikulier-theme-tests",
-  "private": true,
+  "name": "partikulier-dev",
   "version": "6.13.1",
-  "description": "Harnais de non-regression visuelle du theme Partikulier.",
-  "type": "module",
+  "private": true,
+  "description": "Environnement de développement du thème Partikulier",
   "scripts": {
-    "test": "node tests/visual.mjs check",
-    "test:baseline": "node tests/visual.mjs baseline",
-    "setup": "npm install && npx playwright install --with-deps chromium"
+    "setup": "npm install && npx playwright install chromium && npx playwright install-deps chromium",
+    "test": "node scripts/visual.mjs",
+    "test:rapide": "node scripts/rapide.mjs",
+    "test:parcours": "node scripts/parcours.mjs",
+    "test:audit": "node scripts/audit.mjs",
+    "test:securite": "node scripts/securite.mjs",
+    "test:baseline": "node scripts/visual.mjs baseline",
+    "check": "bash scripts/check.sh",
+    "sync": "bash scripts/sync.sh",
+    "start": "bash scripts/start.sh"
   },
   "devDependencies": {
-    "playwright": "^1.50.0",
+    "playwright": "^1.47.0",
     "pngjs": "^7.0.0"
   }
 }
