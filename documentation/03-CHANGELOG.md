@@ -106,3 +106,7 @@ Ce qui fait foi, dans l'ordre :
 3. Le `readme.txt` et son changelog.
 
 L'historique git, lui, peut afficher n'importe quel état antérieur. Si tu reprends ce projet, **initialise un dépôt neuf** depuis le contenu du zip et pousse-le sur un hébergeur distant (GitHub, GitLab) dès la première heure. Les versions listées ci-dessus sont reconstituées à partir du `readme.txt` et des livraisons successives, pas du journal git.
+
+## 6.14.1 — recette réelle complémentaire
+
+Recette sandbox exécutée avec Estatik 4.3.4, Polylang 3.8.7 et Query Monitor 4.0.7. Les langues FR/EN/AR, les familles de traductions, les invariants de taxonomies, les assets Estatik, la galerie et les favoris ont été testés réellement. Le rapport documente également la comparaison historique 6.13.1 et précise que le lot B ne peut pas être déclaré comme gain N+1 démontré tant que le protocole avant/après n’est pas strictement homogène.

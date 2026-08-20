@@ -1,2 +1,12 @@
-Reserve aux administrateurs.
-STATUT taxonomies=0
+REPARATION DES TAXONOMIES — 2026-08-20 10:52 UTC
+MODE : SIMULATION (rien n est modifie)
+--------------------------------------------------------------------
+Termes dans es_category : 3
+Termes qui n y ont pas leur place : 0
+
+
+--------------------------------------------------------------------
+Seraient traites : 0 terme(s), 0 annonce(s)
+
+Pour appliquer reellement : ajoutez ?appliquer=1 a l URL.
+SAUVEGARDEZ LA BASE avant.

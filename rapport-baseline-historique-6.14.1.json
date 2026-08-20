@@ -1,0 +1,134 @@
+[
+  {
+    "file": "404-desktop.png",
+    "status": "ok",
+    "size": [
+      1440,
+      1000
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "404-mobile.png",
+    "status": "ok",
+    "size": [
+      390,
+      1183
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "accueil-desktop.png",
+    "status": "ok",
+    "size": [
+      1440,
+      5765
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "accueil-mobile.png",
+    "status": "ok",
+    "size": [
+      390,
+      6816
+    ],
+    "changed_pixels": 66794,
+    "changed_percent": 2.5127,
+    "bbox": null
+  },
+  {
+    "file": "annonces-desktop.png",
+    "status": "ok",
+    "size": [
+      1440,
+      2168
+    ],
+    "changed_pixels": 510,
+    "changed_percent": 0.0163,
+    "bbox": null
+  },
+  {
+    "file": "annonces-filtre-desktop.png",
+    "status": "ok",
+    "size": [
+      1440,
+      2168
+    ],
+    "changed_pixels": 510,
+    "changed_percent": 0.0163,
+    "bbox": null
+  },
+  {
+    "file": "annonces-filtre-mobile.png",
+    "status": "ok",
+    "size": [
+      390,
+      3006
+    ],
+    "changed_pixels": 38431,
+    "changed_percent": 3.2781,
+    "bbox": null
+  },
+  {
+    "file": "annonces-mobile.png",
+    "status": "ok",
+    "size": [
+      390,
+      3006
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "deposer-desktop.png",
+    "status": "ok",
+    "size": [
+      1440,
+      1694
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "deposer-mobile.png",
+    "status": "ok",
+    "size": [
+      390,
+      2144
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "mes-annonces-desktop.png",
+    "status": "ok",
+    "size": [
+      1440,
+      1000
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  },
+  {
+    "file": "mes-annonces-mobile.png",
+    "status": "ok",
+    "size": [
+      390,
+      844
+    ],
+    "changed_pixels": 0,
+    "changed_percent": 0.0,
+    "bbox": null
+  }
+]

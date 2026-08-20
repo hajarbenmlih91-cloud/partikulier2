@@ -1,0 +1,2 @@
+Archive /annonces/ — console : aucune erreur JavaScript relevée (seulement le log JQMIGRATE). Assets Estatik réellement chargés : jquery.datetimepicker, select2, framework, magnific-popup, slick, public.min.js et ajax-entities.min.js. Query Monitor est présent. La page expose 6 boutons favoris, 5 formulaires et les contrôles de tri/filtres. Vérification DOM effectuée le 2026-08-20.
+
