@@ -57,11 +57,24 @@ Le test interactif a ajouté puis supprimé le favori `postId=50`, avec `aria-pr
 
 ### Lot B — N+1
 
-La qualification retenue est **non-régression SQL**, pas gain de performance global. Aucun motif N+1 nouveau attribuable au thème n’a été détecté dans les profils avant/après existants. Les répétitions résiduelles liées à Polylang doivent rester surveillées séparément ; elles ne sont pas présentées comme supprimées.
+Un protocole homogène a maintenant été exécuté sur le même WordPress, la même base, les mêmes plugins, les mêmes quatre URLs et trois tours par version. Les valeurs moyennes observées sont les suivantes :
+
+| Parcours | 6.13.1 | 6.14.1 | Écart de requêtes | Écart SQL |
+|---|---:|---:|---:|---:|
+| `/annonces/` | 135,33 | 133,00 | **−2,33** | −0,232 ms |
+| Fiche réelle | 99,00 | 99,00 | 0 | +1,335 ms |
+| Dépôt | 55,00 | 55,00 | 0 | +0,103 ms |
+| Favoris | 55,00 | 55,00 | 0 | +2,900 ms |
+
+Le nombre moyen de motifs dupliqués reste identique sur chaque parcours. Le gain de −2,33 requêtes sur l’archive est réel dans ce protocole, mais il ne suffit pas à revendiquer un gain global de performance : le détail, le dépôt et les favoris sont stables en volume, et le temps SQL est soumis à la variance de la sandbox. Le lot B passe donc de « gain non démontré » à **amélioration mesurée sur l’archive, sans gain global démontré**. Les répétitions Polylang restantes ne sont pas présentées comme supprimées.
+
+Preuves : `rapport-sql-comparison-6.13.1-6.14.1.json`, les deux fichiers `rapport-sql-*-raw.jsonl` et `scripts/run-sql-before-after.sh`.
 
 ### Visuel
 
-La comparaison contre `tests/__baseline-6.13.1__` a été exécutée explicitement. Les pages stables `deposer`, `mes-annonces` et `404` restent sous le seuil (0,00–0,11 %). Les pages accueil/archive ont des hauteurs différentes et sont donc signalées à 100 % par le comparateur : le snapshot 6.13.1 contient moins de contenu que la sandbox actuelle. Ce résultat est une réserve de comparabilité des données, pas une preuve de zéro régression pixel historique. Les captures `.actuel.png` et `rapport-visual-baseline-6.13.1-final.txt` sont conservés pour revue.
+La comparaison historique initiale contre `tests/__baseline-6.13.1__` était polluée par un snapshot de données différent : les pages dynamiques avaient des hauteurs incompatibles. Une seconde comparaison senior a donc été exécutée en générant la baseline 6.13.1 et la version 6.14.1 sur **le même snapshot WordPress, les mêmes assets, les mêmes URLs, les mêmes dimensions et le même navigateur**. Résultat : **12/12 vues à 0,00 % d’écart**. La preuve est `rapport-visual-identical-snapshot-6.13.1-6.14.1.txt`.
+
+La baseline historique fournie dans le dépôt reste conservée comme référence documentaire, mais le verdict de non-régression visuelle repose désormais sur le snapshot identique reproductible.
 
 ## Procédure de reprise
 

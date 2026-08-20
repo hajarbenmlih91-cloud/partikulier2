@@ -1,0 +1,162 @@
+{
+  "protocol": {
+    "rounds": 3,
+    "urls_per_round": 4
+  },
+  "versions": {
+    "6.13.1": {
+      "/annonce/casablanca/appartement-lumineux-3-pieces/": {
+        "samples": 3,
+        "avg_queries": 99.0,
+        "avg_sql_time_ms": 26.543,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 99,
+        "max_duplicate_patterns": 8
+      },
+      "/annonces/": {
+        "samples": 3,
+        "avg_queries": 135.333,
+        "avg_sql_time_ms": 37.912,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 140,
+        "max_duplicate_patterns": 8
+      },
+      "/deposer-une-annonce/": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 15.231,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      },
+      "/favoris/": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 14.954,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      }
+    },
+    "6.14.1": {
+      "/annonce/casablanca/appartement-lumineux-3-pieces/": {
+        "samples": 3,
+        "avg_queries": 99.0,
+        "avg_sql_time_ms": 27.878,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 99,
+        "max_duplicate_patterns": 8
+      },
+      "/annonces/": {
+        "samples": 3,
+        "avg_queries": 133.0,
+        "avg_sql_time_ms": 37.68,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 133,
+        "max_duplicate_patterns": 8
+      },
+      "/deposer-une-annonce/": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 15.334,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      },
+      "/favoris/": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 17.854,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      }
+    }
+  },
+  "comparison": {
+    "/annonce/casablanca/appartement-lumineux-3-pieces/": {
+      "avg_queries_delta": 0.0,
+      "avg_sql_time_ms_delta": 1.335,
+      "avg_duplicate_patterns_delta": 0.0,
+      "before": {
+        "samples": 3,
+        "avg_queries": 99.0,
+        "avg_sql_time_ms": 26.543,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 99,
+        "max_duplicate_patterns": 8
+      },
+      "after": {
+        "samples": 3,
+        "avg_queries": 99.0,
+        "avg_sql_time_ms": 27.878,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 99,
+        "max_duplicate_patterns": 8
+      }
+    },
+    "/annonces/": {
+      "avg_queries_delta": -2.333,
+      "avg_sql_time_ms_delta": -0.232,
+      "avg_duplicate_patterns_delta": 0.0,
+      "before": {
+        "samples": 3,
+        "avg_queries": 135.333,
+        "avg_sql_time_ms": 37.912,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 140,
+        "max_duplicate_patterns": 8
+      },
+      "after": {
+        "samples": 3,
+        "avg_queries": 133.0,
+        "avg_sql_time_ms": 37.68,
+        "avg_duplicate_patterns": 8.0,
+        "max_queries": 133,
+        "max_duplicate_patterns": 8
+      }
+    },
+    "/deposer-une-annonce/": {
+      "avg_queries_delta": 0.0,
+      "avg_sql_time_ms_delta": 0.103,
+      "avg_duplicate_patterns_delta": 0.0,
+      "before": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 15.231,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      },
+      "after": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 15.334,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      }
+    },
+    "/favoris/": {
+      "avg_queries_delta": 0.0,
+      "avg_sql_time_ms_delta": 2.9,
+      "avg_duplicate_patterns_delta": 0.0,
+      "before": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 14.954,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      },
+      "after": {
+        "samples": 3,
+        "avg_queries": 55.0,
+        "avg_sql_time_ms": 17.854,
+        "avg_duplicate_patterns": 3.0,
+        "max_queries": 55,
+        "max_duplicate_patterns": 3
+      }
+    }
+  }
+}
