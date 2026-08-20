@@ -1,0 +1,20 @@
+  ECART  accueil-desktop  100.00%
+  ECART  annonces-desktop  100.00%
+  ECART  annonces-filtre-desktop  100.00%
+  ok    deposer-desktop  0.09%
+  ok    mes-annonces-desktop  0.00%
+  ok    404-desktop  0.11%
+  ECART  accueil-mobile  100.00%
+  ECART  annonces-mobile  100.00%
+  ECART  annonces-filtre-mobile  100.00%
+  ok    deposer-mobile  0.08%
+  ok    mes-annonces-mobile  0.00%
+  ok    404-mobile  0.00%
+
+ECHEC :
+  - accueil-desktop : 100.00 % de pixels differents (seuil 0.2 %)
+  - annonces-desktop : 100.00 % de pixels differents (seuil 0.2 %)
+  - annonces-filtre-desktop : 100.00 % de pixels differents (seuil 0.2 %)
+  - accueil-mobile : 100.00 % de pixels differents (seuil 0.2 %)
+  - annonces-mobile : 100.00 % de pixels differents (seuil 0.2 %)
+  - annonces-filtre-mobile : 100.00 % de pixels differents (seuil 0.2 %)

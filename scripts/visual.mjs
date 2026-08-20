@@ -14,7 +14,9 @@ import path from 'path';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8090';
 const MODE = process.argv[2] || 'check';
-const DIR = path.join(process.cwd(), 'tests', '__baseline__');
+const DIR = process.env.PK_BASELINE_DIR
+  ? path.resolve(process.env.PK_BASELINE_DIR)
+  : path.join(process.cwd(), 'tests', '__baseline__');
 const SEUIL = 0.2; // % de pixels differents tolere
 
 const PAGES = [

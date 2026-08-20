@@ -1,0 +1,11 @@
+{
+    "users": {
+        "marc": 2,
+        "sofia": 3
+    },
+    "posts": {
+        "marc": 104,
+        "sofia": 105
+    },
+    "ids_file": "\/tmp\/ids.txt"
+}

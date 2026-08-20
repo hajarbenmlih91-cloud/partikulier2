@@ -1,0 +1,16 @@
+════════ Contrôle qualité Partikulier ════════
+
+── Syntaxe PHP
+   65 fichiers, aucune erreur
+── Syntaxe JavaScript
+   2 fichiers, aucune erreur
+── Cohérence des versions
+   style.css 6.14.1 · functions.php 6.14.1 · package.json 6.14.1 · readme.txt 6.14.1
+   Les 4 fichiers concordent
+── Régressions connues
+   .pk-wish-active stylée               OK
+   gestionnaires favoris : 1 gestionnaire(s) addEventListener détecté(s)
+   garde .pk-steps dans main.js          OK
+   vocabulaire (pas de « mandataire » affiché)  OK
+
+════════ Tout est conforme ════════

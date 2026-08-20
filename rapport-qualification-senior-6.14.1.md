@@ -2,7 +2,7 @@
 
 ## Verdict
 
-La livraison 6.14.1 est qualifiée **conforme aux critères corrigés du CDC sur la sandbox de recette**, après correction des défauts signalés par les audits externes. Les preuves ont été rejouées après synchronisation du thème dans WordPress. Le verdict est fondé sur les résultats ci-dessous et non sur une baseline régénérée seule.
+La livraison 6.14.1 est qualifiée **conforme aux critères fonctionnels corrigés du CDC sur la sandbox de recette**, avec une réserve documentée sur la comparaison pixel historique lorsque le snapshot de données diffère. Les preuves ont été rejouées après synchronisation du thème dans WordPress et activation réelle de Polylang 3.8.7 et Estatik. Le verdict est fondé sur les rapports bruts ci-dessous, et non sur une baseline régénérée seule.
 
 ## Correctifs appliqués
 
@@ -38,9 +38,9 @@ Sur une fiche réelle, le JSON-LD retourné contient deux occurrences `priceCurr
 
 ### Polylang et taxonomies
 
-Le provisioning a été rejoué avec Polylang 3.8.7 actif. La sandbox a produit 18 sources FR et les routes linguistiques FR/EN/AR répondent en 200. Le script est maintenant idempotent sur les annonces existantes : il affecte d’abord les annonces publiées sans langue à FR avant de rechercher les sources FR et de créer les traductions.
+Le provisioning a été rejoué avec Polylang 3.8.7 actif. Le rapport final confirme les slugs `fr`, `en`, `ar`, avec 19 sources FR, 20 contenus EN et 19 contenus AR. Les routes linguistiques FR/EN/AR répondent en 200. Après nettoyage des fixtures historiques de recette, `rapport-taxonomy-final-6.14.1.json` est en statut `PASS` avec zéro annonce publiée sans relation d’action ou de localisation.
 
-Le rapport de taxonomies doit être interprété comme une preuve de dataset de recette : les traductions et leurs termes sont vérifiés par les rapports JSON existants. Toute migration de production doit néanmoins être exécutée en dry-run puis validée par une sauvegarde de base.
+Toute migration de production doit néanmoins être exécutée en dry-run puis validée par une sauvegarde de base. Le nouveau script `migrate-polylang-source-meta.php` conserve les valeurs legacy dans `_pk_translation_source_legacy` et ne répare que les groupes dont la source est déterminable de manière unique.
 
 ### Estatik et interactions
 
@@ -61,7 +61,7 @@ La qualification retenue est **non-régression SQL**, pas gain de performance gl
 
 ### Visuel
 
-La baseline propre 6.14.1 passe à 0,00 % sur les 12 vues. La comparaison historique 6.13.1/6.14.1 conserve les écarts documentés liés au changement fonctionnel du filtre et au contenu multilingue. Ils ne doivent pas être présentés comme un « zéro pixel diff historique ».
+La comparaison contre `tests/__baseline-6.13.1__` a été exécutée explicitement. Les pages stables `deposer`, `mes-annonces` et `404` restent sous le seuil (0,00–0,11 %). Les pages accueil/archive ont des hauteurs différentes et sont donc signalées à 100 % par le comparateur : le snapshot 6.13.1 contient moins de contenu que la sandbox actuelle. Ce résultat est une réserve de comparabilité des données, pas une preuve de zéro régression pixel historique. Les captures `.actuel.png` et `rapport-visual-baseline-6.13.1-final.txt` sont conservés pour revue.
 
 ## Procédure de reprise
 
@@ -93,9 +93,28 @@ Cette qualification ne prétend pas démontrer un gain absolu de performance con
 
 ## Addendum D-bis — cycle de vie des auto-traductions orphelines
 
+### Correctif writer/reader et migration
+
+Le contrat est désormais strict : `_pk_translation_source` contient exclusivement l’ID numérique du post source ; `_pk_source_lang` contient la langue de dépôt. Le reader refuse les anciennes valeurs non numériques et les retourne avec l’action `invalid_source_meta`, au lieu de les convertir silencieusement en zéro.
+
+Le script `scripts/migrate-polylang-source-meta.php` est idempotent et possède deux modes explicites : dry-run par défaut et application via `PK_APPLIQUER=1`. Le test réel `scripts/test-polylang-migration.php` a démontré qu’une valeur legacy `fr` est planifiée sans mutation en dry-run, puis convertie en ID source avec archivage de la valeur historique en mode apply.
+
 Les audits ont identifié un cas que la simple présence des langues FR/EN/AR ne couvre pas : Polylang éjecte une ancienne auto-traduction lorsqu’un administrateur lie une traduction manuelle dans la même langue. L’ancienne auto peut alors rester publiée hors du groupe source.
 
 Le module `theme/inc/class-listing-translations.php` contient désormais `reconcile_orphans( $apply )`. Il retrouve la source via `_pk_translation_source`, lit le groupe Polylang actuel de la source, compare la langue de l’auto à l’ID actuellement associé et passe uniquement l’auto remplacée en `draft`. Aucune suppression et aucun `NOT EXISTS` global ne sont utilisés.
+
+Le test E2E décisif `scripts/test-polylang-sync-e2e.php` appelle le vrai `Partikulier_Listing_Translations::sync()` et a produit :
+
+```text
+sync() FR/EN/AR       : map complète
+source_raw EN/AR     : ID numérique de la source FR
+source_lang EN/AR    : fr
+auto seule            : publish
+invalid legacy meta  : invalid_source_meta
+remplacement manuel  : dry-run draft
+apply                 : auto EN draft, manuel EN publish
+résultat              : PASS
+```
 
 Le scénario `scripts/test-polylang-orphan-replacement.php` a produit :
 
@@ -119,7 +138,7 @@ après        : publish
 résultat     : PASS
 ```
 
-Le dry-run final `scripts/reconcile-polylang-orphans.php` a retourné `count: 0` après réparation. Le mode `--apply` est explicite et réversible ; il doit être précédé d’un backup en production.
+Le dry-run et l’application ont été vérifiés sur la sandbox. Le mode d’application est désormais `PK_APPLIQUER=1`, car `wp eval-file` ne doit pas dépendre d’un passage d’arguments ambigu. L’opération doit être précédée d’un backup en production.
 
 Commandes D-bis :
 
@@ -127,7 +146,7 @@ Commandes D-bis :
 wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
 wp --path=wp eval-file scripts/test-polylang-orphan-replacement.php
 wp --path=wp eval-file scripts/test-polylang-auto-only.php
-wp --path=wp eval-file scripts/reconcile-polylang-orphans.php -- --apply
+PK_APPLIQUER=1 wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
 ```
 
-Le lot D est donc validé pour le scénario métier auto remplacée et pour le scénario auto seule. La migration de production reste une opération à exécuter en dry-run puis après sauvegarde.
+Le lot D est validé sur la sandbox pour le flux réel `sync()`, le scénario auto seule, le remplacement manuel, le rejet des métadonnées invalides et la migration dry-run/apply. En production, la migration reste une opération à exécuter en priorité, en dry-run puis après sauvegarde.

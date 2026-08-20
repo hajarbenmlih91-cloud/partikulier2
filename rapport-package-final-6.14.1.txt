@@ -1,0 +1,24 @@
+── Alignement des versions sur 6.14.1
+── Contrôle qualité
+════════ Contrôle qualité Partikulier ════════
+
+── Syntaxe PHP
+   65 fichiers, aucune erreur
+── Syntaxe JavaScript
+   2 fichiers, aucune erreur
+── Cohérence des versions
+   style.css 6.14.1 · functions.php 6.14.1 · package.json 6.14.1 · readme.txt 6.14.1
+   Les 4 fichiers concordent
+── Régressions connues
+   .pk-wish-active stylée               OK
+   gestionnaires favoris : 1 gestionnaire(s) addEventListener détecté(s)
+   garde .pk-steps dans main.js          OK
+   vocabulaire (pas de « mandataire » affiché)  OK
+
+════════ Tout est conforme ════════
+
+Archive : /home/ubuntu/partikulier2/partikulier-6.14.1.zip
+Taille  : 535K
+SHA-256 : 74370fcc24cf1ad3d682487033786a9895269888eb1d13da51b4bb9e0721fa70
+
+Pensez à ajouter l'entrée de changelog dans theme/readme.txt.

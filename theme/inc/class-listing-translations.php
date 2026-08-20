@@ -29,6 +29,11 @@ class Partikulier_Listing_Translations {
 	const META_SOURCE = '_pk_translation_source';
 
 	/**
+	 * Langue du dépôt de l’annonce source, séparée de son ID source.
+	 */
+	const META_SOURCE_LANG = '_pk_source_lang';
+
+	/**
 	 * Polylang est-il disponible et configure ?
 	 *
 	 * @return bool
@@ -90,8 +95,17 @@ class Partikulier_Listing_Translations {
 			'meta_value'     => '1',
 		) );
 		foreach ( $autos as $auto_id ) {
-			$source_id = (int) get_post_meta( $auto_id, self::META_SOURCE, true );
-			$lang      = pll_get_post_language( $auto_id, 'slug' );
+			$raw_source = get_post_meta( $auto_id, self::META_SOURCE, true );
+			$lang       = pll_get_post_language( $auto_id, 'slug' );
+			if ( ! ctype_digit( (string) $raw_source ) || (int) $raw_source <= 0 ) {
+					$results[] = array(
+						'auto_id' => (int) $auto_id,
+						'action'  => 'invalid_source_meta',
+						'value'   => (string) $raw_source,
+					);
+					continue;
+				}
+			$source_id = (int) $raw_source;
 			$source    = $source_id ? pll_get_post_translations( $source_id ) : array();
 			$replacement = $lang && ! empty( $source[ $lang ] ) ? (int) $source[ $lang ] : 0;
 			if ( ! $source_id || ! $lang || ! $replacement || $replacement === (int) $auto_id ) {
@@ -177,7 +191,7 @@ class Partikulier_Listing_Translations {
 
 		// La source porte la langue de depot.
 		pll_set_post_language( $post_id, $source_lang );
-		update_post_meta( $post_id, self::META_SOURCE, $source_lang );
+		update_post_meta( $post_id, self::META_SOURCE_LANG, $source_lang );
 
 		$map = array( $source_lang => $post_id );
 
@@ -218,7 +232,8 @@ class Partikulier_Listing_Translations {
 
 			pll_set_post_language( $translated_id, $lang );
 			update_post_meta( $translated_id, self::META_GENERATED, '1' );
-			update_post_meta( $translated_id, self::META_SOURCE, $source_lang );
+			update_post_meta( $translated_id, self::META_SOURCE, (string) $post_id );
+			update_post_meta( $translated_id, self::META_SOURCE_LANG, $source_lang );
 			update_post_meta( $translated_id, '_pk_meta_description', Partikulier_Listing_I18n::meta_description( $values, $lang ) );
 
 			self::copy_data( $post_id, $translated_id, $values, $lang );

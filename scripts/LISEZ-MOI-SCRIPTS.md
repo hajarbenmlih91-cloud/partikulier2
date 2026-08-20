@@ -51,7 +51,7 @@ wp eval-file ../scripts/reparer-taxonomies.php    # corrige les termes mal class
 wp eval-file ../scripts/traduire-annonces.php     # rattrape les traductions manquantes
 ```
 
-`wp eval-file` **ne transmet pas les arguments positionnels**. Les scripts qui attendent une confirmation lisent une variable d'environnement, par exemple `PK_APPLIQUER=1`.
+`wp eval-file` **ne transmet pas de manière fiable les arguments positionnels aux scripts**. Les scripts d’application utilisent donc une convention unique : dry-run par défaut, puis `PK_APPLIQUER=1 wp --path=wp eval-file ...` pour appliquer. La sortie JSON indique toujours explicitement `mode: dry-run` ou `mode: apply`.
 
 ## Simuler n8n en local
 
@@ -97,8 +97,12 @@ La documentation complète se trouve dans `documentation/passation-6.14.1/`. Les
 
 ## Réconciliation Polylang D-bis
 
-`reconcile-polylang-orphans.php` réalise un inventaire non destructif par défaut des auto-traductions éjectées de leur groupe après remplacement manuel. Le mode d’application doit être explicitement demandé avec `--apply` et uniquement après sauvegarde de la base.
+`reconcile-polylang-orphans.php` réalise un inventaire non destructif par défaut des auto-traductions éjectées de leur groupe après remplacement manuel. Le mode d’application doit être explicitement demandé avec `PK_APPLIQUER=1` et uniquement après sauvegarde de la base.
+
+`migrate-polylang-source-meta.php` migre les anciennes valeurs langue de `_pk_translation_source` vers l’ID source, conserve la valeur legacy et liste les groupes ambigus. `test-polylang-migration.php` teste le dry-run puis l’application.
+
+`test-polylang-sync-e2e.php` appelle le vrai `sync()` et couvre FR/EN/AR, l’auto seule, le remplacement manuel et `invalid_source_meta`.
 
 `test-polylang-orphan-replacement.php` crée une source FR, une auto EN, puis une traduction manuelle EN dans la même famille et vérifie que l’auto devient `draft` tandis que la manuelle reste `publish`.
 
-`test-polylang-auto-only.php` vérifie le cas inverse : une auto-traduction qui reste la seule version de sa langue demeure `publish`. Ces deux scénarios sont obligatoires avant de signer le lot D.
+`test-polylang-auto-only.php` vérifie le cas inverse : une auto-traduction qui reste la seule version de sa langue demeure `publish`. Ces scénarios sont obligatoires avant de signer le lot D.

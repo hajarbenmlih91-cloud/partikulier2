@@ -4,9 +4,9 @@
  *
  * Usage depuis la racine du dépôt :
  *   wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
- *   wp --path=wp eval-file scripts/reconcile-polylang-orphans.php -- --apply
+ *   PK_APPLIQUER=1 wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
  *
- * Le mode par défaut est un dry-run. --apply passe uniquement les autos
+ * Le mode par défaut est un dry-run. PK_APPLIQUER=1 passe uniquement les autos
  * remplacées en brouillon ; aucune annonce n'est supprimée.
  */
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,7 +17,7 @@ if ( ! class_exists( 'Partikulier_Listing_Translations' ) ) {
     fwrite( STDERR, "Le module de traductions Partikulier n'est pas chargé.\n" );
     exit( 1 );
 }
-$apply = in_array( '--apply', (array) ( $GLOBALS['argv'] ?? array() ), true );
+$apply = '1' === (string) getenv( 'PK_APPLIQUER' );
 $rows  = Partikulier_Listing_Translations::reconcile_orphans( $apply );
 echo wp_json_encode(
     array(

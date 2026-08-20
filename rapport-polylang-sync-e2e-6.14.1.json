@@ -1,0 +1,77 @@
+{
+    "passed": true,
+    "failures": [],
+    "source_id": 115,
+    "auto_id": 116,
+    "invalid_id": 118,
+    "invalid_report": [
+        {
+            "auto_id": 118,
+            "action": "invalid_source_meta",
+            "value": "fr"
+        }
+    ],
+    "manual_id": 119,
+    "group_after_manual": {
+        "fr": 115,
+        "en": 119,
+        "ar": 117
+    },
+    "metadata": {
+        "en": {
+            "id": 116,
+            "source_raw": "115",
+            "source_lang": "fr",
+            "status": "publish"
+        },
+        "ar": {
+            "id": 117,
+            "source_raw": "115",
+            "source_lang": "fr",
+            "status": "publish"
+        }
+    },
+    "auto_only_report": [],
+    "dry_run": [
+        {
+            "auto_id": 116,
+            "source_id": 115,
+            "language": "en",
+            "replacement_id": 119,
+            "action": "draft",
+            "applied": false
+        },
+        {
+            "auto_id": 118,
+            "action": "invalid_source_meta",
+            "value": "fr"
+        }
+    ],
+    "apply": [
+        {
+            "auto_id": 116,
+            "source_id": 115,
+            "language": "en",
+            "replacement_id": 119,
+            "action": "draft",
+            "applied": true
+        },
+        {
+            "auto_id": 118,
+            "action": "invalid_source_meta",
+            "value": "fr"
+        }
+    ],
+    "final_status": {
+        "auto_en": "draft",
+        "manual_en": "publish"
+    },
+    "cleanup_ids": [
+        115,
+        115,
+        116,
+        117,
+        118,
+        119
+    ]
+}

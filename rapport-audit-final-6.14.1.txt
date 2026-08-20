@@ -1,0 +1,206 @@
+
+> partikulier-dev@6.14.1 test:audit
+> node scripts/audit.mjs
+
+{
+ "accueil": {
+  "chargement_ms": 1441,
+  "requetes": 20,
+  "poids_total_ko": 556,
+  "par_type": {
+   "document": {
+    "n": 1,
+    "ko": 0
+   },
+   "stylesheet": {
+    "n": 6,
+    "ko": 287
+   },
+   "image": {
+    "n": 11,
+    "ko": 212
+   },
+   "font": {
+    "n": 1,
+    "ko": 36
+   },
+   "script": {
+    "n": 1,
+    "ko": 21
+   }
+  },
+  "erreurs_404": [],
+  "perf": {
+   "dom_interactif": 212,
+   "dom_complet": 482,
+   "premier_rendu": 536,
+   "noeuds_dom": 793,
+   "profondeur_max": 11
+  },
+  "a11y": {
+   "images": 8,
+   "images_sans_alt": 0,
+   "liens": 72,
+   "liens_sans_intitule": 0,
+   "champs": 12,
+   "champs_sans_label": 0,
+   "h1": 1,
+   "sauts_de_titre": 0,
+   "lang_html": "fr-FR",
+   "lien_evitement": true,
+   "boutons_sans_intitule": 0
+  },
+  "seo": {
+   "title": "Partikulier",
+   "title_longueur": 11,
+   "description": "Annonces immobilières gratuites entre particuliers : achat et location sans commission.",
+   "description_longueur": 87,
+   "canonical": "http://localhost:8090/",
+   "og_title": "Partikulier",
+   "og_image": null,
+   "jsonld_types": [
+    "WebSite+RealEstateAgent"
+   ],
+   "jsonld_invalide": false,
+   "hreflang": 7
+  },
+  "tactile": {
+   "total": 85,
+   "trop_petites": 17
+  },
+  "erreurs_js": 0,
+  "detail_erreurs": []
+ },
+ "annonces": {
+  "chargement_ms": 4154,
+  "requetes": 34,
+  "poids_total_ko": 779,
+  "par_type": {
+   "document": {
+    "n": 3,
+    "ko": 0
+   },
+   "stylesheet": {
+    "n": 6,
+    "ko": 287
+   },
+   "font": {
+    "n": 1,
+    "ko": 36
+   },
+   "script": {
+    "n": 16,
+    "ko": 456
+   },
+   "image": {
+    "n": 8,
+    "ko": 0
+   }
+  },
+  "erreurs_404": [],
+  "perf": {
+   "dom_interactif": 2145,
+   "dom_complet": 3652,
+   "premier_rendu": 2160,
+   "noeuds_dom": 1490,
+   "profondeur_max": 13
+  },
+  "a11y": {
+   "images": 18,
+   "images_sans_alt": 0,
+   "liens": 108,
+   "liens_sans_intitule": 0,
+   "champs": 14,
+   "champs_sans_label": 0,
+   "h1": 1,
+   "sauts_de_titre": 0,
+   "lang_html": "fr-FR",
+   "lien_evitement": true,
+   "boutons_sans_intitule": 0
+  },
+  "seo": {
+   "title": "Propriété – Partikulier",
+   "title_longueur": 23,
+   "description": "Parcourez les annonces immobilières publiées directement par des particuliers : achat et location sans commission.",
+   "description_longueur": 114,
+   "canonical": "http://localhost:8090/annonces/",
+   "og_title": "Propriété – Partikulier",
+   "og_image": null,
+   "jsonld_types": [
+    "ItemList+BreadcrumbList+WebSite"
+   ],
+   "jsonld_invalide": false,
+   "hreflang": 7
+  },
+  "tactile": {
+   "total": 136,
+   "trop_petites": 30
+  },
+  "erreurs_js": 0,
+  "detail_erreurs": []
+ },
+ "deposer": {
+  "chargement_ms": 6308,
+  "requetes": 26,
+  "poids_total_ko": 795,
+  "par_type": {
+   "document": {
+    "n": 2,
+    "ko": 0
+   },
+   "stylesheet": {
+    "n": 6,
+    "ko": 287
+   },
+   "font": {
+    "n": 1,
+    "ko": 36
+   },
+   "script": {
+    "n": 17,
+    "ko": 472
+   }
+  },
+  "erreurs_404": [],
+  "perf": {
+   "dom_interactif": 2499,
+   "dom_complet": 5806,
+   "premier_rendu": 2516,
+   "noeuds_dom": 546,
+   "profondeur_max": 11
+  },
+  "a11y": {
+   "images": 0,
+   "images_sans_alt": 0,
+   "liens": 36,
+   "liens_sans_intitule": 0,
+   "champs": 31,
+   "champs_sans_label": 0,
+   "h1": 1,
+   "sauts_de_titre": 0,
+   "lang_html": "fr-FR",
+   "lien_evitement": true,
+   "boutons_sans_intitule": 0
+  },
+  "seo": {
+   "title": "Déposer une annonce – Partikulier",
+   "title_longueur": 33,
+   "description": "Déposez gratuitement votre annonce immobilière entre particuliers en quelques étapes simples et vérifiées.",
+   "description_longueur": 106,
+   "canonical": "http://localhost:8090/deposer-une-annonce/",
+   "og_title": "Déposer une annonce – Partikulier",
+   "og_image": null,
+   "jsonld_types": [
+    "WebSite+BreadcrumbList"
+   ],
+   "jsonld_invalide": false,
+   "hreflang": 0
+  },
+  "tactile": {
+   "total": 56,
+   "trop_petites": 13
+  },
+  "erreurs_js": 0,
+  "detail_erreurs": []
+ }
+}
