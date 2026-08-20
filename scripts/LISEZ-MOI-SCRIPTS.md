@@ -93,3 +93,12 @@ Le verdict N+1 doit distinguer une régression du thème d’une répétition in
 ## Livrables de passation
 
 La documentation complète se trouve dans `documentation/passation-6.14.1/`. Les sorties brutes restent à la racine sous forme de `rapport-*`. Le package installable est généré avec `bash scripts/package.sh 6.14.1`. Après génération, calculer son empreinte avec `sha256sum partikulier-6.14.1.zip` et reporter cette empreinte dans le rapport de livraison.
+
+
+## Réconciliation Polylang D-bis
+
+`reconcile-polylang-orphans.php` réalise un inventaire non destructif par défaut des auto-traductions éjectées de leur groupe après remplacement manuel. Le mode d’application doit être explicitement demandé avec `--apply` et uniquement après sauvegarde de la base.
+
+`test-polylang-orphan-replacement.php` crée une source FR, une auto EN, puis une traduction manuelle EN dans la même famille et vérifie que l’auto devient `draft` tandis que la manuelle reste `publish`.
+
+`test-polylang-auto-only.php` vérifie le cas inverse : une auto-traduction qui reste la seule version de sa langue demeure `publish`. Ces deux scénarios sont obligatoires avant de signer le lot D.

@@ -89,3 +89,45 @@ Les sorties doivent être conservées dans `rapport-*`, puis comparées aux rapp
 Cette qualification ne prétend pas démontrer un gain absolu de performance contre toutes les configurations d’hébergement. Elle démontre l’absence de régression fonctionnelle et de nouveau motif N+1 dans le protocole de recette disponible. Les tests visuels historiques doivent utiliser exactement le même snapshot de données et les mêmes assets si un zéro pixel diff historique est exigé.
 
 **Conclusion :** les défauts bloquants signalés par les audits — devise EUR résiduelle, pagination legacy instable, provisioning Polylang non idempotent et handles Estatik incomplets — ont été corrigés et vérifiés sur la sandbox active. Le dépôt doit être livré avec ce rapport, les scripts et les rapports bruts associés.
+
+
+## Addendum D-bis — cycle de vie des auto-traductions orphelines
+
+Les audits ont identifié un cas que la simple présence des langues FR/EN/AR ne couvre pas : Polylang éjecte une ancienne auto-traduction lorsqu’un administrateur lie une traduction manuelle dans la même langue. L’ancienne auto peut alors rester publiée hors du groupe source.
+
+Le module `theme/inc/class-listing-translations.php` contient désormais `reconcile_orphans( $apply )`. Il retrouve la source via `_pk_translation_source`, lit le groupe Polylang actuel de la source, compare la langue de l’auto à l’ID actuellement associé et passe uniquement l’auto remplacée en `draft`. Aucune suppression et aucun `NOT EXISTS` global ne sont utilisés.
+
+Le scénario `scripts/test-polylang-orphan-replacement.php` a produit :
+
+```text
+source FR       : 7
+auto EN         : 87
+manuel EN       : 88
+groupe après auto   : {fr:7, en:87, ar:76}
+groupe après manuel : {fr:7, en:88, ar:76}
+auto après apply    : draft
+manuel après apply  : publish
+```
+
+Le scénario `scripts/test-polylang-auto-only.php` a produit :
+
+```text
+source FR    : 90
+auto EN      : 91
+avant        : publish
+après        : publish
+résultat     : PASS
+```
+
+Le dry-run final `scripts/reconcile-polylang-orphans.php` a retourné `count: 0` après réparation. Le mode `--apply` est explicite et réversible ; il doit être précédé d’un backup en production.
+
+Commandes D-bis :
+
+```bash
+wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
+wp --path=wp eval-file scripts/test-polylang-orphan-replacement.php
+wp --path=wp eval-file scripts/test-polylang-auto-only.php
+wp --path=wp eval-file scripts/reconcile-polylang-orphans.php -- --apply
+```
+
+Le lot D est donc validé pour le scénario métier auto remplacée et pour le scénario auto seule. La migration de production reste une opération à exécuter en dry-run puis après sauvegarde.

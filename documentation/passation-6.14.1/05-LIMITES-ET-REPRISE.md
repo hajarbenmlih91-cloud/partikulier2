@@ -35,3 +35,19 @@ Le mu-plugin `senior-http-profiler.php` ne doit pas rester actif sur production.
 ## Reprise par un nouveau développeur
 
 Le développeur repreneur doit créer une branche dédiée, lire le présent dossier, lancer le contrôle statique, puis refaire la recette sur staging. Toute divergence doit être consignée dans un nouveau rapport daté. Il doit comparer les rapports JSON/JSONL plutôt que se fier à une affirmation textuelle. Une modification de code n’est considérée comme terminée qu’après mise à jour du changelog, exécution de la matrice pertinente et mise à jour du package si le thème installable est concerné.
+
+
+## D-bis — auto-traductions Polylang orphelines
+
+Polylang peut éjecter une auto-traduction du groupe lorsqu’une traduction manuelle est ensuite liée dans la même langue. Le thème conserve `_pk_translation_source` et réconcilie maintenant ces cas dans `class-listing-translations.php`.
+
+La règle est prudente : une auto seule reste publiée ; une auto dont la langue est désormais occupée par un autre post du groupe source passe en brouillon. Les contenus ne sont jamais supprimés automatiquement.
+
+Avant production, exécuter :
+
+```bash
+wp --path=wp eval-file scripts/reconcile-polylang-orphans.php
+wp --path=wp eval-file scripts/reconcile-polylang-orphans.php -- --apply
+```
+
+Le premier appel est non destructif. Le second exige une sauvegarde préalable de la base et doit être journalisé. Les tests d’acceptation sont `scripts/test-polylang-orphan-replacement.php` et `scripts/test-polylang-auto-only.php`.

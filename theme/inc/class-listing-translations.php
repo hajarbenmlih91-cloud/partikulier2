@@ -36,7 +36,88 @@ class Partikulier_Listing_Translations {
 	public static function available() {
 		return function_exists( 'pll_set_post_language' )
 			&& function_exists( 'pll_save_post_translations' )
-			&& function_exists( 'pll_languages_list' );
+			&& function_exists( 'pll_languages_list' )
+			&& function_exists( 'pll_get_post_translations' )
+			&& function_exists( 'pll_get_post_language' );
+	}
+
+	/**
+	 * Branche la réconciliation après les écritures de contenu.
+	 *
+	 * Polylang éjecte une ancienne traduction lorsqu'un éditeur lie un nouvel
+	 * ID dans la même langue. L'ancienne auto-traduction reste alors publiée,
+	 * mais n'appartient plus au groupe source. On la met en brouillon, sans
+	 * suppression, dès que le groupe source révèle un remplacement manuel.
+	 */
+	public static function init_lifecycle_reconciliation() {
+		add_action( 'save_post_' . PARTIKULIER_ESTATIK_POST_TYPE, array( __CLASS__, 'schedule_reconciliation' ), 99, 3 );
+	}
+
+	public static function schedule_reconciliation( $post_id, $post, $update ) {
+		if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) || 'auto-draft' === $post->post_status ) {
+			return;
+		}
+		if ( ! self::available() || did_action( 'pk_translation_reconciliation_scheduled' ) ) {
+			return;
+		}
+		do_action( 'pk_translation_reconciliation_scheduled' );
+		add_action( 'shutdown', static function () {
+			self::reconcile_orphans( false );
+		}, 99 );
+	}
+
+	/**
+	 * Réconcilie les autos orphelines. Une auto est obsolète si sa source FR
+	 * possède désormais un autre ID dans sa langue. Elle passe en draft ; elle
+	 * reste publiée lorsqu'elle est la seule version disponible.
+	 *
+	 * @param bool $apply false pour dry-run, true pour appliquer.
+	 * @return array<int,array<string,mixed>>
+	 */
+	public static function reconcile_orphans( $apply = false ) {
+		static $running = false;
+		if ( $running || ! self::available() ) {
+			return array();
+		}
+		$running = true;
+		$results = array();
+		$autos   = get_posts( array(
+			'post_type'      => PARTIKULIER_ESTATIK_POST_TYPE,
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'meta_key'       => self::META_GENERATED,
+			'meta_value'     => '1',
+		) );
+		foreach ( $autos as $auto_id ) {
+			$source_id = (int) get_post_meta( $auto_id, self::META_SOURCE, true );
+			$lang      = pll_get_post_language( $auto_id, 'slug' );
+			$source    = $source_id ? pll_get_post_translations( $source_id ) : array();
+			$replacement = $lang && ! empty( $source[ $lang ] ) ? (int) $source[ $lang ] : 0;
+			if ( ! $source_id || ! $lang || ! $replacement || $replacement === (int) $auto_id ) {
+				continue;
+			}
+			if ( get_post_meta( $replacement, self::META_GENERATED, true ) ) {
+				continue;
+			}
+			$row = array( 'auto_id' => (int) $auto_id, 'source_id' => $source_id, 'language' => $lang, 'replacement_id' => $replacement, 'action' => 'draft' );
+			if ( $apply ) {
+				wp_update_post( array( 'ID' => (int) $auto_id, 'post_status' => 'draft' ) );
+				$row['applied'] = true;
+			} else {
+				$row['applied'] = false;
+			}
+			$results[] = $row;
+		}
+		$running = false;
+		return $results;
+	}
+
+	/**
+	 * Vérifie l’état d’une auto-traduction sans appliquer de mutation.
+	 */
+	public static function orphan_report() {
+		return self::reconcile_orphans( false );
 	}
 
 	/**
@@ -249,3 +330,6 @@ class Partikulier_Listing_Translations {
 		}
 	}
 }
+
+
+Partikulier_Listing_Translations::init_lifecycle_reconciliation();

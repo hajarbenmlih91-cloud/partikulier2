@@ -1,0 +1,17 @@
+/annonces/ 200 
+/en/annonces/ 200 
+/ar/annonces/ 200 
+/property/ 301 http://localhost:8090/annonces/
+/property/page/2/ 301 http://localhost:8090/annonces/page/2/
+JSONLD
+priceCurrency":"MAD"
+priceCurrency":"MAD"
+ORPHANS
+{
+    "mode": "dry-run",
+    "count": 0,
+    "orphaned": [],
+    "destructive": false
+}
+LANG_COUNTS
+fr 19en 20ar 18
