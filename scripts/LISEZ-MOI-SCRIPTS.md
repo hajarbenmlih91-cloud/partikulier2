@@ -65,3 +65,31 @@ cd /tmp/n8n && nohup php -S 127.0.0.1:9099 hook.php >/dev/null 2>&1 &
 ```
 
 Renseigner `http://127.0.0.1:9099` comme URL de webhook, valider une annonce, puis lire `/tmp/n8n/received.json`.
+
+## Procédure de qualification 6.14.1
+
+Pour une recette complète avec Estatik, Polylang et Query Monitor, installer les plugins dans une sandbox fraîche, démarrer WordPress, puis exécuter dans cet ordre :
+
+```bash
+wp --path=wp eval-file scripts/provision-polylang.php
+wp --path=wp rewrite flush
+wp --path=wp eval-file scripts/report-polylang.php
+wp --path=wp eval-file scripts/report-taxonomy-invariants.php
+node scripts/real-ui-evidence.mjs
+node scripts/test-estatik-interactions.mjs
+bash scripts/check.sh
+node scripts/visual.mjs check
+bash scripts/package.sh 6.14.1
+```
+
+`provision-polylang.php` configure FR/EN/AR, relie les familles de traductions et appelle les réparations nécessaires. `provision-polylang-taxonomies.php` et `repair-all-translation-terms.php` sont disponibles lorsque les traductions existent déjà mais que les relations de termes Estatik sont incomplètes. `report-taxonomy-invariants.php` vérifie les relations WordPress brutes indépendamment de la langue active dans WP-CLI.
+
+## Profilage senior
+
+`senior-http-profiler.php` est un mu-plugin temporaire. Il collecte le nombre de requêtes, le temps SQL, la mémoire et les motifs répétés avec leur premier appelant. Il doit être copié temporairement dans `wp/wp-content/mu-plugins/`, avec `SAVEQUERIES` activé, puis supprimé après la mesure. Les versions 6.13.1 et 6.14.1 doivent être mesurées avec la même base, les mêmes plugins, les mêmes URLs, les mêmes langues et le même ordre de parcours.
+
+Le verdict N+1 doit distinguer une régression du thème d’une répétition interne à Polylang. Les rapports de référence sont `rapport-query-monitor-6.13.1.jsonl`, `rapport-query-monitor-6.14.1.jsonl`, `rapport-query-monitor-before-6.13.1.jsonl` et `rapport-query-monitor-after-6.14.1.jsonl`.
+
+## Livrables de passation
+
+La documentation complète se trouve dans `documentation/passation-6.14.1/`. Les sorties brutes restent à la racine sous forme de `rapport-*`. Le package installable est généré avec `bash scripts/package.sh 6.14.1`. Après génération, calculer son empreinte avec `sha256sum partikulier-6.14.1.zip` et reporter cette empreinte dans le rapport de livraison.
