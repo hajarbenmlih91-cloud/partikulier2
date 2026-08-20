@@ -15,11 +15,11 @@
       "http://localhost:8090/wp-content/plugins/estatik/public/js/ajax-entities.min.js?ver=4.3.4"
     ],
     "queryMonitor": false,
-    "favoriteButtons": 6,
+    "favoriteButtons": 18,
     "forms": 7,
     "fields": 28,
     "gallery": 0,
-    "images": 6,
+    "images": 18,
     "filters": 17,
     "scripts": [
       "http://localhost:8090/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",
@@ -56,11 +56,11 @@
       "http://localhost:8090/wp-content/plugins/estatik/public/js/ajax-entities.min.js?ver=4.3.4"
     ],
     "queryMonitor": false,
-    "favoriteButtons": 1,
+    "favoriteButtons": 3,
     "forms": 4,
     "fields": 22,
     "gallery": 4,
-    "images": 3,
+    "images": 5,
     "filters": 1,
     "scripts": [
       "http://localhost:8090/wp-includes/js/jquery/jquery.min.js?ver=3.7.1",

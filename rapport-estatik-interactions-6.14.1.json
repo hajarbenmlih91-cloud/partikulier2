@@ -1,9 +1,9 @@
 {
-  "postId": "9",
+  "postId": "43",
   "add": {
     "ariaPressed": "true",
     "savedAfterAdd": [
-      "9"
+      "43"
     ]
   },
   "remove": {
@@ -12,8 +12,8 @@
   },
   "detail": {
     "gallery": 4,
-    "images": 3,
-    "favorites": 1
+    "images": 5,
+    "favorites": 3
   },
   "consoleErrors": [],
   "status": "PASS"

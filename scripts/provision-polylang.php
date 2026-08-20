@@ -18,14 +18,14 @@ foreach ( $languages as $args ) {
 }
 $option = get_option( 'polylang', array() );
 $option['default_lang'] = 'fr';
-$option['hide_default'] = false;
+$option['hide_default'] = true;
 $option['force_lang'] = 1;
 $option['rewrite'] = true;
 $option['post_types'] = array_values( array_unique( array_merge( (array) ( $option['post_types'] ?? array() ), array( 'properties', 'page' ) ) ) );
 $option['taxonomies'] = array_values( array_unique( array_merge( (array) ( $option['taxonomies'] ?? array() ), array( 'es_type', 'es_category', 'es_location' ) ) ) );
 update_option( 'polylang', $option );
 // Create one linked FR/EN/AR family for each published Estatik listing.
-$listings = get_posts( array( 'post_type' => 'properties', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'ID', 'order' => 'ASC' ) );
+$listings = get_posts( array( 'post_type' => 'properties', 'post_status' => 'publish', 'numberposts' => -1, 'lang' => 'fr', 'orderby' => 'ID', 'order' => 'ASC' ) );
 foreach ( $listings as $source ) {
     pll_set_post_language( $source->ID, 'fr' );
     $translations = array( 'fr' => $source->ID );
@@ -37,9 +37,14 @@ foreach ( $listings as $source ) {
         if ( is_wp_error( $new_id ) ) { fwrite( STDERR, $new_id->get_error_message() . "\n" ); exit( 1 ); }
         pll_set_post_language( $new_id, $slug );
         foreach ( get_post_meta( $source->ID ) as $key => $values ) { foreach ( $values as $value ) { add_post_meta( $new_id, $key, maybe_unserialize( $value ) ); } }
+        foreach ( array( 'es_type', 'es_category', 'es_location' ) as $taxonomy ) {
+            $term_ids = wp_get_object_terms( $source->ID, $taxonomy, array( 'fields' => 'ids' ) );
+            if ( ! is_wp_error( $term_ids ) && ! empty( $term_ids ) ) { wp_set_object_terms( $new_id, $term_ids, $taxonomy, false ); }
+        }
         $translations[ $slug ] = $new_id;
     }
     pll_save_post_translations( $translations );
 }
 flush_rewrite_rules( false );
+require_once __DIR__ . '/provision-polylang-taxonomies.php';
 echo wp_json_encode( array( 'languages' => pll_languages_list( array( 'fields' => 'all' ) ), 'post_types' => $option['post_types'], 'taxonomies' => $option['taxonomies'], 'published_properties' => count( $listings ) ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) . PHP_EOL;
