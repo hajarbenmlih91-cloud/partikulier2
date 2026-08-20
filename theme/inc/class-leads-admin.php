@@ -20,6 +20,7 @@ class Partikulier_Leads_Admin {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_menu' ) );
 		add_action( 'admin_post_pk_update_lead_followup', array( __CLASS__, 'handle_followup_update' ) );
+		add_action( 'admin_post_pk_export_leads', array( __CLASS__, 'handle_export' ) );
 		add_action( 'admin_head', array( __CLASS__, 'admin_styles' ) );
 	}
 
@@ -65,6 +66,39 @@ class Partikulier_Leads_Admin {
 		$redirect = wp_get_referer() ? wp_get_referer() : admin_url( 'admin.php?page=' . self::MENU_SLUG );
 		wp_safe_redirect( add_query_arg( 'pk_lead_updated', '1', $redirect ) );
 		exit;
+	}
+
+	public static function handle_export() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Accès non autorisé.', 'partikulier' ), 403 );
+		}
+		check_admin_referer( 'pk_export_leads' );
+		$filters = array(
+			'status' => sanitize_key( $_POST['lead_status'] ?? '' ),
+			'consent' => sanitize_key( $_POST['consent'] ?? '' ),
+			'search' => sanitize_text_field( wp_unslash( $_POST['q'] ?? '' ) ),
+			'page' => 1,
+		);
+		$result = self::lead_rows( $filters );
+		nocache_headers();
+		header( 'Content-Type: text/csv; charset=UTF-8' );
+		header( 'Content-Disposition: attachment; filename=partikulier-leads-' . gmdate( 'Ymd-His' ) . '.csv' );
+		$out = fopen( 'php://output', 'w' );
+		fwrite( $out, "\xEF\xBB\xBF" );
+		fputcsv( $out, array( 'reference', 'property_title', 'consent', 'followup_status', 'last_seen_at' ), ';' );
+		foreach ( $result['rows'] as $lead ) {
+			$snapshot = json_decode( (string) $lead->property_snapshot, true );
+			$values = array( $lead->reference_code, $snapshot['title'] ?? __( 'Annonce supprimée', 'partikulier' ), $lead->opt_out_at ? 'opted_out' : ( $lead->granted_at && ! $lead->revoked_at ? 'granted' : 'missing' ), $lead->followup_status ?: 'new', $lead->last_seen_at );
+			$values = array_map( array( __CLASS__, 'csv_safe_value' ), $values );
+			fputcsv( $out, $values, ';' );
+		}
+		fclose( $out );
+		exit;
+	}
+
+	private static function csv_safe_value( $value ) {
+		$value = (string) $value;
+		return preg_match( '/^[=+\\-@]/', $value ) ? "'" . $value : $value;
 	}
 
 	public static function render_page() {
@@ -118,6 +152,13 @@ class Partikulier_Leads_Admin {
 				</label>
 				<button class="button button-primary" type="submit"><?php esc_html_e( 'Filtrer', 'partikulier' ); ?></button>
 			</form>
+			<?php if ( current_user_can( 'manage_options' ) ) : ?>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="pk-leads-export-form">
+				<?php wp_nonce_field( 'pk_export_leads' ); ?><input type="hidden" name="action" value="pk_export_leads" />
+				<input type="hidden" name="lead_status" value="<?php echo esc_attr( $filters['status'] ); ?>" /><input type="hidden" name="consent" value="<?php echo esc_attr( $filters['consent'] ); ?>" /><input type="hidden" name="q" value="<?php echo esc_attr( $filters['search'] ); ?>" />
+				<button class="button" type="submit"><?php esc_html_e( 'Exporter les résultats CSV', 'partikulier' ); ?></button>
+			</form>
+			<?php endif; ?>
 
 			<div class="pk-leads-table-wrap">
 				<table class="widefat fixed striped pk-leads-table">

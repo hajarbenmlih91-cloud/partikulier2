@@ -1,0 +1,33 @@
+{
+    "status": "PASS",
+    "checks": {
+        "table_rendered": true,
+        "export_button": true,
+        "sql_budget_100": true,
+        "csv_formula_neutralized": true,
+        "csv_plain_value_untouched": true
+    },
+    "measurements": [
+        {
+            "rows": 1,
+            "queries": 6,
+            "html_bytes": 4322,
+            "has_table": true,
+            "has_export": true
+        },
+        {
+            "rows": 20,
+            "queries": 6,
+            "html_bytes": 30793,
+            "has_table": true,
+            "has_export": true
+        },
+        {
+            "rows": 100,
+            "queries": 6,
+            "html_bytes": 30104,
+            "has_table": true,
+            "has_export": true
+        }
+    ]
+}

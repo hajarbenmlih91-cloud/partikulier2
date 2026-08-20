@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PARTIKULIER_VERSION', '6.14.1' );
+define( 'PARTIKULIER_VERSION', '6.15.0' );
 define( 'PARTIKULIER_DIR', get_template_directory() );
 define( 'PARTIKULIER_URI', get_template_directory_uri() );
 define( 'PARTIKULIER_ESTATIK_POST_TYPE', 'properties' );

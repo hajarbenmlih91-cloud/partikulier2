@@ -299,8 +299,10 @@ class Partikulier_Listing_Approval {
 		$post_id = isset( $_GET['listing'] ) ? absint( $_GET['listing'] ) : 0;
 		check_admin_referer( self::ACTION_RESEND . '_' . $post_id );
 
-		$credentials = self::prepare_credentials( $post_id, true );
-		$sent        = self::notify_n8n( $post_id, $credentials );
+			$request_id = wp_generate_uuid4();
+			$credentials = self::prepare_credentials( $post_id, true );
+			update_post_meta( $post_id, '_pk_credentials_resend_request_id', $request_id );
+			$sent        = self::notify_n8n( $post_id, $credentials, $request_id );
 
 		set_transient( 'pk_last_credentials', array(
 			'login'    => $credentials['login'],
@@ -430,7 +432,7 @@ class Partikulier_Listing_Approval {
 	 * @param array $credentials Identifiants.
 	 * @return bool
 	 */
-	public static function notify_n8n( $post_id, $credentials ) {
+	public static function notify_n8n( $post_id, $credentials, $request_id = '' ) {
 		$url = trim( (string) Partikulier_Settings::get( 'n8n_webhook_url' ) );
 		if ( ! $url ) {
 			return false;
@@ -453,7 +455,7 @@ class Partikulier_Listing_Approval {
 				'Content-Type'             => 'application/json',
 				'X-Partikulier-Automation' => (string) Partikulier_Settings::automation_api_secret(),
 			),
-			'body'     => wp_json_encode( self::payload( $post_id, $credentials ) ),
+				'body'     => wp_json_encode( self::payload( $post_id, $credentials, $request_id ) ),
 		) );
 
 		if ( is_wp_error( $response ) ) {
@@ -463,8 +465,9 @@ class Partikulier_Listing_Approval {
 		}
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
-		if ( $code >= 200 && $code < 300 ) {
-			update_post_meta( $post_id, '_pk_n8n_sent', current_time( 'mysql' ) );
+			if ( $code >= 200 && $code < 300 ) {
+				update_post_meta( $post_id, '_pk_n8n_sent', current_time( 'mysql' ) );
+				update_post_meta( $post_id, '_pk_credentials_resend_pending', current_time( 'mysql', true ) );
 			delete_post_meta( $post_id, '_pk_n8n_error' );
 
 			return true;
@@ -482,9 +485,10 @@ class Partikulier_Listing_Approval {
 	 * @param array $credentials Identifiants.
 	 * @return array
 	 */
-	private static function payload( $post_id, $credentials ) {
-		return array(
-			'event'    => 'listing_approved',
+	private static function payload( $post_id, $credentials, $request_id = '' ) {
+			return array(
+				'event'    => 'listing_approved',
+				'resend_request_id' => sanitize_text_field( $request_id ),
 			'listing'  => array(
 				'id'    => (int) $post_id,
 				'title' => get_the_title( $post_id ),
@@ -512,9 +516,18 @@ class Partikulier_Listing_Approval {
 	 * Route de rattrapage : n8n peut recuperer les validations recentes.
 	 */
 	public static function register_routes() {
-		register_rest_route(
-			'partikulier/v1',
-			'/approved-listings',
+			register_rest_route(
+				'partikulier/v1',
+				'/credentials-resend-accepted',
+				array(
+					'methods' => 'POST',
+					'callback' => array( __CLASS__, 'rest_resend_accepted' ),
+					'permission_callback' => array( 'Partikulier_Automation_Bridge', 'check_automation_secret' ),
+				)
+			);
+			register_rest_route(
+				'partikulier/v1',
+				'/approved-listings',
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( __CLASS__, 'rest_approved' ),
@@ -528,6 +541,24 @@ class Partikulier_Listing_Approval {
 	 *
 	 * @return WP_REST_Response
 	 */
+	public static function rest_resend_accepted( WP_REST_Request $request ) {
+		$post_id = absint( $request->get_param( 'listing_id' ) );
+		$request_id = sanitize_text_field( (string) $request->get_param( 'resend_request_id' ) );
+		if ( ! $post_id || ! $request_id ) {
+			return new WP_Error( 'invalid_resend_ack', __( 'listing_id et resend_request_id sont obligatoires.', 'partikulier' ), array( 'status' => 400 ) );
+		}
+		$expected = (string) get_post_meta( $post_id, '_pk_credentials_resend_request_id', true );
+		if ( ! hash_equals( $expected, $request_id ) ) {
+			return new WP_Error( 'stale_resend_ack', __( 'Demande de renvoi inconnue ou périmée.', 'partikulier' ), array( 'status' => 409 ) );
+		}
+		if ( get_post_meta( $post_id, '_pk_credentials_last_resent_at', true ) ) {
+			return new WP_REST_Response( array( 'accepted' => true, 'idempotent' => true ), 200 );
+		}
+		update_post_meta( $post_id, '_pk_credentials_last_resent_at', current_time( 'mysql', true ) );
+		delete_post_meta( $post_id, '_pk_credentials_resend_pending' );
+		return new WP_REST_Response( array( 'accepted' => true, 'idempotent' => false ), 200 );
+	}
+
 	public static function rest_approved() {
 		$since = gmdate( 'Y-m-d H:i:s', time() - 72 * HOUR_IN_SECONDS );
 

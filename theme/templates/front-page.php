@@ -34,8 +34,11 @@ $home = home_url( '/' );
 $archive = pk_properties_archive_url();
 if ( is_wp_error( $archive ) || ! is_string( $archive ) ) { $archive = home_url( '/' ); }
 $deposit = pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' );
-$tagline = Partikulier_Settings::get( 'site_tagline' );
-$intro = Partikulier_Settings::get( 'site_intro' );
+	$tagline = Partikulier_Customization::editorial( 'home_title', Partikulier_Settings::get( 'site_tagline' ) );
+	$intro = Partikulier_Customization::editorial( 'home_intro', Partikulier_Settings::get( 'site_intro' ) );
+	$badge_1 = Partikulier_Customization::editorial( 'badge_1', 'Zéro commission' );
+	$badge_2 = Partikulier_Customization::editorial( 'badge_2', 'Vendeur identifié' );
+	$badge_3 = Partikulier_Customization::editorial( 'badge_3', 'Contact direct' );
 ?>
 
 <section class="pk-editorial-hero" aria-label="<?php esc_attr_e( 'Recherche principale', 'partikulier' ); ?>">
@@ -56,10 +59,10 @@ $intro = Partikulier_Settings::get( 'site_intro' );
 				echo esc_html( $tagline );
 			}
 			?></h1>
-			<p class="pk-editorial-hero__intro"><?php echo esc_html( $intro ); ?></p>
+			<p class="pk-editorial-hero__intro"><?php echo wp_kses( $intro, array( 'a' => array( 'href' => true, 'title' => true ), 'strong' => array(), 'em' => array(), 'br' => array() ) ); ?></p>
 			<div class="pk-editorial-actions"><a class="pk-btn pk-btn-primary" href="<?php echo esc_url( $deposit ); ?>"><?php echo esc_html( Partikulier_Settings::get( 'btn_deposit' ) ); ?><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="pk-btn pk-btn-light" href="<?php echo esc_url( $archive ); ?>"><?php echo esc_html( Partikulier_Settings::get( 'btn_listings' ) ); ?><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a></div>
 		</div>
-		<div class="pk-editorial-search"><p class="pk-editorial-search__hint"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><?php esc_html_e( 'Commencez par une ville, un quartier ou un code postal.', 'partikulier' ); ?></p><?php $variant = 'hero'; require PARTIKULIER_DIR . '/templates/parts/search-form.php'; ?><ul class="pk-hero-trust"><li><?php esc_html_e( 'Zéro commission', 'partikulier' ); ?></li><li><?php esc_html_e( 'Vendeur identifié', 'partikulier' ); ?></li><li><?php esc_html_e( 'Contact direct', 'partikulier' ); ?></li></ul></div>
+		<div class="pk-editorial-search"><p class="pk-editorial-search__hint"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg><?php esc_html_e( 'Commencez par une ville, un quartier ou un code postal.', 'partikulier' ); ?></p><?php $variant = 'hero'; require PARTIKULIER_DIR . '/templates/parts/search-form.php'; ?><ul class="pk-hero-trust"><li><?php echo esc_html( $badge_1 ); ?></li><li><?php echo esc_html( $badge_2 ); ?></li><li><?php echo esc_html( $badge_3 ); ?></li></ul></div>
 	</div>
 </section>
 

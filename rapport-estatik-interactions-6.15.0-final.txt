@@ -1,0 +1,20 @@
+{
+  "postId": "14",
+  "add": {
+    "ariaPressed": "true",
+    "savedAfterAdd": [
+      "14"
+    ]
+  },
+  "remove": {
+    "ariaPressed": "false",
+    "savedAfterRemove": []
+  },
+  "detail": {
+    "gallery": 4,
+    "images": 3,
+    "favorites": 1
+  },
+  "consoleErrors": [],
+  "status": "PASS"
+}

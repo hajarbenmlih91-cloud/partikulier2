@@ -1,0 +1,70 @@
+{
+    "passed": true,
+    "failures": [],
+    "source_id": 31,
+    "auto_id": 32,
+    "invalid_id": 34,
+    "invalid_report": [
+        {
+            "auto_id": 34,
+            "action": "invalid_source_meta",
+            "value": "fr"
+        }
+    ],
+    "manual_id": 35,
+    "group_after_manual": {
+        "fr": 31,
+        "en": 35,
+        "ar": 33
+    },
+    "metadata": {
+        "en": {
+            "id": 32,
+            "source_raw": "31",
+            "source_lang": "fr",
+            "status": "publish"
+        },
+        "ar": {
+            "id": 33,
+            "source_raw": "31",
+            "source_lang": "fr",
+            "status": "publish"
+        }
+    },
+    "auto_only_report": [],
+    "dry_run": [
+        {
+            "auto_id": 32,
+            "source_id": 31,
+            "language": "en",
+            "replacement_id": 35,
+            "action": "draft",
+            "applied": false
+        },
+        {
+            "auto_id": 34,
+            "action": "invalid_source_meta",
+            "value": "fr"
+        }
+    ],
+    "automatic_report": [
+        {
+            "auto_id": 34,
+            "action": "invalid_source_meta",
+            "value": "fr"
+        }
+    ],
+    "apply": [],
+    "final_status": {
+        "auto_en": "draft",
+        "manual_en": "publish"
+    },
+    "cleanup_ids": [
+        31,
+        31,
+        32,
+        33,
+        34,
+        35
+    ]
+}

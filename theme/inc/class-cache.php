@@ -35,8 +35,16 @@ class Partikulier_Cache {
 		foreach ( array( 'save_post', 'delete_post', 'transition_post_status', 'edited_term', 'create_term', 'delete_term', 'switch_theme', 'wp_update_nav_menu', 'customize_save_after' ) as $hook ) {
 			add_action( $hook, array( __CLASS__, 'purge_all' ) );
 		}
-		// Purge aussi apres une mise a jour du site dans l'admin.
-		add_action( 'wp_trash_post', array( __CLASS__, 'purge_all' ) );
+			// Purge aussi après une mise à jour du site dans l’admin.
+			add_action( 'wp_trash_post', array( __CLASS__, 'purge_all' ) );
+
+			// Les options peuvent être créées via add_option() : le hook
+			// update_option_* ne se déclenche alors pas. Les deux familles sont
+			// donc obligatoires pour éviter de servir une ancienne home en cache.
+			foreach ( array( 'pk_customization_options', 'pk_theme_options' ) as $option ) {
+				add_action( 'add_option_' . $option, array( __CLASS__, 'purge_all' ) );
+				add_action( 'update_option_' . $option, array( __CLASS__, 'purge_all' ) );
+			}
 	}
 
 	/**

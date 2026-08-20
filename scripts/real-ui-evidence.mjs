@@ -3,7 +3,7 @@ import fs from 'fs';
 const base = process.env.PK_BASE || 'http://localhost:8090';
 const routes = {
   archive: '/annonces/',
-  detail: '/annonce/casablanca/appartement-lumineux-3-pieces/',
+  detail: process.env.PK_DETAIL_ROUTE || '/property/security-sofia-listing/',
   depot: '/deposer-une-annonce/',
   favoris: '/favoris/'
 };
@@ -32,5 +32,5 @@ for (const [name, route] of Object.entries(routes)) {
   await page.close();
 }
 await browser.close();
-fs.writeFileSync('rapport-estatik-real-ui-6.14.1.json', JSON.stringify(rows, null, 2) + '\n');
+fs.writeFileSync('rapport-estatik-real-ui-6.15.0.json', JSON.stringify(rows, null, 2) + '\n');
 console.log(JSON.stringify(rows, null, 2));

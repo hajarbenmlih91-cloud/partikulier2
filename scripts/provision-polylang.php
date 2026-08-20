@@ -1,6 +1,13 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
-if ( ! isset( $GLOBALS['polylang']->model->languages ) ) { fwrite( STDERR, "Polylang model unavailable\n" ); exit( 1 ); }
+if ( ! function_exists( 'pll_languages_list' ) || ! isset( $GLOBALS['polylang']->model ) ) { fwrite( STDERR, "Polylang model unavailable\n" ); exit( 1 ); }
+$language_model = $GLOBALS['polylang']->model;
+if ( ! method_exists( $language_model, 'add_language' ) && class_exists( 'PLL_Admin_Model' ) ) {
+    $polylang_options = get_option( 'polylang', array() );
+    $language_model  = new PLL_Admin_Model( $polylang_options );
+    update_option( 'polylang', $polylang_options );
+}
+if ( ! method_exists( $language_model, 'add_language' ) ) { fwrite( STDERR, "Polylang admin language model unavailable\n" ); exit( 1 ); }
 $languages = array(
     array( 'locale' => 'fr_FR', 'name' => 'Français', 'slug' => 'fr', 'flag' => 'fr', 'term_group' => 0, 'rtl' => false ),
     array( 'locale' => 'en_US', 'name' => 'English', 'slug' => 'en', 'flag' => 'us', 'term_group' => 1, 'rtl' => false ),
@@ -10,10 +17,10 @@ $ids = array();
 foreach ( $languages as $args ) {
     $existing = pll_languages_list( array( 'fields' => 'slug' ) );
     if ( ! in_array( $args['slug'], $existing, true ) ) {
-        $result = $GLOBALS['polylang']->model->languages->add( $args );
+        $result = $language_model->add_language( $args );
         if ( is_wp_error( $result ) ) { fwrite( STDERR, $result->get_error_message() . "\n" ); exit( 1 ); }
     }
-    $lang = $GLOBALS['polylang']->model->languages->get( $args['slug'] );
+    $lang = get_term_by( 'slug', $args['slug'], 'language' );
     $ids[ $args['slug'] ] = $lang ? (int) $lang->term_id : 0;
 }
 $option = get_option( 'polylang', array() );

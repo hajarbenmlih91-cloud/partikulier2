@@ -76,6 +76,10 @@ $gallery_ids = array();
 	// lorsque la version d’Estatik ne fournit pas de fonction de galerie publique.
 	if ( ! $gallery_ids ) {
 		$stored_gallery = get_post_meta( $post->ID, 'es_property_gallery', true );
+		if ( is_string( $stored_gallery ) ) {
+			$decoded_gallery = json_decode( $stored_gallery, true );
+			$stored_gallery  = is_array( $decoded_gallery ) ? $decoded_gallery : array();
+		}
 		if ( is_array( $stored_gallery ) ) {
 			$gallery_ids = array_map( 'absint', $stored_gallery );
 		}

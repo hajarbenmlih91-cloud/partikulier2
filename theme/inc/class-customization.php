@@ -126,6 +126,50 @@ class Partikulier_Customization {
 		wp_add_inline_script( 'jquery', $script );
 	}
 
+	/**
+	 * Contrat H : toutes les clés éditoriales de la home existent même si
+	 * l’option est absente ou partielle. Les valeurs restent dans l’option
+	 * dédiée de personnalisation, jamais dans les réglages fonctionnels.
+	 */
+	public static function defaults() {
+		return array(
+			'home_title' => array(
+				'fr' => 'Vendez et louez entre particuliers.',
+				'en' => '',
+				'ar' => '',
+			),
+			'home_intro' => array(
+				'fr' => 'Déposez votre annonce immobilière gratuitement, sans commission, sans intermédiaire. Directement aux acheteurs et locataires.',
+				'en' => '',
+				'ar' => '',
+			),
+			'hero_alt' => array(
+				'fr' => 'Maison moderne à vendre, annonces immobilières entre particuliers',
+				'en' => '',
+				'ar' => '',
+			),
+			'badge_1' => array( 'fr' => 'Zéro commission', 'en' => '', 'ar' => '' ),
+			'badge_2' => array( 'fr' => 'Vendeur identifié', 'en' => '', 'ar' => '' ),
+			'badge_3' => array( 'fr' => 'Contact direct', 'en' => '', 'ar' => '' ),
+		);
+	}
+
+	public static function editorial( $key, $fallback = '' ) {
+		$defaults = self::defaults();
+		$values = isset( $defaults[ $key ] ) ? $defaults[ $key ] : array( 'fr' => $fallback, 'en' => '', 'ar' => '' );
+		$options = get_option( self::OPTION, array() );
+		$options = is_array( $options ) ? $options : array();
+		$stored = isset( $options['editorial'] ) && is_array( $options['editorial'] ) ? $options['editorial'] : array();
+		$current = Partikulier_Settings::current_language();
+		foreach ( array_unique( array( $current, 'fr' ) ) as $language ) {
+			$value = $stored[ $key ][ $language ] ?? $values[ $language ] ?? $fallback;
+			if ( '' !== trim( (string) $value ) ) {
+				return (string) $value;
+			}
+		}
+		return (string) $fallback;
+	}
+
 	public static function get( $key, $fallback = '' ) {
 		$options = get_option( self::OPTION, array() );
 		if ( is_array( $options ) && isset( $options[ $key ] ) && '' !== $options[ $key ] ) {
@@ -204,7 +248,24 @@ class Partikulier_Customization {
 		$posted = isset( $_POST['pk_opts'] ) && is_array( $_POST['pk_opts'] ) ? wp_unslash( $_POST['pk_opts'] ) : array();
 		$custom['logo_attachment_id'] = absint( $posted['logo_attachment_id'] ?? 0 );
 		$custom['hero_attachment_id'] = absint( $posted['hero_attachment_id'] ?? 0 );
-		$custom['hero_image_alt'] = sanitize_text_field( $posted['hero_image_alt'] ?? 'Maison moderne à vendre, annonces immobilières entre particuliers' );
+			$custom['hero_image_alt'] = sanitize_text_field( $posted['hero_image_alt'] ?? 'Maison moderne à vendre, annonces immobilières entre particuliers' );
+			$defaults = self::defaults();
+			if ( ! isset( $custom['editorial'] ) || ! is_array( $custom['editorial'] ) ) {
+				$custom['editorial'] = array();
+			}
+			foreach ( $defaults as $key => $languages ) {
+				if ( isset( $posted['editorial'][ $key ] ) && is_array( $posted['editorial'][ $key ] ) ) {
+					foreach ( Partikulier_Settings::editorial_languages() as $language => $label ) {
+						if ( array_key_exists( $language, $posted['editorial'][ $key ] ) ) {
+							$raw = wp_unslash( $posted['editorial'][ $key ][ $language ] );
+							$custom['editorial'][ $key ][ $language ] = 'home_intro' === $key ? wp_kses( $raw, array( 'a' => array( 'href' => true, 'title' => true ), 'strong' => array(), 'em' => array(), 'br' => array() ) ) : sanitize_text_field( $raw );
+						}
+					}
+				}
+			}
+			if ( isset( $custom['editorial']['home_intro']['fr'] ) && '' === trim( (string) $custom['editorial']['home_intro']['fr'] ) ) {
+				$custom['editorial']['home_intro']['fr'] = $defaults['home_intro']['fr'];
+			}
 		if ( ! isset( $custom['hero_image_alt_i18n'] ) || ! is_array( $custom['hero_image_alt_i18n'] ) ) {
 			$custom['hero_image_alt_i18n'] = array();
 		}
@@ -241,8 +302,13 @@ class Partikulier_Customization {
 				$theme[ $key ] = 'textarea' === ( $field['type'] ?? '' ) ? sanitize_textarea_field( $posted[ $key ] ) : sanitize_text_field( $posted[ $key ] );
 			}
 		}
-		update_option( self::OPTION, $custom );
-		update_option( Partikulier_Settings::OPTION, $theme );
+			if ( $custom['hero_attachment_id'] && empty( $custom['hero_image_alt_i18n']['fr'] ) ) {
+				set_transient( 'pk_customization_invalid_' . get_current_user_id(), $posted, 10 * MINUTE_IN_SECONDS );
+				wp_safe_redirect( add_query_arg( array( 'page' => self::MENU_SLUG, 'pk_validation_error' => 'hero_alt' ), admin_url( 'admin.php' ) ) );
+				exit;
+			}
+			update_option( self::OPTION, $custom );
+			update_option( Partikulier_Settings::OPTION, $theme );
 		wp_safe_redirect( add_query_arg( array( 'page' => self::MENU_SLUG, 'updated' => '1' ), admin_url( 'admin.php' ) ) );
 		exit;
 	}
@@ -251,8 +317,14 @@ class Partikulier_Customization {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Accès non autorisé.', 'partikulier' ), 403 );
 		}
-		$custom   = get_option( self::OPTION, array() );
-		$theme    = get_option( Partikulier_Settings::OPTION, array() );
+			$custom   = get_option( self::OPTION, array() );
+			$theme    = get_option( Partikulier_Settings::OPTION, array() );
+			$invalid_posted = get_transient( 'pk_customization_invalid_' . get_current_user_id() );
+			if ( is_array( $invalid_posted ) ) {
+				$custom['editorial'] = isset( $invalid_posted['editorial'] ) && is_array( $invalid_posted['editorial'] ) ? $invalid_posted['editorial'] : ( $custom['editorial'] ?? array() );
+				$custom['hero_image_alt_i18n'] = isset( $invalid_posted['hero_image_alt_i18n'] ) && is_array( $invalid_posted['hero_image_alt_i18n'] ) ? $invalid_posted['hero_image_alt_i18n'] : ( $custom['hero_image_alt_i18n'] ?? array() );
+				delete_transient( 'pk_customization_invalid_' . get_current_user_id() );
+			}
 		$labels   = array( 'hero' => 'Hero et recherche', 'services' => 'Bande des services', 'types' => 'Types de biens', 'recent' => 'Dernières annonces', 'promos' => 'Bandeaux mis en avant', 'cities' => 'Villes populaires', 'regions' => 'Annonces par région' );
 		$order    = self::section_order();
 		$languages = Partikulier_Settings::editorial_languages();
@@ -261,6 +333,7 @@ class Partikulier_Customization {
 			<h1><?php esc_html_e( 'Partikulier — Personnalisation du site', 'partikulier' ); ?></h1>
 			<p><?php esc_html_e( 'Modifiez les contenus de l’accueil sans toucher au code. Les textes sont indépendants pour le français, l’arabe et l’anglais ; si une traduction est vide, le français est utilisé comme repli.', 'partikulier' ); ?></p>
 			<?php if ( isset( $_GET['updated'] ) ) : ?><div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Personnalisation enregistrée.', 'partikulier' ); ?></p></div><?php endif; ?>
+			<?php if ( isset( $_GET['pk_validation_error'] ) && 'hero_alt' === $_GET['pk_validation_error'] ) : ?><div class="notice notice-error"><p><?php esc_html_e( 'L’alt FR est obligatoire lorsque la photo hero est active. La sauvegarde n’a pas été appliquée.', 'partikulier' ); ?></p></div><?php endif; ?>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<input type="hidden" name="action" value="pk_save_customization">
 				<?php wp_nonce_field( 'pk_save_customization' ); ?>
@@ -275,6 +348,11 @@ class Partikulier_Customization {
 				<?php foreach ( $languages as $language => $label ) : ?>
 						<div class="pk-language-panel" data-language="<?php echo esc_attr( $language ); ?>"<?php echo 'ar' === $language ? ' dir="rtl"' : ''; ?>>
 							<h3><?php echo esc_html( $label ); ?></h3>
+							<h4><?php esc_html_e( 'Éditorialisation de la home — lot H', 'partikulier' ); ?></h4>
+							<table class="form-table" role="presentation"><tbody>
+							<?php foreach ( self::defaults() as $h_key => $h_defaults ) : $h_value = $custom['editorial'][ $h_key ][ $language ] ?? ( 'fr' === $language ? $h_defaults['fr'] : '' ); $h_label = array( 'home_title' => 'Titre de la home', 'home_intro' => 'Introduction de la home', 'hero_alt' => 'Alt hero dans cette langue', 'badge_1' => 'Badge 1', 'badge_2' => 'Badge 2', 'badge_3' => 'Badge 3' )[ $h_key ]; ?>
+							<tr><th scope="row"><label for="pk-h-<?php echo esc_attr( $language . '-' . $h_key ); ?>"><?php echo esc_html( $h_label ); ?></label></th><td><?php if ( 'home_intro' === $h_key ) : ?><textarea class="large-text" rows="3" id="pk-h-<?php echo esc_attr( $language . '-' . $h_key ); ?>" name="pk_opts[editorial][<?php echo esc_attr( $h_key ); ?>][<?php echo esc_attr( $language ); ?>]" maxlength="400"><?php echo esc_textarea( $h_value ); ?></textarea><?php else : ?><input class="regular-text" type="text" maxlength="120" id="pk-h-<?php echo esc_attr( $language . '-' . $h_key ); ?>" name="pk_opts[editorial][<?php echo esc_attr( $h_key ); ?>][<?php echo esc_attr( $language ); ?>]" value="<?php echo esc_attr( $h_value ); ?>"><?php endif; ?></td></tr>
+							<?php endforeach; ?></tbody></table>
 							<table class="form-table" role="presentation"><tbody><tr><th scope="row"><label for="pk-<?php echo esc_attr( $language ); ?>-hero-alt">Texte alternatif de la photo hero</label></th><td><input id="pk-<?php echo esc_attr( $language ); ?>-hero-alt" class="regular-text pk-hero-alt-field" type="text" name="pk_opts[hero_image_alt_i18n][<?php echo esc_attr( $language ); ?>]" value="<?php echo esc_attr( $custom['hero_image_alt_i18n'][ $language ] ?? ( 'fr' === $language ? ( $custom['hero_image_alt'] ?? 'Maison moderne à vendre, annonces immobilières entre particuliers' ) : '' ) ); ?>" data-preview-key="hero_image_alt" data-alt-language="<?php echo esc_attr( strtoupper( $language ) ); ?>"><p class="description">Décrivez précisément la photo dans cette langue pour l’accessibilité et le référencement.</p></td></tr></tbody></table>
 						<?php foreach ( Partikulier_Settings::fields() as $group_key => $group ) : if ( 'verification' === $group_key ) { continue; } ?>
 							<h4><?php echo esc_html( $group['label'] ); ?></h4><table class="form-table" role="presentation"><tbody>
