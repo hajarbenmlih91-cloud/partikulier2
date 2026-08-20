@@ -30,7 +30,7 @@ class Partikulier_Listing_URLs {
 	/**
 	 * Version des regles : incrementer force une regeneration unique.
 	 */
-	const RULES_VERSION = '2';
+	const RULES_VERSION = '3';
 
 	const META_CITY     = '_pk_url_city';
 	const META_DISTRICT = '_pk_url_district';
@@ -251,9 +251,13 @@ class Partikulier_Listing_URLs {
 	/* Regles de reecriture                                                */
 	/* ------------------------------------------------------------------ */
 
-	public static function add_rules() {
-		$base = self::BASE;
-		$cpt  = PARTIKULIER_ESTATIK_POST_TYPE;
+		public static function add_rules() {
+			$base = self::BASE;
+			$cpt  = PARTIKULIER_ESTATIK_POST_TYPE;
+
+			// L’archive publique est francisée ; les anciennes URLs restent récupérables.
+			add_rewrite_rule( '^property/page/([0-9]+)/?$', 'index.php?post_type=' . $cpt . '&paged=$matches[1]', 'top' );
+			add_rewrite_rule( '^property/?$', 'index.php?post_type=' . $cpt, 'top' );
 
 		// Ville + quartier + annonce.
 		add_rewrite_rule(
@@ -297,10 +301,26 @@ class Partikulier_Listing_URLs {
 	 * Sans cela, Google conserverait en index des adresses qui repondent
 	 * encore 200 : deux URL pour un meme bien, donc un signal divise.
 	 */
-	public static function redirect_legacy() {
-		if ( is_admin() || wp_doing_ajax() || ! is_singular( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
-			return;
-		}
+		public static function redirect_legacy() {
+			if ( is_admin() || wp_doing_ajax() ) {
+				return;
+			}
+
+			// L’ancien endpoint d’archive doit répondre en 301, y compris sa pagination.
+			$request_path = wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' ), PHP_URL_PATH );
+			if ( preg_match( '#/property(?:/page/([0-9]+))?/?$#', (string) $request_path, $legacy_match ) ) {
+				$paged = ! empty( $legacy_match[1] ) ? (int) $legacy_match[1] : max( 1, (int) get_query_var( 'paged' ) );
+				$target = pk_properties_archive_url();
+				if ( $paged > 1 ) {
+					$target = trailingslashit( $target ) . 'page/' . $paged . '/';
+				}
+				wp_safe_redirect( $target, 301 );
+				exit;
+			}
+
+			if ( ! is_singular( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
+				return;
+			}
 
 		$post_id = get_queried_object_id();
 		if ( ! $post_id ) {

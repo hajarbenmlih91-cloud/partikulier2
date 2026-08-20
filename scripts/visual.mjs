@@ -14,13 +14,13 @@ import path from 'path';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8090';
 const MODE = process.argv[2] || 'check';
-const DIR = path.join(process.cwd(), 'tests', '__screens__');
+const DIR = path.join(process.cwd(), 'tests', '__baseline__');
 const SEUIL = 0.2; // % de pixels differents tolere
 
 const PAGES = [
   ['accueil', '/'],
-  ['annonces', '/property/'],
-  ['annonces-filtre', '/property/?type=appartement'],
+  ['annonces', '/annonces/'],
+  ['annonces-filtre', '/annonces/?type=appartement'],
   ['deposer', '/deposer-une-annonce/'],
   ['mes-annonces', '/mes-annonces/'],
   ['404', '/page-inexistante-xyz/'],

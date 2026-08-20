@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PARTIKULIER_VERSION', '6.13.1' );
+define( 'PARTIKULIER_VERSION', '6.14.1' );
 define( 'PARTIKULIER_DIR', get_template_directory() );
 define( 'PARTIKULIER_URI', get_template_directory_uri() );
 define( 'PARTIKULIER_ESTATIK_POST_TYPE', 'properties' );
@@ -39,6 +39,21 @@ function pk_properties_archive_url() {
 	// La page WordPress /annonces/ reste le repli SEO et Polylang la traduira si liée.
 	return pk_page_url( 'annonces', '/annonces/' );
 }
+
+/**
+ * Force le slug public francisé de l’archive Estatik sans créer de page /annonces/.
+ *
+ * @param array  $args Arguments du type de contenu.
+ * @param string $post_type Identifiant du type.
+ * @return array
+ */
+function pk_properties_post_type_args( $args, $post_type ) {
+	if ( PARTIKULIER_ESTATIK_POST_TYPE === $post_type ) {
+		$args['has_archive'] = 'annonces';
+	}
+	return $args;
+}
+add_filter( 'register_post_type_args', 'pk_properties_post_type_args', 20, 2 );
 
 /**
  * Résout l’URL d’une page structurelle dans la langue courante.

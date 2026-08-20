@@ -4,6 +4,16 @@ Le thème est parti d'une version 5.5.2 livrée par un prestataire précédent. 
 
 ---
 
+## 6.14.1 — Correctifs techniques sans modification du design
+
+- Archive Estatik francisée sur `/annonces/`, avec redirections 301 de `/property/` et de sa pagination.
+- URLs de templates, sitemap, canonical et hreflang alignées sur l’archive publique.
+- JSON-LD corrigé en devise `MAD` et pays `MA`.
+- Nettoyage conditionnel des assets Estatik lourds hors des parcours immobiliers nécessaires.
+- Normalisation défensive des meta descriptions pour supprimer les séparateurs doubles issus des champs Polylang vides.
+- Contrôle E5 corrigé : le script compte le véritable listener favori et non les mentions de classe.
+- Version alignée sur 6.14.1 dans le thème et les manifests.
+
 ## 6.13.0 — URL géographiques et mot de passe WhatsApp
 
 - URL des annonces incluant ville et quartier : `/annonce/casablanca/maarif/mon-bien/` au lieu de `/property/mon-bien/`.

@@ -169,7 +169,7 @@ class Partikulier_SEO {
 			if ( empty( $published ) && is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
 				foreach ( array( 'fr', 'ar', 'en' ) as $locale ) {
 					$base = function_exists( 'pll_home_url' ) ? pll_home_url( $locale ) : home_url( '/' );
-					$published[ $locale ] = trailingslashit( $base ) . 'property/';
+					$published[ $locale ] = trailingslashit( $base ) . 'annonces/';
 				}
 			}
 
@@ -242,14 +242,19 @@ class Partikulier_SEO {
 		/**
 		 * Description SEO automatique selon le contexte.
 		 */
-		public static function description( $queried ) {
+			private static function normalize_description( $description ) {
+				$description = trim( preg_replace( '/(?:\\s*[.·,]\\s*){2,}/u', '. ', wp_strip_all_tags( (string) $description ) ) );
+				return trim( preg_replace( '/\\s{2,}/u', ' ', $description ) );
+			}
+
+			public static function description( $queried ) {
 		if ( is_singular( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
 			$post = get_queried_object();
 
 			// Meta description dediee, redigee au depot de l'annonce.
 			$stored = get_post_meta( $post->ID, '_pk_meta_description', true );
 			if ( $stored ) {
-				return $stored;
+				return self::normalize_description( $stored );
 			}
 
 			$desc = trim( wp_strip_all_tags( get_the_excerpt( $post ) ) );
@@ -266,7 +271,7 @@ class Partikulier_SEO {
 					get_the_title( $post )
 				);
 			}
-			return self::limit( $full, 155 );
+				return self::limit( self::normalize_description( $full ), 155 );
 		}
 		if ( is_tax() && $queried instanceof WP_Term ) {
 			$desc = trim( term_description( $queried ) );

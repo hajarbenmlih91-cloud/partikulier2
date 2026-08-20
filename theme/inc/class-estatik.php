@@ -134,12 +134,27 @@ class Partikulier_Estatik {
 	 * Retire le CSS par defaut d'Estatik (le theme fournit le sien, plus leger).
 	 * On garde les styles de la carte interactive si Google Maps est active.
 	 */
-	public static function dequeue_heavy() {
-		wp_dequeue_style( 'es-styles' );
-		wp_dequeue_style( 'estatik-style' );
-		wp_dequeue_style( 'estatik-front' );
-		wp_dequeue_style( 'estatik-public' );
-	}
+		public static function dequeue_heavy() {
+			wp_dequeue_style( 'es-styles' );
+			wp_dequeue_style( 'estatik-style' );
+			wp_dequeue_style( 'estatik-front' );
+			wp_dequeue_style( 'estatik-public' );
+
+			// Ces bibliothèques ne sont pas nécessaires sur les pages éditoriales.
+			// Les pages annonces, dépôt, favoris et tableau de bord les conservent
+			// pour ne pas casser galerie, filtres, sélection ou upload.
+			$property_context = is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE )
+				|| is_singular( PARTIKULIER_ESTATIK_POST_TYPE )
+				|| is_page( array( 'deposer-une-annonce', 'mes-annonces', 'favoris' ) );
+			if ( $property_context ) {
+				return;
+			}
+
+			foreach ( array( 'select2', 'select2-js', 'slick', 'slick-js', 'magnific-popup', 'jquery-ui-core', 'jquery-ui-datepicker', 'datetimepicker', 'clipboard' ) as $handle ) {
+				wp_dequeue_script( $handle );
+				wp_deregister_script( $handle );
+			}
+		}
 
 	/**
 	 * Retire les meta generator d'Estatik.

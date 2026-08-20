@@ -144,7 +144,7 @@ class Partikulier_JSONLD {
 			'@type'          => 'Offer',
 			'url'            => $url,
 			'availability'   => $is_closed ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-			'priceCurrency'  => 'EUR',
+			'priceCurrency'  => 'MAD',
 		);
 		if ( $price ) {
 			$offer['price']           = self::clean_price( $price );
@@ -394,6 +394,7 @@ class Partikulier_JSONLD {
 		$addr = array( '@type' => 'PostalAddress' );
 		if ( $zip ) { $addr['postalCode'] = $zip; }
 		if ( $city ) { $addr['addressLocality'] = $city; }
+			$addr['addressCountry'] = 'MA';
 		return $addr;
 	}
 

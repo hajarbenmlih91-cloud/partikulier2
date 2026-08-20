@@ -1,0 +1,61 @@
+DIAGNOSTIC PARTIKULIER — 2026-08-20 10:22 UTC
+--------------------------------------------------------------------
+WordPress          : 7.1
+PHP                : 8.3.6
+Theme actif        : Partikulier v6.14.1
+Theme parent       : aucun
+Repertoire         : partikulier
+style.css         : 85 Ko, modifie le 2026-08-20
+Constante version  : 6.14.1
+
+EXTENSIONS ACTIVES
+--------------------------------------------------------------------
+  Estatik                                4.3.4
+
+TAXONOMIES — verifier que chaque terme est au bon endroit
+--------------------------------------------------------------------
+es_type        : 11 termes  (types de biens (Appartement, Maison, Villa...))
+     - Appartement                  2 annonces
+     - Appartements                 0 annonces
+     - Condos                       0 annonces
+     - Loft                         1 annonces
+     - Maison                       2 annonces
+     - Maisons                      0 annonces
+     - Maisons de ville             0 annonces
+     - Multifamily                  0 annonces
+     - Studio                       1 annonces
+     - Terrain                      0 annonces
+     - Terre                        0 annonces
+es_location    : 5 termes  (villes et quartiers)
+     - Agadir                       1 annonces
+     - Casablanca                   1 annonces
+     - Marrakech                    1 annonces
+     - Rabat                        2 annonces
+     - Tanger                       1 annonces
+es_category    : 3 termes  (actions (A vendre, A louer))
+     - A louer                      2 annonces
+     - À louer                     0 annonces
+     - À vendre                    4 annonces
+
+CONTENU
+--------------------------------------------------------------------
+Annonces publiees  : 6
+Brouillons         : 0
+Visibles en front  : 5
+
+MULTILINGUE
+--------------------------------------------------------------------
+Polylang actif     : non
+
+CACHES ET SURCHARGES
+--------------------------------------------------------------------
+Cache du theme     : 5 fichiers
+CSS additionnel (Personnaliser) : 0 caracteres
+
+INTEGRITE DES FICHIERS
+--------------------------------------------------------------------
+  assets/css/style.css               84.7 Ko  2026-08-20 10:05
+  assets/js/main.js                  21.3 Ko  2026-08-20 10:05
+  templates/header.php               8.1 Ko  2026-08-20 10:05
+  templates/front-page.php           11.0 Ko  2026-08-20 10:05
+

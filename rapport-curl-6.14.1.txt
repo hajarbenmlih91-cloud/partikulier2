@@ -1,0 +1,40 @@
+--- /annonces/ ---
+HTTP/1.1 200 OK
+Host: localhost:8090
+Date: Thu, 20 Aug 2026 10:19:33 GMT
+Connection: close
+X-Powered-By: PHP/8.3.6
+--- /property/ ---
+HTTP/1.1 301 Moved Permanently
+Host: localhost:8090
+Date: Thu, 20 Aug 2026 10:19:35 GMT
+Connection: close
+X-Powered-By: PHP/8.3.6
+Content-Type: text/html; charset=UTF-8
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+--- /property/page/2/ ---
+HTTP/1.1 404 Not Found
+Host: localhost:8090
+Date: Thu, 20 Aug 2026 10:19:35 GMT
+Connection: close
+X-Powered-By: PHP/8.3.6
+Expires: Wed, 11 Jan 1984 05:00:00 GMT
+Cache-Control: no-cache, must-revalidate, max-age=0, no-store, private
+Content-Type: text/html; charset=UTF-8
+--- sitemap ---
+http://www.sitemaps.org/schemas/sitemap/0.9">
+http://localhost:8090/
+http://localhost:8090/favoris/
+http://localhost:8090/page-d-exemple/
+http://localhost:8090/annonces/
+http://localhost:8090/annonce/casablanca/appartement-lumineux-3-pieces/
+http://localhost:8090/annonce/rabat/maison-contemporaine-avec-jardin/
+http://localhost:8090/annonce/marrakech/appartement-t2-vue-mer-avec-balcon/
+http://localhost:8090/annonce/tanger/loft-renove-en-plein-centre-ville/
+http://localhost:8090/annonce/agadir/maison-de-ville-avec-cour-arboree/
+http://localhost:8090/annonce/rabat/studio-calme-proche-des-gares/
+http://localhost:8090/location/agadir/
+--- JSON-LD ---
+--- meta .. ---
+0

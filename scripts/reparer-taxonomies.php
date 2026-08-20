@@ -25,6 +25,13 @@
 
 if ( ! defined( 'ABSPATH' ) ) {
 	$pk_load = '';
+	$pk_candidates = array( dirname( __DIR__ ) . '/wp/wp-load.php', __DIR__ . '/wp-load.php' );
+	foreach ( $pk_candidates as $pk_candidate ) {
+		if ( file_exists( $pk_candidate ) ) {
+			$pk_load = $pk_candidate;
+			break;
+		}
+	}
 	$pk_dir  = __DIR__;
 	for ( $pk_i = 0; $pk_i < 8; $pk_i++ ) {
 		if ( file_exists( $pk_dir . '/wp-load.php' ) ) {

@@ -1,0 +1,3 @@
+Analyse baseline visuelle 6.14.1
+
+Les captures accueil-mobile.png et accueil-mobile.actuel.png ont les mêmes dimensions (390 x 7474). L’écart mesuré est de 3,98 %. La différence visible est localisée à la carte d’annonce située sous « Des biens choisis pour leur lumière » : la baseline affiche une image grise/placeholder alors que l’actuel affiche la photographie de l’annonce. Les autres sections et la structure générale restent identiques. Il s’agit d’une instabilité des données/images de démonstration entre la génération de baseline et le contrôle, pas d’une modification CSS ou de markup du thème. La baseline doit être régénérée après synchronisation des données de démonstration stabilisées, puis le contrôle doit être rejoué.

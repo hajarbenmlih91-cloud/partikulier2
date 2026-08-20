@@ -162,7 +162,7 @@ foreach($d as $x){ list($t,$c,$ty,$ca,$p,$a,$b)=$x;
 
   wp menu create "Principal" >/dev/null 2>&1
   wp menu item add-custom principal "Accueil" "$URL/" >/dev/null 2>&1
-  wp menu item add-custom principal "Annonces" "$URL/annonce/" >/dev/null 2>&1
+  wp menu item add-custom principal "Annonces" "$URL/annonces/" >/dev/null 2>&1
   wp menu location assign principal main >/dev/null 2>&1
 fi
 

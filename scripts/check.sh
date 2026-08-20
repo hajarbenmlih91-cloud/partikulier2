@@ -61,8 +61,8 @@ else
 fi
 
 # Un seul gestionnaire de clic sur le cœur (deux s'annulent).
-h=$(grep -c "pk-card-wishlist\"" "$T/assets/js/main.js" 2>/dev/null || echo 0)
-echo "   gestionnaires favoris : $h référence(s) (2 addEventListener = bug)"
+h=$(grep -c 'b\.addEventListener("click"' "$T/assets/js/main.js" 2>/dev/null || echo 0)
+echo "   gestionnaires favoris : $h gestionnaire(s) addEventListener détecté(s)"
 
 # main.js doit se neutraliser sur la page de dépôt.
 if grep -q "pk-steps" "$T/assets/js/main.js"; then

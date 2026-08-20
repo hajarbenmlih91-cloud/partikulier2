@@ -159,7 +159,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 
 				<div class="pk-filter">
 					<h3 class="pk-filter-title"><?php esc_html_e( 'Budget maximum', 'partikulier' ); ?></h3>
-						<form action="<?php echo esc_url( get_post_type_archive_link( PARTIKULIER_ESTATIK_POST_TYPE ) ); ?>" method="get">
+						<form action="<?php echo esc_url( pk_properties_archive_url() ); ?>" method="get">
 						<div class="pk-filter-price">
 							<input type="number" name="pk_price_max" placeholder="<?php esc_attr_e( '€ max', 'partikulier' ); ?>" min="0" aria-label="<?php esc_attr_e( 'Budget maximum en euros', 'partikulier' ); ?>">
 						</div>
@@ -203,7 +203,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 					<div class="pk-empty">
 						<h2><?php esc_html_e( 'Aucune annonce ne correspond à votre recherche.', 'partikulier' ); ?></h2>
 						<p><?php esc_html_e( 'Essayez d\'élargir vos critères ou consultez les villes populaires.', 'partikulier' ); ?></p>
-							<a class="pk-btn pk-btn-outline" href="<?php echo esc_url( get_post_type_archive_link( PARTIKULIER_ESTATIK_POST_TYPE ) ); ?>">
+							<a class="pk-btn pk-btn-outline" href="<?php echo esc_url( pk_properties_archive_url() ); ?>">
 							<?php esc_html_e( 'Voir toutes les annonces', 'partikulier' ); ?>
 						</a>
 					</div>
