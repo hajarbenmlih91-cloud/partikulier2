@@ -151,7 +151,7 @@ class Partikulier_JSONLD {
 			$offer['priceSpecification'] = array(
 				'@type'         => 'UnitPriceSpecification',
 				'price'         => self::clean_price( $price ),
-				'priceCurrency' => 'EUR',
+				'priceCurrency' => 'MAD',
 			);
 			if ( 'Location' === $action ) {
 				$offer['priceSpecification']['unitText'] = 'MONTH';

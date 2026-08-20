@@ -38,6 +38,7 @@ class Partikulier_Listing_URLs {
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'add_rules' ), 20 );
 		add_filter( 'post_type_link', array( __CLASS__, 'filter_link' ), 10, 2 );
+		add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 		add_action( 'template_redirect', array( __CLASS__, 'redirect_legacy' ), 1 );
 
 		// La geographie est figee a l'enregistrement : une URL ne doit pas
@@ -301,7 +302,29 @@ class Partikulier_Listing_URLs {
 	 * Sans cela, Google conserverait en index des adresses qui repondent
 	 * encore 200 : deux URL pour un meme bien, donc un signal divise.
 	 */
-		public static function redirect_legacy() {
+	/**
+	 * Intercepte les anciennes archives avant qu'une page vide ne devienne 404.
+	 *
+	 * @param WP $wp Requête WordPress.
+	 */
+	public static function redirect_legacy_early( $wp ) {
+		if ( is_admin() || wp_doing_ajax() ) {
+			return;
+		}
+		$request_path = wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' ), PHP_URL_PATH );
+		if ( ! preg_match( '#/property(?:/page/([0-9]+))?/?$#', (string) $request_path, $legacy_match ) ) {
+			return;
+		}
+		$paged = ! empty( $legacy_match[1] ) ? (int) $legacy_match[1] : 1;
+		$target = pk_properties_archive_url();
+		if ( $paged > 1 ) {
+			$target = trailingslashit( $target ) . 'page/' . $paged . '/';
+		}
+		wp_safe_redirect( $target, 301 );
+		exit;
+	}
+
+	public static function redirect_legacy() {
 			if ( is_admin() || wp_doing_ajax() ) {
 				return;
 			}

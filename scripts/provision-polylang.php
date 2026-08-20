@@ -24,6 +24,13 @@ $option['rewrite'] = true;
 $option['post_types'] = array_values( array_unique( array_merge( (array) ( $option['post_types'] ?? array() ), array( 'properties', 'page' ) ) ) );
 $option['taxonomies'] = array_values( array_unique( array_merge( (array) ( $option['taxonomies'] ?? array() ), array( 'es_type', 'es_category', 'es_location' ) ) ) );
 update_option( 'polylang', $option );
+// Normalize every existing published listing to FR before querying language-filtered sources.
+$all_listings = get_posts( array( 'post_type' => 'properties', 'post_status' => 'publish', 'numberposts' => -1, 'orderby' => 'ID', 'order' => 'ASC' ) );
+foreach ( $all_listings as $listing ) {
+    if ( ! pll_get_post_language( $listing->ID ) ) {
+        pll_set_post_language( $listing->ID, 'fr' );
+    }
+}
 // Create one linked FR/EN/AR family for each published Estatik listing.
 $listings = get_posts( array( 'post_type' => 'properties', 'post_status' => 'publish', 'numberposts' => -1, 'lang' => 'fr', 'orderby' => 'ID', 'order' => 'ASC' ) );
 foreach ( $listings as $source ) {
