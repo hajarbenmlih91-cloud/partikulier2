@@ -1,8 +1,15 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) { exit; }
+$language_objects = function_exists( 'pll_languages_list' ) && isset( $GLOBALS['polylang']->model->languages ) ? $GLOBALS['polylang']->model->languages->get_list() : array();
+$language_slugs = array();
+$language_locales = array();
+foreach ( (array) $language_objects as $language ) {
+    $language_slugs[] = (string) $language->slug;
+    $language_locales[] = (string) $language->locale;
+}
 $out = array(
-    'slugs' => function_exists( 'pll_languages_list' ) ? pll_languages_list( array( 'fields' => 'slug' ) ) : array(),
-    'locales' => function_exists( 'pll_languages_list' ) ? pll_languages_list( array( 'fields' => 'locale' ) ) : array(),
+    'slugs' => $language_slugs,
+    'locales' => $language_locales,
     'counts' => array(),
     'families' => array(),
 );

@@ -12,6 +12,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 	return;
 }
 
+if ( ! class_exists( 'WP_List_Table' ) ) {
+	require_once ABSPATH . 'wp-admin/includes/class-wp-list-table.php';
+}
+
+if ( class_exists( 'WP_List_Table' ) && ! class_exists( 'Partikulier_Leads_List_Table' ) ) {
+	class Partikulier_Leads_List_Table extends WP_List_Table {
+		private $statuses = array();
+
+		public function __construct( $rows, $total, $per_page, $current_page, $statuses ) {
+			parent::__construct( array( 'singular' => 'pk_lead', 'plural' => 'pk_leads', 'ajax' => false ) );
+			$this->items = $rows;
+			$this->statuses = $statuses;
+			$this->set_pagination_args( array( 'total_items' => (int) $total, 'per_page' => (int) $per_page, 'total_pages' => max( 1, (int) ceil( $total / $per_page ) ) ) );
+			$this->set_pagination_args( array( 'current_page' => (int) $current_page ) );
+		}
+
+		public function get_columns() {
+			return array(
+				'lead'       => __( 'Lead', 'partikulier' ),
+				'interest'   => __( 'Intérêt et critères', 'partikulier' ),
+				'consent'    => __( 'Accord et quota', 'partikulier' ),
+				'followup'   => __( 'Suivi', 'partikulier' ),
+			);
+		}
+
+		protected function get_table_classes() {
+			return array( 'widefat', 'fixed', 'striped', 'pk-leads-table' );
+		}
+
+		public function prepare_items() {}
+
+		public function display_rows() {
+			foreach ( $this->items as $lead ) {
+				Partikulier_Leads_Admin::render_lead_row( $lead, $this->statuses );
+			}
+		}
+	}
+}
+
 class Partikulier_Leads_Admin {
 
 	const MENU_SLUG = 'pk-whatsapp-leads';
@@ -109,8 +148,8 @@ class Partikulier_Leads_Admin {
 		$filters = self::filters();
 		$summary = self::summary();
 		$result = self::lead_rows( $filters );
-		$statuses = self::followup_statuses();
-		?>
+$statuses = self::followup_statuses();
+			?>
 		<div class="wrap pk-leads-admin">
 			<h1><?php esc_html_e( 'Leads WhatsApp', 'partikulier' ); ?></h1>
 			<p class="pk-leads-intro"><?php esc_html_e( 'Demandes qualifiées reçues depuis les liens Partikulier. Les numéros sont chiffrés en base et visibles ici uniquement pour les administrateurs.', 'partikulier' ); ?></p>
@@ -160,29 +199,18 @@ class Partikulier_Leads_Admin {
 			</form>
 			<?php endif; ?>
 
-			<div class="pk-leads-table-wrap">
-				<table class="widefat fixed striped pk-leads-table">
-					<thead><tr>
-						<th><?php esc_html_e( 'Lead', 'partikulier' ); ?></th>
-						<th><?php esc_html_e( 'Intérêt et critères', 'partikulier' ); ?></th>
-						<th><?php esc_html_e( 'Accord et quota', 'partikulier' ); ?></th>
-						<th><?php esc_html_e( 'Suivi', 'partikulier' ); ?></th>
-					</tr></thead>
-					<tbody>
-						<?php if ( ! $result['rows'] ) : ?>
-							<tr><td colspan="4"><?php esc_html_e( 'Aucun lead ne correspond à ces filtres.', 'partikulier' ); ?></td></tr>
-						<?php endif; ?>
-						<?php foreach ( $result['rows'] as $lead ) : self::render_lead_row( $lead, $statuses ); endforeach; ?>
-					</tbody>
-				</table>
-			</div>
-			<?php self::pagination( $result['total'], $filters ); ?>
+				<div class="pk-leads-table-wrap">
+					<?php
+					$table = new Partikulier_Leads_List_Table( $result['rows'], $result['total'], self::PER_PAGE, $filters['page'], $statuses );
+					$table->display();
+					?>
+				</div>
 			<p class="description pk-leads-policy"><?php esc_html_e( 'Utilisez le bouton WhatsApp uniquement dans le cadre permis par l’échange et le consentement de la personne. Pour les envois proactifs après la fenêtre de conversation, n8n doit employer un modèle WhatsApp approuvé.', 'partikulier' ); ?></p>
 		</div>
 		<?php
 	}
 
-	private static function render_lead_row( $lead, $statuses ) {
+		public static function render_lead_row( $lead, $statuses ) {
 		$phone = Partikulier_Buyer_Qualification::decrypt_phone_for_admin( $lead->phone_encrypted );
 		$snapshot = json_decode( (string) $lead->property_snapshot, true );
 		$areas = json_decode( (string) $lead->areas, true );
@@ -195,12 +223,12 @@ class Partikulier_Leads_Admin {
 		<tr>
 			<td>
 				<strong><?php echo esc_html( $phone ? '+' . $phone : __( 'Numéro indisponible', 'partikulier' ) ); ?></strong>
-				<small><?php printf( esc_html__( 'Vu le %s', 'partikulier' ), esc_html( wp_date( get_option( 'date_format' ) . ' H:i', strtotime( $lead->last_seen_at ) ) ) ); ?></small>
+				<small><?php printf( esc_html__( 'Vu le %s', 'partikulier' ), esc_html( wp_date( get_option( 'date_format' ) . ' H:i', strtotime( (string) ( $lead->last_seen_at ?? '' ) ) ) ) ); ?></small>
 				<?php if ( $phone && ! $lead->opt_out_at ) : ?><a class="button button-small" href="<?php echo esc_url( 'https://wa.me/' . rawurlencode( $phone ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Ouvrir WhatsApp', 'partikulier' ); ?></a><?php endif; ?>
 			</td>
 			<td>
 				<strong><?php echo $property_url ? '<a href="' . esc_url( $property_url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $property_title ) . '</a>' : esc_html( $property_title ); ?></strong>
-				<small><?php echo esc_html( $lead->reference_code ); ?></small>
+				<small><?php echo esc_html( (string) ( $lead->reference_code ?? '' ) ); ?></small>
 				<p class="pk-leads-criteria"><?php echo esc_html( self::criteria_text( $lead, $areas ) ); ?></p>
 			</td>
 			<td>
@@ -215,7 +243,7 @@ class Partikulier_Leads_Admin {
 					<select name="followup_status" aria-label="<?php esc_attr_e( 'Statut de suivi', 'partikulier' ); ?>">
 						<?php foreach ( $statuses as $value => $label ) : ?><option value="<?php echo esc_attr( $value ); ?>" <?php selected( $status, $value ); ?>><?php echo esc_html( $label ); ?></option><?php endforeach; ?>
 					</select>
-					<textarea name="followup_note" rows="2" placeholder="<?php esc_attr_e( 'Note interne', 'partikulier' ); ?>"><?php echo esc_textarea( $lead->note ); ?></textarea>
+					<textarea name="followup_note" rows="2" placeholder="<?php esc_attr_e( 'Note interne', 'partikulier' ); ?>"><?php echo esc_textarea( (string) ( $lead->note ?? '' ) ); ?></textarea>
 					<button class="button button-primary button-small" type="submit"><?php esc_html_e( 'Enregistrer', 'partikulier' ); ?></button>
 				</form>
 			</td>
@@ -227,8 +255,8 @@ class Partikulier_Leads_Admin {
 		$items = array();
 		if ( $lead->budget_max ) { $items[] = sprintf( __( 'Budget max. %s', 'partikulier' ), number_format_i18n( $lead->budget_max ) ); }
 		if ( $areas ) { $items[] = implode( ', ', array_map( 'sanitize_text_field', $areas ) ); }
-		if ( $lead->layout_value ) { $items[] = $lead->layout_value; }
-		if ( $lead->transaction_value ) { $items[] = $lead->transaction_value; }
+		if ( ! empty( $lead->layout_value ) ) { $items[] = (string) $lead->layout_value; }
+		if ( ! empty( $lead->transaction_value ) ) { $items[] = (string) $lead->transaction_value; }
 		return $items ? implode( ' · ', $items ) : __( 'Critères non précisés', 'partikulier' );
 	}
 
@@ -241,7 +269,7 @@ class Partikulier_Leads_Admin {
 		);
 	}
 
-	private static function followup_statuses() {
+		public static function followup_statuses() {
 		return array(
 			'new'          => __( 'À traiter', 'partikulier' ),
 			'in_progress'  => __( 'En cours', 'partikulier' ),

@@ -16,7 +16,12 @@ $languages = array(
 );
 $ids = array();
 foreach ( $languages as $args ) {
-    $existing = pll_languages_list( array( 'fields' => 'slug' ) );
+    $existing = array();
+    foreach ( (array) pll_languages_list() as $language_slug ) {
+        if ( is_string( $language_slug ) && $language_slug !== '' ) {
+            $existing[] = $language_slug;
+        }
+    }
     if ( ! in_array( $args['slug'], $existing, true ) ) {
         $result = $add_language( $args );
         if ( is_wp_error( $result ) ) {
@@ -65,4 +70,8 @@ foreach ( $listings as $source ) {
 }
 flush_rewrite_rules( false );
 require_once __DIR__ . '/provision-polylang-taxonomies.php';
-echo wp_json_encode( array( 'languages' => pll_languages_list( array( 'fields' => 'all' ) ), 'post_types' => $option['post_types'], 'taxonomies' => $option['taxonomies'], 'published_properties' => count( $listings ) ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) . PHP_EOL;
+$language_report = array();
+foreach ( (array) $GLOBALS['polylang']->model->languages->get_list() as $language ) {
+    $language_report[] = array( 'slug' => (string) $language->slug, 'locale' => (string) $language->locale, 'name' => (string) $language->name );
+}
+echo wp_json_encode( array( 'languages' => $language_report, 'post_types' => $option['post_types'], 'taxonomies' => $option['taxonomies'], 'published_properties' => count( $listings ) ), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) . PHP_EOL;

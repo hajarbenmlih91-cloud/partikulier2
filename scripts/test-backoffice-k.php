@@ -18,6 +18,9 @@ $wpdb->query( $wpdb->prepare( "DELETE FROM {$tables['leads']} WHERE phone_hash L
 $user = get_users( array( 'role' => 'administrator', 'number' => 1 ) );
 if ( empty( $user ) ) { $result['status'] = 'FAIL'; $result['checks']['administrator_fixture'] = false; echo wp_json_encode( $result, JSON_PRETTY_PRINT ) . "\n"; exit( 1 ); }
 wp_set_current_user( $user[0]->ID );
+$_SERVER['HTTP_HOST'] = (string) ( wp_parse_url( home_url(), PHP_URL_HOST ) ?: 'localhost' );
+$_SERVER['REQUEST_URI'] = '/wp-admin/admin.php?page=' . rawurlencode( Partikulier_Leads_Admin::MENU_SLUG );
+$_SERVER['REQUEST_METHOD'] = 'GET';
 $measure = static function ( $count ) use ( &$wpdb, $tables, $marker ) {
 	foreach ( $tables as $table ) {
 		$wpdb->query( $wpdb->prepare( "DELETE FROM {$table} WHERE provider_message_id LIKE %s", $marker . '%' ) );
@@ -36,16 +39,28 @@ $measure = static function ( $count ) use ( &$wpdb, $tables, $marker ) {
 		$wpdb->insert( $tables['followups'], array( 'lead_id' => $lead_id, 'status' => 'new', 'updated_at' => $now ) );
 	}
 	$before = $wpdb->num_queries;
-	ob_start();
-	Partikulier_Leads_Admin::render_page();
-	$html = ob_get_clean();
-	$queries = $wpdb->num_queries - $before;
-	return array( 'rows' => $count, 'queries' => $queries, 'html_bytes' => strlen( $html ), 'has_table' => false !== strpos( $html, 'pk-leads-table' ), 'has_export' => false !== strpos( $html, 'pk_export_leads' ) );
+$runtime_messages = array();
+		$previous_handler = set_error_handler(
+			static function ( $severity, $message, $file, $line ) use ( &$runtime_messages ) {
+				if ( $severity & ( E_WARNING | E_NOTICE | E_DEPRECATED | E_USER_WARNING | E_USER_NOTICE | E_USER_DEPRECATED ) ) {
+					$runtime_messages[] = array( 'severity' => $severity, 'message' => $message, 'file' => $file, 'line' => $line );
+					return true;
+				}
+				return false;
+			}
+		);
+		ob_start();
+		Partikulier_Leads_Admin::render_page();
+		$html = ob_get_clean();
+		restore_error_handler();
+		$queries = $wpdb->num_queries - $before;
+		return array( 'rows' => $count, 'queries' => $queries, 'html_bytes' => strlen( $html ), 'has_table' => false !== strpos( $html, 'pk-leads-table' ), 'has_export' => false !== strpos( $html, 'pk_export_leads' ), 'runtime_messages' => $runtime_messages );
 };
 foreach ( array( 1, 20, 100 ) as $count ) { $result['measurements'][] = $measure( $count ); }
 $result['checks']['table_rendered'] = ! empty( $result['measurements'][2]['has_table'] );
 $result['checks']['export_button'] = ! empty( $result['measurements'][2]['has_export'] );
 $result['checks']['sql_budget_100'] = (int) $result['measurements'][2]['queries'] <= 15;
+$result['checks']['runtime_php_clean'] = empty( $result['measurements'][0]['runtime_messages'] ) && empty( $result['measurements'][1]['runtime_messages'] ) && empty( $result['measurements'][2]['runtime_messages'] );
 $reflection = new ReflectionMethod( 'Partikulier_Leads_Admin', 'csv_safe_value' );
 $reflection->setAccessible( true );
 $result['checks']['csv_formula_neutralized'] = "'=SUM(A1)" === $reflection->invoke( null, '=SUM(A1)' );
