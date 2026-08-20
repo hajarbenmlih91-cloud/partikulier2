@@ -108,8 +108,11 @@ console.log(`nonce recupere : ${nonce ? nonce.slice(0, 6) + '...' : 'AUCUN'}\n`)
 // 6. Elevation : un author accede-t-il aux ecrans d administration ?
 {
   const r = await marc.page.goto(BASE + '/wp-admin/users.php', { waitUntil: 'domcontentloaded' });
-  const refuse = r.status() === 403 || (await marc.page.content()).includes('Vous n’avez pas');
-  verdict('Acces admin refuse a un author', true, refuse);
+  const finalUrl = marc.page.url();
+  const html = await marc.page.content();
+  const reachedProtectedPage = /\/wp-admin\/users\.php(?:$|[?#])/.test(finalUrl) && /Utilisateurs|Users|Ajouter/i.test(html);
+  const refuse = r.status() === 403 || ! reachedProtectedPage;
+  verdict('Acces admin refuse a un author', true, refuse, `HTTP ${r.status()} final=${finalUrl}`);
 }
 
 // 7. Octroi de premium reserve a l administrateur

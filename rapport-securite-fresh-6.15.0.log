@@ -1,0 +1,25 @@
+
+> partikulier-dev@6.15.0 test:securite
+> node scripts/securite.mjs
+
+
+=== session marc : connecte ===
+nonce recupere : 04f279...
+
+OK    IDOR suppression annonce d autrui  (attendu 403, obtenu 403) - Vous n’êtes pas autorisé à modifier cette annonc
+OK    IDOR modification annonce d autrui  (attendu 403, obtenu 403) 
+OK    Nonce invalide refuse  (attendu 403, obtenu 403) 
+OK    Action hors liste blanche refusee  (attendu 400, obtenu 400) 
+OK    Action legitime sur sa propre annonce  (attendu 200, obtenu 200) 
+OK    Acces admin refuse a un author  (attendu true, obtenu true) HTTP 200 final=http://localhost:8090/wp-admin/upgrade.php?_wp_http_referer=%2Fwp-admin%2Fusers.php
+OK    Octroi premium refuse a un non-admin  (attendu true, obtenu true) statut 403
+OK    Anonyme ne peut pas gerer une annonce  (attendu true, obtenu true) statut 400
+OK    Depot anonyme sans nonce refuse  (attendu true, obtenu true) statut 403
+OK    Injection SQL dans la recherche  (attendu false, obtenu false) HTTP 200
+OK    XSS reflechi dans la recherche  (attendu false, obtenu false) 
+OK    Enumeration des utilisateurs  (attendu false, obtenu false) HTTP 200
+OK    Fichier protege /wp-config.php  (attendu false, obtenu false) HTTP 200
+OK    Fichier protege /wp-content/debug.log  (attendu false, obtenu false) HTTP 200
+OK    Fichier protege /wp-content/themes/partikulier/package.json  (attendu false, obtenu false) HTTP 200
+
+15/15 tests conformes

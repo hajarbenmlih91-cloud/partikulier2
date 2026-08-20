@@ -1,0 +1,27 @@
+{
+    "taxonomies": [
+        "es_type",
+        "es_category",
+        "es_location"
+    ],
+    "source_families": 3,
+    "term_translation_groups": 3,
+    "assignments": 6
+}
+{
+    "languages": [
+        null,
+        null,
+        null
+    ],
+    "post_types": [
+        "properties",
+        "page"
+    ],
+    "taxonomies": [
+        "es_type",
+        "es_category",
+        "es_location"
+    ],
+    "published_properties": 3
+}

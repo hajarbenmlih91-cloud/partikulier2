@@ -1,0 +1,236 @@
+
+> partikulier-dev@6.15.0 test:audit
+> node scripts/audit.mjs
+
+{
+ "accueil": {
+  "chargement_ms": 960,
+  "requetes": 12,
+  "poids_total_ko": 556,
+  "par_type": {
+   "document": {
+    "n": 1,
+    "ko": 0
+   },
+   "stylesheet": {
+    "n": 6,
+    "ko": 287
+   },
+   "image": {
+    "n": 3,
+    "ko": 212
+   },
+   "font": {
+    "n": 1,
+    "ko": 36
+   },
+   "script": {
+    "n": 1,
+    "ko": 21
+   }
+  },
+  "erreurs_404": [],
+  "perf": {
+   "dom_interactif": 358,
+   "dom_complet": 360,
+   "premier_rendu": 404,
+   "noeuds_dom": 544,
+   "profondeur_max": 11
+  },
+  "a11y": {
+   "images": 2,
+   "images_sans_alt": 0,
+   "liens": 62,
+   "liens_sans_intitule": 0,
+   "champs": 12,
+   "champs_sans_label": 0,
+   "h1": 1,
+   "sauts_de_titre": 0,
+   "lang_html": "fr-FR",
+   "lien_evitement": true,
+   "boutons_sans_intitule": 0
+  },
+  "seo": {
+   "title": "Partikulier",
+   "title_longueur": 11,
+   "description": "Annonces immobilières gratuites entre particuliers : achat et location sans commission.",
+   "description_longueur": 87,
+   "canonical": "http://localhost:8090/",
+   "og_title": "Partikulier",
+   "og_image": null,
+   "jsonld_types": [
+    "WebSite+RealEstateAgent"
+   ],
+   "jsonld_invalide": false,
+   "hreflang": 7
+  },
+  "tactile": {
+   "total": 72,
+   "trop_petites": 15
+  },
+  "erreurs_js": 0,
+  "detail_erreurs": []
+ },
+ "annonces": {
+  "chargement_ms": 6237,
+  "requetes": 27,
+  "poids_total_ko": 779,
+  "par_type": {
+   "document": {
+    "n": 3,
+    "ko": 0
+   },
+   "stylesheet": {
+    "n": 6,
+    "ko": 287
+   },
+   "font": {
+    "n": 1,
+    "ko": 36
+   },
+   "script": {
+    "n": 16,
+    "ko": 456
+   },
+   "image": {
+    "n": 1,
+    "ko": 0
+   }
+  },
+  "erreurs_404": [],
+  "perf": {
+   "dom_interactif": 2976,
+   "dom_complet": 5734,
+   "premier_rendu": 2996,
+   "noeuds_dom": 501,
+   "profondeur_max": 13
+  },
+  "a11y": {
+   "images": 1,
+   "images_sans_alt": 0,
+   "liens": 52,
+   "liens_sans_intitule": 0,
+   "champs": 14,
+   "champs_sans_label": 0,
+   "h1": 1,
+   "sauts_de_titre": 0,
+   "lang_html": "fr-FR",
+   "lien_evitement": true,
+   "boutons_sans_intitule": 0
+  },
+  "seo": {
+   "title": "Propriété – Partikulier",
+   "title_longueur": 23,
+   "description": "Parcourez les annonces immobilières publiées directement par des particuliers : achat et location sans commission.",
+   "description_longueur": 114,
+   "canonical": "http://localhost:8090/annonces/",
+   "og_title": "Propriété – Partikulier",
+   "og_image": null,
+   "jsonld_types": [
+    "ItemList+BreadcrumbList+WebSite"
+   ],
+   "jsonld_invalide": false,
+   "hreflang": 7
+  },
+  "tactile": {
+   "total": 65,
+   "trop_petites": 16
+  },
+  "erreurs_js": 0,
+  "detail_erreurs": []
+ },
+ "deposer": {
+  "chargement_ms": 5888,
+  "requetes": 26,
+  "poids_total_ko": 795,
+  "par_type": {
+   "document": {
+    "n": 2,
+    "ko": 0
+   },
+   "stylesheet": {
+    "n": 6,
+    "ko": 287
+   },
+   "font": {
+    "n": 1,
+    "ko": 36
+   },
+   "script": {
+    "n": 17,
+    "ko": 472
+   }
+  },
+  "erreurs_404": [],
+  "perf": {
+   "dom_interactif": 3090,
+   "dom_complet": 5386,
+   "premier_rendu": 3108,
+   "noeuds_dom": 551,
+   "profondeur_max": 11
+  },
+  "a11y": {
+   "images": 0,
+   "images_sans_alt": 0,
+   "liens": 37,
+   "liens_sans_intitule": 0,
+   "champs": 31,
+   "champs_sans_label": 0,
+   "h1": 1,
+   "sauts_de_titre": 0,
+   "lang_html": "fr-FR",
+   "lien_evitement": true,
+   "boutons_sans_intitule": 0
+  },
+  "seo": {
+   "title": "Déposer une annonce – Partikulier",
+   "title_longueur": 33,
+   "description": "Déposez gratuitement votre annonce immobilière entre particuliers en quelques étapes simples et vérifiées.",
+   "description_longueur": 106,
+   "canonical": "http://localhost:8090/deposer-une-annonce/",
+   "og_title": "Déposer une annonce – Partikulier",
+   "og_image": null,
+   "jsonld_types": [
+    "WebSite+BreadcrumbList"
+   ],
+   "jsonld_invalide": false,
+   "hreflang": 0
+  },
+  "tactile": {
+   "total": 57,
+   "trop_petites": 14
+  },
+  "erreurs_js": 0,
+  "detail_erreurs": []
+ }
+}
+
+> partikulier-dev@6.15.0 test:securite
+> node scripts/securite.mjs
+
+
+=== session marc : connecte ===
+nonce recupere : d1679a...
+
+OK    IDOR suppression annonce d autrui  (attendu 403, obtenu 403) - Vous n’êtes pas autorisé à modifier cette annonc
+OK    IDOR modification annonce d autrui  (attendu 403, obtenu 403) 
+OK    Nonce invalide refuse  (attendu 403, obtenu 403) 
+OK    Action hors liste blanche refusee  (attendu 400, obtenu 400) 
+OK    Action legitime sur sa propre annonce  (attendu 200, obtenu 200) 
+FAIL  Acces admin refuse a un author  (attendu true, obtenu false) 
+OK    Octroi premium refuse a un non-admin  (attendu true, obtenu true) statut 403
+OK    Anonyme ne peut pas gerer une annonce  (attendu true, obtenu true) statut 400
+OK    Depot anonyme sans nonce refuse  (attendu true, obtenu true) statut 403
+OK    Injection SQL dans la recherche  (attendu false, obtenu false) HTTP 200
+OK    XSS reflechi dans la recherche  (attendu false, obtenu false) 
+OK    Enumeration des utilisateurs  (attendu false, obtenu false) HTTP 200
+OK    Fichier protege /wp-config.php  (attendu false, obtenu false) HTTP 200
+OK    Fichier protege /wp-content/debug.log  (attendu false, obtenu false) HTTP 200
+OK    Fichier protege /wp-content/themes/partikulier/package.json  (attendu false, obtenu false) HTTP 200
+
+14/15 tests conformes
+
+A CORRIGER :
+  - Acces admin refuse a un author : attendu true, obtenu false 
+
+UI_RC=0 SECURITY_RC=1
