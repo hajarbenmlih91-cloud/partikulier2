@@ -1,0 +1,174 @@
+<?php
+/**
+ * En-tete du theme.
+ *
+ * Structure calquee sur le kit e-commerce "Woo Shop" de Royal Elementor :
+ * - Topbar sombre (promo + contact)
+ * - Header blanc : logo, barre de recherche centrale, icones (favoris, compte)
+ * - Nav uppercase avec dropdowns CSS + toggle JS vanilla (zero jQuery)
+ *
+ * @package Partikulier
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+?>
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+<meta charset="<?php bloginfo( 'charset' ); ?>">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<link rel="profile" href="https://gmpg.org/xfn/11">
+<?php wp_head(); ?>
+</head>
+
+<body <?php body_class(); ?>>
+<?php wp_body_open(); ?>
+
+<a class="pk-skip-link" href="#main-content"><?php esc_html_e( 'Aller au contenu', 'partikulier' ); ?></a>
+
+<!-- Topbar style Woo Shop -->
+<div class="pk-topbar" role="banner-top">
+	<div class="pk-container pk-topbar-inner">
+		<span class="pk-topbar-promo"><?php echo esc_html( Partikulier_Settings::get( 'topbar_text' ) ); ?></span>
+		<div class="pk-topbar-contact">
+			<a href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?></a>
+			<a href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php esc_html_e( 'Toutes les annonces', 'partikulier' ); ?></a>
+			<?php if ( is_user_logged_in() ) : ?>
+				<a href="<?php echo esc_url( pk_page_url( 'mes-annonces', '/mes-annonces/' ) ); ?>"><?php esc_html_e( 'Mon espace', 'partikulier' ); ?></a>
+			<?php else : ?>
+				<a href="<?php echo esc_url( wp_login_url( pk_page_url( 'mes-annonces', '/mes-annonces/' ) ) ); ?>"><?php esc_html_e( 'Se connecter', 'partikulier' ); ?></a>
+			<?php endif; ?>
+		</div>
+	</div>
+</div>
+
+<header class="pk-site-header" id="site-header">
+	<div class="pk-container pk-header-inner">
+		<div class="pk-header-brand">
+			<?php
+			// Marque en texte : pas d'image, donc nette a toutes les resolutions,
+			// traduisible, selectionnable, et sans requete HTTP supplementaire.
+			// Un logo televerse dans Personnaliser reste prioritaire s'il y en a un.
+			if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
+				the_custom_logo();
+			} else {
+				$pk_home = esc_url( home_url( '/' ) );
+				$pk_name = get_bloginfo( 'name' );
+				?>
+			<a class="pk-logo-text" href="<?php echo $pk_home; // phpcs:ignore ?>" rel="home" aria-label="<?php echo esc_attr( sprintf( __( '%s, retour a l accueil', 'partikulier' ), $pk_name ) ); ?>">
+				<span class="pk-logo-name">partikulier<span class="pk-logo-tld">.com</span></span>
+			</a>
+				<?php
+			}
+			?>
+		</div>
+
+		<div class="pk-header-search">
+			<form class="pk-search-bar" action="<?php echo esc_url( pk_properties_archive_url() ); ?>" method="get">
+				<select name="es_type" aria-label="<?php esc_attr_e( 'Type de bien', 'partikulier' ); ?>">
+					<option value=""><?php esc_html_e( 'Type de bien', 'partikulier' ); ?></option>
+					<?php echo Partikulier_Geo::property_type_options( false ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+				</select>
+				<input type="search" name="s" placeholder="<?php esc_attr_e( 'Ville, code postal, quartier…', 'partikulier' ); ?>" aria-label="<?php esc_attr_e( 'Rechercher une ville', 'partikulier' ); ?>">
+				<button type="submit" aria-label="<?php esc_attr_e( 'Rechercher', 'partikulier' ); ?>">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+				</button>
+			</form>
+		</div>
+
+		<div class="pk-header-actions">
+			<?php
+			if ( function_exists( 'pll_the_languages' ) ) {
+				$pk_langs   = pll_the_languages( array( 'raw' => 1, 'hide_if_empty' => 0 ) );
+				$pk_current = '';
+				foreach ( (array) $pk_langs as $pk_l ) {
+					if ( ! empty( $pk_l['current_lang'] ) ) {
+						$pk_current = $pk_l['slug'];
+					}
+				}
+				if ( ! $pk_current && function_exists( 'pll_current_language' ) ) {
+					$pk_current = (string) pll_current_language();
+				}
+				if ( ! empty( $pk_langs ) ) :
+					?>
+				<div class="pk-lang" data-pk-lang>
+					<button type="button" class="pk-lang-toggle" aria-expanded="false" aria-haspopup="true" aria-label="<?php esc_attr_e( 'Choisir la langue', 'partikulier' ); ?>">
+						<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z"/></svg>
+						<span class="pk-lang-code"><?php echo esc_html( strtoupper( $pk_current ) ); ?></span>
+					</button>
+					<ul class="pk-lang-menu" hidden>
+						<?php foreach ( (array) $pk_langs as $pk_l ) : ?>
+							<li<?php echo ! empty( $pk_l['current_lang'] ) ? ' class="is-current"' : ''; ?>>
+								<a href="<?php echo esc_url( $pk_l['url'] ); ?>" lang="<?php echo esc_attr( $pk_l['locale'] ); ?>" hreflang="<?php echo esc_attr( $pk_l['locale'] ); ?>">
+									<span class="pk-lang-abbr"><?php echo esc_html( strtoupper( $pk_l['slug'] ) ); ?></span>
+									<span class="pk-lang-name"><?php echo esc_html( $pk_l['name'] ); ?></span>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</div>
+					<?php
+				endif;
+			} else {
+				?>
+				<div class="pk-lang pk-lang--static">
+					<span class="pk-lang-toggle" aria-hidden="true">
+						<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z"/></svg>
+						<span class="pk-lang-code"><?php echo esc_html( strtoupper( substr( (string) get_locale(), 0, 2 ) ) ); ?></span>
+					</span>
+				</div>
+				<?php
+			}
+			?>
+			<a class="pk-header-icon" href="<?php echo esc_url( pk_page_url( 'favoris', '/favoris/' ) ); ?>" aria-label="<?php esc_attr_e( 'Favoris', 'partikulier' ); ?>">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+			</a>
+			<?php if ( is_user_logged_in() ) : ?>
+				<a class="pk-header-icon pk-header-cta pk-btn pk-btn-primary pk-btn-sm" href="<?php echo esc_url( pk_page_url( 'mes-annonces', '/mes-annonces/' ) ); ?>">
+					<?php esc_html_e( 'Mon espace', 'partikulier' ); ?>
+				</a>
+			<?php else : ?>
+				<a class="pk-header-icon pk-header-cta pk-btn pk-btn-primary pk-btn-sm" href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>">
+					<?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?>
+				</a>
+			<?php endif; ?>
+			<button class="pk-nav-toggle" type="button" aria-expanded="false" aria-controls="pk-mobile-menu" aria-label="<?php esc_attr_e( 'Ouvrir le menu', 'partikulier' ); ?>">
+				<span class="pk-nav-toggle-bar" aria-hidden="true"></span>
+				<span class="pk-nav-toggle-bar" aria-hidden="true"></span>
+				<span class="pk-nav-toggle-bar" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+
+	<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
+		<div class="pk-container">
+			<?php
+			wp_nav_menu( array(
+				'theme_location' => 'main',
+				'container'      => false,
+				'menu_class'     => 'pk-menu',
+				'depth'          => 2,
+				'fallback_cb'    => array( 'Partikulier_Header', 'fallback_menu' ),
+				'walker'         => new Partikulier_Menu_Walker(),
+			) );
+			?>
+			</div>
+		</nav>
+
+		<div class="pk-mobile-menu" id="pk-mobile-menu" hidden>
+		<?php
+		wp_nav_menu( array(
+			'theme_location' => 'main',
+			'container'      => false,
+			'menu_class'     => 'pk-menu pk-menu-mobile',
+			'depth'          => 1,
+			'fallback_cb'    => false,
+		) );
+		?>
+	</div>
+</header>
+
+<main id="main-content" class="pk-main">
