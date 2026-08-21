@@ -35,7 +35,7 @@ Les preuves détaillées sont archivées dans `seo-rewrite-annonce.json`, `journ
 Le bundle contient le mu-plugin SEO, les fichiers `ar.mo` et `en_US.mo`, les deux WOFF2 Noto Sans Arabic et les scripts de recette. Le hash courant est :
 
 ```text
-b1e27207da6a00e0a162cc955861fe26ac10ae57b698a71930c0008e64e66999  partikulier-6.17.0.zip
+21f0c0b949c7796385022c08eda96d8a6ebaf999ebf0c446295c0af3cdfea19d  partikulier-6.17.0.zip
 ```
 
 ## Verdict
