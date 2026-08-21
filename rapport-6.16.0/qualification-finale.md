@@ -1,7 +1,8 @@
 # Qualification Partikulier 6.16.0 — n8n / WhatsApp
 
 **Base :** Partikulier 6.15.0  
-**CDC appliqué :** `cahier-des-charges-partikulier-6.16-n8n-mobile(4).md` — v2.2 finale gelée  
+**CDC appliqué :** `cahier-des-charges-partikulier-6.16-n8n-mobile-v2.3.md` — v2.3 finale signée
+**SHA-256 du CDC :** `3170c6f37fd2048c578cf07e690cee5b1cb58fd22fae2863118a8a0eed16c2a6`
 **Date de recette :** 2026-08-21  
 **Environnement :** WordPress 7.1, PHP 8.4, Estatik 4.3.4, Polylang 3.8.7, WP-CLI
 
@@ -19,7 +20,8 @@ Le périmètre technique I-1 à I-4 du CDC 6.16 a été implémenté dans le th�
 | I-2 | HMAC SHA-256 sur `METHOD + route + timestamp + corps brut`, fenêtre anti-rejeu de 300 secondes, `key_id`, modes `off/log/enforce`, double clé pendant rotation et wrapper `register_route()`. |
 | I-3 | Préfixes `n8n-` et `pay-`, insertion SQL directe sur index UNIQUE `event_id`, collision transformée en `200 duplicate:true`, sans double traitement. |
 | I-4 | Quota configurable de 1 à 10 via `quota_per_day`, conservé dans la transaction avec verrou `FOR UPDATE`, texte de consentement et URL de canal HTTPS. |
-| Documentation | Changelog 6.16.0 ajouté ; script de packaging corrigé pour les en-têtes WordPress indentés. |
+| Documentation | Changelog 6.16.0 ajouté ; script de packaging corrigé pour les en-têtes WordPress indentés ; CDC v2.3 versionné avec hash. |
+| Garde-fou routes | Contrôle statique ciblé dans `check.sh` et énumération runtime des 8 routes attendues. |
 
 ## Résultats dynamiques
 
@@ -30,6 +32,7 @@ Le périmètre technique I-1 à I-4 du CDC 6.16 a été implémenté dans le th�
 | Anti-rejeu / rejeu `event_id` | PASS | `test-n8n-replay.json` |
 | Rotation double clé | PASS | `test-n8n-secret-rotation.json` |
 | Idempotence duplicate-key | PASS | `test-n8n-idempotence-race.json` |
+| Concurrence HTTP réelle | PASS — 5 rounds simultanés | `test-n8n-idempotence-concurrent.json` |
 | Garde-fou des routes | PASS — 8 routes protégées | `test-n8n-route-guard.json` |
 | Canari secret / absence de fuite | PASS | `test-n8n-canary.json` |
 
@@ -46,7 +49,7 @@ Le contrôle qualité global passe sur **66 fichiers PHP** et **2 fichiers JavaS
 ```text
 Archive : partikulier-6.16.0.zip
 Taille  : 543K
-SHA-256: 24a2cc3428ce6fa80ce907f5bbd183f382b4347186edacb0a6a876398759ac4f
+SHA-256: 0a2ad20846337ea6c2500f380867337eeca6342b0d3651ce907aa0addda475da
 ```
 
 ## Limites honnêtes du sign-off
@@ -55,4 +58,4 @@ Les preuves exécutées appellent les callbacks WordPress directement dans WP-CL
 
 ## Fichiers de preuve
 
-Les rapports JSON bruts sont conservés dans ce dossier, avec le hash indépendant `package-6.16.0.sha256`. Les scripts de recette sont versionnés dans `scripts/test-n8n-*.php` et utilisent `scripts/lib-n8n-test.php`.
+Les rapports JSON bruts sont conservés dans ce dossier, avec le hash indépendant `package-6.16.0.sha256`, la trace CDC/commit `traceability-6.16.0.txt` et la preuve multi-processus `test-n8n-idempotence-concurrent.json`. Les scripts de recette sont versionnés dans `scripts/test-n8n-*.php` et utilisent `scripts/lib-n8n-test.php`.

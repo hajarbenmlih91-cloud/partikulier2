@@ -24,8 +24,19 @@ try {
 				update_option( Partikulier_N8n_Security::OPTION, array( 'automation_api_secret' => $secret, 'active_key_id' => 'N', 'previous_secret' => $previous, 'previous_key_id' => 'N-1', 'previous_expires_at' => gmdate( 'c', time() + 600 ), 'hmac_mode' => 'enforce' ), false ); $body = array( 'event_id' => 'n8n-rotation-' . wp_generate_uuid4() ); $old = pk_n8n_request( 'POST', '/partikulier/v1/automation-event', $body, pk_n8n_hmac_headers( 'POST', '/partikulier/v1/automation-event', $body, $previous, 'N-1' ) ); pk_n8n_assert( true === Partikulier_N8n_Security::check_automation_secret( $old ), 'previous key rejected during overlap' ); update_option( Partikulier_N8n_Security::OPTION, array( 'automation_api_secret' => $secret, 'active_key_id' => 'N', 'previous_secret' => $previous, 'previous_key_id' => 'N-1', 'previous_expires_at' => gmdate( 'c', time() - 1 ), 'hmac_mode' => 'enforce' ), false ); pk_n8n_assert( is_wp_error( Partikulier_N8n_Security::check_automation_secret( $old ) ), 'expired previous key accepted' ); $report['checks'][] = 'dual_key_overlap_expiry';
 			} elseif ( 'test-n8n-idempotence-race.php' === $name ) {
 				$body = array( 'event_id' => 'n8n-race-' . wp_generate_uuid4(), 'event_type' => 'whatsapp_status', 'source' => 'n8n', 'payload' => array( 'race' => true ) ); $one = Partikulier_Automation_Bridge::receive_event( pk_n8n_request( 'POST', '/partikulier/v1/automation-event', $body ) ); $two = Partikulier_Automation_Bridge::receive_event( pk_n8n_request( 'POST', '/partikulier/v1/automation-event', $body ) ); pk_n8n_assert( ! is_wp_error( $one ) && ! is_wp_error( $two ), 'race request failed' ); pk_n8n_assert( true === ( $two->get_data()['duplicate'] ?? false ), 'race duplicate false' ); $report['checks'][] = 'insert_duplicate_path';
-			} elseif ( 'test-n8n-route-guard.php' === $name ) {
-				$routes = rest_get_server()->get_routes(); $automation = array(); foreach ( $routes as $route => $handlers ) { if ( 0 === strpos( $route, '/partikulier/v1/' ) ) { foreach ( $handlers as $handler ) { if ( isset( $handler['permission_callback'] ) && is_array( $handler['permission_callback'] ) && 'Partikulier_Automation_Bridge' === ( $handler['permission_callback'][0] ?? '' ) ) { $automation[] = $route; } } } } pk_n8n_assert( count( $automation ) >= 7, 'shared route guard did not cover expected automation routes' ); $report['checks'][] = 'routes_shared_callback_' . count( $automation );
+				} elseif ( 'test-n8n-route-guard.php' === $name ) {
+					$expected = array( '/partikulier/v1/automation-event', '/partikulier/v1/contact-authorization', '/partikulier/v1/preferences', '/partikulier/v1/consent', '/partikulier/v1/opt-out', '/partikulier/v1/erase-lead', '/partikulier/v1/credentials-resend-accepted', '/partikulier/v1/approved-listings' );
+					$routes = rest_get_server()->get_routes();
+					foreach ( $expected as $route ) {
+						pk_n8n_assert( isset( $routes[ $route ] ), 'expected automation route missing: ' . $route );
+						$matched = false;
+						foreach ( $routes[ $route ] as $handler ) {
+							$permission = $handler['permission_callback'] ?? null;
+							if ( is_array( $permission ) && 'Partikulier_Automation_Bridge' === ( $permission[0] ?? '' ) && 'check_automation_secret' === ( $permission[1] ?? '' ) ) { $matched = true; break; }
+						}
+						pk_n8n_assert( $matched, 'automation route is not protected by shared HMAC callback: ' . $route );
+					}
+					$report['checks'][] = 'explicit_routes_shared_callback_' . count( $expected );
 			} elseif ( 'test-n8n-canary.php' === $name ) {
 				$hash = substr( hash( 'sha256', $secret ), 0, 16 ); $paths = array( ABSPATH . '../partikulier-6.16.0.zip', dirname( __DIR__ ) . '/rapport-6.16.0' ); foreach ( $paths as $path ) { if ( file_exists( $path ) ) { pk_n8n_assert( false === strpos( (string) file_get_contents( $path ), $secret ), 'secret canary leaked' ); } } $report['checks'][] = 'canary_fingerprint_only_' . $hash;
 			} else { throw new RuntimeException( 'unknown test script' ); }

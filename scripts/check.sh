@@ -50,8 +50,24 @@ else
   echo "   INCOHÉRENCE : alignez les 4 fichiers avant de livrer"; FAIL=1
 fi
 
+# ------------------------------------------------ garde-fou routes automation
+ echo "── Garde-fou routes automation"
+ automation_bad=0
+ for f in "$T"/inc/class-buyer-qualification.php "$T"/inc/class-lead-retention.php "$T"/inc/class-listing-approval.php; do
+   [ -f "$f" ] || continue
+   if grep -q "register_rest_route" "$f" && ! grep -q "Partikulier_Automation_Bridge::register_route" "$f"; then
+     echo "   ROUTE AUTOMATION SANS WRAPPER : $f"
+     automation_bad=1
+   fi
+ done
+ if [ "$automation_bad" -eq 0 ]; then
+   echo "   modules automation via wrapper central       OK"
+ else
+   FAIL=1
+ fi
+
 # ------------------------------------------------------- régressions connues
-echo "── Régressions connues"
+ echo "── Régressions connues"
 
 # Le cœur des favoris doit avoir un style, sinon il ne rougit pas.
 if grep -q "pk-wish-active" "$T/assets/css/style.css"; then
