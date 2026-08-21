@@ -34,6 +34,7 @@ Le périmètre technique I-1 à I-4 du CDC 6.16 a été implémenté dans le th�
 | Idempotence duplicate-key | PASS | `test-n8n-idempotence-race.json` |
 | Concurrence HTTP réelle | PASS — 5 rounds simultanés | `test-n8n-idempotence-concurrent.json` |
 | Garde-fou des routes | PASS — 8 routes protégées | `test-n8n-route-guard.json` |
+| Test négatif `check.sh` | PASS — route directe injectée rejetée | `scripts/test-check-routes-negative.sh` |
 | Canari secret / absence de fuite | PASS | `test-n8n-canary.json` |
 
 Tous les rapports ont `runtime_messages: []`. Le premier passage a détecté un accès direct à la clé absente `hmac_mode` pendant la migration legacy ; le code a été corrigé avec une valeur par défaut explicite, puis toute la batterie a été rejouée avec succès.
@@ -58,4 +59,4 @@ Les preuves exécutées appellent les callbacks WordPress directement dans WP-CL
 
 ## Fichiers de preuve
 
-Les rapports JSON bruts sont conservés dans ce dossier, avec le hash indépendant `package-6.16.0.sha256`, la trace CDC/commit `traceability-6.16.0.txt` et la preuve multi-processus `test-n8n-idempotence-concurrent.json`. Les scripts de recette sont versionnés dans `scripts/test-n8n-*.php` et utilisent `scripts/lib-n8n-test.php`.
+Les rapports JSON bruts sont conservés dans ce dossier, avec le hash indépendant `package-6.16.0.sha256`, la trace CDC/commit `traceability-6.16.0.txt`, le test négatif du garde-fou et la preuve multi-processus `test-n8n-idempotence-concurrent.json`. Les scripts de recette sont versionnés dans `scripts/test-n8n-*.php` et utilisent `scripts/lib-n8n-test.php`.

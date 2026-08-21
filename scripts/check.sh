@@ -5,7 +5,7 @@
 # Vérifie : syntaxe PHP, syntaxe JS, cohérence des numéros de version,
 # et absence de régressions connues.
 set -u
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="${PK_CHECK_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 T="$ROOT/theme"
 FAIL=0
 
@@ -55,8 +55,8 @@ fi
  automation_bad=0
  for f in "$T"/inc/class-buyer-qualification.php "$T"/inc/class-lead-retention.php "$T"/inc/class-listing-approval.php; do
    [ -f "$f" ] || continue
-   if grep -q "register_rest_route" "$f" && ! grep -q "Partikulier_Automation_Bridge::register_route" "$f"; then
-     echo "   ROUTE AUTOMATION SANS WRAPPER : $f"
+   if grep -q "register_rest_route" "$f"; then
+     echo "   ROUTE AUTOMATION DIRECTE INTERDITE : $f"
      automation_bad=1
    fi
  done
