@@ -53,10 +53,16 @@ class Partikulier_Security {
 	 * En-têtes défensifs compatibles avec les ressources actuelles du thème.
 	 * HSTS est envoyé seulement derrière HTTPS afin de rester sûr en sandbox.
 	 */
-	public static function send_public_headers() {
-		if ( is_admin() ) {
-			return;
-		}
+		public static function send_public_headers() {
+			if ( is_admin() ) {
+				return;
+			}
+			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+			$is_root = '/' === trailingslashit( (string) $path );
+			if ( $is_root ) {
+				header( 'Cache-Control: private, no-store, max-age=0' );
+				header( 'Vary: Accept-Language, Cookie', false );
+			}
 		header( 'X-Content-Type-Options: nosniff' );
 		header( 'X-Frame-Options: SAMEORIGIN' );
 		header( 'Referrer-Policy: strict-origin-when-cross-origin' );

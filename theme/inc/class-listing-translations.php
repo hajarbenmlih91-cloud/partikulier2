@@ -205,11 +205,18 @@ class Partikulier_Listing_Translations {
 
 			$title       = Partikulier_Listing_I18n::title( $values, $lang );
 			$description = Partikulier_Listing_I18n::description( $values, $lang );
-			if ( '' !== $extra ) {
-				// Le mot personnel est recopie tel quel : c'est la voix de
-				// l'annonceur, on ne la reecrit pas.
-				$description .= "\n\n" . $extra;
-			}
+				if ( '' !== $extra ) {
+					// Le mot personnel est recopie tel quel : c'est la voix de
+					// l'annonceur, on ne la reecrit pas. Son bloc declare sa
+					// langue francaise pour eviter de le faire passer pour une
+					// traduction AR/EN.
+					$note_label = 'ar' === $lang ? 'كلمة المالك (بالفرنسية)' : "Owner's note (in French)";
+					$description .= sprintf(
+						"\n\n<p class=\"pk-owner-note\"><strong>%s</strong><br><span lang=\"fr\">%s</span></p>",
+						esc_html( $note_label ),
+						esc_html( $extra )
+					);
+				}
 
 			$existing = self::find_existing( $post_id, $lang );
 

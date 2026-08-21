@@ -1,0 +1,221 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Partikulier 6.17.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: ar\n"
+
+msgid "Aide"
+msgstr "المساعدة"
+
+msgid "Ajouter un mot personnel"
+msgstr "إضافة كلمة شخصية"
+
+msgid "Annuler"
+msgstr "إلغاء"
+
+msgid "Ascenseur"
+msgstr "مصعد"
+
+msgid "Bien"
+msgstr "عقار"
+
+msgid "Caractéristiques"
+msgstr "الخصائص"
+
+msgid "Chambres"
+msgstr "غرف النوم"
+
+msgid "Contact"
+msgstr "اتصال"
+
+msgid "Contacter le vendeur"
+msgstr "تواصل مع المعلن"
+
+msgid "Contactez-nous"
+msgstr "اتصل بنا"
+
+msgid "Continuer"
+msgstr "متابعة"
+
+msgid "Description"
+msgstr "الوصف"
+
+msgid "Description du bien"
+msgstr "وصف العقار"
+
+msgid "Déposer une annonce"
+msgstr "إضافة إعلان"
+
+msgid "Enregistrer"
+msgstr "حفظ"
+
+msgid "Envoyer"
+msgstr "إرسال"
+
+msgid "Favoris"
+msgstr "المفضلة"
+
+msgid "France"
+msgstr "فرنسا"
+
+msgid "Garage ou sous-sol"
+msgstr "مرآب أو قبو"
+
+msgid "Je publie mon propre bien."
+msgstr "أنشر عقاري الخاص."
+
+msgid "Je publie pour un client."
+msgstr "أنشر لصالح عميل."
+
+msgid "La description principale est déjà créée à partir de vos réponses. Cet espace vous permet d’ajouter un complément si vous le souhaitez."
+msgstr "تم إنشاء الوصف الرئيسي من إجاباتك. يمكنك إضافة تفاصيل هنا إذا رغبت."
+
+msgid "Les informations du bien"
+msgstr "معلومات العقار"
+
+msgid "Louer"
+msgstr "كراء"
+
+msgid "Mentions légales"
+msgstr "الإشعارات القانونية"
+
+msgid "Menu principal"
+msgstr "القائمة الرئيسية"
+
+msgid "Mon espace"
+msgstr "مساحتي"
+
+msgid "Nombre de chambres"
+msgstr "عدد غرف النوم"
+
+msgid "Nombre de salles de bains"
+msgstr "عدد الحمامات"
+
+msgid "Nombre de salons"
+msgstr "عدد غرف الجلوس"
+
+msgid "Non"
+msgstr "لا"
+
+msgid "Oui"
+msgstr "نعم"
+
+msgid "Ouvrir le menu"
+msgstr "فتح القائمة"
+
+msgid "Photos du bien"
+msgstr "صور العقار"
+
+msgid "Prix"
+msgstr "السعر"
+
+msgid "Prix demandé"
+msgstr "السعر المطلوب"
+
+msgid "Propriétaire"
+msgstr "مالك"
+
+msgid "Précédent"
+msgstr "السابق"
+
+msgid "Publier"
+msgstr "نشر"
+
+msgid "Quartier"
+msgstr "الحي"
+
+msgid "Questions fréquentes"
+msgstr "الأسئلة الشائعة"
+
+msgid "Qui publie l’annonce ?"
+msgstr "من ينشر الإعلان؟"
+
+msgid "Recherche rapide"
+msgstr "بحث سريع"
+
+msgid "Rechercher"
+msgstr "بحث"
+
+msgid "Rechercher une ville"
+msgstr "البحث عن مدينة"
+
+msgid "Retour"
+msgstr "رجوع"
+
+msgid "Salles de bains"
+msgstr "الحمامات"
+
+msgid "Salons"
+msgstr "غرف الجلوس"
+
+msgid "Se connecter"
+msgstr "تسجيل الدخول"
+
+msgid "Suivant"
+msgstr "التالي"
+
+msgid "Superficie (m²)"
+msgstr "المساحة (م²)"
+
+msgid "Superficie de la terrasse (m²)"
+msgstr "مساحة التراس (م²)"
+
+msgid "Surface"
+msgstr "المساحة"
+
+msgid "Terrasse"
+msgstr "تراس"
+
+msgid "Titre de l’annonce"
+msgstr "عنوان الإعلان"
+
+msgid "Tous droits réservés."
+msgstr "جميع الحقوق محفوظة."
+
+msgid "Toutes les annonces"
+msgstr "كل الإعلانات"
+
+msgid "Type de bien"
+msgstr "نوع العقار"
+
+msgid "Types de biens"
+msgstr "أنواع العقارات"
+
+msgid "Téléphone"
+msgstr "الهاتف"
+
+msgid "Un détail important, une précision sur le quartier ou vos conditions de visite…"
+msgstr "تفصيل مهم أو توضيح عن الحي أو شروط الزيارة…"
+
+msgid "Valider avec WhatsApp"
+msgstr "التأكيد عبر واتساب"
+
+msgid "Vendre"
+msgstr "بيع"
+
+msgid "Ville"
+msgstr "المدينة"
+
+msgid "Votre aperçu"
+msgstr "معاينتك"
+
+msgid "Votre e-mail"
+msgstr "بريدك الإلكتروني"
+
+msgid "Votre nom"
+msgstr "اسمك"
+
+msgid "Votre numéro de téléphone"
+msgstr "رقم هاتفك"
+
+msgid "Vue"
+msgstr "الإطلالة"
+
+msgid "WhatsApp"
+msgstr "واتساب"
+
+msgid "À propos"
+msgstr "من نحن"
+
+msgid "Étage"
+msgstr "الطابق"

@@ -22,15 +22,105 @@ class Partikulier_Localization {
 	const META_FREE_TEXT_LANGUAGE = '_pk_free_text_language';
 
 	public static function init() {
-		add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
-		add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
+			add_action( 'init', array( __CLASS__, 'load_textdomain' ), 5 );
+			add_action( 'wp', array( __CLASS__, 'load_active_textdomain' ), 1 );
+			add_action( 'template_redirect', array( __CLASS__, 'maybe_redirect_browser_language' ), 1 );
+			add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
+			add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
 		add_filter( 'gettext_partikulier', array( __CLASS__, 'translate_polylang_string' ), 10, 3 );
 		add_filter( 'pll_get_post_types', array( __CLASS__, 'register_polylang_post_type' ), 10, 2 );
-		add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
+			add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
+			add_filter( 'pll_preferred_language', array( __CLASS__, 'filter_robot_preferred_language' ), 10, 2 );
 	}
 
-	/**
-	 * Registre minimal du chrome commun. Les templates continuent d’utiliser
+			/**
+		 * Charge les fichiers gettext du thème avant tout dictionnaire de repli.
+		 */
+		public static function load_textdomain() {
+				load_theme_textdomain( 'partikulier', PARTIKULIER_DIR . '/languages' );
+			}
+
+			/**
+			 * Polylang peut definir son slug actif apres le chargement initial de WP.
+			 * On recharge alors le fichier theme correspondant au slug public.
+			 */
+			public static function load_active_textdomain() {
+				$slug = function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : '';
+				$locale = 'en' === $slug ? 'en_US' : ( 'ar' === $slug ? 'ar' : '' );
+				if ( ! $locale ) {
+					return;
+				}
+				$file = trailingslashit( PARTIKULIER_DIR ) . 'languages/' . $locale . '.mo';
+				if ( is_readable( $file ) ) {
+					load_textdomain( 'partikulier', $file );
+				}
+			}
+
+		/**
+		 * Redirige uniquement la première visite humaine de la racine selon
+		 * Accept-Language lorsque Polylang browser detection est activée.
+		 */
+		public static function maybe_redirect_browser_language() {
+			if ( ! function_exists( 'pll_home_url' ) || ! self::is_root_request() || is_user_logged_in() ) {
+				return;
+			}
+			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+			if ( '/' !== trailingslashit( (string) $path ) || self::is_robot_request() ) {
+				return;
+			}
+			$browser_enabled = function_exists( 'pll_get_option' ) ? pll_get_option( 'browser' ) : false;
+			if ( ! $browser_enabled || ! empty( $_COOKIE['pll_language'] ) ) {
+				return;
+			}
+			$accept = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? strtolower( (string) $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) : '';
+			$lang = false;
+			if ( preg_match( '/(?:^|,)\\s*ar(?:[-_][a-z]+)?(?:\\s*;|,|$)/i', $accept ) ) {
+				$lang = 'ar';
+			} elseif ( preg_match( '/(?:^|,)\\s*en(?:[-_][a-z]+)?(?:\\s*;|,|$)/i', $accept ) ) {
+				$lang = 'en';
+			}
+			if ( ! $lang ) {
+				return;
+			}
+			$languages = function_exists( 'pll_languages_list' ) ? pll_languages_list() : array();
+			if ( ! in_array( $lang, array_map( 'sanitize_key', (array) $languages ), true ) ) {
+				return;
+			}
+			wp_safe_redirect( pll_home_url( $lang ), 302 );
+			exit;
+		}
+
+		private static function is_root_request() {
+			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+			return '/' === trailingslashit( (string) $path );
+		}
+
+		/**
+		 * Polylang exécute sa redirection browser avant template_redirect.
+		 * Les robots doivent donc être neutralisés sur son filtre officiel, sinon
+		 * l’exemption locale arrive trop tard et produit un cloaking par langue.
+		 *
+		 * @param string|false $language Langue préférée détectée.
+		 * @param bool         $cookie   Préférence issue d’un cookie.
+		 * @return string|false
+		 */
+		public static function filter_robot_preferred_language( $language, $cookie ) {
+			unset( $cookie );
+			if ( ! self::is_robot_request() ) {
+				return $language;
+			}
+			$default = function_exists( 'pll_default_language' ) ? pll_default_language( 'slug' ) : '';
+			return $default ? sanitize_key( $default ) : $language;
+		}
+
+		private static function is_robot_request() {
+			$ua = isset( $_SERVER['HTTP_USER_AGENT'] ) ? strtolower( (string) $_SERVER['HTTP_USER_AGENT'] ) : '';
+			return '' !== $ua && (bool) preg_match( '/bot|crawler|spider|slurp|bingpreview|facebookexternalhit|linkedinbot|whatsapp/i', $ua );
+		}
+
+		/**
+		 * Registre minimal du chrome commun. Les templates continuent d’utiliser
+
 	 * gettext : Polylang gratuit fournit les traductions sans nouvelle UI.
 	 *
 	 * @return array<string,string>
@@ -152,8 +242,14 @@ class Partikulier_Localization {
 			return $translation;
 		}
 
-			$form_translations = self::form_translations();
-			if ( isset( $form_translations[ $text ] ) ) {
+				// Une traduction gettext provenant d’un fichier .mo est canonique.
+				// Les dictionnaires internes ne servent qu’en repli.
+				if ( $translation !== $text && '' !== $translation ) {
+					return $translation;
+				}
+
+				$form_translations = self::form_translations();
+				if ( isset( $form_translations[ $text ] ) ) {
 				$language = self::current_language();
 				return isset( $form_translations[ $text ][ $language ] ) ? $form_translations[ $text ][ $language ] : $text;
 			}

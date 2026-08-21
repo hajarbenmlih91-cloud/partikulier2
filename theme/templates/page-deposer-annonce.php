@@ -353,18 +353,18 @@ $types = get_terms( array(
 					<label class="pk-label" for="pk-title">
 						<?php esc_html_e( 'Titre de l’annonce', 'partikulier' ); ?> <em class="pk-editable"><?php esc_html_e( 'modifiable', 'partikulier' ); ?></em>
 					</label>
-					<input type="text" id="pk-title" name="pk_title" maxlength="160">
+					<input type="text" id="pk-title" name="pk_title" maxlength="160" lang="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'locale' ) : get_locale() ); ?>" data-pk-free-text="1">
 					<small class="pk-field-hint"><?php esc_html_e( 'Le titre est créé automatiquement à partir de vos réponses. Vous pouvez le modifier avant la validation.', 'partikulier' ); ?></small>
 				</div>
 
 				<div class="pk-field">
 					<label class="pk-label" for="pk-extra"><?php esc_html_e( 'Ajouter un mot personnel', 'partikulier' ); ?></label>
 					<p class="pk-optional"><?php esc_html_e( 'facultatif', 'partikulier' ); ?></p>
-					<textarea id="pk-extra" name="pk_extra" rows="4" placeholder="<?php esc_attr_e( 'Un détail important, une précision sur le quartier ou vos conditions de visite…', 'partikulier' ); ?>"></textarea>
+					<textarea id="pk-extra" name="pk_extra" rows="4" lang="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'locale' ) : get_locale() ); ?>" data-pk-free-text="1" placeholder="<?php esc_attr_e( 'Un détail important, une précision sur le quartier ou vos conditions de visite…', 'partikulier' ); ?>"></textarea>
 					<small class="pk-field-hint"><?php esc_html_e( 'La description principale est déjà créée à partir de vos réponses. Cet espace vous permet d’ajouter un complément si vous le souhaitez.', 'partikulier' ); ?></small>
 				</div>
 
-				<input type="hidden" name="pk_description" id="pk-description">
+				<input type="hidden" name="pk_description" id="pk-description" lang="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'locale' ) : get_locale() ); ?>" data-pk-free-text="1">
 
 				<div class="pk-field">
 					<label class="pk-label" for="pk-name"><?php esc_html_e( 'Votre nom', 'partikulier' ); ?> <span class="pk-req">*</span></label>

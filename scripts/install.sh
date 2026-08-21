@@ -97,6 +97,10 @@ ROUTER
 step "5/7 thème et plugin"
 rm -rf wp-content/themes/partikulier
 cp -r "$THEME_SRC" wp-content/themes/partikulier
+if [ -d "$ROOT/mu-plugins" ]; then
+  mkdir -p wp-content/mu-plugins
+  cp -r "$ROOT/mu-plugins/." wp-content/mu-plugins/
+fi
 [ -d wp-content/plugins/estatik ] || wp plugin install estatik >>"$LOG" 2>&1
 wp plugin activate estatik >>"$LOG" 2>&1
 wp theme activate partikulier >>"$LOG" 2>&1

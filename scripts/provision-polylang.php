@@ -36,6 +36,7 @@ $option = get_option( 'polylang', array() );
 $option['default_lang'] = 'fr';
 $option['hide_default'] = true;
 $option['force_lang'] = 1;
+$option['browser'] = 1;
 $option['rewrite'] = true;
 $option['post_types'] = array_values( array_unique( array_merge( (array) ( $option['post_types'] ?? array() ), array( 'properties', 'page' ) ) ) );
 $option['taxonomies'] = array_values( array_unique( array_merge( (array) ( $option['taxonomies'] ?? array() ), array( 'es_type', 'es_category', 'es_location' ) ) ) );
@@ -65,6 +66,48 @@ foreach ( $listings as $source ) {
             if ( ! is_wp_error( $term_ids ) && ! empty( $term_ids ) ) { wp_set_object_terms( $new_id, $term_ids, $taxonomy, false ); }
         }
         $translations[ $slug ] = $new_id;
+    }
+    pll_save_post_translations( $translations );
+}
+// Structure pages Lot 4bis : chaque page existe dans les trois langues et reste liee.
+$structure_pages = array(
+    'deposer-une-annonce' => array( 'fr' => 'Déposer une annonce', 'en' => 'Submit a listing', 'ar' => 'إضافة إعلان' ),
+    'favoris' => array( 'fr' => 'Favoris', 'en' => 'Favorites', 'ar' => 'المفضلة' ),
+    'mes-annonces' => array( 'fr' => 'Mes annonces', 'en' => 'My listings', 'ar' => 'إعلاناتي' ),
+    'politique-de-confidentialite' => array( 'fr' => 'Politique de confidentialité — contenu en attente de validation juridique', 'en' => 'Privacy policy — pending legal validation', 'ar' => 'سياسة الخصوصية — في انتظار المصادقة القانونية' ),
+    'conditions-utilisation' => array( 'fr' => 'Conditions générales — contenu en attente de validation juridique', 'en' => 'Terms of use — pending legal validation', 'ar' => 'شروط الاستخدام — في انتظار المصادقة القانونية' ),
+);
+foreach ( $structure_pages as $page_slug => $titles ) {
+    $source = get_page_by_path( $page_slug, OBJECT, 'page' );
+    if ( ! $source ) {
+        $source_id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_name' => $page_slug, 'post_title' => $titles['fr'], 'post_content' => '' ), true );
+        if ( is_wp_error( $source_id ) ) { fwrite( STDERR, $source_id->get_error_message() . "\\n" ); exit( 1 ); }
+        $source = get_post( $source_id );
+    }
+    pll_set_post_language( $source->ID, 'fr' );
+    $template_map = array(
+        'deposer-une-annonce' => 'templates/page-deposer-annonce.php',
+        'favoris' => 'templates/page-favoris.php',
+        'mes-annonces' => 'templates/page-mes-annonces.php',
+    );
+    if ( isset( $template_map[ $page_slug ] ) ) {
+        update_post_meta( $source->ID, '_wp_page_template', $template_map[ $page_slug ] );
+    }
+    $translations = array( 'fr' => $source->ID );
+    foreach ( array( 'en', 'ar' ) as $slug_lang ) {
+        $existing = pll_get_post_translations( $source->ID );
+        $translated_id = ! empty( $existing[ $slug_lang ] ) ? (int) $existing[ $slug_lang ] : 0;
+        if ( ! $translated_id ) {
+            $translated_id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $titles[ $slug_lang ], 'post_content' => '' ), true );
+            if ( is_wp_error( $translated_id ) ) { fwrite( STDERR, $translated_id->get_error_message() . "\\n" ); exit( 1 ); }
+            pll_set_post_language( $translated_id, $slug_lang );
+        } else {
+            wp_update_post( array( 'ID' => $translated_id, 'post_title' => $titles[ $slug_lang ], 'post_status' => 'publish' ) );
+        }
+        if ( isset( $template_map[ $page_slug ] ) ) {
+            update_post_meta( $translated_id, '_wp_page_template', $template_map[ $page_slug ] );
+        }
+        $translations[ $slug_lang ] = $translated_id;
     }
     pll_save_post_translations( $translations );
 }

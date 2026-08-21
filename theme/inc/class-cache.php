@@ -50,8 +50,10 @@ class Partikulier_Cache {
 	/**
 	 * Le plus tot possible : sert le fichier HTML cache si disponible.
 	 */
-	public static function maybe_serve_cached() {
-		if ( ! self::is_cacheable_request() ) {
+		public static function maybe_serve_cached() {
+			// La racine dépend de la langue/cookie/UA et ne doit jamais être servie
+			// depuis le cache fichier partagé.
+			if ( self::is_root_request() || ! self::is_cacheable_request() ) {
 			return;
 		}
 
@@ -88,11 +90,14 @@ class Partikulier_Cache {
 	/**
 	 * Demarre la capture de sortie pour generer le fichier cache.
 	 */
-	public static function start_caching() {
-		if ( ! self::is_cacheable_request() ) {
-			return;
-		}
-		ob_start( array( __CLASS__, 'store_cache' ) );
+		public static function start_caching() {
+			if ( self::is_root_request() || ! self::is_cacheable_request() ) {
+				return;
+			}
+			// Les variantes localisees sont immuables par URL et restent publiques.
+			header( 'Cache-Control: public, max-age=' . self::TTL );
+			header( 'Vary: Accept-Encoding', false );
+			ob_start( array( __CLASS__, 'store_cache' ) );
 	}
 
 	/**
@@ -183,7 +188,13 @@ class Partikulier_Cache {
 	/**
 	 * La requete courante est-elle cachable ?
 	 */
-	private static function is_cacheable_request() {
+			private static function is_root_request() {
+			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+			return '/' === trailingslashit( (string) $path );
+		}
+
+		private static function is_cacheable_request() {
+
 			if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) ) {
 			return false;
 		}

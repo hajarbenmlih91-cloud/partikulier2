@@ -124,25 +124,19 @@ class Partikulier_SEO {
 			return;
 		}
 
-		// Polylang emet deja ses propres balises alternate sur les contenus
-		// traduits. En ajouter d'autres produit des doublons contradictoires
-		// (fr / fr-FR pour la meme URL), que Google signale comme erreur.
-		// On se contente alors de completer le x-default, que Polylang n'emet pas.
-		if ( is_singular() && function_exists( 'pll_get_post_translations' ) ) {
-			$existing = pll_get_post_translations( get_queried_object_id() );
-			if ( count( $existing ) > 1 ) {
-				$default = function_exists( 'pll_default_language' ) ? pll_default_language() : 'fr';
-				if ( ! empty( $existing[ $default ] ) && 'publish' === get_post_status( $existing[ $default ] ) ) {
-					printf(
-						'<link rel="alternate" hreflang="x-default" href="%s">%s',
-						esc_url( get_permalink( $existing[ $default ] ) ),
-						"\n"
-					);
+			// Polylang emet deja les trois alternates sur les contenus relies.
+			// Le theme complete uniquement x-default pour eviter les doublons
+			// contradictoires (fr/en/ar et fr-FR/en-US/ar-MA).
+			if ( is_singular() && function_exists( 'pll_get_post_translations' ) ) {
+				$existing = pll_get_post_translations( get_queried_object_id() );
+				if ( count( $existing ) > 1 ) {
+					$default = function_exists( 'pll_default_language' ) ? pll_default_language() : 'fr';
+					if ( ! empty( $existing[ $default ] ) && 'publish' === get_post_status( $existing[ $default ] ) ) {
+						printf( '<link rel="alternate" hreflang="x-default" href="%s">%s', esc_url( get_permalink( $existing[ $default ] ) ), "\\n" );
+					}
+					return;
 				}
-
-				return;
 			}
-		}
 
 		$translations = array();
 		$published    = array();
