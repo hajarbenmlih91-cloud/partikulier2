@@ -14,7 +14,7 @@ if [ -z "$V" ]; then
 fi
 
 echo "── Alignement des versions sur $V"
-sed -i -E "s/^( \* )?Version: *[0-9.]+/\1Version: $V/"                 "$T/style.css"
+sed -i -E "s/^[[:space:]]*Version: *[0-9.]+/ Version: $V/"                 "$T/style.css"
 sed -i -E "s/(PARTIKULIER_VERSION', *')[0-9.]+/\1$V/"                  "$T/functions.php"
 sed -i -E "s/(\"version\": *\")[0-9.]+/\1$V/"                          "$T/package.json"
 sed -i -E "s/^Stable tag: *[0-9.]+/Stable tag: $V/"                    "$T/readme.txt"

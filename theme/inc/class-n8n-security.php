@@ -1,0 +1,266 @@
+<?php
+/**
+ * Sécurité et réglages n8n / WhatsApp pour Partikulier 6.16.
+ *
+ * @package Partikulier
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+class Partikulier_N8n_Security {
+	const OPTION = 'pk_n8n_settings';
+	const MIGRATION_OPTION = '_pk_n8n_settings_migration_state';
+	const MIGRATED_AT_OPTION = '_pk_n8n_settings_migrated_at';
+	const AUDIT_DB_VERSION = '1.0.0';
+	const AUDIT_DB_OPTION = 'pk_n8n_hmac_audit_db_version';
+	const MAX_FAILURES_PER_HOUR = 100;
+
+	public static function init() {
+		add_action( 'init', array( __CLASS__, 'maybe_migrate' ), 5 );
+		add_action( 'init', array( __CLASS__, 'maybe_install_audit_table' ), 6 );
+		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
+		add_action( 'admin_post_pk_save_n8n_settings', array( __CLASS__, 'save_admin' ) );
+	}
+
+	public static function maybe_migrate() {
+		$state = (string) get_option( self::MIGRATION_OPTION, '' );
+		if ( 'completed' === $state ) {
+			return;
+		}
+		$current = get_option( self::OPTION, null );
+		if ( ! is_array( $current ) ) {
+			$current = array();
+		}
+		$legacy = get_option( Partikulier_Settings::OPTION, array() );
+		if ( ! is_array( $legacy ) ) {
+			$legacy = array();
+		}
+		$keys = array( 'n8n_webhook_url', 'automation_api_secret', 'hmac_mode', 'consent_text', 'channel_url', 'quota_per_day' );
+		if ( 'pending' !== $state ) {
+			update_option( self::MIGRATION_OPTION, 'pending', false );
+		}
+		foreach ( $keys as $key ) {
+			if ( ! array_key_exists( $key, $current ) && array_key_exists( $key, $legacy ) ) {
+				$current[ $key ] = $legacy[ $key ];
+			}
+		}
+		$mode = $current['hmac_mode'] ?? 'off';
+		$current['hmac_mode'] = in_array( $mode, array( 'off', 'log', 'enforce' ), true ) ? $mode : 'off';
+		$current['quota_per_day'] = max( 1, min( 10, absint( $current['quota_per_day'] ?? 2 ) ?: 2 ) );
+		if ( ! empty( $current['n8n_webhook_url'] ) && ! self::is_https_url( $current['n8n_webhook_url'] ) ) {
+			$current['n8n_webhook_url'] = '';
+		}
+		if ( ! empty( $current['automation_api_secret'] ) ) {
+			$current['automation_api_secret'] = (string) $current['automation_api_secret'];
+		}
+		update_option( self::OPTION, $current, false );
+		$verified = is_array( get_option( self::OPTION, null ) ) && ( ! empty( $current['automation_api_secret'] ) || self::env_secret() );
+		if ( $verified ) {
+			update_option( self::MIGRATION_OPTION, 'verified', false );
+			foreach ( $keys as $key ) {
+				if ( array_key_exists( $key, $legacy ) ) {
+					unset( $legacy[ $key ] );
+				}
+			}
+			update_option( Partikulier_Settings::OPTION, $legacy, false );
+			update_option( self::MIGRATED_AT_OPTION, gmdate( 'c' ), false );
+			update_option( self::MIGRATION_OPTION, 'completed', false );
+		}
+	}
+
+	public static function env_secret() {
+		if ( defined( 'PARTIKULIER_N8N_SECRET' ) && PARTIKULIER_N8N_SECRET ) {
+			return (string) PARTIKULIER_N8N_SECRET;
+		}
+		$value = getenv( 'PARTIKULIER_N8N_SECRET' );
+		return false !== $value && '' !== $value ? (string) $value : '';
+	}
+
+	public static function env_webhook() {
+		if ( defined( 'PARTIKULIER_N8N_WEBHOOK_URL' ) && PARTIKULIER_N8N_WEBHOOK_URL ) {
+			return (string) PARTIKULIER_N8N_WEBHOOK_URL;
+		}
+		$value = getenv( 'PARTIKULIER_N8N_WEBHOOK_URL' );
+		return false !== $value && '' !== $value ? (string) $value : '';
+	}
+
+	public static function settings() {
+		$value = get_option( self::OPTION, array() );
+		return is_array( $value ) ? $value : array();
+	}
+
+	public static function get( $key, $default = '' ) {
+		$env_secret = self::env_secret();
+		if ( 'automation_api_secret' === $key && $env_secret ) {
+			return $env_secret;
+		}
+		if ( 'n8n_webhook_url' === $key ) {
+			$env_webhook = self::env_webhook();
+			if ( $env_webhook ) {
+				return $env_webhook;
+			}
+		}
+		$settings = self::settings();
+		if ( array_key_exists( $key, $settings ) && '' !== (string) $settings[ $key ] ) {
+			return $settings[ $key ];
+		}
+		if ( 'completed' !== get_option( self::MIGRATION_OPTION, '' ) ) {
+			$legacy = get_option( Partikulier_Settings::OPTION, array() );
+			if ( is_array( $legacy ) && array_key_exists( $key, $legacy ) ) {
+				return $legacy[ $key ];
+			}
+		}
+		return $default;
+	}
+
+	public static function secret_keys() {
+		$settings = self::settings();
+		$active = self::env_secret() ?: (string) ( $settings['automation_api_secret'] ?? '' );
+		$active_id = self::env_secret() ? 'env' : (string) ( $settings['active_key_id'] ?? 'N' );
+		$keys = array( $active_id => $active );
+		if ( ! empty( $settings['previous_secret'] ) && ! empty( $settings['previous_key_id'] ) && strtotime( (string) ( $settings['previous_expires_at'] ?? '' ) ) > time() ) {
+			$keys[ (string) $settings['previous_key_id'] ] = (string) $settings['previous_secret'];
+		}
+		return array_filter( $keys );
+	}
+
+	public static function check_automation_secret( WP_REST_Request $request ) {
+		$keys = self::secret_keys();
+		$secret = self::get( 'automation_api_secret' );
+		$provided = (string) $request->get_header( 'x_partikulier_automation' );
+		if ( ! $provided ) {
+			$authorization = (string) $request->get_header( 'authorization' );
+			if ( 0 === stripos( $authorization, 'bearer ' ) ) {
+				$provided = trim( substr( $authorization, 7 ) );
+			}
+		}
+		$shared_valid = false;
+		foreach ( $keys as $candidate ) {
+			if ( $provided && hash_equals( (string) $candidate, $provided ) ) {
+				$shared_valid = true;
+				break;
+			}
+		}
+		if ( ! $secret || ! $provided || ! $shared_valid ) {
+			return new WP_Error( 'pk_automation_auth', __( 'Requête non autorisée.', 'partikulier' ), array( 'status' => 401 ) );
+		}
+		$mode = self::get( 'hmac_mode', 'off' );
+		if ( 'off' === $mode ) {
+			return true;
+		}
+		$timestamp = (string) $request->get_header( 'x_partikulier_timestamp' );
+		$key_id = (string) $request->get_header( 'x_partikulier_key_id' );
+		$signature = (string) $request->get_header( 'x_partikulier_signature' );
+		$valid = ctype_digit( $timestamp ) && abs( time() - (int) $timestamp ) <= 300 && preg_match( '/^sha256=[a-f0-9]{64}$/', $signature );
+		$secret_for_key = $keys[ $key_id ] ?? '';
+		if ( $valid && $secret_for_key ) {
+			$path = (string) $request->get_route();
+			$canonical = strtoupper( $request->get_method() ) . "\n" . $path . "\n" . $timestamp . "\n" . $request->get_body();
+			$expected = 'sha256=' . hash_hmac( 'sha256', $canonical, $secret_for_key );
+			$valid = hash_equals( $expected, $signature );
+		}
+		if ( ! $valid ) {
+			if ( 'log' === $mode ) {
+				self::audit_failure( $key_id ?: 'missing', 'invalid_signature' );
+				return true;
+			}
+			return new WP_Error( 'pk_automation_signature', __( 'Requête non autorisée.', 'partikulier' ), array( 'status' => 401 ) );
+		}
+		return true;
+	}
+
+	public static function audit_failure( $key_id, $reason ) {
+		global $wpdb;
+		$table = self::audit_table();
+		$hour = gmdate( 'Y-m-d H:00:00' );
+		$wpdb->query( $wpdb->prepare( "INSERT INTO {$table} (key_id,hour_key,failure_count,last_reason) VALUES (%s,%s,1,%s) ON DUPLICATE KEY UPDATE failure_count=LEAST(failure_count+1,%d),last_reason=VALUES(last_reason)", sanitize_key( $key_id ), $hour, sanitize_key( $reason ), self::MAX_FAILURES_PER_HOUR ) );
+	}
+
+	public static function audit_table() {
+		global $wpdb;
+		return $wpdb->prefix . 'pk_n8n_hmac_audit';
+	}
+
+	public static function maybe_install_audit_table() {
+		if ( self::AUDIT_DB_VERSION === get_option( self::AUDIT_DB_OPTION ) ) {
+			return;
+		}
+		global $wpdb;
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		$charset = $wpdb->get_charset_collate();
+		dbDelta( "CREATE TABLE {$wpdb->prefix}pk_n8n_hmac_audit (id bigint(20) unsigned NOT NULL AUTO_INCREMENT,key_id varchar(64) NOT NULL,hour_key datetime NOT NULL,failure_count int unsigned NOT NULL DEFAULT 0,last_reason varchar(64) NOT NULL,PRIMARY KEY(id),UNIQUE KEY key_hour (key_id,hour_key)) {$charset};" );
+		update_option( self::AUDIT_DB_OPTION, self::AUDIT_DB_VERSION, false );
+	}
+
+	public static function admin_menu() {
+		add_management_page( 'Réglages n8n', 'Réglages n8n', 'manage_options', 'pk-n8n-settings', array( __CLASS__, 'render_admin' ) );
+	}
+
+	public static function save_admin() {
+		if ( ! current_user_can( 'manage_options' ) || ! check_admin_referer( 'pk_save_n8n_settings' ) ) {
+			wp_die( esc_html__( 'Accès non autorisé.', 'partikulier' ), 403 );
+		}
+		$current = self::settings();
+		$posted = wp_unslash( $_POST['pk_n8n'] ?? array() );
+		$url = esc_url_raw( (string) ( $posted['n8n_webhook_url'] ?? '' ) );
+		if ( $url && ! self::is_https_url( $url ) ) {
+			$url = '';
+		}
+		$current['n8n_webhook_url'] = $url;
+		$current['hmac_mode'] = in_array( $posted['hmac_mode'] ?? 'off', array( 'off', 'log', 'enforce' ), true ) ? $posted['hmac_mode'] : 'off';
+		$current['quota_per_day'] = max( 1, min( 10, absint( $posted['quota_per_day'] ?? 2 ) ?: 2 ) );
+		$current['consent_text'] = sanitize_textarea_field( (string) ( $posted['consent_text'] ?? '' ) );
+		$current['channel_url'] = esc_url_raw( (string) ( $posted['channel_url'] ?? '' ) );
+		$replacement = trim( (string) ( $posted['automation_api_secret'] ?? '' ) );
+		if ( $replacement ) {
+			if ( ! self::is_strong_secret( $replacement ) ) {
+				wp_die( esc_html__( 'Le secret doit contenir au moins 32 octets aléatoires encodés.', 'partikulier' ), 400 );
+			}
+			$current['automation_api_secret'] = $replacement;
+		}
+		update_option( self::OPTION, $current, false );
+		wp_safe_redirect( add_query_arg( array( 'page' => 'pk-n8n-settings', 'updated' => 1 ), admin_url( 'tools.php' ) ) );
+		exit;
+	}
+
+	public static function render_admin() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Accès non autorisé.', 'partikulier' ), 403 );
+		}
+		$s = self::settings();
+		$has_env = (bool) ( self::env_secret() || self::env_webhook() );
+		?>
+		<div class="wrap"><h1>Partikulier — Réglages n8n</h1>
+		<?php if ( isset( $_GET['updated'] ) ) : ?><div class="notice notice-success"><p>Réglages enregistrés.</p></div><?php endif; ?>
+		<p><?php echo $has_env ? esc_html__( 'Une partie de la configuration est fournie par l’environnement et n’est pas éditable ici.', 'partikulier' ) : esc_html__( 'Les secrets sont masqués et ne sont jamais réaffichés.', 'partikulier' ); ?></p>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="pk_save_n8n_settings"><?php wp_nonce_field( 'pk_save_n8n_settings' ); ?>
+		<table class="form-table"><tr><th>Webhook n8n</th><td><input class="regular-text" type="url" name="pk_n8n[n8n_webhook_url]" value="<?php echo $has_env ? '' : esc_attr( $s['n8n_webhook_url'] ?? '' ); ?>" <?php disabled( $has_env ); ?>></td></tr>
+		<tr><th>Secret</th><td><code>••••••••••••••••</code> <input type="password" name="pk_n8n[automation_api_secret]" value="" autocomplete="new-password" placeholder="Remplacer uniquement"></td></tr>
+		<tr><th>Mode HMAC</th><td><select name="pk_n8n[hmac_mode]"><?php foreach ( array( 'off', 'log', 'enforce' ) as $mode ) : ?><option value="<?php echo esc_attr( $mode ); ?>" <?php selected( $s['hmac_mode'] ?? 'off', $mode ); ?>><?php echo esc_html( $mode ); ?></option><?php endforeach; ?></select></td></tr>
+		<tr><th>Quota / jour</th><td><input type="number" min="1" max="10" name="pk_n8n[quota_per_day]" value="<?php echo absint( $s['quota_per_day'] ?? 2 ); ?>"></td></tr>
+		<tr><th>Consentement WhatsApp</th><td><textarea name="pk_n8n[consent_text]" rows="4" class="large-text"><?php echo esc_textarea( $s['consent_text'] ?? '' ); ?></textarea></td></tr>
+		<tr><th>Canal WhatsApp</th><td><input class="regular-text" type="url" name="pk_n8n[channel_url]" value="<?php echo esc_attr( $s['channel_url'] ?? '' ); ?>"></td></tr></table><p><button class="button button-primary">Enregistrer</button></p></form></div>
+		<?php
+	}
+
+	private static function is_strong_secret( $secret ) {
+		$secret = trim( (string) $secret );
+		$decoded = base64_decode( $secret, true );
+		$bytes = is_string( $decoded ) ? strlen( $decoded ) : 0;
+		if ( $bytes < 32 && preg_match( '/^[a-f0-9]{64,}$/i', $secret ) ) {
+			$bytes = (int) ( strlen( $secret ) / 2 );
+		}
+		if ( $bytes < 32 || preg_match( '/^(.)\\1+$/', $secret ) ) {
+			return false;
+		}
+		return true;
+	}
+
+	private static function is_https_url( $url ) {
+		return 'https' === strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+	}
+}
+
+Partikulier_N8n_Security::init();

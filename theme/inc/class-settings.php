@@ -279,6 +279,9 @@ class Partikulier_Settings {
 	 * du personnaliseur afin qu’aucun secret de production ne dépende de l’UI.
 	 */
 	public static function automation_api_secret() {
+		if ( class_exists( 'Partikulier_N8n_Security' ) ) {
+			return (string) Partikulier_N8n_Security::get( 'automation_api_secret' );
+		}
 		if ( defined( 'PARTIKULIER_AUTOMATION_API_SECRET' ) && PARTIKULIER_AUTOMATION_API_SECRET ) {
 			return (string) PARTIKULIER_AUTOMATION_API_SECRET;
 		}

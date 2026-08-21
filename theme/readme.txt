@@ -5,7 +5,7 @@ Tags: real-estate, property, listings, immobilier, performance, avif
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 6.15.0
+Stable tag: 6.16.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,12 @@ Caracteristiques :
 * Le theme surcharge automatiquement les templates d'Estatik via le dossier `estatik4/front/`.
 
 == Changelog ==
+
+= 6.16.0 =
+* Sécurité n8n : secret dédié, migration reprenable hors `pk_theme_options`, HMAC SHA-256 canonique, timestamp anti-rejeu et rotation à double clé.
+* Routes d’automatisation protégées par un wrapper REST commun, avec refus fail-closed des secrets absents ou invalides.
+* Journalisation idempotente des événements avec préfixes `n8n-`/`pay-`, gestion des collisions UNIQUE et quota configurable `quota_per_day` sous transaction.
+* Sept recettes JSON exécutées sur sandbox fraîche, plus non-régression H/K et Polylang ; aucun warning PHP 8.4 capturé.
 
 = 6.15.0 =
 * Lot H : textes éditoriaux FR/EN/AR avec fallback FR, validation d’alt hero et purge de cache sur création et mise à jour des options.

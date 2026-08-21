@@ -43,13 +43,11 @@ class Partikulier_Lead_Retention {
 	}
 
 	public static function register_route() {
-		register_rest_route(
-			Partikulier_Buyer_Qualification::REST_NAMESPACE,
+		Partikulier_Automation_Bridge::register_route(
 			'/erase-lead',
 			array(
-				'methods'             => 'POST',
-				'callback'            => array( __CLASS__, 'handle_erase_request' ),
-				'permission_callback' => array( 'Partikulier_Buyer_Qualification', 'check_automation_secret' ),
+				'methods'  => 'POST',
+				'callback' => array( __CLASS__, 'handle_erase_request' ),
 			)
 		);
 	}

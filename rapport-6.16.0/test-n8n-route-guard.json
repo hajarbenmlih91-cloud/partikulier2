@@ -1,0 +1,10 @@
+{
+    "test": "test-n8n-route-guard.php",
+    "started_at": "2026-08-21T01:19:42+00:00",
+    "passed": true,
+    "checks": [
+        "routes_shared_callback_8"
+    ],
+    "runtime_messages": [],
+    "finished_at": "2026-08-21T01:19:42+00:00"
+}

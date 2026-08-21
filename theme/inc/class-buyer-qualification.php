@@ -17,9 +17,14 @@ class Partikulier_Buyer_Qualification {
 
 	const DB_VERSION = '1.1.0';
 	const REST_NAMESPACE = 'partikulier/v1';
-	const DAILY_LIMIT = 2;
+		const DAILY_LIMIT = 2;
 
-	public static function init() {
+		public static function daily_limit() {
+			$value = class_exists( 'Partikulier_N8n_Security' ) ? Partikulier_N8n_Security::get( 'quota_per_day', self::DAILY_LIMIT ) : self::DAILY_LIMIT;
+			return max( 1, min( 10, absint( $value ) ?: self::DAILY_LIMIT ) );
+		}
+
+		public static function init() {
 		add_action( 'init', array( __CLASS__, 'maybe_install' ), 5 );
 		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
 	}
@@ -135,15 +140,13 @@ class Partikulier_Buyer_Qualification {
 
 	public static function register_routes() {
 		foreach ( array( 'contact-authorization', 'preferences', 'consent', 'opt-out' ) as $route ) {
-			register_rest_route(
-				self::REST_NAMESPACE,
-				'/' . $route,
-				array(
-					'methods'             => 'POST',
-					'callback'            => array( __CLASS__, 'handle_' . str_replace( '-', '_', $route ) ),
-					'permission_callback' => array( __CLASS__, 'check_automation_secret' ),
-				)
-			);
+				Partikulier_Automation_Bridge::register_route(
+					'/' . $route,
+					array(
+						'methods'  => 'POST',
+						'callback' => array( __CLASS__, 'handle_' . str_replace( '-', '_', $route ) ),
+					)
+				);
 		}
 	}
 
@@ -265,9 +268,9 @@ class Partikulier_Buyer_Qualification {
 			if ( ! $known_owner ) {
 				$wpdb->query( $wpdb->prepare( "INSERT INTO {$limits} (lead_id, day_key, contacts_count) VALUES (%d, %s, 0) ON DUPLICATE KEY UPDATE contacts_count = contacts_count", $lead_id, $day ) );
 				$used = (int) $wpdb->get_var( $wpdb->prepare( "SELECT contacts_count FROM {$limits} WHERE lead_id = %d AND day_key = %s FOR UPDATE", $lead_id, $day ) );
-				if ( $used >= self::DAILY_LIMIT ) {
+				if ( $used >= self::daily_limit() ) {
 					$wpdb->query( 'COMMIT' );
-					return new WP_REST_Response( array( 'allowed' => false, 'reason' => 'daily_limit', 'limit' => self::DAILY_LIMIT ), 200 );
+					return new WP_REST_Response( array( 'allowed' => false, 'reason' => 'daily_limit', 'limit' => self::daily_limit() ), 200 );
 				}
 			}
 

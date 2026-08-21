@@ -1,0 +1,10 @@
+{
+    "test": "test-n8n-settings-migration.php",
+    "started_at": "2026-08-21T01:19:40+00:00",
+    "passed": true,
+    "checks": [
+        "migration_idempotente_reprise_completed"
+    ],
+    "runtime_messages": [],
+    "finished_at": "2026-08-21T01:19:40+00:00"
+}

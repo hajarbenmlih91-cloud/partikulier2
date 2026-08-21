@@ -54,13 +54,11 @@ class Partikulier_Automation_Bridge {
 	}
 
 	public static function register_routes() {
-		register_rest_route(
-			self::REST_NAMESPACE,
+		self::register_route(
 			self::ROUTE,
 			array(
-				'methods'             => 'POST',
-				'callback'            => array( __CLASS__, 'receive_event' ),
-				'permission_callback' => array( __CLASS__, 'check_automation_secret' ),
+				'methods'  => 'POST',
+				'callback' => array( __CLASS__, 'receive_event' ),
 			)
 		);
 	}
@@ -70,16 +68,13 @@ class Partikulier_Automation_Bridge {
 	 * PARTIKULIER_AUTOMATION_API_SECRET ; il ne doit jamais être présent dans le
 	 * JavaScript, dans une URL ni dans une capture de workflow.
 	 */
+	public static function register_route( $route, $args ) {
+		$args['permission_callback'] = array( __CLASS__, 'check_automation_secret' );
+		register_rest_route( self::REST_NAMESPACE, $route, $args );
+	}
+
 	public static function check_automation_secret( WP_REST_Request $request ) {
-		$secret = Partikulier_Settings::automation_api_secret();
-		$provided = (string) $request->get_header( 'x_partikulier_automation' );
-		if ( ! $provided ) {
-			$authorization = (string) $request->get_header( 'authorization' );
-			if ( 0 === stripos( $authorization, 'bearer ' ) ) {
-				$provided = trim( substr( $authorization, 7 ) );
-			}
-		}
-		return $secret && $provided && hash_equals( $secret, $provided );
+		return Partikulier_N8n_Security::check_automation_secret( $request );
 	}
 
 	/**
@@ -93,16 +88,13 @@ class Partikulier_Automation_Bridge {
 		$source = sanitize_key( (string) $request->get_param( 'source' ) );
 		$payload = $request->get_param( 'payload' );
 		$allowed_types = array( 'whatsapp_inbound', 'whatsapp_status', 'payment_status' );
-		if ( ! $event_id || ! in_array( $event_type, $allowed_types, true ) || ! in_array( $source, array( 'n8n', 'payment_provider' ), true ) ) {
+		$prefix = 'n8n' === $source ? 'n8n-' : ( 'payment_provider' === $source ? 'pay-' : '' );
+		if ( ! $event_id || ! $prefix || 0 !== strpos( $event_id, $prefix ) || strlen( $event_id ) > 191 || ! in_array( $event_type, $allowed_types, true ) || ! in_array( $source, array( 'n8n', 'payment_provider' ), true ) ) {
 			return new WP_Error( 'pk_automation_payload', __( 'Événement d’automatisation invalide.', 'partikulier' ), array( 'status' => 400 ) );
 		}
 
 		global $wpdb;
 		$table = self::events_table();
-		$existing = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM {$table} WHERE event_id = %s", $event_id ) );
-		if ( $existing ) {
-			return new WP_REST_Response( array( 'accepted' => true, 'duplicate' => true, 'processing' => 'disabled' ), 200 );
-		}
 		$encoded_payload = wp_json_encode( is_array( $payload ) || is_object( $payload ) ? $payload : array( 'value' => (string) $payload ) );
 		$stored = $wpdb->insert(
 			$table,
@@ -117,9 +109,12 @@ class Partikulier_Automation_Bridge {
 			array( '%s', '%s', '%s', '%s', '%s', '%s' )
 		);
 		if ( false === $stored ) {
+			if ( false !== strpos( strtolower( (string) $wpdb->last_error ), 'duplicate' ) || false !== strpos( strtolower( (string) $wpdb->last_error ), 'unique' ) ) {
+				return new WP_REST_Response( array( 'accepted' => true, 'duplicate' => true, 'processing' => 'disabled' ), 200 );
+			}
 			return new WP_Error( 'pk_automation_storage', __( 'Impossible de journaliser l’événement.', 'partikulier' ), array( 'status' => 500 ) );
 		}
-		return new WP_REST_Response( array( 'accepted' => true, 'duplicate' => false, 'processing' => 'disabled' ), 202 );
+		return new WP_REST_Response( array( 'accepted' => true, 'duplicate' => false, 'processing' => 'disabled' ), 200 );
 	}
 }
 

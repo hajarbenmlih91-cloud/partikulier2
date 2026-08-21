@@ -521,23 +521,19 @@ class Partikulier_Listing_Approval {
 	 * Route de rattrapage : n8n peut recuperer les validations recentes.
 	 */
 	public static function register_routes() {
-			register_rest_route(
-				'partikulier/v1',
-				'/credentials-resend-accepted',
-				array(
-					'methods' => 'POST',
-					'callback' => array( __CLASS__, 'rest_resend_accepted' ),
-					'permission_callback' => array( 'Partikulier_Automation_Bridge', 'check_automation_secret' ),
-				)
-			);
-			register_rest_route(
-				'partikulier/v1',
-				'/approved-listings',
-			array(
-				'methods'             => 'GET',
-				'callback'            => array( __CLASS__, 'rest_approved' ),
-				'permission_callback' => array( 'Partikulier_Automation_Bridge', 'check_automation_secret' ),
-			)
+				Partikulier_Automation_Bridge::register_route(
+					'/credentials-resend-accepted',
+					array(
+						'methods'  => 'POST',
+						'callback' => array( __CLASS__, 'rest_resend_accepted' ),
+					)
+				);
+				Partikulier_Automation_Bridge::register_route(
+					'/approved-listings',
+					array(
+						'methods'  => 'GET',
+						'callback' => array( __CLASS__, 'rest_approved' ),
+					)
 		);
 	}
 

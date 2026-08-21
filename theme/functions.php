@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PARTIKULIER_VERSION', '6.15.0' );
+define( 'PARTIKULIER_VERSION', '6.16.0' );
 define( 'PARTIKULIER_DIR', get_template_directory() );
 define( 'PARTIKULIER_URI', get_template_directory_uri() );
 define( 'PARTIKULIER_ESTATIK_POST_TYPE', 'properties' );
@@ -96,6 +96,7 @@ $partikulier_modules = array(
 	'/inc/class-dashboard.php',
 	'/inc/class-owner-insights.php',
 	'/inc/class-estatik.php',
+	'/inc/class-n8n-security.php',
 	'/inc/class-settings.php',
 	'/inc/class-customization.php',
 	'/inc/class-whatsapp-verification.php',

@@ -1,0 +1,1 @@
+<?php define('PK_N8N_TEST_NAME', 'test-n8n-secret-rotation.php'); require __DIR__ . "/test-n8n-run.php";
