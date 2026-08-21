@@ -14,11 +14,11 @@ Le sign-off contractuel final reste **conditionnel** tant que les deux attestati
 | Élément | Valeur |
 |---|---|
 | Bundle principal | `partikulier-6.17.0.zip` |
-| SHA-256 | `dd52905797b78e8d89c99413a494355b4a84e33565959dfb83b88c215911b732` |
+| SHA-256 | `dc97e55a148056c770a7c7ca8afdcdb79ed4d9ab67864d037872f29ab6f3878c` |
 | Archive thème complémentaire | `partikulier-6.17.0-theme.zip` |
 | Contenu obligatoire vérifié | `theme/`, `mu-plugins/partikulier-early-seo.php`, `theme/languages/ar.mo`, `theme/languages/en_US.mo`, `INSTALL.md` |
 
-Le mu-plugin est maintenant livré dans l’artefact principal. Il ne faut pas installer uniquement l’archive thème si l’on veut bénéficier de l’exemption robots exécutée avant Polylang.
+Le mu-plugin est maintenant livré dans l’artefact principal. Il ne faut pas installer uniquement l’archive thème si l’on veut bénéficier de l’exemption robots exécutée avant Polylang. Les deux TTF arabes inutilisés ont été retirés ; le bundle contient uniquement les WOFF2 déclarés par le CSS.
 
 ## Corrections appliquées
 
@@ -28,7 +28,7 @@ Le registre public a été corrigé de `France` vers `Maroc`, avec replis `Moroc
 
 Le sélecteur de langue Lot 5 utilise désormais des SVG inline pour le Maroc, la France et les États-Unis, avec code et nom natif. Sur la page AR, quatre occurrences SVG `pk-flag` ont été observées et l’ancien globe n’a pas été détecté. Aucune image externe n’est utilisée pour ces drapeaux.
 
-Le garde-fou R6 est branché dans `scripts/check.sh`. Il possède un fichier d’exceptions versionné et un test négatif qui injecte `3 chambres ou plus` dans une copie temporaire et exige l’échec du contrôle.
+Le garde-fou R6 est branché dans `scripts/check.sh`. Il possède un fichier d’exceptions versionné et un test négatif qui injecte `3 chambres ou plus` dans une copie temporaire et exige l’échec du contrôle. La recette SEO a également été corrigée pour découvrir le post type Estatik `properties` et la famille Polylang FR/EN/AR dynamiquement, sans slug historique ; elle refuse désormais toute famille absente ou toute réponse autre que 200 avant analyse.
 
 ## Recettes exécutées depuis le bundle extrait
 
@@ -37,7 +37,7 @@ Le garde-fou R6 est branché dans `scripts/check.sh`. Il possède un fichier d�
 | Détection navigateur, cookie, robots et headers root | PASS |
 | Parcours Playwright mobile AR/EN à 390 px | PASS |
 | Contrôle police Noto Sans Arabic | PASS |
-| SEO hreflang, JSON-LD, meta et cache localisé | PASS |
+| SEO hreflang, JSON-LD, meta et cache localisé, famille découverte dynamiquement | PASS |
 | Provisioning Polylang avec assertion browser | PASS |
 | `check.sh` | PASS |
 | Lint PHP | 66 fichiers, aucune erreur |
