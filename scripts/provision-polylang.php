@@ -111,7 +111,6 @@ foreach ( $structure_pages as $page_slug => $titles ) {
     }
     pll_save_post_translations( $translations );
 }
-flush_rewrite_rules( false );
 require_once __DIR__ . '/provision-polylang-taxonomies.php';
 // Polylang peut réécrire ses options pendant le provisioning : la détection
 // navigateur est donc forcée une dernière fois, puis vérifiée avant le rapport.
@@ -132,6 +131,9 @@ if ( empty( get_option( 'polylang', array() )['browser'] ) ) {
     fwrite( STDERR, "Polylang browser detection was not persisted\\n" );
     exit( 1 );
 }
+// Estatik, Polylang, les traductions et les taxonomies sont maintenant en place.
+// Le flush final doit donc refleter l’etat complet, et non un etat intermediaire.
+flush_rewrite_rules( false );
 $language_report = array();
 foreach ( (array) $GLOBALS['polylang']->model->languages->get_list() as $language ) {
     $language_report[] = array( 'slug' => (string) $language->slug, 'locale' => (string) $language->locale, 'name' => (string) $language->name );

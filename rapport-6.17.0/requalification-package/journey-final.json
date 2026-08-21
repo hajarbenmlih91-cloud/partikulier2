@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "lang": "ar",
+      "passed": true,
+      "failures": [],
+      "screens": [
+        {
+          "name": "home",
+          "url": "http://localhost:8090/ar/",
+          "ok": true,
+          "html": "ar",
+          "dir": "rtl",
+          "detail": "lang=ar dir=rtl",
+          "http_status": 200
+        },
+        {
+          "name": "archive",
+          "url": "http://localhost:8090/ar/annonces/",
+          "ok": true,
+          "property_links": 16,
+          "detail": "property_links=16",
+          "http_status": 200
+        },
+        {
+          "name": "property",
+          "url": "http://localhost:8090/ar/annonce/casablanca/maarif/%d8%a5%d8%b9%d9%84%d8%a7%d9%86-%d9%85%d8%aa%d8%b1%d8%ac%d9%85-security-sofia-listing/",
+          "ok": true,
+          "html": "ar",
+          "dir": "rtl",
+          "hreflang": 4,
+          "owner_note_fr_blocks": 0,
+          "http_status": 200
+        },
+        {
+          "name": "deposit",
+          "url": "http://localhost:8090/ar/%d8%a5%d8%b6%d8%a7%d9%81%d8%a9-%d8%a5%d8%b9%d9%84%d8%a7%d9%86/",
+          "ok": true,
+          "html": "ar",
+          "dir": "rtl",
+          "free_text_fields": 3,
+          "title": 1,
+          "extra": 1,
+          "http_status": 200
+        }
+      ]
+    },
+    {
+      "lang": "en",
+      "passed": true,
+      "failures": [],
+      "screens": [
+        {
+          "name": "home",
+          "url": "http://localhost:8090/en/",
+          "ok": true,
+          "html": "en-US",
+          "dir": null,
+          "detail": "lang=en-US dir=null",
+          "http_status": 200
+        },
+        {
+          "name": "archive",
+          "url": "http://localhost:8090/en/annonces/",
+          "ok": true,
+          "property_links": 20,
+          "detail": "property_links=20",
+          "http_status": 200
+        },
+        {
+          "name": "property",
+          "url": "http://localhost:8090/en/annonce/casablanca/maarif/manual-test-en-14/",
+          "ok": true,
+          "html": "en-US",
+          "dir": null,
+          "hreflang": 4,
+          "owner_note_fr_blocks": 0,
+          "http_status": 200
+        },
+        {
+          "name": "deposit",
+          "url": "http://localhost:8090/en/submit-a-listing/",
+          "ok": true,
+          "html": "en-US",
+          "dir": null,
+          "free_text_fields": 3,
+          "title": 1,
+          "extra": 1,
+          "http_status": 200
+        }
+      ]
+    }
+  ]
+}

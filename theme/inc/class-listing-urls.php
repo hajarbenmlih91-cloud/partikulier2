@@ -260,19 +260,33 @@ class Partikulier_Listing_URLs {
 			add_rewrite_rule( '^property/page/([0-9]+)/?$', 'index.php?post_type=' . $cpt . '&paged=$matches[1]', 'top' );
 			add_rewrite_rule( '^property/?$', 'index.php?post_type=' . $cpt, 'top' );
 
-		// Ville + quartier + annonce.
-		add_rewrite_rule(
-			'^' . $base . '/[^/]+/[^/]+/([^/]+)/?$',
-			'index.php?post_type=' . $cpt . '&name=$matches[1]',
-			'top'
-		);
+			// Polylang ajoute le slug de langue devant les fiches non par defaut.
+			// Ces regles doivent preceder les regles sans prefixe : sans elles,
+			// /en/annonce/... et /ar/annonce/... tombent en 404 avant resolution.
+			add_rewrite_rule(
+				'^(fr|en|ar)/' . $base . '/[^/]+/[^/]+/([^/]+)/?$',
+				'index.php?post_type=' . $cpt . '&name=$matches[2]&lang=$matches[1]',
+				'top'
+			);
+			add_rewrite_rule(
+				'^(fr|en|ar)/' . $base . '/[^/]+/([^/]+)/?$',
+				'index.php?post_type=' . $cpt . '&name=$matches[2]&lang=$matches[1]',
+				'top'
+			);
 
-		// Ville + annonce (quartier absent).
-		add_rewrite_rule(
-			'^' . $base . '/[^/]+/([^/]+)/?$',
-			'index.php?post_type=' . $cpt . '&name=$matches[1]',
-			'top'
-		);
+			// Ville + quartier + annonce.
+			add_rewrite_rule(
+				'^' . $base . '/[^/]+/[^/]+/([^/]+)/?$',
+				'index.php?post_type=' . $cpt . '&name=$matches[1]',
+				'top'
+			);
+
+			// Ville + annonce (quartier absent).
+			add_rewrite_rule(
+				'^' . $base . '/[^/]+/([^/]+)/?$',
+				'index.php?post_type=' . $cpt . '&name=$matches[1]',
+				'top'
+			);
 	}
 
 	/**
