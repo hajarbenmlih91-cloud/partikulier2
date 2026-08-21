@@ -245,13 +245,18 @@ class Partikulier_SEO {
 		if ( is_singular( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
 			$post = get_queried_object();
 
-			// Meta description dediee, redigee au depot de l'annonce.
-			$stored = get_post_meta( $post->ID, '_pk_meta_description', true );
-			if ( $stored ) {
-				return self::normalize_description( $stored );
-			}
+				// Le texte libre stocké est conservé en FR ; EN/AR utilisent un
+				// gabarit localisé afin de ne jamais injecter une meta française.
+				$locale = function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr';
+				$stored = get_post_meta( $post->ID, '_pk_meta_description', true );
+				if ( $stored && 'fr' === $locale ) {
+					return self::normalize_description( $stored );
+				}
+				if ( 'en' === $locale || 'ar' === $locale ) {
+					return self::localized_listing_description( $post, $locale );
+				}
 
-			$desc = trim( wp_strip_all_tags( get_the_excerpt( $post ) ) );
+				$desc = trim( wp_strip_all_tags( get_the_excerpt( $post ) ) );
 			if ( ! $desc ) {
 				$desc = trim( wp_strip_all_tags( $post->post_content ) );
 			}
@@ -265,9 +270,9 @@ class Partikulier_SEO {
 					get_the_title( $post )
 				);
 			}
-				return self::limit( self::normalize_description( $full ), 155 );
-		}
-		if ( is_tax() && $queried instanceof WP_Term ) {
+							return self::limit( self::normalize_description( $full ), 155 );
+			}
+			if ( is_tax() && $queried instanceof WP_Term ) {
 			$desc = trim( term_description( $queried ) );
 			if ( ! $desc ) {
 				$desc = sprintf(
@@ -303,9 +308,33 @@ class Partikulier_SEO {
 		return '';
 	}
 
-	/**
-	 * Directive robots : index,follow sauf pages inutiles.
-	 */
+		/** Description localisée des fiches EN/AR sans fuite du texte libre FR. */
+		private static function localized_listing_description( $post, $locale ) {
+			$type     = self::localized_property_type( self::term_name( $post, PARTIKULIER_ESTATIK_TYPE_TAXONOMY ), $locale );
+			$location = self::term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+			$type     = $type ? $type : ( 'ar' === $locale ? 'عقار' : 'Property' );
+			$location = $location ? $location : ( 'ar' === $locale ? 'المغرب' : 'Morocco' );
+
+			if ( 'ar' === $locale ) {
+				return self::limit( sprintf( 'عقار مقترح مباشرة من مالكه، بدون عمولة وكالة. %s في %s', $type, $location ), 155 );
+			}
+			return self::limit( sprintf( 'Property offered directly by its owner, without agency commission. %s in %s', $type, $location ), 155 );
+		}
+
+		private static function localized_property_type( $type, $locale ) {
+			$map = array(
+				'Appartement' => array( 'en' => 'Apartment', 'ar' => 'شقة' ),
+				'Villa'       => array( 'en' => 'Villa', 'ar' => 'فيلا' ),
+				'Maison'      => array( 'en' => 'House', 'ar' => 'منزل' ),
+				'Terrain'     => array( 'en' => 'Land', 'ar' => 'أرض' ),
+				'Studio'      => array( 'en' => 'Studio', 'ar' => 'استوديو' ),
+			);
+			return isset( $map[ $type ][ $locale ] ) ? $map[ $type ][ $locale ] : $type;
+		}
+
+		/**
+		 * Directive robots : index,follow sauf pages inutiles.
+		 */
 	public static function robots_directive() {
 		if ( is_search() || is_404() || is_attachment() || is_page( array( 'deposer-une-annonce', 'mes-annonces' ) ) ) {
 			return 'noindex,follow';

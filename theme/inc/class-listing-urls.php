@@ -38,8 +38,10 @@ class Partikulier_Listing_URLs {
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'add_rules' ), 20 );
 		add_filter( 'post_type_link', array( __CLASS__, 'filter_link' ), 10, 2 );
-		add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
-		add_action( 'template_redirect', array( __CLASS__, 'redirect_legacy' ), 1 );
+add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
+			add_action( 'parse_request', array( __CLASS__, 'resolve_geo_request' ), 2 );
+			add_filter( 'query_vars', array( __CLASS__, 'query_vars' ) );
+			add_action( 'template_redirect', array( __CLASS__, 'redirect_legacy' ), 1 );
 
 		// La geographie est figee a l'enregistrement : une URL ne doit pas
 		// changer parce qu'un terme a ete renomme trois mois plus tard.
@@ -211,7 +213,8 @@ class Partikulier_Listing_URLs {
 			return $link;
 		}
 
-		return home_url( user_trailingslashit( $path . '/' . $post->post_name ) );
+		$slug = self::clean_slug( $post->post_name );
+			return home_url( user_trailingslashit( $path . '/' . $slug ) );
 	}
 
 	/**
@@ -252,6 +255,57 @@ class Partikulier_Listing_URLs {
 	/* Regles de reecriture                                                */
 	/* ------------------------------------------------------------------ */
 
+		/**
+		 * Query var interne utilisée pour éviter que Polylang ne filtre les règles
+		 * localisées contenant directement `name=`.
+		 */
+		public static function query_vars( $vars ) {
+			$vars[] = 'pk_listing_slug';
+			return $vars;
+		}
+
+		/** Résout le slug géographique en ID après le parsing WordPress. */
+		public static function resolve_geo_request( $wp ) {
+			$raw_slug = isset( $wp->query_vars['pk_listing_slug'] ) ? rawurldecode( (string) $wp->query_vars['pk_listing_slug'] ) : '';
+			$slug     = $raw_slug ? sanitize_title( $raw_slug ) : '';
+			if ( ! $slug || ! empty( $wp->query_vars['p'] ) ) {
+				return;
+			}
+
+			$post = get_page_by_path( $slug, OBJECT, PARTIKULIER_ESTATIK_POST_TYPE );
+			// Compatibilité avec les anciennes traductions arabes dont le post_name
+			// conserve encore `إعلان-مترجم-`, alors que l’URL publique est nettoyée.
+			if ( ! $post instanceof WP_Post ) {
+				$legacy_slug = sanitize_title( 'إعلان-مترجم-' . $raw_slug );
+				$post        = get_page_by_path( $legacy_slug, OBJECT, PARTIKULIER_ESTATIK_POST_TYPE );
+			}
+			if ( ! $post instanceof WP_Post || 'publish' !== $post->post_status ) {
+				return;
+			}
+
+			$lang = isset( $wp->query_vars['lang'] ) ? sanitize_key( $wp->query_vars['lang'] ) : '';
+			if ( $lang && function_exists( 'pll_get_post' ) ) {
+				$translated_id = pll_get_post( $post->ID, $lang );
+				if ( $translated_id ) {
+					$translated = get_post( $translated_id );
+					if ( $translated instanceof WP_Post && 'publish' === $translated->post_status ) {
+						$post = $translated;
+					}
+				}
+			}
+
+			$wp->query_vars['p']         = (int) $post->ID;
+			$wp->query_vars['post_type'] = PARTIKULIER_ESTATIK_POST_TYPE;
+			unset( $wp->query_vars['pk_listing_slug'] );
+		}
+
+		/** Supprime le préfixe de traduction parasite des slugs arabes. */
+		private static function clean_slug( $slug ) {
+			$slug = rawurldecode( (string) $slug );
+			$slug = preg_replace( '/^إعلان-مترجم-/u', '', $slug );
+			return sanitize_title( trim( $slug, '-' ) );
+		}
+
 		public static function add_rules() {
 			$base = self::BASE;
 			$cpt  = PARTIKULIER_ESTATIK_POST_TYPE;
@@ -265,26 +319,26 @@ class Partikulier_Listing_URLs {
 			// /en/annonce/... et /ar/annonce/... tombent en 404 avant resolution.
 			add_rewrite_rule(
 				'^(fr|en|ar)/' . $base . '/[^/]+/[^/]+/([^/]+)/?$',
-				'index.php?post_type=' . $cpt . '&name=$matches[2]&lang=$matches[1]',
+				'index.php?post_type=' . $cpt . '&pk_listing_slug=$matches[2]&lang=$matches[1]',
 				'top'
 			);
 			add_rewrite_rule(
 				'^(fr|en|ar)/' . $base . '/[^/]+/([^/]+)/?$',
-				'index.php?post_type=' . $cpt . '&name=$matches[2]&lang=$matches[1]',
+				'index.php?post_type=' . $cpt . '&pk_listing_slug=$matches[2]&lang=$matches[1]',
 				'top'
 			);
 
 			// Ville + quartier + annonce.
 			add_rewrite_rule(
 				'^' . $base . '/[^/]+/[^/]+/([^/]+)/?$',
-				'index.php?post_type=' . $cpt . '&name=$matches[1]',
+				'index.php?post_type=' . $cpt . '&pk_listing_slug=$matches[1]',
 				'top'
 			);
 
 			// Ville + annonce (quartier absent).
 			add_rewrite_rule(
 				'^' . $base . '/[^/]+/([^/]+)/?$',
-				'index.php?post_type=' . $cpt . '&name=$matches[1]',
+				'index.php?post_type=' . $cpt . '&pk_listing_slug=$matches[1]',
 				'top'
 			);
 	}

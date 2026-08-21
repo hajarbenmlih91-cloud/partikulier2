@@ -26,7 +26,7 @@ exit(1);
 }
 
 python3 - "$BASE" "$REPORT" "$FAMILY" <<'PY'
-import json, re, subprocess, sys, tempfile, os
+import json, re, subprocess, sys, tempfile, os, urllib.parse
 base, report, family_raw = sys.argv[1:]
 try:
     family=json.loads(family_raw)
@@ -63,7 +63,17 @@ for lang,path,html_lang,dirv,inlang,og in cases:
     ld_ok=bool(re.search(r'"inLanguage"\s*:\s*"'+re.escape(inlang)+r'"',body))
     og_ok=bool(re.search(r'property="og:locale" content="'+re.escape(og)+r'"',body))
     h_ok=len(set(hreflangs))>=4 and 'x-default' in hreflangs and any(x in hreflangs for x in ['fr','fr-FR']) and 'en' in hreflangs and 'ar' in hreflangs
-    rows.append({'lang':lang,'path':path,'status':status,'http_ok':status=='200','html_lang':html.group(0) if html else '', 'lang_ok':lang_ok,'dir_ok':bool(dir_ok),'jsonld_inLanguage':inlang if ld_ok else None,'og_locale':og if og_ok else None,'hreflang':hreflangs,'meta_description':desc.group(1) if desc else '', 'passed':status=='200' and all([lang_ok,dir_ok,ld_ok,og_ok,h_ok])})
+    meta = desc.group(1) if desc else ''
+    french_markers = ['Bien proposé', 'À vendre', 'Appartement', 'sans commission d agence', 'annonce immobilière']
+    if lang == 'fr':
+        meta_ok = bool(meta)
+    elif lang == 'en':
+        meta_ok = bool(meta) and not any(marker.lower() in meta.lower() for marker in french_markers) and bool(re.search(r'\b(Property|Apartment|House|Villa|Land|Studio|Morocco|owner|commission)\b', meta, re.I))
+    else:
+        meta_ok = bool(meta) and not any(marker.lower() in meta.lower() for marker in french_markers) and bool(re.search(r'[\u0600-\u06ff]', meta))
+    decoded_path = urllib.parse.unquote(path)
+    slug_ok = not 'إعلان-مترجم-' in decoded_path
+    rows.append({'lang':lang,'path':path,'status':status,'http_ok':status=='200','html_lang':html.group(0) if html else '', 'lang_ok':lang_ok,'dir_ok':bool(dir_ok),'jsonld_inLanguage':inlang if ld_ok else None,'og_locale':og if og_ok else None,'hreflang':hreflangs,'meta_description':meta,'meta_language_ok':meta_ok,'slug_ok':slug_ok,'passed':status=='200' and all([lang_ok,dir_ok,ld_ok,og_ok,h_ok,meta_ok,slug_ok])})
 
 cache=[]
 for lang,path,_,_,_,_ in cases:

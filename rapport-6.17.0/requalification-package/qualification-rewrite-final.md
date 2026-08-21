@@ -17,10 +17,10 @@ La recette SEO découvre maintenant une famille `properties` publiée via Polyla
 | Famille Polylang découverte | FR `14`, EN `94`, AR `26` |
 | Fiche FR géographique | `/annonce/casablanca/maarif/security-sofia-listing/` → HTTP 200 |
 | Fiche EN géographique | `/en/annonce/casablanca/maarif/manual-test-en-14/` → HTTP 200 |
-| Fiche AR géographique | `/ar/annonce/casablanca/maarif/إعلان-مترجم-security-sofia-listing/` → HTTP 200 |
-| HTML AR | `lang="ar"`, `dir="rtl"` |
+| Fiche AR géographique | `/ar/annonce/casablanca/maarif/security-sofia-listing/` → HTTP 200 |
+| HTML AR | `lang="ar"`, `dir="rtl"` ; meta arabe localisée ; préfixe `إعلان-مترجم-` absent |
 | hreflang | `fr`, `en`, `ar`, `x-default` sur les trois fiches |
-| JSON-LD / Open Graph | cohérents avec `fr_FR`, `en_US` et `ar` |
+| JSON-LD / Open Graph | cohérents avec `fr_FR`, `en_US` et `ar` ; meta EN/AR non françaises |
 | Cache | MISS puis trois HIT publics par langue, tous HTTP 200 |
 | Playwright AR | accueil, archive, fiche `/ar/annonce`, dépôt : PASS, `failures: []` |
 | Playwright EN | accueil, archive, fiche `/en/annonce`, dépôt : PASS, `failures: []` |
@@ -28,14 +28,14 @@ La recette SEO découvre maintenant une famille `properties` publiée via Polyla
 | PHP | `class-listing-urls.php` et provisioning : aucune erreur de syntaxe |
 | R6 | contrôle positif et test négatif PASS |
 
-Les preuves détaillées sont archivées dans `seo-rewrite-annonce.json` et `journey-final.json`.
+Les preuves détaillées sont archivées dans `seo-rewrite-annonce.json`, `journey-final.json` et le rapport JSON généré par `test-i18n-seo.sh`. Le résultat final est `passed: true` avec trois statuts 200, meta EN/AR localisées, slug arabe propre et MISS puis trois HIT publics par langue.
 
 ## Artefact
 
 Le bundle contient le mu-plugin SEO, les fichiers `ar.mo` et `en_US.mo`, les deux WOFF2 Noto Sans Arabic et les scripts de recette. Le hash courant est :
 
 ```text
-92ff01f41e6974022edff7de2e6267cbbe9c50035f0da9d65cec7b3ebbec005e  partikulier-6.17.0.zip
+b1e27207da6a00e0a162cc955861fe26ac10ae57b698a71930c0008e64e66999  partikulier-6.17.0.zip
 ```
 
 ## Verdict
