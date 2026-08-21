@@ -24,7 +24,10 @@ class Partikulier_Listing_Approval {
 
 	const MENU_SLUG = 'pk-approvals';
 	const ACTION    = 'pk_approve_listing';
-	const ACTION_RESEND = 'pk_resend_credentials';
+		const ACTION_RESEND = 'pk_resend_credentials';
+		const META_LAST_RESEND_ACCEPTED = '_pk_credentials_last_resend_accepted_at';
+		const META_LAST_RESEND_LEGACY   = '_pk_credentials_last_resent_at';
+		const META_MIGRATION_OPTION     = 'pk_credentials_resend_meta_migrated_v1';
 
 	/**
 	 * Longueur du mot de passe genere et transmis a l'annonceur.
@@ -37,7 +40,9 @@ class Partikulier_Listing_Approval {
 		add_action( 'admin_menu', array( __CLASS__, 'add_menu' ), 15 );
 		add_action( 'admin_post_' . self::ACTION, array( __CLASS__, 'handle' ) );
 		add_action( 'admin_post_' . self::ACTION_RESEND, array( __CLASS__, 'handle_resend' ) );
-		add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+					add_action( 'rest_api_init', array( __CLASS__, 'register_routes' ) );
+			add_action( 'init', array( __CLASS__, 'migrate_resend_meta' ), 5 );
+
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -541,7 +546,27 @@ class Partikulier_Listing_Approval {
 	 *
 	 * @return WP_REST_Response
 	 */
-	public static function rest_resend_accepted( WP_REST_Request $request ) {
+			/**
+		 * Migre une seule fois l'ancien nom de méta vers le contrat v2.2.
+		 * L'ancienne valeur est conservée comme trace de compatibilité.
+		 */
+		public static function migrate_resend_meta() {
+			if ( get_option( self::META_MIGRATION_OPTION, false ) ) {
+				return;
+			}
+
+			global $wpdb;
+			$rows = $wpdb->get_results( $wpdb->prepare( "SELECT post_id, meta_value FROM {$wpdb->postmeta} WHERE meta_key = %s", self::META_LAST_RESEND_LEGACY ) );
+			foreach ( $rows as $row ) {
+				if ( ! get_post_meta( (int) $row->post_id, self::META_LAST_RESEND_ACCEPTED, true ) ) {
+					update_post_meta( (int) $row->post_id, self::META_LAST_RESEND_ACCEPTED, sanitize_text_field( (string) $row->meta_value ) );
+				}
+			}
+			add_option( self::META_MIGRATION_OPTION, gmdate( 'c' ), '', true );
+		}
+
+		public static function rest_resend_accepted( WP_REST_Request $request ) {
+
 		$post_id = absint( $request->get_param( 'listing_id' ) );
 		$request_id = sanitize_text_field( (string) $request->get_param( 'resend_request_id' ) );
 		if ( ! $post_id || ! $request_id ) {
@@ -551,10 +576,16 @@ class Partikulier_Listing_Approval {
 		if ( ! hash_equals( $expected, $request_id ) ) {
 			return new WP_Error( 'stale_resend_ack', __( 'Demande de renvoi inconnue ou périmée.', 'partikulier' ), array( 'status' => 409 ) );
 		}
-		if ( get_post_meta( $post_id, '_pk_credentials_last_resent_at', true ) ) {
+					$accepted_at = get_post_meta( $post_id, self::META_LAST_RESEND_ACCEPTED, true );
+			if ( ! $accepted_at ) {
+				$accepted_at = get_post_meta( $post_id, self::META_LAST_RESEND_LEGACY, true );
+			}
+			if ( $accepted_at ) {
+
 			return new WP_REST_Response( array( 'accepted' => true, 'idempotent' => true ), 200 );
 		}
-		update_post_meta( $post_id, '_pk_credentials_last_resent_at', current_time( 'mysql', true ) );
+					update_post_meta( $post_id, self::META_LAST_RESEND_ACCEPTED, current_time( 'mysql', true ) );
+
 		delete_post_meta( $post_id, '_pk_credentials_resend_pending' );
 		return new WP_REST_Response( array( 'accepted' => true, 'idempotent' => false ), 200 );
 	}

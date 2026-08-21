@@ -41,6 +41,14 @@ if ( class_exists( 'WP_List_Table' ) && ! class_exists( 'Partikulier_Leads_List_
 			return array( 'widefat', 'fixed', 'striped', 'pk-leads-table' );
 		}
 
+		public function get_sortable_columns() {
+			return array(
+				'lead'     => array( 'last_seen_at', true ),
+				'consent'  => array( 'consent', false ),
+				'followup' => array( 'status', false ),
+			);
+		}
+
 		public function prepare_items() {}
 
 		public function display_rows() {
@@ -116,8 +124,10 @@ class Partikulier_Leads_Admin {
 			'status' => sanitize_key( $_POST['lead_status'] ?? '' ),
 			'consent' => sanitize_key( $_POST['consent'] ?? '' ),
 			'search' => sanitize_text_field( wp_unslash( $_POST['q'] ?? '' ) ),
-			'page' => 1,
-		);
+'page' => 1,
+				'orderby' => sanitize_key( $_POST['orderby'] ?? 'last_seen_at' ),
+				'order' => strtoupper( sanitize_key( $_POST['order'] ?? 'DESC' ) ),
+			);
 		$result = self::lead_rows( $filters );
 		nocache_headers();
 		header( 'Content-Type: text/csv; charset=UTF-8' );
@@ -265,8 +275,10 @@ $statuses = self::followup_statuses();
 			'status' => sanitize_key( $_GET['lead_status'] ?? '' ),
 			'consent' => sanitize_key( $_GET['consent'] ?? '' ),
 			'search' => sanitize_text_field( wp_unslash( $_GET['q'] ?? '' ) ),
-			'page' => max( 1, absint( $_GET['paged'] ?? 1 ) ),
-		);
+'page' => max( 1, absint( $_GET['paged'] ?? 1 ) ),
+				'orderby' => sanitize_key( $_GET['orderby'] ?? 'last_seen_at' ),
+				'order' => strtoupper( sanitize_key( $_GET['order'] ?? 'DESC' ) ),
+			);
 	}
 
 		public static function followup_statuses() {
@@ -329,7 +341,16 @@ $statuses = self::followup_statuses();
 		$count_params = array_merge( $join_params, $params );
 		$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $count_params ) );
 		$offset = ( $filters['page'] - 1 ) * self::PER_PAGE;
-		$list_sql = "SELECT l.*, i.reference_code, i.property_snapshot, p.budget_max, p.areas, p.layout_value, p.transaction_value, c.granted_at, c.revoked_at, f.status AS followup_status, f.note, COALESCE(lim.contacts_count, 0) AS today_contacts {$joins} WHERE {$where} ORDER BY l.last_seen_at DESC LIMIT %d OFFSET %d";
+			$sort_columns = array(
+				'first_seen_at' => 'l.first_seen_at',
+				'last_seen_at'  => 'l.last_seen_at',
+				'status'       => "COALESCE(f.status, 'new')",
+				'consent'      => 'c.granted_at',
+			);
+			$sort_key = isset( $sort_columns[ $filters['orderby'] ] ) ? $filters['orderby'] : 'last_seen_at';
+			$sort_direction = in_array( $filters['order'], array( 'ASC', 'DESC' ), true ) ? $filters['order'] : 'DESC';
+			$order_sql = $sort_columns[ $sort_key ] . ' ' . $sort_direction . ', l.id DESC';
+			$list_sql = "SELECT l.*, i.reference_code, i.property_snapshot, p.budget_max, p.areas, p.layout_value, p.transaction_value, c.granted_at, c.revoked_at, f.status AS followup_status, f.note, COALESCE(lim.contacts_count, 0) AS today_contacts {$joins} WHERE {$where} ORDER BY {$order_sql} LIMIT %d OFFSET %d";
 		$list_params = array_merge( $join_params, $params, array( self::PER_PAGE, $offset ) );
 		return array( 'rows' => $wpdb->get_results( $wpdb->prepare( $list_sql, $list_params ) ), 'total' => $total );
 	}
