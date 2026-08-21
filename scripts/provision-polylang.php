@@ -113,6 +113,25 @@ foreach ( $structure_pages as $page_slug => $titles ) {
 }
 flush_rewrite_rules( false );
 require_once __DIR__ . '/provision-polylang-taxonomies.php';
+// Polylang peut réécrire ses options pendant le provisioning : la détection
+// navigateur est donc forcée une dernière fois, puis vérifiée avant le rapport.
+$final_option = get_option( 'polylang', array() );
+$final_option['browser'] = 1;
+update_option( 'polylang', $final_option );
+wp_cache_delete( 'polylang', 'options' );
+register_shutdown_function(
+    static function() {
+        $shutdown_option = get_option( 'polylang', array() );
+        if ( empty( $shutdown_option['browser'] ) ) {
+            $shutdown_option['browser'] = 1;
+            update_option( 'polylang', $shutdown_option );
+        }
+    }
+);
+if ( empty( get_option( 'polylang', array() )['browser'] ) ) {
+    fwrite( STDERR, "Polylang browser detection was not persisted\\n" );
+    exit( 1 );
+}
 $language_report = array();
 foreach ( (array) $GLOBALS['polylang']->model->languages->get_list() as $language ) {
     $language_report[] = array( 'slug' => (string) $language->slug, 'locale' => (string) $language->locale, 'name' => (string) $language->name );

@@ -26,11 +26,11 @@ if ( ! $property ) {
 	$bathrooms = get_post_meta( $property->ID, '_pk_bathrooms_label', true );
 	$terrace = get_post_meta( $property->ID, '_pk_terrace', true );
 	$terrace_surface = get_post_meta( $property->ID, '_pk_terrace_surface', true );
-	$bedrooms = '' !== $bedrooms ? ( '0' === (string) $bedrooms ? 'Studio' : ( '3+' === (string) $bedrooms ? '3 chambres ou plus' : $bedrooms . ' chambre' . ( '1' === (string) $bedrooms ? '' : 's' ) ) ) : '';
-	$living_rooms = '0' === (string) $living_rooms ? 'Pièce principale' : ( '3+' === (string) $living_rooms ? '3 salons ou plus' : ( $living_rooms ? $living_rooms . ' salon' . ( '1' === (string) $living_rooms ? '' : 's' ) : '' ) );
-	$bathrooms = '3+' === (string) $bathrooms ? '3 salles de bains ou plus' : ( $bathrooms ? $bathrooms . ' salle' . ( '1' === (string) $bathrooms ? '' : 's' ) . ' de bains' : '' );
-	$composition = implode( ' · ', array_filter( array( $bedrooms, $living_rooms ) ) );
-	$terrace_label = 'Oui' === $terrace ? 'Terrasse' . ( $terrace_surface ? ' · ' . $terrace_surface . ' m²' : '' ) : '';
+		$bedrooms = '' !== $bedrooms ? ( '0' === (string) $bedrooms ? __( 'Studio', 'partikulier' ) : ( '3+' === (string) $bedrooms ? __( '3 chambres ou plus', 'partikulier' ) : sprintf( _n( '%d chambre', '%d chambres', (int) $bedrooms, 'partikulier' ), (int) $bedrooms ) ) ) : '';
+		$living_rooms = '0' === (string) $living_rooms ? __( 'Pièce principale', 'partikulier' ) : ( '3+' === (string) $living_rooms ? __( '3 salons ou plus', 'partikulier' ) : ( $living_rooms ? sprintf( _n( '%d salon', '%d salons', (int) $living_rooms, 'partikulier' ), (int) $living_rooms ) : '' ) );
+		$bathrooms = '3+' === (string) $bathrooms ? __( '3 salles de bains ou plus', 'partikulier' ) : ( $bathrooms ? sprintf( _n( '%d salle de bains', '%d salles de bains', (int) $bathrooms, 'partikulier' ), (int) $bathrooms ) : '' );
+		$composition = implode( ' · ', array_filter( array( $bedrooms, $living_rooms ) ) );
+		$terrace_label = 'Oui' === $terrace ? __( 'Terrasse', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' m²' : '' ) : '';
 $location = Partikulier_Geo::location_string( $property->ID );
 
 $types   = wp_get_object_terms( $property->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY, array( 'number' => 1, 'fields' => 'names' ) );
@@ -49,7 +49,7 @@ if ( $thumb_id && ! in_array( $thumb_id, $gallery, true ) ) {
 $price_html = '';
 if ( $price ) {
 	$action_slug = ( $actions && ! is_wp_error( $actions ) ) ? sanitize_title( $actions[0] ) : '';
-	$label       = ( 'a-louer' === $action_slug || 'location' === $action_slug || 'rent' === $action_slug ) ? ' <span class="pk-card-price-note">/ mois</span>' : '';
+	$label       = ( 'a-louer' === $action_slug || 'location' === $action_slug || 'rent' === $action_slug ) ? sprintf( ' <span class="pk-card-price-note">%s</span>', esc_html__( '/ mois', 'partikulier' ) ) : '';
 	$formatted  = is_numeric( $price ) ? number_format_i18n( (float) $price ) : $price;
 	/** Devise affichee ; filtrable pour les sites hors Maroc. */
 	$currency    = apply_filters( 'partikulier_currency', 'MAD' );

@@ -183,7 +183,7 @@ class Partikulier_Localization {
 			'contact_us'               => 'Contactez-nous',
 			'property_types'           => 'Types de biens',
 			'contact'                  => 'Contact',
-			'country'                  => 'France',
+			'country'                  => 'Maroc',
 			'all_rights_reserved'      => 'Tous droits réservés.',
 			'legal_notices'            => 'Mentions légales',
 			'bedroom'                  => 'chambre',
@@ -295,7 +295,7 @@ class Partikulier_Localization {
 				'Contactez-nous' => array( 'fr' => 'Contactez-nous', 'en' => 'Contact us', 'ar' => 'اتصل بنا' ),
 				'Types de biens' => array( 'fr' => 'Types de biens', 'en' => 'Property types', 'ar' => 'أنواع العقارات' ),
 				'Contact' => array( 'fr' => 'Contact', 'en' => 'Contact', 'ar' => 'اتصل بنا' ),
-				'France' => array( 'fr' => 'France', 'en' => 'France', 'ar' => 'فرنسا' ),
+				'Maroc' => array( 'fr' => 'Maroc', 'en' => 'Morocco', 'ar' => 'المغرب' ),
 				'Tous droits réservés.' => array( 'fr' => 'Tous droits réservés.', 'en' => 'All rights reserved.', 'ar' => 'جميع الحقوق محفوظة.' ),
 				'Mentions légales' => array( 'fr' => 'Mentions légales', 'en' => 'Legal notices', 'ar' => 'الإشعارات القانونية' ),
 			);

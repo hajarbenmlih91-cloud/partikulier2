@@ -66,6 +66,14 @@ fi
    FAIL=1
  fi
 
+# ------------------------------------------------ garde-fou R6 i18n
+ echo "── Garde-fou R6 chaînes publiques"
+ if [ -x "$ROOT/scripts/check-i18n-hardcoded.sh" ] && [ -f "$ROOT/scripts/i18n-exceptions.txt" ]; then
+   "$ROOT/scripts/check-i18n-hardcoded.sh" || FAIL=1
+ else
+   echo "   script R6 ou exceptions absent"; FAIL=1
+ fi
+
 # ------------------------------------------------------- régressions connues
  echo "── Régressions connues"
 

@@ -60,7 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					printf( '<p><a href="mailto:%1$s">%1$s</a></p>', esc_html( $blog_email ) );
 				}
 				?>
-				<p><?php esc_html_e( 'France', 'partikulier' ); ?></p>
+				<p><?php esc_html_e( 'Maroc', 'partikulier' ); ?></p>
 				<?php
 				$cities = Partikulier_Geo::top_cities( 5 );
 				if ( $cities ) {

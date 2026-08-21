@@ -23,14 +23,35 @@ echo "── Contrôle qualité"
 bash "$ROOT/scripts/check.sh" || { echo "Contrôle échoué : archive non produite."; exit 1; }
 
 OUT="$ROOT/partikulier-$V.zip"
-rm -f "$OUT"
-( cd "$T" && zip -rq "$OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
+THEME_OUT="$ROOT/partikulier-$V-theme.zip"
+rm -f "$OUT" "$THEME_OUT"
+# Archive thème historique, utile pour un upload direct dans wp-admin.
+( cd "$T" && zip -rq "$THEME_OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
+# Bundle de livraison : le mu-plugin est obligatoire car Polylang redirige
+# pendant plugins_loaded, avant le chargement du thème.
+STAGE="$(mktemp -d)"
+mkdir -p "$STAGE/theme" "$STAGE/mu-plugins"
+cp -a "$T/." "$STAGE/theme/"
+if [ -d "$ROOT/mu-plugins" ]; then cp -a "$ROOT/mu-plugins/." "$STAGE/mu-plugins/"; fi
+cat > "$STAGE/INSTALL.md" <<'EOF'
+# Installation Partikulier
+
+Décompresser `theme/` dans `wp-content/themes/partikulier/` et `mu-plugins/` dans `wp-content/mu-plugins/`. Le mu-plugin est obligatoire : il protège la racine contre la redirection navigateur des robots avant le chargement du thème.
+EOF
+( cd "$STAGE" && zip -rq "$OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
+rm -rf "$STAGE"
 
 unzip -t "$OUT" >/dev/null 2>&1 || { echo "Archive corrompue."; exit 1; }
+unzip -t "$THEME_OUT" >/dev/null 2>&1 || { echo "Archive thème corrompue."; exit 1; }
+
+if ! unzip -l "$OUT" | grep -q 'mu-plugins/partikulier-early-seo.php'; then
+  echo "Archive bundle incomplète : mu-plugin SEO absent."; exit 1;
+fi
 
 echo
-echo "Archive : $OUT"
+echo "Bundle : $OUT"
 echo "Taille  : $(ls -lh "$OUT" | awk '{print $5}')"
 echo "SHA-256 : $(sha256sum "$OUT" | cut -d' ' -f1)"
+echo "Thème  : $THEME_OUT"
 echo
 echo "Pensez à ajouter l'entrée de changelog dans theme/readme.txt."

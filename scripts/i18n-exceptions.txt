@@ -1,0 +1,4 @@
+# R6 — exceptions versionnées, une expression grep par ligne.
+# Les valeurs Oui/Non sont des valeurs de formulaire internes et ne sont pas
+# des libellés publics ; les noms propres et contenus libres sont hors scan.
+# Les libellés publics doivent être dans gettext et ne doivent pas être ajoutés ici.

@@ -128,10 +128,10 @@ while ( have_posts() ) :
 								$bath = get_post_meta( get_the_ID(), '_pk_bathrooms_label', true ) ?: get_post_meta( get_the_ID(), 'es_bathrooms', true );
 								$terrace = get_post_meta( get_the_ID(), '_pk_terrace', true );
 								$terrace_surface = get_post_meta( get_the_ID(), '_pk_terrace_surface', true );
-								$bedrooms = '0' === (string) $bedrooms ? 'Studio' : ( '3+' === (string) $bedrooms ? '3 chambres ou plus' : ( $bedrooms ? $bedrooms . ' chambre' . ( '1' === (string) $bedrooms ? '' : 's' ) : '' ) );
-								$living_rooms = '0' === (string) $living_rooms ? 'Pièce principale' : ( '3+' === (string) $living_rooms ? '3 salons ou plus' : ( $living_rooms ? $living_rooms . ' salon' . ( '1' === (string) $living_rooms ? '' : 's' ) : '' ) );
-								$bath = '3+' === (string) $bath ? '3 salles de bains ou plus' : ( $bath ? $bath . ' salle' . ( '1' === (string) $bath ? '' : 's' ) . ' de bains' : '' );
-								$terrace_label = 'Oui' === $terrace ? 'Oui' . ( $terrace_surface ? ' · ' . $terrace_surface . ' m²' : '' ) : 'Non';
+								$bedrooms = '0' === (string) $bedrooms ? __( 'Studio', 'partikulier' ) : ( '3+' === (string) $bedrooms ? __( '3 chambres ou plus', 'partikulier' ) : ( $bedrooms ? sprintf( _n( '%d chambre', '%d chambres', (int) $bedrooms, 'partikulier' ), (int) $bedrooms ) : '' ) );
+								$living_rooms = '0' === (string) $living_rooms ? __( 'Pièce principale', 'partikulier' ) : ( '3+' === (string) $living_rooms ? __( '3 salons ou plus', 'partikulier' ) : ( $living_rooms ? sprintf( _n( '%d salon', '%d salons', (int) $living_rooms, 'partikulier' ), (int) $living_rooms ) : '' ) );
+								$bath = '3+' === (string) $bath ? __( '3 salles de bains ou plus', 'partikulier' ) : ( $bath ? sprintf( _n( '%d salle de bains', '%d salles de bains', (int) $bath, 'partikulier' ), (int) $bath ) : '' );
+								$terrace_label = 'Oui' === $terrace ? __( 'Oui', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' m²' : '' ) : __( 'Non', 'partikulier' );
 							$garage   = get_post_meta( get_the_ID(), 'es_garages', true );
 							$floor    = get_post_meta( get_the_ID(), 'es_floor', true );
 							$year     = get_post_meta( get_the_ID(), 'es_year_built', true );

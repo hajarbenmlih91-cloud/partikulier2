@@ -92,24 +92,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 				if ( ! $pk_current && function_exists( 'pll_current_language' ) ) {
 					$pk_current = (string) pll_current_language();
 				}
-				if ( ! empty( $pk_langs ) ) :
-					?>
-				<div class="pk-lang" data-pk-lang>
-					<button type="button" class="pk-lang-toggle" aria-expanded="false" aria-haspopup="true" aria-label="<?php esc_attr_e( 'Choisir la langue', 'partikulier' ); ?>">
-						<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3.6 9h16.8M3.6 15h16.8"/><path d="M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18z"/></svg>
-						<span class="pk-lang-code"><?php echo esc_html( strtoupper( $pk_current ) ); ?></span>
-					</button>
-					<ul class="pk-lang-menu" hidden>
-						<?php foreach ( (array) $pk_langs as $pk_l ) : ?>
-							<li<?php echo ! empty( $pk_l['current_lang'] ) ? ' class="is-current"' : ''; ?>>
-								<a href="<?php echo esc_url( $pk_l['url'] ); ?>" lang="<?php echo esc_attr( $pk_l['locale'] ); ?>" hreflang="<?php echo esc_attr( $pk_l['locale'] ); ?>">
-									<span class="pk-lang-abbr"><?php echo esc_html( strtoupper( $pk_l['slug'] ) ); ?></span>
-									<span class="pk-lang-name"><?php echo esc_html( $pk_l['name'] ); ?></span>
-								</a>
-							</li>
-						<?php endforeach; ?>
-					</ul>
-				</div>
+					if ( ! empty( $pk_langs ) ) :
+						$pk_flag_svg = static function( $slug ) {
+							$slug = sanitize_key( $slug );
+							if ( 'ar' === $slug ) {
+								return '<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><rect width="24" height="16" rx="2" fill="#c1272d"/><path d="M12 3.7l1.1 3.4h3.6l-2.9 2.1 1.1 3.4-2.9-2.1-2.9 2.1 1.1-3.4-2.9-2.1h3.6z" fill="none" stroke="#006233" stroke-width=".8"/></svg>';
+							}
+							if ( 'en' === $slug ) {
+								return '<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><rect width="24" height="16" rx="2" fill="#fff"/><path d="M0 1h24M0 4h24M0 7h24M0 10h24M0 13h24" stroke="#b22234" stroke-width="1.5"/><path d="M0 0h10v9H0z" fill="#3c3b6e"/><circle cx="2" cy="2" r=".35" fill="#fff"/><circle cx="5" cy="2" r=".35" fill="#fff"/><circle cx="8" cy="2" r=".35" fill="#fff"/><circle cx="3.5" cy="4.5" r=".35" fill="#fff"/><circle cx="6.5" cy="4.5" r=".35" fill="#fff"/><circle cx="2" cy="7" r=".35" fill="#fff"/><circle cx="5" cy="7" r=".35" fill="#fff"/><circle cx="8" cy="7" r=".35" fill="#fff"/></svg>';
+							}
+							return '<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><path d="M0 0h8v16H0z" fill="#0055a4"/><path d="M8 0h8v16H8z" fill="#fff"/><path d="M16 0h8v16h-8z" fill="#ef4135"/></svg>';
+						};
+						?>
+					<div class="pk-lang" data-pk-lang>
+						<button type="button" class="pk-lang-toggle" aria-expanded="false" aria-haspopup="true" aria-label="<?php esc_attr_e( 'Choisir la langue', 'partikulier' ); ?>">
+							<?php echo $pk_flag_svg( $pk_current ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+							<span class="pk-lang-code"><?php echo esc_html( strtoupper( $pk_current ) ); ?></span>
+						</button>
+						<ul class="pk-lang-menu" hidden>
+							<?php foreach ( (array) $pk_langs as $pk_l ) : ?>
+								<li<?php echo ! empty( $pk_l['current_lang'] ) ? ' class="is-current"' : ''; ?>>
+									<a href="<?php echo esc_url( $pk_l['url'] ); ?>" lang="<?php echo esc_attr( $pk_l['locale'] ); ?>" hreflang="<?php echo esc_attr( $pk_l['locale'] ); ?>">
+										<?php echo $pk_flag_svg( $pk_l['slug'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+										<span class="pk-lang-abbr"><?php echo esc_html( strtoupper( $pk_l['slug'] ) ); ?></span>
+										<span class="pk-lang-name"><?php echo esc_html( $pk_l['name'] ); ?></span>
+									</a>
+								</li>
+							<?php endforeach; ?>
+						</ul>
+					</div>
 					<?php
 				endif;
 			} else {
