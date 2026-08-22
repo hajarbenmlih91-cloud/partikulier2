@@ -5,7 +5,7 @@ Tags: real-estate, property, listings, immobilier, performance, avif
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 6.17.1
+Stable tag: 6.17.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,7 +47,7 @@ Caracteristiques :
 
 == Changelog ==
 
-= 6.17.1 =
+= 6.17.2 =
 * Fix: Senior CDC v1.5 compliance (N+1, RTL, slugs, pagination, HMAC proofs)
 * Fix: PHP 8.4 runtime support
 * Fix: N+1 SQL optimization (106 -> 91 queries)

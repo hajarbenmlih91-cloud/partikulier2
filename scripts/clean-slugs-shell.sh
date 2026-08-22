@@ -1,5 +1,5 @@
 #!/bin/bash
-WP="wp --path=/home/ubuntu/wp-6170-clean --allow-root"
+WP="wp --path=${PK_WP_DIR} --allow-root"
 POSTS=$($WP post list --post_type=properties --format=ids)
 for ID in $POSTS; do
     TITLE=$($WP post get $ID --field=post_title)

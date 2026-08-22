@@ -1,14 +1,20 @@
 <?php
 /**
  * Mesure senior du nombre de requêtes SQL avec optimisations.
+ * Usage: PK_WP_DIR=/chemin/vers/wp php scripts/measure-sql-senior.php
  */
-$_SERVER['HTTP_HOST'] = 'localhost:8092';
+$wp_dir = getenv('PK_WP_DIR');
+if (!$wp_dir || !file_exists($wp_dir . '/wp-load.php')) {
+    die("Erreur: PK_WP_DIR non défini ou invalide.\n");
+}
+
+$_SERVER['HTTP_HOST'] = getenv('PK_BASE') ? parse_url(getenv('PK_BASE'), PHP_URL_HOST) : 'localhost';
 $_SERVER['REQUEST_URI'] = '/annonces/';
 $_SERVER['REQUEST_METHOD'] = 'GET';
 $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
 define('WP_USE_THEMES', true);
-require_once '/home/ubuntu/wp-6170-clean/wp-load.php';
+require_once $wp_dir . '/wp-load.php';
 
 global $wpdb, $wp_query;
 
@@ -21,12 +27,10 @@ $wp_query->query(array(
     'cache_results' => true
 ));
 
-global $wpdb;
 $before = count($wpdb->queries);
 
 // Simuler le rendu du template
 $template = get_stylesheet_directory() . '/templates/archive.php';
-
 if (file_exists($template)) {
     ob_start();
     include($template);

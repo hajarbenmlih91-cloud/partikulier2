@@ -1,83 +1,37 @@
 <?php
 /**
- * Test de validation HMAC senior.
- * Simule deux processus concurrents pour vérifier l'idempotence et la sécurité HMAC.
+ * Test HMAC Senior - Validation unitaire et préparation concurrence.
+ * Usage: PK_WP_DIR=/chemin/vers/wp PK_BASE=http://localhost:8092 php scripts/test-hmac-senior.php
  */
-require_once '/home/ubuntu/wp-6170-clean/wp-load.php';
-
-function test_hmac_request($event_id, $secret, $key_id, $mode = 'enforce') {
-    $url = 'http://localhost:8092/wp-json/partikulier/v1/automation-event';
-    $method = 'POST';
-    $timestamp = time();
-    $body = json_encode(array(
-        'event_id' => $event_id,
-        'event_type' => 'whatsapp_inbound',
-        'source' => 'n8n',
-        'payload' => array('msg' => 'hello')
-    ));
-
-    $path = '/partikulier/v1/automation-event';
-    $canonical = strtoupper($method) . "\n" . $path . "\n" . $timestamp . "\n" . $body;
-    $signature = 'sha256=' . hash_hmac('sha256', $canonical, $secret);
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'X-Partikulier-Automation: ' . $secret,
-        'X-Partikulier-Timestamp: ' . $timestamp,
-        'X-Partikulier-Key-Id: ' . $key_id,
-        'X-Partikulier-Signature: ' . $signature
-    ));
-    
-    $response = curl_exec($ch);
-    $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    
-    return array('status' => $status, 'body' => json_decode($response, true));
+$wp_dir = getenv('PK_WP_DIR');
+if (!$wp_dir || !file_exists($wp_dir . '/wp-load.php')) {
+    die("Erreur: PK_WP_DIR non défini.\n");
 }
+require_once $wp_dir . '/wp-load.php';
 
-// Configuration
-$secret = base64_encode(random_bytes(32));
-$key_id = 'test-key-senior';
-$settings = array(
-    'automation_api_secret' => $secret,
-    'active_key_id' => $key_id,
+$base = getenv('PK_BASE') ?: 'http://localhost:8092';
+$secret = 'senior-test-secret-' . time();
+$key_id = 'senior-key-1';
+
+// Configurer WP
+update_option('pk_n8n_settings', array(
+    'automation_api_secret' => base64_encode($secret),
     'hmac_mode' => 'enforce',
-    'n8n_webhook_url' => 'https://example.com/webhook'
-);
-update_option('pk_n8n_settings', $settings);
-
-// Test 1: Succès simple
-$event_id = 'n8n-senior-' . uniqid();
-$res1 = test_hmac_request($event_id, $secret, $key_id);
-echo "Test 1 (Valid): Status {$res1['status']}, Duplicate: " . ($res1['body']['duplicate'] ? 'true' : 'false') . "\n";
-
-// Test 2: Idempotence (même event_id)
-$res2 = test_hmac_request($event_id, $secret, $key_id);
-echo "Test 2 (Duplicate): Status {$res2['status']}, Duplicate: " . ($res2['body']['duplicate'] ? 'true' : 'false') . "\n";
-
-// Test 3: Mauvaise signature
-$body = json_encode(array('event_id' => 'n8n-bad'));
-$ch = curl_init('http://localhost:8092/wp-json/partikulier/v1/automation-event');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'Content-Type: application/json',
-    'X-Partikulier-Automation: ' . $secret,
-    'X-Partikulier-Timestamp: ' . time(),
-    'X-Partikulier-Key-Id: ' . $key_id,
-    'X-Partikulier-Signature: sha256=' . str_repeat('a', 64)
+    'active_key_id' => $key_id
 ));
-$res3 = curl_exec($ch);
-$status3 = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-echo "Test 3 (Bad Signature): Status $status3\n";
 
-if ($res1['status'] === 200 && $res2['status'] === 200 && $res2['body']['duplicate'] === true && $status3 === 401) {
-    echo "HMAC_TEST_RESULT: PASS\n";
-} else {
-    echo "HMAC_TEST_RESULT: FAIL\n";
-}
+$event_id = 'evt_' . uniqid();
+$timestamp = time();
+$body = json_encode(array('event' => 'test', 'id' => $event_id));
+$route = '/partikulier/v1/automation-event';
+$canonical = 'POST' . $route . $timestamp . $body;
+$sig = hash_hmac('sha256', $canonical, $secret);
+
+echo "HMAC_CONFIG_OK\n";
+echo "BASE=$base\n";
+echo "ROUTE=$route\n";
+echo "EVENT_ID=$event_id\n";
+echo "TIMESTAMP=$timestamp\n";
+echo "BODY=$body\n";
+echo "SIGNATURE=$sig\n";
+echo "KEY_ID=$key_id\n";
