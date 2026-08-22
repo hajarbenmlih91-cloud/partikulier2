@@ -34,16 +34,44 @@ $surface  = get_post_meta( $post->ID, 'es_property_area', true ) ?: get_post_met
 		$terrace_surface = get_post_meta( $post->ID, '_pk_terrace_surface', true );
 		$vis_a_vis = get_post_meta( $post->ID, '_pk_vis_a_vis', true );
 		$sunshine = get_post_meta( $post->ID, '_pk_sunshine', true );
-			$terrace_label = 'Oui' === $terrace ? __( 'Oui', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' m²' : '' ) : __( 'Non', 'partikulier' );
-		$bedrooms_display = '0' === (string) $bedrooms_label ? __( 'Studio', 'partikulier' ) : ( '3+' === (string) $bedrooms_label ? __( '3 chambres ou plus', 'partikulier' ) : ( $bedrooms_label ? $bedrooms_label . ' ' . ( '1' === (string) $bedrooms_label ? __( 'chambre', 'partikulier' ) : __( 'chambres', 'partikulier' ) ) : '' ) );
-		$living_display = '0' === (string) $living_rooms ? __( 'Pièce principale', 'partikulier' ) : ( '3+' === (string) $living_rooms ? __( '3 salons ou plus', 'partikulier' ) : ( $living_rooms ? $living_rooms . ' ' . ( '1' === (string) $living_rooms ? __( 'salon', 'partikulier' ) : __( 'salons', 'partikulier' ) ) : '' ) );
-		$bathrooms_display = '3+' === (string) $bathrooms_label ? __( '3 salles de bains ou plus', 'partikulier' ) : ( $bathrooms_label ? $bathrooms_label . ' ' . ( '1' === (string) $bathrooms_label ? __( 'salle de bains', 'partikulier' ) : __( 'salles de bains', 'partikulier' ) ) : '' );
+			$terrace_label = 'Oui' === $terrace ? Partikulier_Localization::translate_polylang_string( 'Oui', 'Oui', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' ' . Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) : '' ) : Partikulier_Localization::translate_polylang_string( 'Non', 'Non', 'partikulier' );
+			if ( '0' === (string) $bedrooms_label ) {
+				$bedrooms_display = __( 'Studio', 'partikulier' );
+			} elseif ( '3+' === (string) $bedrooms_label ) {
+				$bedrooms_display = __( '3 chambres ou plus', 'partikulier' );
+			} elseif ( $bedrooms_label ) {
+				$label = ( 1 === (int) $bedrooms_label ) ? '1 chambre' : '2 chambres';
+				$bedrooms_display = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
+			} else {
+				$bedrooms_display = '';
+			}
+
+			if ( '0' === (string) $living_rooms ) {
+				$living_display = __( 'Pièce principale', 'partikulier' );
+			} elseif ( '3+' === (string) $living_rooms ) {
+				$living_display = __( '3 salons ou plus', 'partikulier' );
+			} elseif ( $living_rooms ) {
+				$label = ( 1 === (int) $living_rooms ) ? '1 salon' : '2 salons';
+				$living_display = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
+			} else {
+				$living_display = '';
+			}
+
+			if ( '3+' === (string) $bathrooms_label ) {
+				$bathrooms_display = __( '3 salles de bains ou plus', 'partikulier' );
+			} elseif ( $bathrooms_label ) {
+				$label = ( 1 === (int) $bathrooms_label ) ? '1 salle de bains' : '2 salles de bains';
+				$bathrooms_display = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
+			} else {
+				$bathrooms_display = '';
+			}
 $location = Partikulier_Geo::location_string( $post->ID );
 
-$types   = wp_get_object_terms( $post->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY, array( 'number' => 1, 'fields' => 'names' ) );
-$actions = wp_get_object_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, array( 'number' => 1, 'fields' => 'names' ) );
-$type    = ( ! is_wp_error( $types ) && $types ) ? $types[0] : __( 'Bien', 'partikulier' );
-$action  = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0] : '';
+	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
+	$types   = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
+	$actions = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$type    = ( ! is_wp_error( $types ) && $types ) ? $types[0]->name : __( 'Bien', 'partikulier' );
+	$action  = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
 
 // Statut proprietaire : vendu / loue / archive / actif.
 	$pk_status  = get_post_meta( $post->ID, '_pk_status', true );
@@ -203,21 +231,21 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 		<div class="pk-single-grid">
 			<div class="pk-single-main">
 				<section class="pk-single-section" aria-label="<?php esc_attr_e( 'Caractéristiques', 'partikulier' ); ?>">
-					<h2 class="pk-single-section-title"><?php esc_html_e( 'Caractéristiques', 'partikulier' ); ?></h2>
+					<h2 class="pk-single-section-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Caractéristiques', 'Caractéristiques', 'partikulier' ) ); ?></h2>
 					<dl class="pk-features">
 						<?php
 						$fields = array(
-								'es_property_area' => array( $surface, __( 'Surface', 'partikulier' ), 'm²' ),
-								'es_property_bedrooms' => array( $bedrooms_display, __( 'Chambres', 'partikulier' ), '' ),
-								'_pk_living_rooms' => array( $living_display, __( 'Salons', 'partikulier' ), '' ),
-								'es_property_bathrooms' => array( $bathrooms_display, __( 'Salles de bains', 'partikulier' ), '' ),
-								'_pk_terrace'     => array( $terrace_label, __( 'Terrasse', 'partikulier' ), '' ),
-								'_pk_vis_a_vis'   => array( 'Oui' === $vis_a_vis ? __( 'Sans vis-à-vis', 'partikulier' ) : '', __( 'Vue', 'partikulier' ), '' ),
-								'_pk_sunshine'    => array( $sunshine, __( 'Ensoleillement', 'partikulier' ), '' ),
-							'es_garages'     => array( get_post_meta( $post->ID, 'es_garages', true ), __( 'Parkings', 'partikulier' ), '' ),
-							'es_floor'       => array( get_post_meta( $post->ID, 'es_floor', true ), __( 'Étage', 'partikulier' ), '' ),
-							'es_year_built'  => array( get_post_meta( $post->ID, 'es_year_built', true ), __( 'Année de construction', 'partikulier' ), '' ),
-							'es_energy_class' => array( get_post_meta( $post->ID, 'es_energy_class', true ), __( 'Classe énergie', 'partikulier' ), '' ),
+								'es_property_area' => array( $surface, Partikulier_Localization::translate_polylang_string( 'Surface', 'Surface', 'partikulier' ), Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) ),
+'es_property_bedrooms' => array( $bedrooms_display, Partikulier_Localization::translate_polylang_string( 'Chambres', 'Chambres', 'partikulier' ), '' ),
+									'_pk_living_rooms' => array( $living_display, Partikulier_Localization::translate_polylang_string( 'Salons', 'Salons', 'partikulier' ), '' ),
+									'es_property_bathrooms' => array( $bathrooms_display, Partikulier_Localization::translate_polylang_string( 'Salles de bains', 'Salles de bains', 'partikulier' ), '' ),
+									'_pk_terrace'     => array( $terrace_label, Partikulier_Localization::translate_polylang_string( 'Terrasse', 'Terrasse', 'partikulier' ), '' ),
+									'_pk_vis_a_vis'   => array( 'Oui' === $vis_a_vis ? Partikulier_Localization::translate_polylang_string( 'Sans vis-à-vis', 'Sans vis-à-vis', 'partikulier' ) : '', Partikulier_Localization::translate_polylang_string( 'Vue', 'Vue', 'partikulier' ), '' ),
+									'_pk_sunshine'    => array( $sunshine, Partikulier_Localization::translate_polylang_string( 'Ensoleillement', 'Ensoleillement', 'partikulier' ), '' ),
+								'es_garages'     => array( get_post_meta( $post->ID, 'es_garages', true ), Partikulier_Localization::translate_polylang_string( 'Parkings', 'Parkings', 'partikulier' ), '' ),
+								'es_floor'       => array( get_post_meta( $post->ID, 'es_floor', true ), Partikulier_Localization::translate_polylang_string( 'Étage', 'Étage', 'partikulier' ), '' ),
+								'es_year_built'  => array( get_post_meta( $post->ID, 'es_year_built', true ), Partikulier_Localization::translate_polylang_string( 'Année de construction', 'Année de construction', 'partikulier' ), '' ),
+								'es_energy_class' => array( get_post_meta( $post->ID, 'es_energy_class', true ), Partikulier_Localization::translate_polylang_string( 'Classe énergie', 'Classe énergie', 'partikulier' ), '' ),
 						);
 						foreach ( $fields as $key => $f ) {
 							if ( '' !== $f[0] && null !== $f[0] ) {
@@ -234,7 +262,7 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 				</section>
 
 				<section class="pk-single-section pk-single-description" aria-label="<?php esc_attr_e( 'Description', 'partikulier' ); ?>">
-					<h2 class="pk-single-section-title"><?php esc_html_e( 'Description', 'partikulier' ); ?></h2>
+					<h2 class="pk-single-section-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Description', 'Description', 'partikulier' ) ); ?></h2>
 					<div class="pk-content">
 						<?php
 						if ( has_excerpt( $post ) ) {
@@ -248,13 +276,13 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 
 			<aside class="pk-single-sidebar">
 				<div class="pk-contact-card pk-contact-card--dark">
-					<p class="pk-contact-kicker"><?php esc_html_e( 'Contact sécurisé', 'partikulier' ); ?></p>
-					<h2 class="pk-contact-title"><?php esc_html_e( 'Intéressé par ce bien ?', 'partikulier' ); ?></h2>
-					<p class="pk-contact-note"><?php esc_html_e( 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ); ?></p>
+<p class="pk-contact-kicker"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact sécurisé', 'Contact sécurisé', 'partikulier' ) ); ?></p>
+						<h2 class="pk-contact-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Intéressé par ce bien ?', 'Intéressé par ce bien ?', 'partikulier' ) ); ?></h2>
+						<p class="pk-contact-note"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ) ); ?></p>
 					<?php if ( $is_closed ) : ?>
 						<div class="pk-contact-sold">
 							<strong><?php echo esc_html( $closed_label ); ?></strong>
-							<span><?php esc_html_e( 'Cette annonce ne reçoit plus de contacts.', 'partikulier' ); ?></span>
+							<span><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Cette annonce ne reçoit plus de contacts.', 'Cette annonce ne reçoit plus de contacts.', 'partikulier' ) ); ?></span>
 					</div>
 				<?php endif; ?>
 					<?php
@@ -265,19 +293,19 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 								<span class="pk-contact-avatar" aria-hidden="true"><?php echo esc_html( mb_substr( $owner_name ? $owner_name : $author->display_name, 0, 1 ) ); ?></span>
 								<div>
 									<strong><?php echo esc_html( $owner_name ? $owner_name : $author->display_name ); ?></strong>
-									<span><?php echo esc_html__( 'Propriétaire', 'partikulier' ); ?></span>
+									<span><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Propriétaire', 'Propriétaire', 'partikulier' ) ); ?></span>
 								</div>
 							</div>
 						<?php endif; ?>
 						<?php if ( $buyer_contact_url ) : ?>
 							<div class="pk-buyer-contact-flow">
-								<p><?php esc_html_e( 'Envoyez-nous cette annonce sur WhatsApp. Après contrôle de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ); ?></p>
+								<p><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Envoyez-nous cette annonce sur WhatsApp. Après contrôle de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'Envoyez-nous cette annonce sur WhatsApp. Après contrôle de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ) ); ?></p>
 								<a class="pk-btn pk-btn-primary pk-btn-block pk-btn-whatsapp" href="<?php echo esc_url( $buyer_contact_url ); ?>" target="_blank" rel="noopener">
 									<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.13 15.06l-.3-.18-3.08.89.9-3-.2-.31A8.1 8.1 0 0 1 12.04 3.8zm4.6 10.2c-.25-.13-1.46-.72-1.69-.8-.22-.09-.39-.13-.55.12s-.63.8-.77.96c-.14.17-.28.19-.53.06a6.6 6.6 0 0 1-3.3-2.88c-.25-.43.25-.4.71-1.33.08-.17.04-.31-.02-.44s-.55-1.33-.76-1.82c-.2-.48-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.75 2.75 0 0 0-.86 2.05c0 1.2.88 2.37 1 2.53.12.17 1.72 2.63 4.17 3.69 1.55.67 2.16.73 2.94.61.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.23-.17-.48-.29z"/></svg>
-									<?php esc_html_e( 'Demander sur WhatsApp', 'partikulier' ); ?>
+									<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Demander sur WhatsApp', 'Demander sur WhatsApp', 'partikulier' ) ); ?>
 								</a>
 								<small><?php printf( esc_html__( 'Référence de la demande : %s', 'partikulier' ), esc_html( $buyer_reference ) ); ?></small>
-								<small><?php esc_html_e( 'Vos critères seront demandés sur WhatsApp. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.', 'partikulier' ); ?></small>
+								<small><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Vos critères seront demandés sur WhatsApp. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.', 'Vos critères seront demandés sur WhatsApp. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.', 'partikulier' ) ); ?></small>
 							</div>
 						<?php elseif ( ! $is_closed ) : ?>
 							<?php
@@ -289,9 +317,9 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 							<div class="pk-buyer-contact-flow">
 								<a class="pk-btn pk-btn-primary pk-btn-block pk-btn-whatsapp" href="https://wa.me/?text=<?php echo esc_attr( $pk_wa_text ); ?>" target="_blank" rel="noopener nofollow">
 									<svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor" aria-hidden="true"><path d="M12.04 2a9.9 9.9 0 0 0-8.5 14.95L2 22l5.2-1.5A9.9 9.9 0 1 0 12.04 2zm0 1.8a8.1 8.1 0 1 1-4.13 15.06l-.3-.18-3.08.89.9-3-.2-.31A8.1 8.1 0 0 1 12.04 3.8zm4.6 10.2c-.25-.13-1.46-.72-1.69-.8-.22-.09-.39-.13-.55.12s-.63.8-.77.96c-.14.17-.28.19-.53.06a6.6 6.6 0 0 1-3.3-2.88c-.25-.43.25-.4.71-1.33.08-.17.04-.31-.02-.44s-.55-1.33-.76-1.82c-.2-.48-.4-.41-.55-.42h-.47a.9.9 0 0 0-.65.3 2.75 2.75 0 0 0-.86 2.05c0 1.2.88 2.37 1 2.53.12.17 1.72 2.63 4.17 3.69 1.55.67 2.16.73 2.94.61.47-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.23-.17-.48-.29z"/></svg>
-									<?php esc_html_e( 'Demander sur WhatsApp', 'partikulier' ); ?>
+									<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Demander sur WhatsApp', 'Demander sur WhatsApp', 'partikulier' ) ); ?>
 								</a>
-								<small><?php esc_html_e( 'Vos critères sont vérifiés avant transmission des coordonnées.', 'partikulier' ); ?></small>
+								<small><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Vos critères sont vérifiés avant transmission des coordonnées.', 'Vos critères sont vérifiés avant transmission des coordonnées.', 'partikulier' ) ); ?></small>
 							</div>
 						<?php endif; ?>
 					<?php
@@ -345,11 +373,11 @@ if ( $pk_related ) :
 		<div class="pk-container">
 			<div class="pk-editorial-heading pk-editorial-heading--row">
 				<div>
-					<p class="pk-editorial-kicker"><?php esc_html_e( 'Dans la même ville', 'partikulier' ); ?></p>
-					<h2><?php printf( esc_html__( 'Voir aussi à %s', 'partikulier' ), esc_html( $pk_city_name ) ); ?></h2>
+<p class="pk-editorial-kicker"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Dans la même ville', 'Dans la même ville', 'partikulier' ) ); ?></p>
+						<h2><?php printf( esc_html( Partikulier_Localization::translate_polylang_string( 'Voir aussi à %s', 'Voir aussi à %s', 'partikulier' ) ), esc_html( $pk_city_name ) ); ?></h2>
 				</div>
 				<a class="pk-editorial-link" href="<?php echo esc_url( Partikulier_Geo::city_link( $pk_current->ID ) ?: pk_properties_archive_url() ); ?>">
-					<?php esc_html_e( 'Tout voir', 'partikulier' ); ?> <span aria-hidden="true">&rarr;</span>
+					<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Tout voir', 'Tout voir', 'partikulier' ) ); ?> <span aria-hidden="true">&rarr;</span>
 				</a>
 			</div>
 			<div class="pk-editorial-cards">

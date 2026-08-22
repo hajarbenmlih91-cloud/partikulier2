@@ -19,14 +19,38 @@ $post      = isset( $property ) ? $property : get_post();
 	$bathrooms = get_post_meta( $post->ID, '_pk_bathrooms_label', true );
 	$terrace   = get_post_meta( $post->ID, '_pk_terrace', true );
 	$terrace_surface = get_post_meta( $post->ID, '_pk_terrace_surface', true );
-		$bedrooms  = '' !== $bedrooms ? ( '0' === (string) $bedrooms ? __( 'Studio', 'partikulier' ) : ( '3+' === (string) $bedrooms ? __( '3 chambres ou plus', 'partikulier' ) : sprintf( _n( '%d chambre', '%d chambres', (int) $bedrooms, 'partikulier' ), (int) $bedrooms ) ) ) : '';
-		$living_rooms = '0' === (string) $living_rooms ? __( 'Pièce principale', 'partikulier' ) : ( '3+' === (string) $living_rooms ? __( '3 salons ou plus', 'partikulier' ) : ( $living_rooms ? sprintf( _n( '%d salon', '%d salons', (int) $living_rooms, 'partikulier' ), (int) $living_rooms ) : '' ) );
-		$bathrooms = '3+' === (string) $bathrooms ? __( '3 salles de bains ou plus', 'partikulier' ) : ( $bathrooms ? sprintf( _n( '%d salle de bains', '%d salles de bains', (int) $bathrooms, 'partikulier' ), (int) $bathrooms ) : '' );
+					if ( '' !== $bedrooms ) {
+				if ( '0' === (string) $bedrooms ) {
+					$bedrooms = __( 'Studio', 'partikulier' );
+				} elseif ( '3+' === (string) $bedrooms ) {
+					$bedrooms = __( '3 chambres ou plus', 'partikulier' );
+				} else {
+					$label = ( 1 === (int) $bedrooms ) ? '1 chambre' : '2 chambres';
+					$bedrooms = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
+				}
+			}
+
+			if ( '0' === (string) $living_rooms ) {
+				$living_rooms = __( 'Pièce principale', 'partikulier' );
+			} elseif ( '3+' === (string) $living_rooms ) {
+				$living_rooms = __( '3 salons ou plus', 'partikulier' );
+			} elseif ( $living_rooms ) {
+				$label = ( 1 === (int) $living_rooms ) ? '1 salon' : '2 salons';
+				$living_rooms = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
+			}
+
+			if ( '3+' === (string) $bathrooms ) {
+				$bathrooms = __( '3 salles de bains ou plus', 'partikulier' );
+			} elseif ( $bathrooms ) {
+				$label = ( 1 === (int) $bathrooms ) ? Partikulier_Localization::translate_polylang_string( '1 salle de bains', '1 salle de bains', 'partikulier' ) : Partikulier_Localization::translate_polylang_string( '2 salles de bains', '2 salles de bains', 'partikulier' );
+				$bathrooms = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
+			}
 		$composition = implode( ' · ', array_filter( array( $bedrooms, $living_rooms ) ) );
-		$terrace_label = 'Oui' === $terrace ? __( 'Terrasse', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' m²' : '' ) : '';
-$location  = Partikulier_Geo::location_string( $post->ID );
-$actions   = wp_get_object_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, array( 'number' => 1, 'fields' => 'names' ) );
-$action    = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0] : '';
+		$terrace_label = 'Oui' === $terrace ? Partikulier_Localization::translate_polylang_string( 'Terrasse', 'Terrasse', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' ' . Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) : '' ) : '';
+	$location  = Partikulier_Geo::location_string( $post->ID );
+	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
+	$actions   = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$action    = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
 
 // Image : galerie Estatik en premier, puis featured.
 $img_id = 0;
@@ -82,7 +106,7 @@ $avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
 		<?php endif; ?>
 		<dl class="pk-card-meta">
 			<?php if ( $surface ) : ?>
-				<div class="pk-card-meta-item"><dd><?php echo esc_html( number_format_i18n( (int) $surface ) ) . ' m²'; ?></dd></div>
+				<div class="pk-card-meta-item"><dd><?php echo esc_html( number_format_i18n( (int) $surface ) ) . ' ' . esc_html( Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) ); ?></dd></div>
 			<?php endif; ?>
 				<?php if ( $composition ) : ?>
 					<div class="pk-card-meta-item"><dd><?php echo esc_html( $composition ); ?></dd></div>

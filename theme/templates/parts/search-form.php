@@ -66,9 +66,9 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 		<label class="pk-search-label" for="pk-s-budget"><?php esc_html_e( 'Budget max', 'partikulier' ); ?></label>
 		<select name="es_price_max" id="pk-s-budget">
 			<option value=""><?php esc_html_e( 'Illimité', 'partikulier' ); ?></option>
-			<?php foreach ( array( 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 1500000 ) as $b ) : ?>
-				<option value="<?php echo esc_attr( $b ); ?>"><?php echo esc_html( number_format_i18n( $b ) ) . ' €'; ?></option>
-			<?php endforeach; ?>
+				<?php foreach ( array( 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 1500000 ) as $b ) : ?>
+					<option value="<?php echo esc_attr( $b ); ?>"><?php echo esc_html( number_format_i18n( $b ) ) . ' MAD'; ?></option>
+				<?php endforeach; ?>
 		</select>
 	</div>
 

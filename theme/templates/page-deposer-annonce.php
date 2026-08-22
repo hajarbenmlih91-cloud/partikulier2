@@ -148,7 +148,7 @@ $types = get_terms( array(
 
 				<div class="pk-field pk-autocomplete" id="pk-district-wrap" hidden>
 					<label class="pk-label" for="pk-district"><?php esc_html_e( 'Quartier', 'partikulier' ); ?> <span class="pk-req">*</span></label>
-					<input type="text" id="pk-district" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="pk-district-list" placeholder="<?php esc_attr_e( 'Choisissez un quartier', 'partikulier' ); ?>">
+						<input type="text" id="pk-district" autocomplete="off" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="pk-district-list" placeholder="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Choisissez un quartier', 'Choisissez un quartier', 'partikulier' ) ); ?>">
 					<ul class="pk-suggest" id="pk-district-list" role="listbox" hidden></ul>
 				</div>
 
@@ -228,9 +228,9 @@ $types = get_terms( array(
 						<select id="pk-living-rooms" name="pk_living_rooms" required>
 							<option value=""><?php esc_html_e( 'Choisissez le nombre', 'partikulier' ); ?></option>
 							<option value="0"><?php esc_html_e( '0 salon — pièce principale', 'partikulier' ); ?></option>
-							<option value="1"><?php esc_html_e( '1 salon', 'partikulier' ); ?></option>
-							<option value="2"><?php esc_html_e( '2 salons', 'partikulier' ); ?></option>
-							<option value="3+"><?php esc_html_e( '3 salons ou plus', 'partikulier' ); ?></option>
+								<option value="1"><?php esc_html_e( '1 salon', 'partikulier' ); ?></option>
+								<option value="2"><?php esc_html_e( '2 salons', 'partikulier' ); ?></option>
+								<option value="3+"><?php esc_html_e( '3 salons ou plus', 'partikulier' ); ?></option>
 						</select>
 					</div>
 					<div class="pk-field">
@@ -241,9 +241,9 @@ $types = get_terms( array(
 							</span>
 							<select id="pk-bathrooms" name="pk_bathrooms" required>
 								<option value=""><?php esc_html_e( 'Choisissez le nombre', 'partikulier' ); ?></option>
-								<option value="1"><?php esc_html_e( '1 salle de bains', 'partikulier' ); ?></option>
-								<option value="2"><?php esc_html_e( '2 salles de bains', 'partikulier' ); ?></option>
-								<option value="3+"><?php esc_html_e( '3 salles de bains ou plus', 'partikulier' ); ?></option>
+									<option value="1"><?php esc_html_e( '1 salle de bains', 'partikulier' ); ?></option>
+									<option value="2"><?php esc_html_e( '2 salles de bains', 'partikulier' ); ?></option>
+									<option value="3+"><?php esc_html_e( '3 salles de bains ou plus', 'partikulier' ); ?></option>
 							</select>
 						</div>
 					</div>
@@ -254,9 +254,9 @@ $types = get_terms( array(
 						<label class="pk-label" for="pk-floor"><?php esc_html_e( 'Étage', 'partikulier' ); ?></label>
 						<select id="pk-floor" name="pk_floor">
 							<option value="RDC"><?php esc_html_e( 'RDC', 'partikulier' ); ?></option>
-							<?php for ( $i = 1; $i <= 12; $i++ ) : ?>
-								<option value="<?php echo esc_attr( $i . 'e étage' ); ?>"><?php echo esc_html( $i . 'e étage' ); ?></option>
-							<?php endfor; ?>
+								<?php for ( $i = 1; $i <= 12; $i++ ) : ?>
+									<option value="<?php echo esc_attr( $i . ( 1 === $i ? 'er' : 'e' ) . ' étage' ); ?>"><?php printf( esc_html__( '%d%s étage', 'partikulier' ), (int) $i, ( 1 === $i ? 'er' : 'e' ) ); ?></option>
+								<?php endfor; ?>
 							<option value="Dernier étage"><?php esc_html_e( 'Dernier étage', 'partikulier' ); ?></option>
 						</select>
 					</div>

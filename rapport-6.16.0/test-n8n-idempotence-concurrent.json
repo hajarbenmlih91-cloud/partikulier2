@@ -1,0 +1,1 @@
+{"passed":true,"rounds":5,"invariants":["two independent HTTP processes","200/200 each round","one duplicate:false and one duplicate:true","no 500"]}

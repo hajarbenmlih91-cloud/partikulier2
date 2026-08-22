@@ -30,10 +30,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="pk-footer-col">
 				<h3 class="pk-footer-title"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Aide', 'Aide', 'partikulier' ) : __( 'Aide', 'partikulier' ) ); ?></h3>
 			<ul class="pk-footer-links">
-				<li><a href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?></a></li>
-				<li><a href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php esc_html_e( 'Toutes les annonces', 'partikulier' ); ?></a></li>
-				<li><a href="<?php echo esc_url( pk_page_url( 'faq', '/faq/' ) ); ?>"><?php esc_html_e( 'Questions fréquentes', 'partikulier' ); ?></a></li>
-				<li><a href="<?php echo esc_url( pk_page_url( 'contact', '/contact/' ) ); ?>"><?php esc_html_e( 'Contactez-nous', 'partikulier' ); ?></a></li>
+<li><a href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Déposer une annonce', 'Déposer une annonce', 'partikulier' ) ); ?></a></li>
+					<li><a href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Toutes les annonces', 'Toutes les annonces', 'partikulier' ) ); ?></a></li>
+					<li><a href="<?php echo esc_url( pk_page_url( 'faq', '/faq/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Questions fréquentes', 'Questions fréquentes', 'partikulier' ) ); ?></a></li>
+					<li><a href="<?php echo esc_url( pk_page_url( 'contact', '/contact/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contactez-nous', 'Contactez-nous', 'partikulier' ) ); ?></a></li>
 			</ul>
 		</div>
 
@@ -60,7 +60,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					printf( '<p><a href="mailto:%1$s">%1$s</a></p>', esc_html( $blog_email ) );
 				}
 				?>
-				<p><?php esc_html_e( 'Maroc', 'partikulier' ); ?></p>
+				<p><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Maroc', 'Maroc', 'partikulier' ) ); ?></p>
 				<?php
 				$cities = Partikulier_Geo::top_cities( 5 );
 				if ( $cities ) {
@@ -75,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="pk-footer-bottom">
 		<div class="pk-container pk-footer-bottom-inner">
 				<p class="pk-copyright">&copy; <?php echo esc_html( date_i18n( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Tous droits réservés.', 'Tous droits réservés.', 'partikulier' ) : __( 'Tous droits réservés.', 'partikulier' ) ); ?></p>
-			<nav class="pk-footer-legal" aria-label="<?php esc_attr_e( 'Mentions légales', 'partikulier' ); ?>">
+			<nav class="pk-footer-legal" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Mentions légales', 'Mentions légales', 'partikulier' ) ); ?>">
 				<?php
 				wp_nav_menu( array(
 					'theme_location' => 'footer',

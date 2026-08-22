@@ -108,25 +108,26 @@ class Partikulier_Geo {
 	/**
 	 * Localisation lisible d'une annonce : "Rue X, Quartier Y, Ville, Region".
 	 */
-	public static function location_string( $post_id ) {
-		$parts = array();
-		$terms = wp_get_object_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY, array( 'fields' => 'names' ) );
-		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-			$parts = $terms;
+		public static function location_string( $post_id ) {
+			$parts = array();
+			// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
+			$terms = get_the_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+				$parts = wp_list_pluck( $terms, 'name' );
+			}
+			return implode( ', ', array_unique( $parts ) );
 		}
-		return implode( ', ', array_unique( $parts ) );
-	}
 
 	/**
 	 * URL de la ville d'une annonce (pour le bouton "Voir les annonces de cette ville").
 	 */
-	public static function city_link( $post_id ) {
-		$terms = wp_get_object_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY, array( 'number' => 1 ) );
-		if ( $terms && ! is_wp_error( $terms ) ) {
-			return get_term_link( $terms[0] );
+		public static function city_link( $post_id ) {
+			$terms = get_the_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+			if ( $terms && ! is_wp_error( $terms ) ) {
+				return get_term_link( $terms[0] );
+			}
+			return pk_properties_archive_url();
 		}
-		return pk_properties_archive_url();
-	}
 }
 
 Partikulier_Geo::init();

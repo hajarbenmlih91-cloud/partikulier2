@@ -25,7 +25,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 		<?php echo Partikulier_Geo::breadcrumbs_html(); // phpcs:ignore ?>
 
 		<header class="pk-archive-head">
-			<p class="pk-editorial-kicker"><?php esc_html_e( 'Le catalogue direct', 'partikulier' ); ?></p>
+			<p class="pk-editorial-kicker"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Le catalogue direct', 'Le catalogue direct', 'partikulier' ) ); ?></p>
 			<h1 class="pk-archive-title">
 				<?php
 				if ( is_search() ) {
@@ -105,9 +105,9 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 		</header>
 
 		<div class="pk-archive-search">
-			<p class="pk-archive-subtitle"><?php esc_html_e( 'Des biens publiés directement par leurs propriétaires.', 'partikulier' ); ?></p>
+			<p class="pk-archive-subtitle"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Des biens publiés directement par leurs propriétaires.', 'Des biens publiés directement par leurs propriétaires.', 'partikulier' ) ); ?></p>
 			<?php $variant = 'archive'; require PARTIKULIER_DIR . '/templates/parts/search-form.php'; ?>
-			<ul class="pk-archive-trust"><li><?php esc_html_e( 'Localisation d’abord', 'partikulier' ); ?></li><li><?php esc_html_e( 'Vendeur identifié', 'partikulier' ); ?></li><li><?php esc_html_e( 'Contact direct', 'partikulier' ); ?></li></ul>
+			<ul class="pk-archive-trust"><li><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Localisation d’abord', 'Localisation d’abord', 'partikulier' ) ); ?></li><li><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Vendeur identifié', 'Vendeur identifié', 'partikulier' ) ); ?></li><li><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact direct', 'Contact direct', 'partikulier' ) ); ?></li></ul>
 		</div>
 
 
@@ -116,7 +116,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 					<h2 class="screen-reader-text"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Filtres', 'Filtres', 'partikulier' ) : __( 'Filtres', 'partikulier' ) ); ?></h2>
 
 				<div class="pk-filter">
-					<h3 class="pk-filter-title"><?php esc_html_e( 'Action', 'partikulier' ); ?></h3>
+					<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Action', 'Action', 'partikulier' ) ); ?></h3>
 					<?php
 					$actions = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, 'hide_empty' => true ) );
 					if ( $actions && ! is_wp_error( $actions ) ) {
@@ -137,7 +137,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 				</div>
 
 				<div class="pk-filter">
-					<h3 class="pk-filter-title"><?php esc_html_e( 'Types de biens', 'partikulier' ); ?></h3>
+					<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Types de biens', 'Types de biens', 'partikulier' ) ); ?></h3>
 					<?php
 					$types = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_TYPE_TAXONOMY, 'hide_empty' => true ) );
 					if ( $types && ! is_wp_error( $types ) ) {
@@ -158,17 +158,17 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 				</div>
 
 				<div class="pk-filter">
-					<h3 class="pk-filter-title"><?php esc_html_e( 'Budget maximum', 'partikulier' ); ?></h3>
+					<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Budget maximum', 'Budget maximum', 'partikulier' ) ); ?></h3>
 						<form action="<?php echo esc_url( pk_properties_archive_url() ); ?>" method="get">
 						<div class="pk-filter-price">
-							<input type="number" name="pk_price_max" placeholder="<?php esc_attr_e( '€ max', 'partikulier' ); ?>" min="0" aria-label="<?php esc_attr_e( 'Budget maximum en euros', 'partikulier' ); ?>">
+								<input type="number" name="pk_price_max" placeholder="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'MAD max', 'MAD max', 'partikulier' ) ); ?>" min="0" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Budget maximum en MAD', 'Budget maximum en MAD', 'partikulier' ) ); ?>">
 						</div>
 							<button type="submit" class="pk-filter-apply"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'APPLIQUER', 'APPLIQUER', 'partikulier' ) : __( 'APPLIQUER', 'partikulier' ) ); ?></button>
 					</form>
 				</div>
 
 				<div class="pk-filter">
-					<h3 class="pk-filter-title"><?php esc_html_e( 'Villes populaires', 'partikulier' ); ?></h3>
+					<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Villes populaires', 'Villes populaires', 'partikulier' ) ); ?></h3>
 					<?php
 					$cities = Partikulier_Geo::top_cities( 6 );
 					if ( $cities ) {
@@ -201,11 +201,11 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 					<?php pk_pagination(); ?>
 				<?php else : ?>
 					<div class="pk-empty">
-						<h2><?php esc_html_e( 'Aucune annonce ne correspond à votre recherche.', 'partikulier' ); ?></h2>
-						<p><?php esc_html_e( 'Essayez d\'élargir vos critères ou consultez les villes populaires.', 'partikulier' ); ?></p>
-							<a class="pk-btn pk-btn-outline" href="<?php echo esc_url( pk_properties_archive_url() ); ?>">
-							<?php esc_html_e( 'Voir toutes les annonces', 'partikulier' ); ?>
-						</a>
+<h2><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Aucune annonce ne correspond à votre recherche.', 'Aucune annonce ne correspond à votre recherche.', 'partikulier' ) ); ?></h2>
+							<p><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Essayez d\'élargir vos critères ou consultez les villes populaires.', 'Essayez d\'élargir vos critères ou consultez les villes populaires.', 'partikulier' ) ); ?></p>
+								<a class="pk-btn pk-btn-outline" href="<?php echo esc_url( pk_properties_archive_url() ); ?>">
+								<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Voir toutes les annonces', 'Voir toutes les annonces', 'partikulier' ) ); ?>
+							</a>
 					</div>
 				<?php endif; ?>
 			</div>

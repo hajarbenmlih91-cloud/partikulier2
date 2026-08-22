@@ -21,36 +21,52 @@ class Partikulier_Localization {
 	const STATUS_PREPARED = 'prepared';
 	const META_FREE_TEXT_LANGUAGE = '_pk_free_text_language';
 
-	public static function init() {
-		add_action( 'init', array( __CLASS__, 'load_textdomain' ), 5 );
-		add_action( 'wp', array( __CLASS__, 'load_active_textdomain' ), 1 );
-		add_action( 'template_redirect', array( __CLASS__, 'maybe_redirect_browser_language' ), 1 );
-		add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
-		add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
-		add_filter( 'gettext_partikulier', array( __CLASS__, 'translate_polylang_string' ), 10, 3 );
-		add_filter( 'pll_get_post_types', array( __CLASS__, 'register_polylang_post_type' ), 10, 2 );
-		add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
-		add_filter( 'pll_preferred_language', array( __CLASS__, 'filter_robot_preferred_language' ), 10, 2 );
-		add_action( 'pre_get_posts', array( __CLASS__, 'optimize_property_queries' ) );
-	}
+		public static function init() {
+			add_action( 'init', array( __CLASS__, 'load_textdomain' ), 5 );
+			add_action( 'wp', array( __CLASS__, 'load_active_textdomain' ), 1 );
+			add_action( 'template_redirect', array( __CLASS__, 'maybe_redirect_browser_language' ), 1 );
+			add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
+			add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
+			add_filter( 'gettext_partikulier', array( __CLASS__, 'translate_polylang_string' ), 10, 3 );
+			add_filter( 'pll_get_post_types', array( __CLASS__, 'register_polylang_post_type' ), 10, 2 );
+			add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
+			add_filter( 'pll_preferred_language', array( __CLASS__, 'filter_robot_preferred_language' ), 10, 2 );
+			// Priorité 20 pour passer APRES les filtres par défaut d'Estatik.
+			add_action( 'pre_get_posts', array( __CLASS__, 'optimize_property_queries' ), 20 );
+			// Neutraliser le réglage Estatik properties_per_page pour forcer 24.
+			add_filter( 'es_settings', array( __CLASS__, 'force_estatik_pagination' ), 999 );
+		}
 
 	/**
 	 * Optimise les requêtes de propriétés pour éviter les N+1 (terms/meta cache)
 	 * et ajuste la pagination pour une meilleure performance.
 	 */
-	public static function optimize_property_queries( $query ) {
-		if ( is_admin() || ! $query->is_main_query() ) {
-			return;
+		/**
+		 * Force le réglage Estatik à 24 pour la cohérence globale.
+		 */
+		public static function force_estatik_pagination( $settings ) {
+			if ( is_array( $settings ) ) {
+				$settings['properties_per_page'] = 24;
+			}
+			return $settings;
 		}
 
-			if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
-				$query->set( 'update_post_term_cache', true );
-				$query->set( 'update_post_meta_cache', true );
-				// Optimisation senior : forcer 24 par page sur l'archive pour respecter la grille responsive et limiter les requêtes N+1.
-				if ( ! is_admin() && ( $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax() ) ) {
-					$query->set( 'posts_per_page', 24 );
-				}
+		public static function optimize_property_queries( $query ) {
+			if ( is_admin() || ! $query->is_main_query() ) {
+				return;
 			}
+
+					if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
+						// Forcer le cache des termes et meta pour éviter les N+1 dans les cartes.
+						$query->set( 'cache_results', true );
+						$query->set( 'update_post_term_cache', true );
+						$query->set( 'update_post_meta_cache', true );
+					
+					// Optimisation senior : forcer 24 par page sur l'archive pour respecter la grille responsive et limiter les requêtes N+1.
+					if ( ! is_admin() && ( $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax() ) ) {
+						$query->set( 'posts_per_page', 24 );
+					}
+				}
 	}
 
 			/**
@@ -169,8 +185,10 @@ class Partikulier_Localization {
 			'view'                     => 'Vue',
 			'sunshine'                 => 'Ensoleillement',
 			'parking'                  => 'Parkings',
-			'floor'                    => 'Étage',
-			'year_built'               => 'Année de construction',
+				'floor'                    => 'Étage',
+				'first_floor'              => '1er étage',
+				'nth_floor'                => '%d%s étage',
+				'year_built'               => 'Année de construction',
 			'energy_class'             => 'Classe énergie',
 			'yes'                      => 'Oui',
 			'no'                       => 'Non',
@@ -483,11 +501,132 @@ class Partikulier_Localization {
 		 */
 		public static function form_translations() {
 		return array(
-			'Titre de l’annonce *' => array( 'fr' => 'Titre de l’annonce *', 'en' => 'Listing title *', 'ar' => 'عنوان الإعلان *' ),
+				'1er étage' => array( 'fr' => '1er étage', 'en' => '1st floor', 'ar' => 'الطابق الأول' ),
+				'e étage' => array( 'fr' => 'e étage', 'en' => 'th floor', 'ar' => 'الطابق' ),
+				'%d%s étage' => array( 'fr' => '%d%s étage', 'en' => '%d%s floor', 'ar' => 'الطابق %d' ),
+				'1 salon' => array( 'fr' => '1 salon', 'en' => '1 living room', 'ar' => 'صالون واحد' ),
+				'2 salons' => array( 'fr' => '2 salons', 'en' => '2 living rooms', 'ar' => 'صالونان' ),
+				'3 salons ou plus' => array( 'fr' => '3 salons ou plus', 'en' => '3 living rooms or more', 'ar' => '3 صالونات أو أكثر' ),
+				'1 salle de bains' => array( 'fr' => '1 salle de bains', 'en' => '1 bathroom', 'ar' => 'حمام واحد' ),
+				'2 salles de bains' => array( 'fr' => '2 salles de bains', 'en' => '2 bathrooms', 'ar' => 'حمامات' ),
+				'3 salles de bains ou plus' => array( 'fr' => '3 salles de bains ou plus', 'en' => '3 bathrooms or more', 'ar' => '3 حمامات أو أكثر' ),
+				'Recherche principale' => array( 'fr' => 'Recherche principale', 'en' => 'Main search', 'ar' => 'البحث الرئيسي' ),
+				'Annonce à la une' => array( 'fr' => 'Annonce à la une', 'en' => 'Featured listing', 'ar' => 'إعلان مميز' ),
+				'Des biens choisis pour leur lumière.' => array( 'fr' => 'Des biens choisis pour leur lumière.', 'en' => 'Properties chosen for their light.', 'ar' => 'عقارات مختارة لجمال إضاءتها.' ),
+				'Un accès direct aux annonces publiées par leurs propriétaires.' => array( 'fr' => 'Un accès direct aux annonces publiées par leurs propriétaires.', 'en' => 'Direct access to listings published by owners.', 'ar' => 'وصول مباشر للإعلانات المنشورة من قبل أصحابها.' ),
+				'Fraîchement publiées' => array( 'fr' => 'Fraîchement publiées', 'en' => 'Freshly published', 'ar' => 'نشرت حديثاً' ),
+				'Les dernières annonces' => array( 'fr' => 'Les dernières annonces', 'en' => 'Latest listings', 'ar' => 'آخر الإعلانات' ),
+				'Des biens ajoutés récemment par leurs propriétaires.' => array( 'fr' => 'Des biens ajoutés récemment par leurs propriétaires.', 'en' => 'Properties recently added by their owners.', 'ar' => 'عقارات أضيفت مؤخراً من قبل أصحابها.' ),
+				'Voir toutes les annonces' => array( 'fr' => 'Voir toutes les annonces', 'en' => 'View all listings', 'ar' => 'مشاهدة جميع الإعلانات' ),
+				'Trouvez votre bien' => array( 'fr' => 'Trouvez votre bien', 'en' => 'Find your property', 'ar' => 'جد عقارك' ),
+				'Une recherche qui commence par le bon lieu.' => array( 'fr' => 'Une recherche qui commence par le bon lieu.', 'en' => 'A search that starts with the right place.', 'ar' => 'بحث يبدأ بالمكان المناسب.' ),
+				'Parcourez les catégories sans bruit, puis laissez les détails vous guider.' => array( 'fr' => 'Parcourez les catégories sans bruit, puis laissez les détails vous guider.', 'en' => 'Browse categories without noise, then let details guide you.', 'ar' => 'تصفح الفئات بكل هدوء، واترك التفاصيل توجهك.' ),
+				'À louer directement' => array( 'fr' => 'À louer directement', 'en' => 'For rent directly', 'ar' => 'للكراء المباشر' ),
+				'Un appartement avec vue sur le large.' => array( 'fr' => 'Un appartement avec vue sur le large.', 'en' => 'An apartment with a view of the open sea.', 'ar' => 'شقة مطلة على البحر.' ),
+				'Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.' => array( 'fr' => 'Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.', 'en' => 'Discover properties that prioritize light, space and direct contact.', 'ar' => 'اكتشف العقارات التي تعطي الأولوية للإضاءة، المساحة والتواصل المباشر.' ),
+				'Rechercher un bien' => array( 'fr' => 'Rechercher un bien', 'en' => 'Search for a property', 'ar' => 'البحث عن عقار' ),
+				'Proche de chez vous' => array( 'fr' => 'Proche de chez vous', 'en' => 'Near you', 'ar' => 'بالقرب منك' ),
+				'Trouvez un bien dans votre ville.' => array( 'fr' => 'Trouvez un bien dans votre ville.', 'en' => 'Find a property in your city.', 'ar' => 'جد عقاراً في مدينتك.' ),
+				'Les quartiers et villes sont indexés pour vous aider à trouver plus vite.' => array( 'fr' => 'Les quartiers et villes sont indexés pour vous aider à trouver plus vite.', 'en' => 'Neighborhoods and cities are indexed to help you find faster.', 'ar' => 'الأحياء والمدن مفهرسة لمساعدتك في العثور بسرعة.' ),
+				'Explorer les annonces' => array( 'fr' => 'Explorer les annonces', 'en' => 'Explore listings', 'ar' => 'استكشاف الإعلانات' ),
+				'Par région' => array( 'fr' => 'Par région', 'en' => 'By region', 'ar' => 'حسب الجهة' ),
+				'Partout au Maroc.' => array( 'fr' => 'Partout au Maroc.', 'en' => 'Throughout Morocco.', 'ar' => 'في جميع أنحاء المغرب.' ),
+				'Aide' => array( 'fr' => 'Aide', 'en' => 'Help', 'ar' => 'مساعدة' ),
+					'Maison lumineuse à vendre entre particuliers' => array( 'fr' => 'Maison lumineuse à vendre entre particuliers', 'en' => 'Bright house for sale between individuals', 'ar' => 'منزل مشرق للبيع بين الأفراد' ),
+					'Choisissez un quartier' => array( 'fr' => 'Choisissez un quartier', 'en' => 'Choose a neighborhood', 'ar' => 'اختر الحي' ),
+					'Le catalogue direct' => array( 'fr' => 'Le catalogue direct', 'en' => 'The direct catalog', 'ar' => 'كتالوج مباشر' ),
+					'Des biens publiés directement par leurs propriétaires.' => array( 'fr' => 'Des biens publiés directement par leurs propriétaires.', 'en' => 'Properties published directly by their owners.', 'ar' => 'عقارات منشورة مباشرة من قبل أصحابها.' ),
+					'Localisation d’abord' => array( 'fr' => 'Localisation d’abord', 'en' => 'Location first', 'ar' => 'الموقع أولاً' ),
+					'Action' => array( 'fr' => 'Action', 'en' => 'Action', 'ar' => 'العملية' ),
+					'Budget maximum' => array( 'fr' => 'Budget maximum', 'en' => 'Maximum budget', 'ar' => 'الميزانية القصوى' ),
+					'Villes populaires' => array( 'fr' => 'Villes populaires', 'en' => 'Popular cities', 'ar' => 'المدن الأكثر شعبية' ),
+					'MAD max' => array( 'fr' => 'MAD max', 'en' => 'MAD max', 'ar' => 'الحد الأقصى بالدرهم' ),
+					'Budget maximum en MAD' => array( 'fr' => 'Budget maximum en MAD', 'en' => 'Maximum budget in MAD', 'ar' => 'الميزانية القصوى بالدرهم' ),
+					'Aucune annonce ne correspond à votre recherche.' => array( 'fr' => 'Aucune annonce ne correspond à votre recherche.', 'en' => 'No listing matches your search.', 'ar' => 'لا يوجد إعلان يطابق بحثك.' ),
+					'Essayez d\'élargir vos critères ou consultez les villes populaires.' => array( 'fr' => 'Essayez d\'élargir vos critères ou consultez les villes populaires.', 'en' => 'Try to broaden your criteria or check popular cities.', 'ar' => 'حاول توسيع معاييرك أو تحقق من المدن الأكثر شعبية.' ),
+					'Publier gratuitement' => array( 'fr' => 'Publier gratuitement', 'en' => 'Publish for free', 'ar' => 'نشر مجاني' ),
+					'Toutes les annonces' => array( 'fr' => 'Toutes les annonces', 'en' => 'All listings', 'ar' => 'جميع الإعلانات' ),
+					'Propriétaire' => array( 'fr' => 'Propriétaire', 'en' => 'Owner', 'ar' => 'المالك' ),
+					'/ mois' => array( 'fr' => '/ mois', 'en' => '/ month', 'ar' => '/ شهر' ),
+					'Ajouter aux favoris' => array( 'fr' => 'Ajouter aux favoris', 'en' => 'Add to favorites', 'ar' => 'إضافة إلى المفضلة' ),
+					'Partager cette annonce' => array( 'fr' => 'Partager cette annonce', 'en' => 'Share this listing', 'ar' => 'مشاركة هذا الإعلان' ),
+					'Caractéristiques' => array( 'fr' => 'Caractéristiques', 'en' => 'Features', 'ar' => 'الخصائص' ),
+					'Oui' => array( 'fr' => 'Oui', 'en' => 'Yes', 'ar' => 'نعم' ),
+					'Non' => array( 'fr' => 'Non', 'en' => 'No', 'ar' => 'لا' ),
+					'Surface' => array( 'fr' => 'Surface', 'en' => 'Area', 'ar' => 'المساحة' ),
+					'Chambres' => array( 'fr' => 'Chambres', 'en' => 'Bedrooms', 'ar' => 'غرف النوم' ),
+					'Salons' => array( 'fr' => 'Salons', 'en' => 'Living rooms', 'ar' => 'الصالات' ),
+					'Salles de bains' => array( 'fr' => 'Salles de bains', 'en' => 'Bathrooms', 'ar' => 'حمامات' ),
+					'Terrasse' => array( 'fr' => 'Terrasse', 'en' => 'Terrace', 'ar' => 'تراس' ),
+					'Parkings' => array( 'fr' => 'Parkings', 'en' => 'Parking', 'ar' => 'مواقف سيارات' ),
+					'Étage' => array( 'fr' => 'Étage', 'en' => 'Floor', 'ar' => 'الطابق' ),
+					'Année de construction' => array( 'fr' => 'Année de construction', 'en' => 'Year built', 'ar' => 'سنة البناء' ),
+					'Classe énergie' => array( 'fr' => 'Classe énergie', 'en' => 'Energy class', 'ar' => 'فئة الطاقة' ),
+					'Description' => array( 'fr' => 'Description', 'en' => 'Description', 'ar' => 'الوصف' ),
+					'Contact sécurisé' => array( 'fr' => 'Contact sécurisé', 'en' => 'Secure contact', 'ar' => 'اتصال آمن' ),
+					'Intéressé par ce bien ?' => array( 'fr' => 'Intéressé par ce bien ?', 'en' => 'Interested in this property?', 'ar' => 'مهتم بهذا العقار؟' ),
+					'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.' => array( 'fr' => 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'en' => 'Send this listing on WhatsApp. After verification of your request, we will send you the owner\'s contact details.', 'ar' => 'أرسل هذا الإعلان على واتساب. بعد التحقق من طلبك، سنقوم بتزويدك بمعلومات الاتصال الخاصة بالمالك.' ),
+					'Contact transmis après contrôle' => array( 'fr' => 'Contact transmis après contrôle', 'en' => 'Contact transmitted after verification', 'ar' => 'يتم إرسال معلومات الاتصال بعد التحقق' ),
+					'Demander sur WhatsApp' => array( 'fr' => 'Demander sur WhatsApp', 'en' => 'Request on WhatsApp', 'ar' => 'الطلب عبر واتساب' ),
+					'Vos critères sont enregistrés pour vérifier la demande. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.' => array( 'fr' => 'Vos critères sont enregistrés pour vérifier la demande. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.', 'en' => 'Your criteria are recorded to verify the request. Similar listings are only sent with your explicit agreement.', 'ar' => 'يتم تسجيل معاييرك للتحقق من الطلب. لا يتم إرسال إعلانات مماثلة إلا بموافقتك الصريحة.' ),
+					'Voir les autres annonces dans cette ville' => array( 'fr' => 'Voir les autres annonces dans cette ville', 'en' => 'See other listings in this city', 'ar' => 'مشاهدة الإعلانات الأخرى في هذه المدينة' ),
+					'Dans la même ville' => array( 'fr' => 'Dans la même ville', 'en' => 'In the same city', 'ar' => 'في نفس المدينة' ),
+					'Voir aussi à %s' => array( 'fr' => 'Voir aussi à %s', 'en' => 'See also in %s', 'ar' => 'شاهد أيضاً في %s' ),
+					'Tout voir' => array( 'fr' => 'Tout voir', 'en' => 'See all', 'ar' => 'مشاهدة الكل' ),
+					'Maison lumineuse à vendre entre particuliers' => array( 'fr' => 'Maison lumineuse à vendre entre particuliers', 'en' => 'Bright house for sale by owner', 'ar' => 'منزل مشرق للبيع من طرف صاحبه' ),
+					'Explorer' => array( 'fr' => 'Explorer', 'en' => 'Explore', 'ar' => 'استكشاف' ),
+					'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
+					'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
+					'Terrain' => array( 'fr' => 'Terrain', 'en' => 'Land', 'ar' => 'أرض' ),
+					'Parking' => array( 'fr' => 'Parking', 'en' => 'Parking', 'ar' => 'موقف سيارات' ),
+					'Immeuble' => array( 'fr' => 'Immeuble', 'en' => 'Building', 'ar' => 'عمارة' ),
+					'Local' => array( 'fr' => 'Local', 'en' => 'Commercial', 'ar' => 'محل تجاري' ),
+					'Caractéristiques' => array( 'fr' => 'Caractéristiques', 'en' => 'Features', 'ar' => 'المميزات' ),
+					'Description' => array( 'fr' => 'Description', 'en' => 'Description', 'ar' => 'الوصف' ),
+					'Demander sur WhatsApp' => array( 'fr' => 'Demander sur WhatsApp', 'en' => 'Ask on WhatsApp', 'ar' => 'الطلب عبر واتساب' ),
+					'Chambres' => array( 'fr' => 'Chambres', 'en' => 'Bedrooms', 'ar' => 'غرف النوم' ),
+					'Salons' => array( 'fr' => 'Salons', 'en' => 'Living rooms', 'ar' => 'صالونات' ),
+					'Salles de bains' => array( 'fr' => 'Salles de bains', 'en' => 'Bathrooms', 'ar' => 'حمامات' ),
+					'Parkings' => array( 'fr' => 'Parkings', 'en' => 'Parking spaces', 'ar' => 'مواقف السيارات' ),
+					'Étage' => array( 'fr' => 'Étage', 'en' => 'Floor', 'ar' => 'الطابق' ),
+					'Année de construction' => array( 'fr' => 'Année de construction', 'en' => 'Year built', 'ar' => 'سنة البناء' ),
+					'Classe énergie' => array( 'fr' => 'Classe énergie', 'en' => 'Energy class', 'ar' => 'فئة الطاقة' ),
+					'Contact sécurisé' => array( 'fr' => 'Contact sécurisé', 'en' => 'Secure contact', 'ar' => 'اتصال آمن' ),
+					'Intéressé par ce bien ?' => array( 'fr' => 'Intéressé par ce bien ?', 'en' => 'Interested in this property?', 'ar' => 'مهتم بهذا العقار؟' ),
+					'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.' => array( 'fr' => 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'en' => 'Send this listing on WhatsApp. After verification of your request, we will send you the owner\'s contact details.', 'ar' => 'أرسل هذا الإعلان عبر واتساب. بعد التحقق من طلبك، سنزودك ببيانات اتصال المالك.' ),
+					'Cette annonce ne reçoit plus de contacts.' => array( 'fr' => 'Cette annonce ne reçoit plus de contacts.', 'en' => 'This listing no longer accepts contacts.', 'ar' => 'هذا الإعلان لم يعد يستقبل اتصالات.' ),
+					'Envoyez-nous cette annonce sur WhatsApp. Après contrôle de votre demande, nous vous transmettons les coordonnées du propriétaire.' => array( 'fr' => 'Envoyez-nous cette annonce sur WhatsApp. Après contrôle de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'en' => 'Send us this listing on WhatsApp. After verification of your request, we will send you the owner\'s contact details.', 'ar' => 'أرسل لنا هذا الإعلان عبر واتساب. بعد التحقق من طلبك، سنزودك ببيانات اتصال المالك.' ),
+					'Vos critères seront demandés sur WhatsApp. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.' => array( 'fr' => 'Vos critères seront demandés sur WhatsApp. Les annonces similaires ne sont envoyées qu’avec votre accord explicite.', 'en' => 'Your criteria will be requested on WhatsApp. Similar listings are only sent with your explicit agreement.', 'ar' => 'سيتم طلب معاييرك عبر واتساب. لا يتم إرسال إعلانات مماثلة إلا بموافقتك الصريحة.' ),
+					'Vos critères sont vérifiés avant transmission des coordonnées.' => array( 'fr' => 'Vos critères sont vérifiés avant transmission des coordonnées.', 'en' => 'Your criteria are verified before transmitting contact details.', 'ar' => 'يتم التحقق من معاييرك قبل إرسال بيانات الاتصال.' ),
+					'Dans la même ville' => array( 'fr' => 'Dans la même ville', 'en' => 'In the same city', 'ar' => 'في نفس المدينة' ),
+					'Voir aussi à %s' => array( 'fr' => 'Voir aussi à %s', 'en' => 'See also in %s', 'ar' => 'شاهد أيضاً في %s' ),
+					'Prix sur demande' => array( 'fr' => 'Prix sur demande', 'en' => 'Price on request', 'ar' => 'السعر عند الطلب' ),
+					'Aperçu rapide' => array( 'fr' => 'Aperçu rapide', 'en' => 'Quick view', 'ar' => 'عرض سريع' ),
+					'Composition' => array( 'fr' => 'Composition', 'en' => 'Composition', 'ar' => 'التكوين' ),
+					'Voir l\'annonce' => array( 'fr' => 'Voir l\'annonce', 'en' => 'View listing', 'ar' => 'عرض الإعلان' ),
+					'Bien' => array( 'fr' => 'Bien', 'en' => 'Property', 'ar' => 'عقار' ),
+					'1 chambre' => array( 'fr' => '1 chambre', 'en' => '1 bedroom', 'ar' => 'غرفة نوم واحدة' ),
+					'2 chambres' => array( 'fr' => '2 chambres', 'en' => '2 bedrooms', 'ar' => 'غرفتا نوم' ),
+					'1 salon' => array( 'fr' => '1 salon', 'en' => '1 living room', 'ar' => 'صالون واحد' ),
+					'2 salons' => array( 'fr' => '2 salons', 'en' => '2 living rooms', 'ar' => 'صالونان' ),
+					'1 salle de bains' => array( 'fr' => '1 salle de bains', 'en' => '1 bathroom', 'ar' => 'حمام واحد' ),
+					'2 salles de bains' => array( 'fr' => '2 salles de bains', 'en' => '2 bathrooms', 'ar' => 'حمامات' ),
+					'3 chambres ou plus' => array( 'fr' => '3 chambres ou plus', 'en' => '3 or more bedrooms', 'ar' => '3 غرف نوم أو أكثر' ),
+					'3 salons ou plus' => array( 'fr' => '3 salons ou plus', 'en' => '3 or more living rooms', 'ar' => '3 صالونات أو أكثر' ),
+					'3 salles de bains ou plus' => array( 'fr' => '3 salles de bains ou plus', 'en' => '3 or more bathrooms', 'ar' => '3 حمامات أو أكثر' ),
+					'Studio' => array( 'fr' => 'Studio', 'en' => 'Studio', 'ar' => 'استوديو' ),
+					'Pièce principale' => array( 'fr' => 'Pièce principale', 'en' => 'Main room', 'ar' => 'الغرفة الرئيسية' ),
+					'Commencez par une ville, un quartier ou un code postal.' => array( 'fr' => 'Commencez par une ville, un quartier ou un code postal.', 'en' => 'Start with a city, neighborhood, or zip code.', 'ar' => 'ابدأ بمدينة أو حي أو رمز بريدي.' ),
+					'annonces' => array( 'fr' => 'annonces', 'en' => 'listings', 'ar' => 'إعلانات' ),
+					'Questions fréquentes' => array( 'fr' => 'Questions fréquentes', 'en' => 'FAQ', 'ar' => 'الأسئلة الشائعة' ),
+					'Contactez-nous' => array( 'fr' => 'Contactez-nous', 'en' => 'Contact us', 'ar' => 'اتصل بنا' ),
+					'Mentions légales' => array( 'fr' => 'Mentions légales', 'en' => 'Legal notice', 'ar' => 'إشعار قانوني' ),
+					'Maroc' => array( 'fr' => 'Maroc', 'en' => 'Morocco', 'ar' => 'المغرب' ),
+				'Titre de l’annonce *' => array( 'fr' => 'Titre de l’annonce *', 'en' => 'Listing title *', 'ar' => 'عنوان الإعلان *' ),
 			'Ex : Appartement lumineux 3 pièces avec balcon' => array( 'fr' => 'Ex : Appartement lumineux 3 pièces avec balcon', 'en' => 'E.g. Bright 3-bedroom apartment with balcony', 'ar' => 'مثال: شقة مشرقة بثلاث غرف مع شرفة' ),
 			'Vous souhaitez' => array( 'fr' => 'Vous souhaitez', 'en' => 'You want to', 'ar' => 'أرغب في' ),
 			'Type de bien' => array( 'fr' => 'Type de bien', 'en' => 'Property type', 'ar' => 'نوع العقار' ),
-			'Prix (€)' => array( 'fr' => 'Prix (€)', 'en' => 'Price (€)', 'ar' => 'السعر (€)' ),
+				'Prix (MAD)' => array( 'fr' => 'Prix (MAD)', 'en' => 'Price (MAD)', 'ar' => 'السعر (درهم)' ),
 			'Ex : 245000' => array( 'fr' => 'Ex : 245000', 'en' => 'E.g. 245000', 'ar' => 'مثال: 245000' ),
 			'Ville' => array( 'fr' => 'Ville', 'en' => 'City', 'ar' => 'المدينة' ),
 			'Choisir une ville…' => array( 'fr' => 'Choisir une ville…', 'en' => 'Choose a city…', 'ar' => 'اختر مدينة…' ),
