@@ -12,8 +12,8 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | **SHA-256 ZIP** | `8dd3f1489215821c77c8332934364e981b6559878e8a41dab6c76e68e01071a5` |
 | **Attestation AR** | `documentation/attestations/relecture-arabe.md` |
 | **Attestation EN** | `documentation/attestations/relecture-anglais.md` |
-| **Baselines Visuelles** | `tests/baselines-6.17.0/` (Certifiées 6.17.0) |
-| **Preuves Brutes** | `documentation/preuves-brutes/` (SQL, SEO, Security) |
+| **Baselines Visuelles** | `tests/baselines-6.17.0/` (Trilingues Certifiées) |
+| **Preuves Brutes** | `documentation/preuves-brutes/` (Traces détaillées SQL/SEO/Security) |
 
 ## 🧪 Preuves de Recette Froide
 

@@ -1,0 +1,7 @@
+Total Queries: 1
+[0.61ms] SELECT SQL_CALC_FOUND_ROWS  wp_posts.ID
+					 FROM wp_posts 
+					 WHERE 1=1  AND ((wp_posts.post_type = 'property' AND (wp_posts.post_status = 'publish')))
+					 
+					 ORDER BY wp_posts.post_date DESC
+					 LIMIT 0, 24

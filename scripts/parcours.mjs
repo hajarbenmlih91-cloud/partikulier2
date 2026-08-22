@@ -39,26 +39,29 @@ function note(nom, ok, detail = '') {
   const bouton = page.locator('form button[type=submit], form input[type=submit]').first();
   if (await bouton.count()) {
     // Cibler explicitement le formulaire de dépôt (Lot 4bis)
-    // Utiliser Promise.all pour gérer le clic et le changement d'état sans détruire le contexte
-    const result = await page.evaluate(() => {
-      const forms = [...document.querySelectorAll('form')];
-      const formDepot = forms.find(f => {
-        const action = f.getAttribute('action') || '';
-        return action.includes('deposer') || f.querySelector('input[name*="title"]');
-      });
-      if (!formDepot) return { found: false };
-      
-      const isValid = formDepot.checkValidity();
-      if (!isValid) {
-        // La validation navigateur bloque le clic, c'est ce qu'on veut tester
-        return { found: true, blocked: true };
-      }
-      
-      // Si c'est valide (ne devrait pas arriver ici pour ce test), on ne clique pas pour éviter la navigation
-      return { found: true, blocked: false };
-    });
+    // Utiliser une approche sans evaluate pour le clic si possible, ou gérer la navigation
+    const formSelector = 'form:has(input[name*="title"]), form[action*="deposer"]';
+    const formExists = await page.locator(formSelector).count() > 0;
     
-    note('Soumission a vide bloquee', result.found && result.blocked);
+    if (formExists) {
+      const isInvalid = await page.evaluate((sel) => {
+        const f = document.querySelector(sel);
+        return f && !f.checkValidity();
+      }, formSelector);
+      
+      if (isInvalid) {
+        // Si le formulaire est déjà invalide, on tente le clic et on vérifie qu'on reste sur la page
+        const urlBefore = page.url();
+        await page.click(`${formSelector} button[type=submit], ${formSelector} input[type=submit]`).catch(() => {});
+        await page.waitForTimeout(500);
+        const urlAfter = page.url();
+        note('Soumission a vide bloquee', urlBefore === urlAfter);
+      } else {
+        note('Soumission a vide bloquee', false, 'Formulaire valide a vide?');
+      }
+    } else {
+      note('Formulaire de depot trouve', false);
+    }
   } else {
     note('Bouton de soumission present', false);
   }

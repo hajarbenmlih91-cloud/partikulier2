@@ -16,7 +16,7 @@ const BASE = process.env.PK_BASE || 'http://localhost:8090';
 const MODE = process.argv[2] || 'check';
 const DIR = process.env.PK_BASELINE_DIR
   ? path.resolve(process.env.PK_BASELINE_DIR)
-  : path.join(process.cwd(), 'tests', '__baseline__');
+  : path.join(process.cwd(), 'tests', 'baselines-6.17.0');
 const SEUIL = 0.2; // % de pixels differents tolere
 
 const LANGUAGES = ['', '/en', '/ar'];
