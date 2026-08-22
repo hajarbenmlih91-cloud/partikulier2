@@ -312,6 +312,19 @@ class Partikulier_SEO {
 		private static function localized_listing_description( $post, $locale ) {
 			$type     = self::localized_property_type( self::term_name( $post, PARTIKULIER_ESTATIK_TYPE_TAXONOMY ), $locale );
 			$location = self::term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+			if ( 'ar' === $locale ) {
+				$type     = preg_replace( '/^ترجمة\\s+/u', '', (string) $type );
+				$location = preg_replace( '/^ترجمة\\s+/u', '', (string) $location );
+				$ar_places = array(
+					'Casablanca' => 'الدار البيضاء',
+					'Rabat'      => 'الرباط',
+					'Marrakech'  => 'مراكش',
+					'Agadir'     => 'أكادير',
+					'Tanger'     => 'طنجة',
+					'Maroc'      => 'المغرب',
+				);
+				$location = $ar_places[ $location ] ?? $location;
+			}
 			$type     = $type ? $type : ( 'ar' === $locale ? 'عقار' : 'Property' );
 			$location = $location ? $location : ( 'ar' === $locale ? 'المغرب' : 'Morocco' );
 
@@ -323,7 +336,8 @@ class Partikulier_SEO {
 
 		private static function localized_property_type( $type, $locale ) {
 			$map = array(
-				'Appartement' => array( 'en' => 'Apartment', 'ar' => 'شقة' ),
+				'Appartement'          => array( 'en' => 'Apartment', 'ar' => 'شقة' ),
+				'ترجمة Appartement'   => array( 'en' => 'Apartment', 'ar' => 'شقة' ),
 				'Villa'       => array( 'en' => 'Villa', 'ar' => 'فيلا' ),
 				'Maison'      => array( 'en' => 'House', 'ar' => 'منزل' ),
 				'Terrain'     => array( 'en' => 'Land', 'ar' => 'أرض' ),

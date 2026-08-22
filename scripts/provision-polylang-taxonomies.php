@@ -11,15 +11,35 @@ foreach ( $taxonomies as $taxonomy ) {
         $translations = pll_get_term_translations( $fr_term->term_id );
         $translations['fr'] = (int) $fr_term->term_id;
         foreach ( array( 'en', 'ar' ) as $lang ) {
+            $name = $fr_term->name;
+            if ( 'ar' === $lang ) {
+                $ar_lexicon = array(
+                    'Appartement' => 'شقة',
+                    'Villa'       => 'فيلا',
+                    'Maison'      => 'منزل',
+                    'Terrain'     => 'أرض',
+                    'Studio'      => 'استوديو',
+                    'Casablanca'  => 'الدار البيضاء',
+                    'Rabat'       => 'الرباط',
+                    'Marrakech'   => 'مراكش',
+                    'Agadir'      => 'أكادير',
+                    'Tanger'      => 'طنجة',
+                    'Maroc'       => 'المغرب',
+                );
+                $name = $ar_lexicon[ $name ] ?? preg_replace( '/^ترجمة\\s+/u', '', $name );
+            }
             if ( empty( $translations[ $lang ] ) ) {
-                $name = $fr_term->name;
-                if ( 'ar' === $lang ) { $name = 'ترجمة ' . $name; }
                 $created = wp_insert_term( $name, $taxonomy, array( 'slug' => sanitize_title( $fr_term->slug . '-' . $lang ) ) );
                 if ( is_wp_error( $created ) && 'term_exists' === $created->get_error_code() ) { $created = array( 'term_id' => $created->get_error_data() ); }
                 if ( is_wp_error( $created ) ) { continue; }
                 $term_id = (int) $created['term_id'];
                 pll_set_term_language( $term_id, $lang );
                 $translations[ $lang ] = $term_id;
+            } elseif ( 'ar' === $lang ) {
+                $existing = get_term( (int) $translations[ $lang ], $taxonomy );
+                if ( $existing && ! is_wp_error( $existing ) && $existing->name !== $name ) {
+                    wp_update_term( (int) $existing->term_id, $taxonomy, array( 'name' => $name ) );
+                }
             }
         }
         pll_save_term_translations( $translations );

@@ -6,7 +6,7 @@ Cette requalification ferme la réserve observée sur les archives et fiches EN/
 
 ## Corrections livrées
 
-Le provisioning effectue le flush final après la configuration complète d’Estatik, Polylang, des traductions et des taxonomies. Il rejoue également un flush WP-CLI `rewrite flush --hard` et vérifie la présence des règles linguistiques Polylang et de la query var `lang`. Le contrôle ne cherche plus les chaînes littérales `en/annonces` ou `ar/annonces`, qui ne sont pas la représentation interne des règles génériques Polylang `(en|ar)`.
+Le provisioning effectue le flush final après la configuration complète d’Estatik, Polylang, des traductions et des taxonomies. Les termes AR utilisent désormais un lexique explicite (`Appartement` → `شقة`, `Casablanca` → `الدار البيضاء`, etc.) et une migration idempotente corrige les anciens noms préfixés par `ترجمة`. La génération SEO applique en plus un nettoyage défensif des anciens termes afin qu’aucun marqueur artificiel ni fragment français ne puisse entrer dans la meta AR. Il rejoue également un flush WP-CLI `rewrite flush --hard` et vérifie la présence des règles linguistiques Polylang et de la query var `lang`. Le contrôle ne cherche plus les chaînes littérales `en/annonces` ou `ar/annonces`, qui ne sont pas la représentation interne des règles génériques Polylang `(en|ar)`.
 
 La recette SEO découvre une famille `properties` publiée réellement dans Polylang et utilise ses IDs et permaliens courants. Le parcours navigateur utilise le même principe via `discover-i18n-family.php`; aucune ancienne fixture d’URL n’est imposée.
 
@@ -23,7 +23,7 @@ La recette SEO découvre une famille `properties` publiée réellement dans Poly
 | hreflang | `fr`, `en`, `ar`, `x-default` sur les trois fiches |
 | JSON-LD / Open Graph | `fr_FR`, `en_US` et `ar` cohérents avec les URLs |
 | Meta EN | anglaise, sans fragments français détectés |
-| Meta AR | arabe, sans fragments français détectés |
+| Meta AR | `عقار مقترح مباشرة من مالكه، بدون عمولة وكالة. عقار في المغرب` ; sans fragments français ni `ترجمة` |
 | Slug AR | préfixe parasite `إعلان-مترجم-` absent sur la fiche testée |
 | Cache fiches | un MISS puis trois HIT publics par langue, HTTP `200` |
 | `browser=1` | persistant après provisioning et contrôlé avant le flush final |
@@ -39,17 +39,17 @@ Le package installable régénéré est :
 
 ```text
 partikulier-6.17.0.zip
-SHA-256: f35f84791d22844bd5895e1f579a22c16d3556e0f23a700b36e4a4dcb37f2a79
+SHA-256: 1d88fd5634b2af98ccd557d2b18723365ac73c4644192aaa493b196d9dadf263
 ```
 
 Le package thème seul est :
 
 ```text
 partikulier-6.17.0-theme.zip
-SHA-256: aa5235d9603a54c47e08dd205e53993abb89f9ea2fdf8ca0fa1e062183536f79
+SHA-256: 940451dfcd74f4d2bdbe7adbfb81fcf14e076c6181a1bade28b11a6fec19d6b9
 ```
 
-Le bundle installable contient notamment le thème et `mu-plugins/partikulier-early-seo.php`. Les scripts de recette et le présent rapport restent dans le dépôt de développement afin de séparer l’artefact WordPress installable des outils d’audit.
+Le bundle installable contient notamment le thème, `theme/languages/partikulier.pot`, les catalogues `.mo`, le mu-plugin `mu-plugins/partikulier-early-seo.php` et les deux polices Noto Sans Arabic. Les scripts de recette et le présent rapport restent dans le dépôt de développement afin de séparer l’artefact WordPress installable des outils d’audit.
 
 ## Verdict
 

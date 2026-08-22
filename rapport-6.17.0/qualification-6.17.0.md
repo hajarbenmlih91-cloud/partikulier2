@@ -42,15 +42,15 @@ Les alternates hreflang du thème ont été dédoublonnés : Polylang émet les 
 |---|---|
 | Archive | `partikulier-6.17.0.zip` |
 | Taille | 914 Ko environ |
-| SHA-256 | `3427c4eaaa4188784b3105ba299a24b24b41ed96fe2348487cdb4d32e6363b04` |
+| SHA-256 | `1d88fd5634b2af98ccd557d2b18723365ac73c4644192aaa493b196d9dadf263` |
 | Versions | `style.css`, `functions.php`, `package.json`, `readme.txt` alignés sur `6.17.0` |
 | Intégrité ZIP | `unzip -t` PASS |
 
 ## Réserves de sign-off
 
-La sortie est **techniquement qualifiée**, mais la signature finale de production reste conditionnée à la réception des attestations de relecture native arabe et anglaise prévues explicitement par le CdC. Il faut également conserver une preuve de validation visuelle des baselines AR/EN et, si le client exige la preuve métier complète, un test de soumission de dépôt jusqu’à l’état de modération avec fixture isolée et sans notification externe réelle.
+La sortie est **techniquement requalifiée après correction de la meta AR**, mais la signature finale de production reste conditionnée à la réception des attestations de relecture native arabe et anglaise prévues explicitement par le CdC. Il faut également conserver une preuve de validation visuelle des baselines AR/EN et, si le client exige la preuve métier complète, un test de soumission de dépôt jusqu’à l’état de modération avec fixture isolée et sans notification externe réelle.
 
-Le contrôle SEO utilise des fixtures dont les meta descriptions sont des contenus de test (`Security fixture` et `Manual test`). Elles prouvent la structure, la locale et l’intégrité des balises ; elles ne constituent pas une relecture éditoriale des textes métier. Les textes éditoriaux de la page d’accueil doivent rester remplis et relus dans la page Personnalisation, conformément au Lot 4.
+Le contrôle SEO utilise des fixtures dont les meta descriptions sont des contenus de test (`Security fixture` et `Manual test`). Elles prouvent la structure, la locale et l’intégrité des balises ; elles ne constituent pas une relecture éditoriale des textes métier. Les textes éditoriaux de la page d’accueil doivent rester remplis et relus dans la page Personnalisation, conformément au Lot 4. La recette automatisée ne remplace pas la relecture humaine native AR/EN.
 
 > **Conclusion :** 6.17.0 est prête pour revue et intégration avec une recette technique verte. Elle ne doit pas être annoncée comme signée à 100 % tant que les attestations linguistiques natives et les éventuelles preuves visuelles finales ne sont pas jointes.
 
