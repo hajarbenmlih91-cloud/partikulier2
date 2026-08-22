@@ -359,7 +359,7 @@ $statuses = self::followup_statuses();
 		$total_pages = max( 1, (int) ceil( $total / self::PER_PAGE ) );
 		if ( $total_pages < 2 ) { return; }
 		$base_args = array_filter( array( 'page' => self::MENU_SLUG, 'lead_status' => $filters['status'], 'consent' => $filters['consent'], 'q' => $filters['search'] ) );
-		echo '<div class="tablenav"><div class="tablenav-pages">' . wp_kses_post( paginate_links( array( 'base' => add_query_arg( array_merge( $base_args, array( 'paged' => '%#%' ) ), admin_url( 'admin.php' ) ), 'format' => '', 'current' => $filters['page'], 'total' => $total_pages ) ) ) . '</div></div>';
+		echo '<div class="tablenav"><div class="tablenav-pages">' . wp_kses( paginate_links( array( 'base' => add_query_arg( array_merge( $base_args, array( 'paged' => '%#%' ) ), admin_url( 'admin.php' ) ), 'format' => '', 'current' => $filters['page'], 'total' => $total_pages ) ), array( 'a' => array( 'class' => array(), 'href' => array() ), 'span' => array( 'class' => array() ) ) ) . '</div></div>';
 	}
 
 	public static function admin_styles() {

@@ -1,0 +1,17 @@
+rules:
+  - id: php-eval
+    pattern: eval(...)
+    message: "L'utilisation de eval() est dangereuse."
+    severity: ERROR
+    languages: [php]
+  - id: wp-kses-post-check
+    pattern: wp_kses_post(...)
+    message: "Vérifier l'usage de wp_kses_post par rapport à l'allowlist."
+    severity: WARNING
+    languages: [php]
+  - id: hmac-secret-leak
+    pattern: |
+      $secret = "...";
+    message: "Ne pas coder de secret en dur."
+    severity: ERROR
+    languages: [php]

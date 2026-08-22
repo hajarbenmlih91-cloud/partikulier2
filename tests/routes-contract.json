@@ -1,0 +1,21 @@
+{
+  "version": "6.17.9",
+  "scenarios": [
+    { "url": "/", "expected_code": 302, "expected_location": "/fr/", "description": "Redirection racine vers FR" },
+    { "url": "/fr/", "expected_code": 200, "expected_lang": "fr-FR", "expected_dir": "ltr", "description": "Accueil FR" },
+    { "url": "/en/", "expected_code": 200, "expected_lang": "en-US", "expected_dir": "ltr", "description": "Accueil EN" },
+    { "url": "/ar/", "expected_code": 200, "expected_lang": "ar", "expected_dir": "rtl", "description": "Accueil AR" },
+    { "url": "/fr/annonces/", "expected_code": 200, "expected_lang": "fr-FR", "description": "Archive FR" },
+    { "url": "/en/annonces/", "expected_code": 200, "expected_lang": "en-US", "description": "Archive EN" },
+    { "url": "/ar/annonces/", "expected_code": 200, "expected_lang": "ar", "expected_dir": "rtl", "description": "Archive AR" },
+    { "url": "/fr/deposer/", "expected_code": 200, "expected_lang": "fr-FR", "description": "Dépôt FR" },
+    { "url": "/en/deposer-en/", "expected_code": 200, "expected_lang": "en-US", "description": "Dépôt EN" },
+    { "url": "/ar/deposer-ar/", "expected_code": 200, "expected_lang": "ar", "expected_dir": "rtl", "description": "Dépôt AR" },
+    { "url": "/fr/favoris/", "expected_code": 200, "expected_lang": "fr-FR", "description": "Favoris FR" },
+    { "url": "/en/favoris-en/", "expected_code": 200, "expected_lang": "en-US", "description": "Favoris EN" },
+    { "url": "/ar/favoris-ar/", "expected_code": 200, "expected_lang": "ar", "expected_dir": "rtl", "description": "Favoris AR" },
+    { "url": "/fr/mes-annonces/", "expected_code": 302, "expected_location_contains": "wp-login.php", "description": "Protection Mes Annonces FR" },
+    { "url": "/en/mes-annonces-en/", "expected_code": 302, "expected_location_contains": "wp-login.php", "description": "Protection Mes Annonces EN" },
+    { "url": "/ar/mes-annonces-ar/", "expected_code": 302, "expected_location_contains": "wp-login.php", "description": "Protection Mes Annonces AR" }
+  ]
+}
