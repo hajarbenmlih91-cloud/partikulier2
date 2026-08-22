@@ -1,0 +1,138 @@
+SQL_QUERIES_TOTAL: 92
+QUERY [0]: SELECT pll_tr.term_taxonomy_id, COUNT( * ) AS num_posts FROM wp_posts INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = wp_posts.ID WHE
+QUERY [1]: SELECT option_value FROM wp_options WHERE option_name = 'es_google_maps_api_key' LIMIT 1
+QUERY [2]: 
+		SELECT ID, post_name, post_parent, post_type
+		FROM wp_posts
+		WHERE post_name IN ('annonces')
+		AND post_type IN ('page','attachment')
+	
+QUERY [3]: SELECT   wp_posts.*
+					 FROM wp_posts 
+					 WHERE 1=1  AND wp_posts.post_name = 'partikulier' AND wp_posts.post_type = 'custom_css' AND ((wp_posts.
+QUERY [4]: SELECT autoload FROM wp_options WHERE option_name = 'theme_mods_partikulier' LIMIT 1
+QUERY [5]: SHOW FULL COLUMNS FROM `wp_options`
+QUERY [6]: UPDATE `wp_options` SET `option_value` = 'a:2:{s:18:\"nav_menu_locations\";a:2:{s:4:\"main\";i:0;s:6:\"footer\";i:0;}s:18:\"custom_css_post_id\";i:-1;
+QUERY [7]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [8]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (90)
+QUERY [9]: SELECT option_value FROM wp_options WHERE option_name = 'site_logo' LIMIT 1
+QUERY [10]: SELECT option_value FROM wp_options WHERE option_name = 'pk_theme_options' LIMIT 1
+QUERY [11]: 
+		SELECT ID, post_name, post_parent, post_type
+		FROM wp_posts
+		WHERE post_name IN ('deposer-une-annonce')
+		AND post_type IN ('page','attachment')
+
+QUERY [12]: SELECT * FROM wp_posts WHERE ID = 5 LIMIT 1
+QUERY [13]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [14]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (87)
+QUERY [15]: 
+		SELECT ID, post_name, post_parent, post_type
+		FROM wp_posts
+		WHERE post_name IN ('mes-annonces')
+		AND post_type IN ('page','attachment')
+	
+QUERY [16]: SELECT * FROM wp_posts WHERE ID = 6 LIMIT 1
+QUERY [17]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [18]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (89)
+QUERY [19]: SELECT  t.term_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pl
+QUERY [20]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (5,7,4,6,8,150,9)
+QUERY [21]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [22]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (96,101,106,111,116,121,151)
+QUERY [23]: 
+		SELECT ID, post_name, post_parent, post_type
+		FROM wp_posts
+		WHERE post_name IN ('favoris')
+		AND post_type IN ('page','attachment')
+	
+QUERY [24]: SELECT * FROM wp_posts WHERE ID = 7 LIMIT 1
+QUERY [25]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [26]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (88)
+QUERY [27]: SELECT  t.term_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pl
+QUERY [28]: SELECT  t.term_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pl
+QUERY [29]: SELECT  t.term_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pl
+QUERY [30]: SELECT  t.term_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pl
+QUERY [31]: SELECT term_id, meta_key, meta_value FROM wp_termmeta WHERE term_id IN (185,184,183,182,181,180,179,178,177,176,175,174,173,172,171,170,169,168,167,16
+QUERY [32]: SELECT user_id, meta_key, meta_value FROM wp_usermeta WHERE user_id IN (1) ORDER BY umeta_id ASC
+QUERY [33]: SELECT * FROM wp_users WHERE ID IN (1)
+QUERY [34]: SELECT * FROM wp_posts WHERE ID = 65 LIMIT 1
+QUERY [35]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (65) ORDER BY meta_id ASC
+QUERY [36]: SELECT * FROM wp_posts WHERE ID = 104 LIMIT 1
+QUERY [37]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (104) ORDER BY meta_id ASC
+QUERY [38]: SELECT * FROM wp_posts WHERE ID = 101 LIMIT 1
+QUERY [39]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (101) ORDER BY meta_id ASC
+QUERY [40]: SELECT * FROM wp_posts WHERE ID = 98 LIMIT 1
+QUERY [41]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (98) ORDER BY meta_id ASC
+QUERY [42]: SELECT * FROM wp_posts WHERE ID = 95 LIMIT 1
+QUERY [43]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (95) ORDER BY meta_id ASC
+QUERY [44]: SELECT * FROM wp_posts WHERE ID = 92 LIMIT 1
+QUERY [45]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (92) ORDER BY meta_id ASC
+QUERY [46]: SELECT * FROM wp_posts WHERE ID = 89 LIMIT 1
+QUERY [47]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (89) ORDER BY meta_id ASC
+QUERY [48]: SELECT * FROM wp_posts WHERE ID = 86 LIMIT 1
+QUERY [49]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (86) ORDER BY meta_id ASC
+QUERY [50]: SELECT * FROM wp_posts WHERE ID = 83 LIMIT 1
+QUERY [51]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (83) ORDER BY meta_id ASC
+QUERY [52]: SELECT * FROM wp_posts WHERE ID = 80 LIMIT 1
+QUERY [53]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (80) ORDER BY meta_id ASC
+QUERY [54]: SELECT * FROM wp_posts WHERE ID = 77 LIMIT 1
+QUERY [55]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (77) ORDER BY meta_id ASC
+QUERY [56]: SELECT * FROM wp_posts WHERE ID = 74 LIMIT 1
+QUERY [57]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (74) ORDER BY meta_id ASC
+QUERY [58]: SELECT * FROM wp_posts WHERE ID = 71 LIMIT 1
+QUERY [59]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (71) ORDER BY meta_id ASC
+QUERY [60]: SELECT * FROM wp_posts WHERE ID = 68 LIMIT 1
+QUERY [61]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (68) ORDER BY meta_id ASC
+QUERY [62]: SELECT * FROM wp_posts WHERE ID = 107 LIMIT 1
+QUERY [63]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (107) ORDER BY meta_id ASC
+QUERY [64]: SELECT * FROM wp_posts WHERE ID = 110 LIMIT 1
+QUERY [65]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (110) ORDER BY meta_id ASC
+QUERY [66]: SELECT * FROM wp_posts WHERE ID = 146 LIMIT 1
+QUERY [67]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (146) ORDER BY meta_id ASC
+QUERY [68]: SELECT * FROM wp_posts WHERE ID = 143 LIMIT 1
+QUERY [69]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (143) ORDER BY meta_id ASC
+QUERY [70]: SELECT * FROM wp_posts WHERE ID = 140 LIMIT 1
+QUERY [71]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (140) ORDER BY meta_id ASC
+QUERY [72]: SELECT * FROM wp_posts WHERE ID = 137 LIMIT 1
+QUERY [73]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (137) ORDER BY meta_id ASC
+QUERY [74]: SELECT * FROM wp_posts WHERE ID = 134 LIMIT 1
+QUERY [75]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (134) ORDER BY meta_id ASC
+QUERY [76]: SELECT * FROM wp_posts WHERE ID = 131 LIMIT 1
+QUERY [77]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (131) ORDER BY meta_id ASC
+QUERY [78]: SELECT * FROM wp_posts WHERE ID = 128 LIMIT 1
+QUERY [79]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (128) ORDER BY meta_id ASC
+QUERY [80]: SELECT * FROM wp_posts WHERE ID = 125 LIMIT 1
+QUERY [81]: SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (125) ORDER BY meta_id ASC
+QUERY [82]: 
+		SELECT ID, post_name, post_parent, post_type
+		FROM wp_posts
+		WHERE post_name IN ('faq')
+		AND post_type IN ('page','attachment')
+	
+QUERY [83]: SELECT * FROM wp_posts WHERE ID = 26 LIMIT 1
+QUERY [84]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [85]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (93)
+QUERY [86]: 
+		SELECT ID, post_name, post_parent, post_type
+		FROM wp_posts
+		WHERE post_name IN ('contact')
+		AND post_type IN ('page','attachment')
+	
+QUERY [87]: SELECT * FROM wp_posts WHERE ID = 29 LIMIT 1
+QUERY [88]: SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relatio
+QUERY [89]: SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (94)
+QUERY [90]: SELECT  t.term_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pl
+QUERY [91]: SELECT option_value FROM wp_options WHERE option_name = 'es_flash_authenticate' LIMIT 1

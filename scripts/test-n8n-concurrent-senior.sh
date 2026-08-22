@@ -16,13 +16,14 @@ for i in {1..5}; do
     TS=$(echo "$VARS" | grep "TIMESTAMP=" | cut -d= -f2)
     KID=$(echo "$VARS" | grep "KEY_ID=" | cut -d= -f2)
     BODY=$(echo "$VARS" | grep "BODY=" | cut -d= -f2)
+    TOKEN=$(echo "$VARS" | grep "AUTH_TOKEN=" | cut -d= -f2)
 
     URL="${BASE}${ROUTE}"
 
-    # Lancer deux requêtes en parallèle
+    # Lancer deux requêtes en parallèle avec le header direct
     curl -s -X POST "$URL" \
         -H "Content-Type: application/json" \
-        -H "X-Partikulier-Automation: 1" \
+        -H "X-Partikulier-Automation: $TOKEN" \
         -H "X-Partikulier-Key-Id: $KID" \
         -H "X-Partikulier-Timestamp: $TS" \
         -H "X-Partikulier-Signature: $SIG" \
@@ -30,7 +31,7 @@ for i in {1..5}; do
     
     curl -s -X POST "$URL" \
         -H "Content-Type: application/json" \
-        -H "X-Partikulier-Automation: 1" \
+        -H "X-Partikulier-Automation: $TOKEN" \
         -H "X-Partikulier-Key-Id: $KID" \
         -H "X-Partikulier-Timestamp: $TS" \
         -H "X-Partikulier-Signature: $SIG" \

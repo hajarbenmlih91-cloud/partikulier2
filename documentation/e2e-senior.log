@@ -1,0 +1,11 @@
+
+4/9 conformes
+OK    Formulaire de depot servi  — 58 champs
+OK    Champs obligatoires declares  — 14 requis
+OK    Soumission a vide bloquee 
+FAIL  Recherche sans filtre  — HTTP 200, 0 resultats
+FAIL  Recherche par type  — HTTP 404, 0 resultats
+FAIL  Recherche par mot-cle  — HTTP 404, 0 resultats
+FAIL  Recherche mot-cle inexistant  — HTTP 404, 0 resultats
+FAIL  Recherche page 2  — HTTP 404, 0 resultats
+OK    Focus clavier visible  — 10/10 elements avec indicateur

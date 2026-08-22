@@ -15,6 +15,7 @@ $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 
 define('WP_USE_THEMES', true);
 require_once $wp_dir . '/wp-load.php';
+define('SAVEQUERIES', true);
 
 global $wpdb, $wp_query;
 

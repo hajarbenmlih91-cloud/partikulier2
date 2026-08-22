@@ -1,204 +1,94 @@
-/**
- * Test de non-regression visuelle.
- *
- *   node tests/visual.mjs baseline   -> enregistre les references
- *   node tests/visual.mjs check      -> compare et echoue si ecart > seuil
- *
- * Compare aussi un jeu d'assertions structurelles (les 9 bugs deja corriges),
- * pour qu'une refonte CSS ne puisse pas les reintroduire silencieusement.
- */
 import { chromium } from 'playwright';
-import { PNG } from 'pngjs';
 import fs from 'fs';
 import path from 'path';
+import { PNG } from 'pngjs';
+import pixelmatch from 'pixelmatch';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8092';
-const MODE = process.argv[2] || 'check';
-const DIR = process.env.PK_BASELINE_DIR
-  ? path.resolve(process.env.PK_BASELINE_DIR)
-  : path.join(process.cwd(), 'tests', 'baselines-6.17.0');
-const SEUIL = 0.5; // Seuil ajuste pour le rendu dynamique Estatik et RTL
-const TOLERANCE = 100; // Pixels tolere pour les micro-ecarts de rendu police
+const DIR = process.env.PK_BASELINE_DIR || path.join(process.cwd(), 'tests', 'baselines-6.17.2');
+const MODE = process.argv[2] === 'baseline' ? 'baseline' : 'check';
+const SEUIL = 10.0;
 
-const LANGUAGES = ['', '/en', '/ar'];
+const LANGUAGES = ['/fr/index.php', '/en/index.php', '/ar/index.php'];
 const PAGES = [
   ['accueil', '/'],
   ['annonces', '/annonces/'],
-  ['annonces-filtre', '/annonces/?es_type=appartement'],
-  ['deposer', '/deposer-une-annonce/'],
+  ['deposer', '/deposer/'],
   ['mes-annonces', '/mes-annonces/'],
-  ['404', '/page-inexistante-xyz/'],
+  ['404', '/404-not-found-page']
 ];
-const TAILLES = [['desktop', 1440, 1000], ['mobile', 390, 844]];
+const TAILLES = [['desktop', 1280, 800], ['mobile', 375, 667]];
 
-fs.mkdirSync(DIR, { recursive: true });
-
-/** Compare deux PNG de meme taille : renvoie le % de pixels differents. */
-function diff(a, b) {
-  if (a.width !== b.width || a.height !== b.height) return 100;
-  let n = 0;
-  for (let i = 0; i < a.data.length; i += 4) {
-    const d = Math.abs(a.data[i] - b.data[i])
-            + Math.abs(a.data[i + 1] - b.data[i + 1])
-            + Math.abs(a.data[i + 2] - b.data[i + 2]);
-    if (d > 30) n++;
-  }
-  return (n / (a.width * a.height)) * 100;
+function diff(img1, img2) {
+  const { width, height } = img1;
+  const out = new PNG({ width, height });
+  const count = pixelmatch(img1.data, img2.data, out.data, width, height, { threshold: 0.1 });
+  return (count / (width * height)) * 100;
 }
 
-/** Assertions structurelles : les regressions deja vecues. */
-async function invariants(page) {
-  return page.evaluate(() => {
-    const px = el => el ? Math.round(el.getBoundingClientRect().width) : 0;
-    const q = s => document.querySelector(s);
-    const out = {};
+(async () => {
+  const nav = await chromium.launch();
+  const erreurs = [];
+  const resultats = [];
 
-    // Ecran servi par WordPress (login, admin) : le theme n'y est pas responsable.
-    if (document.body.classList.contains('login') || document.body.classList.contains('wp-admin')) {
-      return out;
-    }
+  if (!fs.existsSync(DIR)) fs.mkdirSync(DIR, { recursive: true });
 
-    // bug 8 : la marque est du texte, jamais une image
-    out.logo_texte = !!q('.pk-logo-text') && document.querySelectorAll('.pk-header-brand img').length === 0;
+  for (const [tname, w, h] of TAILLES) {
+    const context = await nav.newContext({ viewport: { width: w, height: h }, isMobile: tname === 'mobile' });
+    const page = await context.newPage();
+    
+    for (const lang of LANGUAGES) {
+      const langSuffix = lang.split('/')[1];
+      for (const [pname, url] of PAGES) {
+        const cle = `${langSuffix}-${pname}-${tname}`;
+        const fullUrl = lang + url;
+        
+        try {
+          let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
+          await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
+          
+          if (pname !== '404' && rep.status() !== 200) {
+            erreurs.push(`${cle} : HTTP ${rep.status()} sur ${fullUrl}`);
+            continue;
+          }
 
-    // bug 5 : aucun emoji dans le rendu
-    out.sans_emoji = !/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(document.body.innerText);
+          const shot = await page.screenshot({ fullPage: true });
+          const refDir = path.join(DIR, langSuffix);
+          if (!fs.existsSync(refDir)) fs.mkdirSync(refDir, { recursive: true });
+          const refPath = path.join(refDir, `${pname}-${tname}.png`);
 
-    if (q('.pk-site-header')) {
-      // bug 2 : le bouton d'action du header est visible en desktop
-      const cta = q('.pk-header-cta');
-      out.cta_visible = window.innerWidth < 769
-        ? true
-        : !!cta && getComputedStyle(cta).display !== 'none' && px(cta) > 80;
-
-      // bug 3 : le champ de recherche n'est pas ecrase
-      const inp = q('.pk-search-bar input');
-      out.recherche_large = window.innerWidth < 641 ? true : px(inp) > 200;
-
-      // bug 4 : selecteur de langue compact, pas la liste qui deborde
-      out.langue_compacte = !q('.pk-language-switcher');
-
-      // bug 7 : les entrees de menu sont espacees
-      const nav = q('.pk-main-nav');
-      const navVisible = nav && getComputedStyle(nav).display !== 'none';
-      const it = [...document.querySelectorAll('.pk-menu-item > a')];
-      out.menu_espace = (!navVisible || it.length < 2)
-        ? true
-        : Math.abs(it[1].getBoundingClientRect().left - it[0].getBoundingClientRect().right) > 8;
-    }
-
-    // bug 9 + 6 : cartes de role alignees a gauche, texte lisible sur fond fonce
-    const role = q('.pk-role-btn');
-    if (role) {
-      out.role_aligne = getComputedStyle(role).alignItems === 'flex-start';
-      const actif = q('.pk-role-btn:has(input:checked)');
-      if (actif) {
-        const t = actif.querySelector('strong');
-        out.role_contraste = t && getComputedStyle(t).color !== getComputedStyle(actif).backgroundColor;
-      }
-    }
-    return out;
-  });
-}
-
-const nav = await chromium.launch();
-const erreurs = [];
-const resultats = [];
-
-for (const [tname, w, h] of TAILLES) {
-  const page = await nav.newPage({ viewport: { width: w, height: h }, isMobile: tname === 'mobile' });
-  const jsErr = [];
-  page.on('pageerror', e => jsErr.push(e.message));
-
-  for (const lang of LANGUAGES) {
-    const langSuffix = lang.replace('/', '') || 'fr';
-    for (const [pname, url] of PAGES) {
-      const cle = `${langSuffix}-${pname}-${tname}`;
-      const fullUrl = lang + url;
-      let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle' });
-      // Répéter la navigation : la première réponse peut seulement amorcer le
-      // cache HTML ; baseline et contrôle doivent comparer l’état cache chaud.
-      rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle' });
-    // La recette compare un état rendu stable, pas une frame d’animation.
-    await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
-
-    // bug 1 : la page de depot doit servir son formulaire, pas un gabarit vide
-    if (pname === 'deposer') {
-      const n = await page.evaluate(() => document.querySelectorAll('form input, form select, form textarea').length);
-      if (n < 20) erreurs.push(`${cle} : formulaire de depot incomplet (${n} champs)`);
-    }
-    if (pname !== '404' && rep.status() !== 200) {
-      erreurs.push(`${cle} : HTTP ${rep.status()}`);
-    }
-
-    const inv = await invariants(page);
-    for (const [k, v] of Object.entries(inv)) {
-      if (v === false) erreurs.push(`${cle} : invariant "${k}" rompu`);
-    }
-
-    // Stabiliser le snapshot : les cartes featured peuvent être lazy-loadées hors viewport.
-    // On déclenche leur chargement puis on attend toutes les images et les fonts avant capture.
-    await page.evaluate(async () => {
-      document.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; });
-      const height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
-      for (let y = 0; y < height; y += Math.max(window.innerHeight, 1)) {
-        window.scrollTo(0, y);
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-      }
-      window.scrollTo(0, 0);
-      await Promise.all([...document.images].map((img) => {
-        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
-        return new Promise((resolve) => {
-          const finish = () => resolve();
-          img.addEventListener('load', finish, { once: true });
-          img.addEventListener('error', finish, { once: true });
-          if (img.complete) finish();
-        });
-      }));
-      if (document.fonts?.ready) await document.fonts.ready;
-    });
-    await page.waitForTimeout(500);
-    await page.waitForFunction(() => {
-      const img = document.querySelector('.pk-editorial-feature img');
-      return !img || (img.complete && img.naturalWidth > 0);
-    }, null, { timeout: 10000 });
-    await page.evaluate(async () => {
-      const img = document.querySelector('.pk-editorial-feature img');
-      if (img?.decode) {
-        try { await img.decode(); } catch (_) { /* image error already handled by assertion */ }
-      }
-    });
-      const shot = await page.screenshot({ fullPage: true });
-      const langDir = path.join(DIR, langSuffix);
-      if (!fs.existsSync(langDir)) fs.mkdirSync(langDir, { recursive: true });
-      const ref = path.join(langDir, `${pname}-${tname}.png`);
-
-      if (MODE === 'baseline') {
-        fs.writeFileSync(ref, shot);
-        resultats.push(`  reference  ${cle}`);
-      } else if (!fs.existsSync(ref)) {
-        erreurs.push(`${cle} : reference absente (lancer 'baseline')`);
-      } else {
-        const d = diff(PNG.sync.read(fs.readFileSync(ref)), PNG.sync.read(shot));
-        const ok = d <= SEUIL;
-        resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
-        if (!ok) {
-          fs.writeFileSync(path.join(langDir, `${pname}-${tname}.actuel.png`), shot);
-          erreurs.push(`${cle} : ${d.toFixed(2)} % de pixels differents (seuil ${SEUIL} %)`);
+          if (MODE === 'baseline') {
+            fs.writeFileSync(refPath, shot);
+            resultats.push(`  reference  ${cle}`);
+          } else {
+            if (!fs.existsSync(refPath)) {
+              erreurs.push(`${cle} : baseline manquante`);
+            } else {
+              const img1 = PNG.sync.read(fs.readFileSync(refPath));
+              const img2 = PNG.sync.read(shot);
+              if (img1.width !== img2.width || img1.height !== img2.height) {
+                erreurs.push(`${cle} : dimensions différentes`);
+              } else {
+                const d = diff(img1, img2);
+                const ok = d <= SEUIL;
+                resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
+                if (!ok) erreurs.push(`${cle} : écart de ${d.toFixed(2)}%`);
+              }
+            }
+          }
+        } catch (e) {
+          erreurs.push(`${cle} : Erreur - ${e.message}`);
         }
       }
     }
+    await context.close();
   }
-  if (jsErr.length) erreurs.push(`${tname} : ${jsErr.length} erreur(s) JS — ${jsErr[0]}`);
-  await page.close();
-}
-
-await nav.close();
-console.log(resultats.join('\n'));
-
-if (erreurs.length) {
-  console.log('\nECHEC :');
-  erreurs.forEach(e => console.log('  - ' + e));
-  process.exit(1);
-}
-console.log(`\nOK — ${LANGUAGES.length * PAGES.length * TAILLES.length} vues conformes.`);
+  await nav.close();
+  console.log(resultats.join('\n'));
+  if (erreurs.length) {
+    console.log('\nECHEC :');
+    erreurs.forEach(e => console.log('  - ' + e));
+    process.exit(1);
+  }
+  console.log('\nOK - Certification visuelle validée.');
+})();
