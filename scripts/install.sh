@@ -113,9 +113,6 @@ done
 
 wp theme activate partikulier >>"$LOG" 2>&1
 
-# Configuration Polylang (FR/EN/AR)
-wp eval-file "$ROOT/scripts/provision-polylang.php" >>"$LOG" 2>&1
-
 # Réglages sans lesquels le formulaire refuse tous les dépôts.
 wp eval '
 $o = get_option("pk_theme_options", array());
@@ -180,6 +177,9 @@ foreach($d as $x){ list($t,$c,$ty,$ca,$p,$a,$b)=$x;
   wp menu item add-custom principal "Annonces" "$URL/annonces/" >/dev/null 2>&1
   wp menu location assign principal main >/dev/null 2>&1
 fi
+
+# Configuration Polylang (FR/EN/AR) - Appel après création des données
+wp eval-file "$ROOT/scripts/provision-polylang.php" >>"$LOG" 2>&1
 
 wp rewrite flush --hard >>"$LOG" 2>&1
 rm -rf wp-content/uploads/partikulier-cache/* 2>/dev/null

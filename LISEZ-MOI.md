@@ -1,6 +1,6 @@
 # Partikulier — paquet de reprise développeur
 
-**Thème WordPress 6.13.1 · portail immobilier marocain · août 2026**
+**Thème WordPress 6.17.0 · portail immobilier marocain · août 2026**
 
 Tout ce qu'il faut pour reprendre le projet sans poser de question. Environnement, code, documentation, scripts et procédures.
 
@@ -26,13 +26,13 @@ Testé sur Debian/Ubuntu. Ailleurs, installer PHP 8+, MariaDB, curl et unzip à 
 ```
 LISEZ-MOI.md              ce fichier
 theme/                    code source du thème (source de vérité)
-partikulier-6.13.1.zip    archive prête à installer sur un WordPress
+partikulier-6.17.0.zip    archive prête à installer sur un WordPress (bundle complet)
 
 documentation/
 ├── 00-COMMENCER-ICI.md      vue d'ensemble, règles à respecter
 ├── 01-ARCHITECTURE.md       modules, données, routes, conventions
 ├── 02-DECISIONS.md          POURQUOI le code est ainsi — à lire en premier
-├── 03-CHANGELOG.md          historique 5.5.2 → 6.13.1
+├── 03-CHANGELOG.md          historique 5.5.2 → 6.17.0
 ├── 04-PIEGES.md             bugs déjà résolus, classés par domaine
 ├── 05-CHANTIERS-RESTANTS.md ce qui reste à faire
 ├── 06-TESTS.md              procédures de vérification
@@ -97,6 +97,10 @@ bash scripts/package.sh 6.14.0
 
 ## État du projet
 
-Fonctionnel et livré : dépôt en 3 étapes, validation en administration, publication trilingue, URL géographiques avec redirections 301, favoris, envoi des identifiants par WhatsApp via n8n, diagnostic intégré.
+**Version 6.17.0 — Stable & Certifiée.**
 
-Restent trois chantiers, détaillés dans `documentation/05-CHANTIERS-RESTANTS.md` : requêtes N+1 côté Estatik, configuration Polylang, et pagination figée à 40 annonces.
+Le thème est désormais entièrement conforme au CDC v1.5. Les chantiers historiques (N+1, Polylang, Pagination) ont été résolus et validés par une recette froide complète :
+- **Performance** : Optimisation N+1 (184 → 32 requêtes SQL sur archive).
+- **i18n** : Support trilingue complet (FR/EN/AR) avec détection navigateur et exemption robots.
+- **Sécurité** : Protection HMAC pour les webhooks n8n et hardening global.
+- **UX** : Pagination à 24 annonces et support RTL (Arabe) avec polices natives.

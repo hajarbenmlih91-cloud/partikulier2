@@ -76,11 +76,11 @@ function note(nom, ok, detail = '') {
   const page = await ctx.newPage();
 
   const cas = [
-    ['sans filtre', '/property/'],
-    ['par type', '/property/?type=appartement'],
-    ['par mot-cle', '/property/?q=casablanca'],
-    ['mot-cle inexistant', '/property/?q=zzzzintrouvable'],
-    ['page 2', '/property/page/2/'],
+    ['sans filtre', '/annonces/'],
+    ['par type', '/annonces/?es_type=appartement'],
+    ['par mot-cle', '/annonces/?s=casablanca'],
+    ['mot-cle inexistant', '/annonces/?s=zzzzintrouvable'],
+    ['page 2', '/annonces/page/2/'],
   ];
   for (const [nom, url] of cas) {
     const r = await page.goto(BASE + url, { waitUntil: 'networkidle' });
@@ -91,9 +91,9 @@ function note(nom, ok, detail = '') {
   }
 
   // La recherche filtre-t-elle reellement ?
-  await page.goto(BASE + '/property/', { waitUntil: 'networkidle' });
+  await page.goto(BASE + '/annonces/', { waitUntil: 'networkidle' });
   const total = await page.locator('.pk-card-title').count();
-  await page.goto(BASE + '/property/?q=zzzzintrouvable', { waitUntil: 'networkidle' });
+  await page.goto(BASE + '/annonces/?s=zzzzintrouvable', { waitUntil: 'networkidle' });
   const filtre = await page.locator('.pk-card-title').count();
   note('Le filtre reduit bien les resultats', filtre < total, `${total} -> ${filtre}`);
 
@@ -104,7 +104,7 @@ function note(nom, ok, detail = '') {
 {
   const ctx = await nav.newContext();
   const page = await ctx.newPage();
-  await page.goto(BASE + '/property/', { waitUntil: 'networkidle' });
+  await page.goto(BASE + '/annonces/', { waitUntil: 'networkidle' });
   const lien = page.locator('.pk-card-title a').first();
   if (await lien.count()) {
     await lien.click();
@@ -126,7 +126,7 @@ function note(nom, ok, detail = '') {
 {
   const ctx = await nav.newContext();
   const page = await ctx.newPage();
-  await page.goto(BASE + '/property/', { waitUntil: 'networkidle' });
+  await page.goto(BASE + '/annonces/', { waitUntil: 'networkidle' });
   const coeur = page.locator('.pk-card-wishlist').first();
   if (await coeur.count()) {
     await coeur.click();

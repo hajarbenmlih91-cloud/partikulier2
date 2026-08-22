@@ -9,7 +9,7 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | **Version** | 6.17.0 |
 | **Commit GitHub** | tag `v6.17.0` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
-| **SHA-256 ZIP** | `f742fbb64a267a34df7a7b83756ab0861386693fd31c7242b027055dccbf3ac4` |
+| **SHA-256 ZIP** | `a999e9997942f2c60cdb0dc8f23c92d0bb6204b8193b9fd264438f46df0e9d42` |
 
 ## 🧪 Preuves de Recette Froide
 
