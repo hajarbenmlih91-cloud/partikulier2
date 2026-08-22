@@ -1,11 +1,11 @@
 <?php
 /**
- * Test HMAC sur la vraie route REST WordPress corrigé (URL directe).
+ * Test HMAC Senior v6.17.5.
  */
 $wp_dir = getenv('PK_WP_DIR');
 require_once $wp_dir . '/wp-load.php';
 
-$base = getenv('PK_BASE') ?: 'http://localhost:8093';
+$base = getenv('PK_BASE') ?: 'http://localhost:8094';
 $secret_raw = 'senior-real-route-secret-32bytes-12345';
 $encoded_secret = base64_encode($secret_raw);
 $key_id = 'real-key-1';
@@ -25,12 +25,13 @@ $body = json_encode(array(
     'payload' => array('msg' => 'real route test')
 ));
 
+// La route REST WordPress interne
 $path = '/partikulier/v1/automation-event';
 $canonical = "POST\n" . $path . "\n" . $timestamp . "\n" . $body;
 $sig = 'sha256=' . hash_hmac('sha256', $canonical, $secret_raw);
 
 echo "BASE=$base\n";
-echo "ROUTE=/index.php/wp-json$path\n";
+echo "ROUTE=/wp-json$path\n";
 echo "TIMESTAMP=$timestamp\n";
 echo "BODY=$body\n";
 echo "SIGNATURE=$sig\n";

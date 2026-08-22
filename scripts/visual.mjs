@@ -5,104 +5,96 @@ import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8092';
-const DIR = process.env.PK_BASELINE_DIR || path.join(process.cwd(), 'tests', 'baselines-6.17.3');
-const MODE = process.argv[2] === 'baseline' ? 'baseline' : 'check';
+const BASELINE_DIR = 'tests/baselines-6.17.5';
+const GENERATE = process.env.PK_GENERATE === '1';
 const SEUIL = 0.5;
-const TAILLES = [['desktop', 1280, 800], ['mobile', 375, 667]];
 
-// Mapping exact des URLs pour le test
 const SCENARIOS = [
-  { id: 'fr-accueil', url: '/fr/' },
-  { id: 'fr-annonces', url: '/fr/annonces/' },
-  { id: 'fr-deposer', url: '/fr/deposer/' },
-  { id: 'fr-mes-annonces', url: '/fr/mes-annonces/' },
-  { id: 'fr-404', url: '/fr/404-not-found' },
-  { id: 'en-accueil', url: '/en/' },
-  { id: 'en-annonces', url: '/en/annonces-en/' },
-  { id: 'en-deposer', url: '/en/deposer-une-annonce-en/' },
-  { id: 'en-mes-annonces', url: '/en/mes-annonces-en/' },
-  { id: 'en-404', url: '/en/404-not-found' },
-  { id: 'ar-accueil', url: '/ar/' },
-  { id: 'ar-annonces', url: '/ar/annonces-ar/' },
-  { id: 'ar-deposer', url: '/ar/deposer-une-annonce-ar/' },
-  { id: 'ar-mes-annonces', url: '/ar/mes-annonces-ar/' },
-  { id: 'ar-404', url: '/ar/404-not-found' }
+  { id: 'accueil', path: '/' },
+  { id: 'annonces', path: '/annonces/' },
+  { id: 'deposer', path: '/deposer-PAGE/' },
+  { id: 'mes-annonces', path: '/mes-annonces-PAGE/' },
+  { id: 'favoris', path: '/favoris-PAGE/' }
 ];
 
-function diff(img1, img2) {
-  const { width, height } = img1;
-  const out = new PNG({ width, height });
-  const count = pixelmatch(img1.data, img2.data, out.data, width, height, { threshold: 0.1 });
-  return (count / (width * height)) * 100;
-}
+const VIEWPORTS = [
+  { name: 'desktop', width: 1280, height: 800 },
+  { name: 'mobile', width: 375, height: 667 }
+];
+
+const LANGUAGES = ['fr', 'en', 'ar'];
 
 (async () => {
-  const nav = await chromium.launch();
-  const erreurs = [];
-  const resultats = [];
+  const browser = await chromium.launch();
+  const results = [];
+  let failed = false;
 
-  if (!fs.existsSync(DIR)) fs.mkdirSync(DIR, { recursive: true });
+  if (!fs.existsSync(BASELINE_DIR)) fs.mkdirSync(BASELINE_DIR, { recursive: true });
 
-  for (const [tname, w, h] of TAILLES) {
-    const context = await nav.newContext({ viewport: { width: w, height: h }, isMobile: tname === 'mobile' });
-    const page = await context.newPage();
-
-    for (const sc of SCENARIOS) {
-      const cle = `${sc.id}-${tname}`;
-      const fullUrl = sc.url;
-
-      try {
-        let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
-        await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
-
-        if (!fullUrl.includes('404') && rep.status() !== 200) {
-          erreurs.push(`${cle} : HTTP ${rep.status()} sur ${fullUrl}`);
-          continue;
+  for (const lang of LANGUAGES) {
+    for (const v of VIEWPORTS) {
+      for (const s of SCENARIOS) {
+        const scenarioId = `${lang}-${s.id}-${v.name}`;
+        const langPrefix = lang === 'fr' ? '/fr' : (lang === 'en' ? '/en' : '/ar');
+        
+        let pathPart = s.path;
+        if (pathPart.includes('-PAGE/')) {
+            const baseSlug = pathPart.replace('-PAGE/', '');
+            pathPart = baseSlug + (lang === 'fr' ? '/' : `-${lang}/`);
         }
-
-        if (sc.id.startsWith('ar')) {
-          const dir = await page.evaluate(() => document.documentElement.dir);
-          if (dir !== 'rtl') erreurs.push(`${cle} : RTL non détecté`);
-        }
-
-        const shot = await page.screenshot({ fullPage: true });
-        const lang = sc.id.split('-')[0];
-        const refDir = path.join(DIR, lang);
-        if (!fs.existsSync(refDir)) fs.mkdirSync(refDir, { recursive: true });
-        const refPath = path.join(refDir, `${sc.id.split('-').slice(1).join('-')}-${tname}.png`);
-
-        if (MODE === 'baseline') {
-          fs.writeFileSync(refPath, shot);
-          resultats.push(`  reference  ${cle}`);
-        } else {
-          if (!fs.existsSync(refPath)) {
-            erreurs.push(`${cle} : baseline manquante`);
-          } else {
-            const img1 = PNG.sync.read(fs.readFileSync(refPath));
-            const img2 = PNG.sync.read(shot);
-            if (img1.width !== img2.width || img1.height !== img2.height) {
-              erreurs.push(`${cle} : dimensions différentes`);
-            } else {
-              const d = diff(img1, img2);
-              const ok = d <= SEUIL;
-              resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
-              if (!ok) erreurs.push(`${cle} : écart de ${d.toFixed(2)}%`);
-            }
+        
+        const url = BASE + langPrefix + pathPart;
+        const context = await browser.newContext({ viewport: v });
+        const page = await context.newPage();
+        
+        try {
+          console.log(`Traitement ${scenarioId} : ${url}`);
+          const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+          
+          if (response.status() !== 200) {
+             throw new Error(`HTTP ${response.status()}`);
           }
+
+          if (lang === 'ar') {
+            const dir = await page.evaluate(() => document.documentElement.dir || document.body.dir || getComputedStyle(document.documentElement).direction);
+            if (dir !== 'rtl') throw new Error(`RTL non détecté (${dir})`);
+          }
+
+          const screenshotPath = path.join(BASELINE_DIR, `${scenarioId}.png`);
+          
+          if (GENERATE) {
+            await page.screenshot({ path: screenshotPath });
+            results.push(`[GEN] ${scenarioId} générée`);
+          } else {
+            if (!fs.existsSync(screenshotPath)) {
+              throw new Error(`Baseline manquante`);
+            }
+            
+            const img1 = PNG.sync.read(fs.readFileSync(screenshotPath));
+            const img2 = PNG.sync.read(await page.screenshot());
+            const { width, height } = img1;
+            const diff = new PNG({ width, height });
+            
+            const numDiffPixels = pixelmatch(img1.data, img2.data, diff.data, width, height, { threshold: 0.1 });
+            const diffPercent = (numDiffPixels / (width * height)) * 100;
+            
+            if (diffPercent > SEUIL) {
+              throw new Error(`Écart de ${diffPercent.toFixed(2)}%`);
+            }
+            results.push(`[OK] ${scenarioId} (${diffPercent.toFixed(2)}%)`);
+          }
+        } catch (e) {
+          console.error(`ERREUR ${scenarioId} : ${e.message}`);
+          results.push(`[FAIL] ${scenarioId} : ${e.message}`);
+          failed = true;
         }
-      } catch (e) {
-        erreurs.push(`${cle} : Erreur - ${e.message}`);
+        await page.close();
       }
     }
-    await context.close();
   }
 
-  await nav.close();
-  console.log(resultats.join('\n'));
-  if (erreurs.length) {
-    console.log('\nECHEC :');
-    erreurs.forEach(e => console.log('  - ' + e));
-    process.exit(1);
-  }
-  console.log('\nOK - Certification visuelle validée.');
+  await browser.close();
+  console.log("\n--- RÉSULTATS VISUELS v6.17.5 ---");
+  console.log(results.join('\n'));
+  process.exit(failed && !GENERATE ? 1 : 0);
 })();

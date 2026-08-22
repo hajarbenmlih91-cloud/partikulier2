@@ -10,41 +10,46 @@ const LANGUAGES = ['/fr', '/en', '/ar'];
   const results = [];
   let failed = false;
 
-  const PAGES_TO_TEST = [
+  const SCENARIOS = [
     { name: 'Accueil', path: '/' },
-    { name: 'Archive Annonces', path: '/annonces/' },
-    { name: 'Déposer', path: '/deposer/' },
-    { name: 'Mes Annonces', path: '/mes-annonces/' },
-    { name: 'Favoris', path: '/favoris/' }
+    { name: 'Archive', path: '/annonces/' },
+    { name: 'Déposer', path: '/deposer-PAGE/' },
+    { name: 'Mes Annonces', path: '/mes-annonces-PAGE/' },
+    { name: 'Favoris', path: '/favoris-PAGE/' }
   ];
 
   try {
-    for (const lang of LANGUAGES) {
-      console.log(`Test du parcours ${lang}...`);
+    for (const langPrefix of LANGUAGES) {
+      console.log(`Test du parcours ${langPrefix}...`);
+      const lang = langPrefix.replace('/', '');
       
-      for (const p of PAGES_TO_TEST) {
-        // Déterminer le slug traduit (Polylang par défaut ajoute le slug de langue)
-        let fullUrl = BASE + lang + p.path;
-        
-        // Cas particuliers pour les slugs traduits si nécessaire
-        if (lang === '/en' && p.path === '/annonces/') fullUrl = BASE + '/en/annonces-en/';
-        if (lang === '/ar' && p.path === '/annonces/') fullUrl = BASE + '/ar/annonces-ar/';
-
-        const response = await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
-        if (response.status() !== 200) {
-          throw new Error(`HTTP ${response.status()} sur ${fullUrl}`);
+      for (const s of SCENARIOS) {
+        let pathPart = s.path;
+        if (pathPart.includes('-PAGE/')) {
+            const baseSlug = pathPart.replace('-PAGE/', '');
+            pathPart = baseSlug + (lang === 'fr' ? '/' : `-${lang}/`);
         }
         
-        results.push(`[PASS] ${lang} - ${p.name} (${response.status()})`);
+        const url = BASE + langPrefix + pathPart;
+        console.log(`Visite : ${url}`);
+        
+        const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+        
+        if (response.status() !== 200) {
+          throw new Error(`HTTP ${response.status()} sur ${url}`);
+        }
+        
+        results.push(`[PASS] ${langPrefix} - ${s.name}`);
 
-        if (lang === '/ar') {
-          const dir = await page.evaluate(() => document.documentElement.dir);
-          if (dir !== 'rtl') throw new Error(`RTL manquant sur ${fullUrl}`);
+        if (lang === 'ar') {
+          const dir = await page.evaluate(() => document.documentElement.dir || document.body.dir || getComputedStyle(document.documentElement).direction);
+          if (dir !== 'rtl') throw new Error(`RTL manquant sur ${url} (${dir})`);
         }
       }
     }
 
-    results.push("[PASS] Invariants RTL validés");
+    results.push("[PASS] 15/15 Scénarios validés");
+    results.push("[PASS] Invariants RTL confirmés");
 
   } catch (e) {
     console.error(`ERREUR : ${e.message}`);
@@ -52,7 +57,7 @@ const LANGUAGES = ['/fr', '/en', '/ar'];
   }
 
   await browser.close();
-  console.log("\n--- RÉSULTATS E2E SENIOR ---");
+  console.log("\n--- RÉSULTATS E2E SENIOR v6.17.5 ---");
   console.log(results.join('\n'));
   process.exit(failed ? 1 : 0);
 })();
