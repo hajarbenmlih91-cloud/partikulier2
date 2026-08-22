@@ -99,6 +99,7 @@ h2 { font-size: clamp(1.5rem, 3vw, 2rem); }
 p { margin: 0 0 1em; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
+:focus { outline: 2px solid var(--pk-primary) !important; outline-offset: 2px; }
 .screen-reader-text { clip: rect(0 0 0 0); clip-path: inset(50%); height: 1px; width: 1px; overflow: hidden; position: absolute; white-space: nowrap; }
 
 /* ---------- Utilitaires ---------- */

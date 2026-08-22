@@ -126,7 +126,7 @@ if (class_exists("Partikulier_Listing_URLs")) Partikulier_Listing_URLs::flush();
 # ------------------------------------------------------------------ 6. données
 step "6/7 données de démonstration"
 COUNT=$(wp post list --post_type=properties --format=count 2>/dev/null || echo 0)
-if [ "$COUNT" -lt 6 ]; then
+if [ "$COUNT" -lt 30 ]; then
 wp eval '
 foreach(array("Casablanca","Rabat","Marrakech","Tanger","Agadir") as $t) wp_insert_term($t,"es_location");
 foreach(array("Appartement","Maison","Terrain","Loft","Studio") as $t) wp_insert_term($t,"es_type");
@@ -138,6 +138,9 @@ $d=array(
  array("Loft rénové en plein centre-ville","Tanger","Loft","À louer",12500,110,2),
  array("Maison de ville avec cour arborée","Agadir","Maison","À vendre",2850000,98,3),
  array("Studio calme proche des gares","Rabat","Studio","À vendre",850000,28,0));
+// Duplication pour atteindre 30 annonces (pagination)
+for($i=0; $i<4; $i++) $d = array_merge($d, $d);
+$d = array_slice($d, 0, 30);
 foreach($d as $x){ list($t,$c,$ty,$ca,$p,$a,$b)=$x;
  $id=wp_insert_post(array("post_type"=>"properties","post_status"=>"publish","post_title"=>$t,"post_author"=>1,
   "post_content"=>"Bien proposé directement par son propriétaire, sans commission d agence."));

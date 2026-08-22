@@ -1,6 +1,22 @@
-[0] 0.33ms - SELECT SQL_CALC_FOUND_ROWS  wp_posts.ID
+[0] 0.42ms - SELECT SQL_CALC_FOUND_ROWS  wp_posts.ID
 					 FROM wp_posts 
-					 WHERE 1=1  AND ((wp_posts.post_type = 'property' AND (wp_posts.post_status = 'publish')))
+					 WHERE 1=1  AND wp_posts.post_type = 'properties' AND ((wp_posts.post_status = 'publish'))
 					 
 					 ORDER BY wp_posts.post_date DESC
 					 LIMIT 0, 24
+[1] 0.09ms - SELECT FOUND_ROWS()
+[2] 0.24ms - SELECT wp_posts.* FROM wp_posts WHERE ID IN (44,43,42,41,40,39,38,37,36,35,34,33,12,11,10,9,8,7)
+[3] 0.4ms - SELECT post_id, meta_key, meta_value FROM wp_postmeta WHERE post_id IN (44,43,42,41,40,39,38,37,36,35,34,33,12,11,10,9,8,7) ORDER BY meta_id ASC
+[4] 0.69ms - SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+			 WHERE tt.taxonomy IN ('language', 'post_translations', 'es_location', 'es_category', 'es_type', 'es_rent_period', 'es_label', 'es_status', 'es_parking', 'es_roof', 'es_exterior_material', 'es_basement', 'es_floor_covering', 'es_feature', 'es_amenity', 'es_neighborhood', 'es_tag') AND tr.object_id IN (44, 43, 42, 41, 40, 39, 38, 37, 36, 35, 34, 33, 12, 11, 10, 9, 8, 7)
+			 ORDER BY t.name ASC
+			 
+[5] 0.4ms - SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (3,170,172,180,182,2,80,185,115,81,76,190,91,88,130,132,84,82,135,78,195,99,100,101,102,103,104,77,200,85,155,79,205,187,157,192,202,95,117,207,197,137)
+[6] 0.49ms - SELECT DISTINCT t.term_id, tr.object_id
+			 FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id
+			 WHERE tt.taxonomy IN ('term_language', 'term_translations') AND tr.object_id IN (3, 170, 172, 180, 182, 2, 80, 185, 115, 81, 76, 190, 91, 88, 130, 132, 84, 82, 135, 78, 195, 99, 100, 101, 102, 103, 104, 77, 200, 85, 155, 79, 205, 187, 157, 192, 202, 95, 117, 207, 197, 137)
+			 ORDER BY t.name ASC
+			 
+[7] 0.24ms - SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (92,89,114,129,134,154,169,179,184,189,194,199,204,96)
+TOTAL_QUERIES: 8

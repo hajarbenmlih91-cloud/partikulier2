@@ -9,7 +9,7 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | **Version** | 6.17.0 |
 | **Commit GitHub** | tag `v6.17.0` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
-| **SHA-256 ZIP** | `8dd3f1489215821c77c8332934364e981b6559878e8a41dab6c76e68e01071a5` |
+| **SHA-256 ZIP** | `e8d417e6d06ea36c5b3a4fa18ab17bfe9c70d77c5720ac709581dc0912249849` |
 | **Attestation AR** | `documentation/attestations/relecture-arabe.md` |
 | **Attestation EN** | `documentation/attestations/relecture-anglais.md` |
 | **Baselines Visuelles** | `tests/baselines-6.17.0/` (Trilingues Certifiées) |

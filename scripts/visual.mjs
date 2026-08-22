@@ -18,6 +18,7 @@ const DIR = process.env.PK_BASELINE_DIR
   ? path.resolve(process.env.PK_BASELINE_DIR)
   : path.join(process.cwd(), 'tests', 'baselines-6.17.0');
 const SEUIL = 0.5; // Seuil ajuste pour le rendu dynamique Estatik et RTL
+const TOLERANCE = 100; // Pixels tolere pour les micro-ecarts de rendu police
 
 const LANGUAGES = ['', '/en', '/ar'];
 const PAGES = [
