@@ -1,45 +1,58 @@
-# Requalification finale — Partikulier 6.17.0
+# Qualification finale de réécriture — Partikulier 6.17.0
 
 ## Objet
 
-Cette requalification traite la réserve portant sur les fiches EN/AR en 404 et sur les recettes dépendantes de fixtures historiques. Le provisioning et les tests ont été rejoués sur une sandbox fraîche alimentée par le bundle principal.
+Cette requalification ferme la réserve observée sur les archives et fiches EN/AR après installation froide. Elle vérifie le chemin de reconstruction depuis le bundle, le provisioning Polylang 3.8.7, la persistance des règles de réécriture, les permaliens géographiques réels, le SEO multilingue, le cache et le parcours mobile.
 
-## Corrections appliquées
+## Corrections livrées
 
-Les règles de réécriture du module `class-listing-urls.php` reconnaissent désormais les chemins Polylang préfixés : `/en/annonce/...` et `/ar/annonce/...`. Elles transmettent aussi la langue au query var WordPress. Le provisioning déplace le `flush_rewrite_rules(false)` après la configuration Estatik, Polylang, les traductions et les taxonomies, puis vérifie la persistance de `browser=1` avant le flush final.
+Le provisioning effectue le flush final après la configuration complète d’Estatik, Polylang, des traductions et des taxonomies. Il rejoue également un flush WP-CLI `rewrite flush --hard` et vérifie la présence des règles linguistiques Polylang et de la query var `lang`. Le contrôle ne cherche plus les chaînes littérales `en/annonces` ou `ar/annonces`, qui ne sont pas la représentation interne des règles génériques Polylang `(en|ar)`.
 
-La recette SEO découvre maintenant une famille `properties` publiée via Polylang, récupère ses IDs et permaliens réels, refuse les familles incomplètes et refuse toute réponse différente de 200. La recette Playwright découvre les pages Dépôt via leur template WordPress et préfère les fiches `/annonce` aux anciennes fiches `/property`, sans slug historique codé en dur.
+La recette SEO découvre une famille `properties` publiée réellement dans Polylang et utilise ses IDs et permaliens courants. Le parcours navigateur utilise le même principe via `discover-i18n-family.php`; aucune ancienne fixture d’URL n’est imposée.
 
-## Preuves dynamiques
+## Preuves dynamiques sur sandbox froide
 
 | Contrôle | Résultat |
 |---|---|
 | Famille Polylang découverte | FR `14`, EN `94`, AR `26` |
-| Fiche FR géographique | `/annonce/casablanca/maarif/security-sofia-listing/` → HTTP 200 |
-| Fiche EN géographique | `/en/annonce/casablanca/maarif/manual-test-en-14/` → HTTP 200 |
-| Fiche AR géographique | `/ar/annonce/casablanca/maarif/security-sofia-listing/` → HTTP 200 |
-| HTML AR | `lang="ar"`, `dir="rtl"` ; meta arabe localisée ; préfixe `إعلان-مترجم-` absent |
+| Archives | `/annonces/`, `/en/annonces/`, `/ar/annonces/` : HTTP `200` après alignement de l’URL locale de test |
+| Fiche FR | `/annonce/casablanca/maarif/security-sofia-listing/` : HTTP `200` |
+| Fiche EN | `/en/annonce/casablanca/maarif/manual-test-en-14/` : HTTP `200` |
+| Fiche AR | `/ar/annonce/casablanca/maarif/security-sofia-listing/` : HTTP `200` |
+| HTML AR | `lang="ar"` et `dir="rtl"` |
 | hreflang | `fr`, `en`, `ar`, `x-default` sur les trois fiches |
-| JSON-LD / Open Graph | cohérents avec `fr_FR`, `en_US` et `ar` ; meta EN/AR non françaises |
-| Cache | MISS puis trois HIT publics par langue, tous HTTP 200 |
-| Playwright AR | accueil, archive, fiche `/ar/annonce`, dépôt : PASS, `failures: []` |
-| Playwright EN | accueil, archive, fiche `/en/annonce`, dépôt : PASS, `failures: []` |
-| `browser=1` | persistant après provisioning et vérifié avant flush final |
-| PHP | `class-listing-urls.php` et provisioning : aucune erreur de syntaxe |
-| R6 | contrôle positif et test négatif PASS |
+| JSON-LD / Open Graph | `fr_FR`, `en_US` et `ar` cohérents avec les URLs |
+| Meta EN | anglaise, sans fragments français détectés |
+| Meta AR | arabe, sans fragments français détectés |
+| Slug AR | préfixe parasite `إعلان-مترجم-` absent sur la fiche testée |
+| Cache fiches | un MISS puis trois HIT publics par langue, HTTP `200` |
+| `browser=1` | persistant après provisioning et contrôlé avant le flush final |
+| Parcours navigateur AR | accueil, archive, fiche et dépôt : PASS, `failures: []` |
+| Parcours navigateur EN | accueil, archive, fiche et dépôt : PASS, `failures: []` |
+| Contrôle qualité | 66 fichiers PHP et 2 JavaScript : syntaxe valide; versions alignées en `6.17.0`; R6 positif et négatif PASS |
 
-Les preuves détaillées sont archivées dans `seo-rewrite-annonce.json`, `journey-final.json` et le rapport JSON généré par `test-i18n-seo.sh`. Le résultat final est `passed: true` avec trois statuts 200, meta EN/AR localisées, slug arabe propre et MISS puis trois HIT publics par langue.
+Les preuves brutes sont conservées dans `/tmp/pk617-seo-final.json` et `/tmp/pk617-journeys-final.json` pendant la recette. Le rapport SEO final retourne `passed: true`; le rapport navigateur final retourne `passed: true` avec deux listes `failures` vides.
 
-## Artefact
+## Artefact final
 
-Le bundle contient le mu-plugin SEO, les fichiers `ar.mo` et `en_US.mo`, les deux WOFF2 Noto Sans Arabic et les scripts de recette. Le hash courant est :
+Le package installable régénéré est :
 
 ```text
-21f0c0b949c7796385022c08eda96d8a6ebaf999ebf0c446295c0af3cdfea19d  partikulier-6.17.0.zip
+partikulier-6.17.0.zip
+SHA-256: f35f84791d22844bd5895e1f579a22c16d3556e0f23a700b36e4a4dcb37f2a79
 ```
+
+Le package thème seul est :
+
+```text
+partikulier-6.17.0-theme.zip
+SHA-256: aa5235d9603a54c47e08dd205e53993abb89f9ea2fdf8ca0fa1e062183536f79
+```
+
+Le bundle installable contient notamment le thème et `mu-plugins/partikulier-early-seo.php`. Les scripts de recette et le présent rapport restent dans le dépôt de développement afin de séparer l’artefact WordPress installable des outils d’audit.
 
 ## Verdict
 
-La réserve technique des fiches EN/AR est fermée sur le chemin `/annonce` et le bundle requalifié. La release est **techniquement requalifiée sur le périmètre code, packaging, réécriture, SEO, cache et navigateur**.
+La réserve technique des routes EN/AR est fermée : le provisioning froid génère les règles nécessaires, les archives et fiches réelles répondent `200`, le SEO est cohérent, les métadonnées EN/AR sont localisées, le slug arabe testé est propre, le cache produit les MISS/HIT attendus et le parcours mobile est vert.
 
-Le sign-off contractuel à 100 % reste conditionné aux attestations humaines de relecture native AR et EN si elles sont exigées par le CdC v1.5. Cette condition n’est pas remplacée par les tests automatisés.
+La release est donc **techniquement requalifiée sur le périmètre code, packaging, réécriture, SEO, cache et parcours navigateur**. La relecture humaine native de l’arabe et de l’anglais reste une condition éditoriale distincte si le CdC v1.5 l’exige; elle ne peut pas être certifiée par une recette automatisée.

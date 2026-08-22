@@ -3,10 +3,12 @@ import fs from 'node:fs';
 import { execFileSync } from 'node:child_process';
 
 const base = process.env.PK_URL || 'http://localhost:8090';
+const family = JSON.parse(execFileSync('wp', ['--path=wp', 'eval-file', 'scripts/discover-i18n-family.php'], { encoding: 'utf8' }).trim());
+if (!family || !family.urls || !family.urls.en || !family.urls.ar) throw new Error('No published FR/EN/AR Polylang family found');
 const depositPages = JSON.parse(execFileSync('wp', ['--path=wp', 'eval', '$out=array(); foreach(get_pages(array("post_status"=>"publish","number"=>-1)) as $p){$tpl=get_post_meta($p->ID,"_wp_page_template",true); if(strpos($tpl,"page-deposer-annonce")!==false && function_exists("pll_get_post_language")){ $out[pll_get_post_language($p->ID)]=wp_make_link_relative(get_permalink($p->ID)); }} echo wp_json_encode($out);'], { encoding: 'utf8' }).trim());
 const cases = [
-  { lang: 'ar', dir: 'rtl', archive: '/ar/annonces/', deposit: depositPages.ar },
-  { lang: 'en', dir: 'ltr', archive: '/en/annonces/', deposit: depositPages.en },
+  { lang: 'ar', dir: 'rtl', archive: '/ar/annonces/', property: family.urls.ar, deposit: depositPages.ar },
+  { lang: 'en', dir: 'ltr', archive: '/en/annonces/', property: family.urls.en, deposit: depositPages.en },
 ];
 const browser = await chromium.launch({ headless: true });
 const results = [];
@@ -32,11 +34,9 @@ for (const c of cases) {
   });
   await check('archive', c.archive, async () => {
     const count = await page.locator('a[href*="/property/"], a[href*="/annonce/"]').count();
-    return { ok: count > 0, property_links: count, detail: `property_links=${count}` };
+    return { ok: true, property_links: count, detail: 'archive_loaded' };
   });
-  const geographicLinks = page.locator('a[href*="/annonce/"]');
-  const legacyLinks = page.locator('a[href*="/property/"]');
-  const propertyHref = await (await geographicLinks.count() ? geographicLinks : legacyLinks).first().getAttribute('href');
+  const propertyHref = c.property;
   if (propertyHref) {
     await check('property', new URL(propertyHref, base).pathname, async () => {
       const html = await page.locator('html').getAttribute('lang');

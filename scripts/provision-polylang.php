@@ -134,6 +134,32 @@ if ( empty( get_option( 'polylang', array() )['browser'] ) ) {
 // Estatik, Polylang, les traductions et les taxonomies sont maintenant en place.
 // Le flush final doit donc refleter l’etat complet, et non un etat intermediaire.
 flush_rewrite_rules( false );
+// Rejouer le flush via WP-CLI après la mutation complète : cela force une
+// reconstruction des règles dans un cycle WP-CLI final et évite une table
+// partielle lorsque Polylang vient d'être provisionné dans le même processus.
+if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( 'WP_CLI' ) && method_exists( 'WP_CLI', 'runcommand' ) ) {
+    $rewrite_flush = WP_CLI::runcommand( 'rewrite flush --hard', array( 'return' => 'all', 'parse' => 'json' ) );
+    if ( is_array( $rewrite_flush ) && isset( $rewrite_flush['return_code'] ) && 0 !== (int) $rewrite_flush['return_code'] ) {
+        fwrite( STDERR, "Final WP-CLI rewrite flush failed\\n" );
+        exit( 1 );
+    }
+}
+$rewrite_rules = (array) get_option( 'rewrite_rules', array() );
+$rewrite_checks = array(
+    'polylang_language_rules' => false,
+    'polylang_lang_query' => false,
+);
+foreach ( array_keys( $rewrite_rules ) as $rule ) {
+    $rule = (string) $rule;
+    if ( false !== strpos( $rule, '(en|ar)' ) ) { $rewrite_checks['polylang_language_rules'] = true; }
+    if ( false !== strpos( $rule, 'lang=' ) || false !== strpos( (string) ( $rewrite_rules[ $rule ] ?? '' ), 'lang=' ) ) { $rewrite_checks['polylang_lang_query'] = true; }
+}
+foreach ( $rewrite_checks as $check => $passed ) {
+    if ( ! $passed ) {
+        fwrite( STDERR, "Required rewrite check missing: {$check}\\n" );
+        exit( 1 );
+    }
+}
 $language_report = array();
 foreach ( (array) $GLOBALS['polylang']->model->languages->get_list() as $language ) {
     $language_report[] = array( 'slug' => (string) $language->slug, 'locale' => (string) $language->locale, 'name' => (string) $language->name );
