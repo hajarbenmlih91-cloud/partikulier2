@@ -1,0 +1,870 @@
+HTTP/1.1 200 OK
+Host: localhost:8090
+Date: Sat, 22 Aug 2026 12:30:40 GMT
+Connection: close
+X-Powered-By: PHP/8.3.6
+Content-Type: text/html; charset=UTF-8
+Cache-Control: private, no-store, max-age=0
+Vary: Accept-Language, Cookie
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: geolocation=(), microphone=(), camera=()
+Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'self'; frame-src 'self' https://static.addtoany.com; form-action 'self'; img-src 'self' data: blob: https://static.addtoany.com; font-src 'self' data:; script-src 'self' 'unsafe-inline' https://static.addtoany.com; style-src 'self' 'unsafe-inline'; connect-src 'self'
+Set-Cookie: pll_language=fr; expires=Sun, 22 Aug 2027 12:30:40 GMT; Max-Age=31536000; path=/; SameSite=Lax
+
+<!doctype html>
+<html lang="fr-FR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#111111">
+<link rel="profile" href="https://gmpg.org/xfn/11">
+<title>Partikulier</title>
+<meta name='robots' content='max-image-preview:large' />
+<link rel="alternate" href="http://localhost:8090/" hreflang="fr" />
+<link rel="alternate" href="http://localhost:8090/en/" hreflang="en" />
+<link rel="alternate" href="http://localhost:8090/ar/" hreflang="ar" />
+<link rel="canonical" href="http://localhost:8090/">
+<meta name="description" content="Annonces immobilières gratuites entre particuliers : achat et location sans commission.">
+<meta property="og:description" content="Annonces immobilières gratuites entre particuliers : achat et location sans commission.">
+<meta name="twitter:description" content="Annonces immobilières gratuites entre particuliers : achat et location sans commission.">
+<meta property="og:url" content="http://localhost:8090/">
+<meta property="og:site_name" content="Partikulier">
+<meta property="og:locale" content="fr_FR">
+<meta name="generator" content="WordPress 7.1">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Partikulier">
+<meta name="twitter:card" content="summary">
+<link rel='dns-prefetch' href='//localhost' />
+<link rel="alternate" type="application/rss+xml" title="Partikulier &raquo; Flux" href="http://localhost:8090/feed/" />
+<link rel="alternate" type="application/rss+xml" title="Partikulier &raquo; Flux des commentaires" href="http://localhost:8090/comments/feed/" />
+<link rel="preload" href="http://localhost:8090/wp-content/themes/partikulier/assets/fonts/dm-sans-latin.woff2" as="font" type="font/woff2" crossorigin fetchpriority="high">
+<link rel="alternate" hreflang="fr-FR" href="http://localhost:8090/">
+<link rel="alternate" hreflang="ar-MA" href="http://localhost:8090/ar/">
+<link rel="alternate" hreflang="en-US" href="http://localhost:8090/en/">
+<link rel="alternate" hreflang="x-default" href="http://localhost:8090/">
+
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebSite","@id":"http://localhost:8090/#website","url":"http://localhost:8090/","name":"Partikulier","description":"","inLanguage":"fr_FR","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"http://localhost:8090/?s={search_term_string}&post_type=properties"},"query-input":"required name=search_term_string"}},{"@type":"RealEstateAgent","@id":"http://localhost:8090/#organization","url":"http://localhost:8090/","name":"Partikulier","sameAs":[],"contactPoint":{"@type":"ContactPoint","contactType":"customer service","areaServed":"FR","availableLanguage":["French"]}}]}</script>
+<style id="wp-img-auto-sizes-contain-inline-css">
+img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
+/*# sourceURL=wp-img-auto-sizes-contain-inline-css */
+</style>
+<style id="wp-block-library-inline-css">
+:root{--wp-block-synced-color:#7a00df;--wp-block-synced-color--rgb:122,0,223;--wp-bound-block-color:var(--wp-block-synced-color);--wp-editor-canvas-background:#ddd;--wp-admin-theme-color:#007cba;--wp-admin-theme-color--rgb:0,124,186;--wp-admin-theme-color-darker-10:#006ba1;--wp-admin-theme-color-darker-10--rgb:0,107,160.5;--wp-admin-theme-color-darker-20:#005a87;--wp-admin-theme-color-darker-20--rgb:0,90,135;--wp-admin-border-width-focus:2px}@media (min-resolution:192dpi){:root{--wp-admin-border-width-focus:1.5px}}.wp-element-button{cursor:pointer}:root .has-very-light-gray-background-color{background-color:#eee}:root .has-very-dark-gray-background-color{background-color:#313131}:root .has-very-light-gray-color{color:#eee}:root .has-very-dark-gray-color{color:#313131}:root .has-vivid-green-cyan-to-vivid-cyan-blue-gradient-background{background:linear-gradient(135deg,#00d084,#0693e3)}:root .has-purple-crush-gradient-background{background:linear-gradient(135deg,#34e2e4,#4721fb 50%,#ab1dfe)}:root .has-hazy-dawn-gradient-background{background:linear-gradient(135deg,#faaca8,#dad0ec)}:root .has-subdued-olive-gradient-background{background:linear-gradient(135deg,#fafae1,#67a671)}:root .has-atomic-cream-gradient-background{background:linear-gradient(135deg,#fdd79a,#004a59)}:root .has-nightshade-gradient-background{background:linear-gradient(135deg,#330968,#31cdcf)}:root .has-midnight-gradient-background{background:linear-gradient(135deg,#020381,#2874fc)}:root{--wp--preset--font-size--normal:16px;--wp--preset--font-size--huge:42px}.has-regular-font-size{font-size:1em}.has-larger-font-size{font-size:2.625em}.has-normal-font-size{font-size:var(--wp--preset--font-size--normal)}.has-huge-font-size{font-size:var(--wp--preset--font-size--huge)}:root .has-text-align-center{text-align:center}:root .has-text-align-left{text-align:left}:root .has-text-align-right{text-align:right}.has-fit-text{white-space:nowrap!important}#end-resizable-editor-section{display:none}.aligncenter{clear:both}.items-justified-left{justify-content:flex-start}.items-justified-center{justify-content:center}.items-justified-right{justify-content:flex-end}.items-justified-space-between{justify-content:space-between}.screen-reader-text{word-wrap:normal!important;border:0;clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute;width:1px;word-break:normal!important}.screen-reader-text:focus{background-color:#ddd;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000}html :where(.has-border-color){border-style:solid}html :where([style^=border-color],[style*=";border-color"],[style*="; border-color"]){border-style:solid}html :where([style^=border-top-color],[style*=";border-top-color"],[style*="; border-top-color"]){border-top-style:solid}html :where([style^=border-right-color],[style*=";border-right-color"],[style*="; border-right-color"]){border-right-style:solid}html :where([style^=border-bottom-color],[style*=";border-bottom-color"],[style*="; border-bottom-color"]){border-bottom-style:solid}html :where([style^=border-left-color],[style*=";border-left-color"],[style*="; border-left-color"]){border-left-style:solid}html :where([style^=border-width],[style*=";border-width"],[style*="; border-width"]){border-style:solid}html :where([style^=border-top-width],[style*=";border-top-width"],[style*="; border-top-width"]){border-top-style:solid}html :where([style^=border-right-width],[style*=";border-right-width"],[style*="; border-right-width"]){border-right-style:solid}html :where([style^=border-bottom-width],[style*=";border-bottom-width"],[style*="; border-bottom-width"]){border-bottom-style:solid}html :where([style^=border-left-width],[style*=";border-left-width"],[style*="; border-left-width"]){border-left-style:solid}html :where(img[class*=wp-image-]){height:auto;max-width:100%}:where(figure){margin:0 0 1em}html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:var(--wp-admin--admin-bar--height,0px)}@media screen and (max-width:600px){html :where(.is-position-sticky){--wp-admin--admin-bar--position-offset:0px}}
+
+/*# sourceURL=/wp-includes/css/dist/block-library/common.min.css */
+</style>
+<style id="classic-theme-styles-inline-css">
+/*! This file is auto-generated */
+.wp-block-button__link{color:#fff;background-color:#32373c;border-radius:9999px;box-shadow:none;text-decoration:none;padding:calc(.667em + 2px) calc(1.333em + 2px);font-size:1.125em}.wp-block-file__button{background:#32373c;color:#fff;text-decoration:none}
+/*# sourceURL=/wp-includes/css/classic-themes.min.css */
+</style>
+
+<style id="global-styles-inline-css">
+:root{--wp--preset--aspect-ratio--square: 1;--wp--preset--aspect-ratio--4-3: 4/3;--wp--preset--aspect-ratio--3-4: 3/4;--wp--preset--aspect-ratio--3-2: 3/2;--wp--preset--aspect-ratio--2-3: 2/3;--wp--preset--aspect-ratio--16-9: 16/9;--wp--preset--aspect-ratio--9-16: 9/16;--wp--preset--color--black: #000000;--wp--preset--color--cyan-bluish-gray: #abb8c3;--wp--preset--color--white: #ffffff;--wp--preset--color--pale-pink: #f78da7;--wp--preset--color--vivid-red: #cf2e2e;--wp--preset--color--luminous-vivid-orange: #ff6900;--wp--preset--color--luminous-vivid-amber: #fcb900;--wp--preset--color--light-green-cyan: #7bdcb5;--wp--preset--color--vivid-green-cyan: #00d084;--wp--preset--color--pale-cyan-blue: #8ed1fc;--wp--preset--color--vivid-cyan-blue: #0693e3;--wp--preset--color--vivid-purple: #9b51e0;--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple: linear-gradient(135deg,rgb(6,147,227) 0%,rgb(155,81,224) 100%);--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan: linear-gradient(135deg,rgb(122,220,180) 0%,rgb(0,208,130) 100%);--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange: linear-gradient(135deg,rgb(252,185,0) 0%,rgb(255,105,0) 100%);--wp--preset--gradient--luminous-vivid-orange-to-vivid-red: linear-gradient(135deg,rgb(255,105,0) 0%,rgb(207,46,46) 100%);--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray: linear-gradient(135deg,rgb(238,238,238) 0%,rgb(169,184,195) 100%);--wp--preset--gradient--cool-to-warm-spectrum: linear-gradient(135deg,rgb(74,234,220) 0%,rgb(151,120,209) 20%,rgb(207,42,186) 40%,rgb(238,44,130) 60%,rgb(251,105,98) 80%,rgb(254,248,76) 100%);--wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);--wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);--wp--preset--gradient--luminous-dusk: linear-gradient(135deg,rgb(255,203,112) 0%,rgb(199,81,192) 50%,rgb(65,88,208) 100%);--wp--preset--gradient--pale-ocean: linear-gradient(135deg,rgb(255,245,203) 0%,rgb(182,227,212) 50%,rgb(51,167,181) 100%);--wp--preset--gradient--electric-grass: linear-gradient(135deg,rgb(202,248,128) 0%,rgb(113,206,126) 100%);--wp--preset--gradient--midnight: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);--wp--preset--font-size--small: 13px;--wp--preset--font-size--medium: 20px;--wp--preset--font-size--large: 36px;--wp--preset--font-size--x-large: 42px;--wp--preset--spacing--20: 0.44rem;--wp--preset--spacing--30: 0.67rem;--wp--preset--spacing--40: 1rem;--wp--preset--spacing--50: 1.5rem;--wp--preset--spacing--60: 2.25rem;--wp--preset--spacing--70: 3.38rem;--wp--preset--spacing--80: 5.06rem;--wp--preset--shadow--natural: 6px 6px 9px rgba(0, 0, 0, 0.2);--wp--preset--shadow--deep: 12px 12px 50px rgba(0, 0, 0, 0.4);--wp--preset--shadow--sharp: 6px 6px 0px rgba(0, 0, 0, 0.2);--wp--preset--shadow--outlined: 6px 6px 0px -3px rgb(255, 255, 255), 6px 6px rgb(0, 0, 0);--wp--preset--shadow--crisp: 6px 6px 0px rgb(0, 0, 0);}.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;--wp--preset--dimension--75: 75%;--wp--preset--dimension--100: 100%;}:where(body) { margin: 0; }:where(.is-layout-flex){gap: 0.5em;}:where(.is-layout-grid){gap: 0.5em;}body .is-layout-flex{display: flex;}.is-layout-flex{flex-wrap: wrap;align-items: center;}.is-layout-flex > :is(*, div){margin: 0;}body .is-layout-grid{display: grid;}.is-layout-grid > :is(*, div){margin: 0;}body{padding-top: 0px;padding-right: 0px;padding-bottom: 0px;padding-left: 0px;}:root :where(.wp-element-button, .wp-block-button__link){background-color: #32373c;border-width: 0;color: #fff;font-family: inherit;font-size: inherit;font-style: inherit;font-weight: inherit;letter-spacing: inherit;line-height: inherit;padding-top: calc(0.667em + 2px);padding-right: calc(1.333em + 2px);padding-bottom: calc(0.667em + 2px);padding-left: calc(1.333em + 2px);text-decoration: none;text-transform: inherit;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-color{color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-color{color: var(--wp--preset--color--white) !important;}.has-pale-pink-color{color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-color{color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-color{color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-color{color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-color{color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-color{color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-color{color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-color{color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-color{color: var(--wp--preset--color--vivid-purple) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-background-color{background-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-pale-pink-background-color{background-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-background-color{background-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-background-color{background-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-background-color{background-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-background-color{background-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-background-color{background-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-background-color{background-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-background-color{background-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-background-color{background-color: var(--wp--preset--color--vivid-purple) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}.has-cyan-bluish-gray-border-color{border-color: var(--wp--preset--color--cyan-bluish-gray) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-pale-pink-border-color{border-color: var(--wp--preset--color--pale-pink) !important;}.has-vivid-red-border-color{border-color: var(--wp--preset--color--vivid-red) !important;}.has-luminous-vivid-orange-border-color{border-color: var(--wp--preset--color--luminous-vivid-orange) !important;}.has-luminous-vivid-amber-border-color{border-color: var(--wp--preset--color--luminous-vivid-amber) !important;}.has-light-green-cyan-border-color{border-color: var(--wp--preset--color--light-green-cyan) !important;}.has-vivid-green-cyan-border-color{border-color: var(--wp--preset--color--vivid-green-cyan) !important;}.has-pale-cyan-blue-border-color{border-color: var(--wp--preset--color--pale-cyan-blue) !important;}.has-vivid-cyan-blue-border-color{border-color: var(--wp--preset--color--vivid-cyan-blue) !important;}.has-vivid-purple-border-color{border-color: var(--wp--preset--color--vivid-purple) !important;}.has-vivid-cyan-blue-to-vivid-purple-gradient-background{background: var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple) !important;}.has-light-green-cyan-to-vivid-green-cyan-gradient-background{background: var(--wp--preset--gradient--light-green-cyan-to-vivid-green-cyan) !important;}.has-luminous-vivid-amber-to-luminous-vivid-orange-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-amber-to-luminous-vivid-orange) !important;}.has-luminous-vivid-orange-to-vivid-red-gradient-background{background: var(--wp--preset--gradient--luminous-vivid-orange-to-vivid-red) !important;}.has-very-light-gray-to-cyan-bluish-gray-gradient-background{background: var(--wp--preset--gradient--very-light-gray-to-cyan-bluish-gray) !important;}.has-cool-to-warm-spectrum-gradient-background{background: var(--wp--preset--gradient--cool-to-warm-spectrum) !important;}.has-blush-light-purple-gradient-background{background: var(--wp--preset--gradient--blush-light-purple) !important;}.has-blush-bordeaux-gradient-background{background: var(--wp--preset--gradient--blush-bordeaux) !important;}.has-luminous-dusk-gradient-background{background: var(--wp--preset--gradient--luminous-dusk) !important;}.has-pale-ocean-gradient-background{background: var(--wp--preset--gradient--pale-ocean) !important;}.has-electric-grass-gradient-background{background: var(--wp--preset--gradient--electric-grass) !important;}.has-midnight-gradient-background{background: var(--wp--preset--gradient--midnight) !important;}.has-small-font-size{font-size: var(--wp--preset--font-size--small) !important;}.has-medium-font-size{font-size: var(--wp--preset--font-size--medium) !important;}.has-large-font-size{font-size: var(--wp--preset--font-size--large) !important;}.has-x-large-font-size{font-size: var(--wp--preset--font-size--x-large) !important;}
+/*# sourceURL=global-styles-inline-css */
+</style>
+
+<link rel='stylesheet' id='es-select2-css' href='http://localhost:8090/wp-content/plugins/estatik/common/select2/select2.min.css?ver=4.3.4' media='all' />
+<link rel='stylesheet' id='es-datetime-picker-css' href='http://localhost:8090/wp-content/plugins/estatik/includes/classes/framework/assets/css/jquery.datetimepicker.min.css' media='all' />
+<link rel='stylesheet' id='es-slick-css' href='http://localhost:8090/wp-content/plugins/estatik/common/slick/slick.min.css?ver=4.3.4' media='all' />
+<link rel='stylesheet' id='es-magnific-css' href='http://localhost:8090/wp-content/plugins/estatik/common/magnific-popup/magnific-popup.min.css?ver=4.3.4' media='all' />
+<link rel='stylesheet' id='es-frontend-css' href='http://localhost:8090/wp-content/plugins/estatik/public/css/public.min.css?ver=4.3.4' media='all' />
+<style id="es-frontend-inline-css">
+@font-face {font-family: 'Lato'; font-style: normal; font-weight: 300; src: url(http://localhost:8090/wp-content/uploads/2026/08/S6u9w4BMUTPHh7USew-FGC_p9dw.ttf) format('woff2'); font-display: swap;}@font-face {font-family: 'Lato'; font-style: normal; font-weight: 400; src: url(http://localhost:8090/wp-content/uploads/2026/08/S6uyw4BMUTPHvxk6XweuBCY.ttf) format('woff2'); font-display: swap;}@font-face {font-family: 'Lato'; font-style: normal; font-weight: 700; src: url(http://localhost:8090/wp-content/uploads/2026/08/S6u9w4BMUTPHh6UVew-FGC_p9dw.ttf) format('woff2'); font-display: swap;}@font-face {font-family: 'Open Sans'; font-style: normal; font-weight: 300; src: url(http://localhost:8090/wp-content/uploads/2026/08/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsiH0C4nY1M2xLER.ttf) format('woff2'); font-display: swap;}@font-face {font-family: 'Open Sans'; font-style: normal; font-weight: 400; src: url(http://localhost:8090/wp-content/uploads/2026/08/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsjZ0C4nY1M2xLER.ttf) format('woff2'); font-display: swap;}@font-face {font-family: 'Open Sans'; font-style: normal; font-weight: 700; src: url(http://localhost:8090/wp-content/uploads/2026/08/memSYaGs126MiZpBA-UvWbX2vVnXBbObj2OVZyOOSr4dVJWUgsg-1y4nY1M2xLER.ttf) format('woff2'); font-display: swap;}
+
+        .es-btn.es-btn--primary, .es-btn--primary[type=submit], button.es-btn--primary, a.es-btn--primary {
+            border-color: #FF5A5F;
+        }
+        
+        .es-price-marker--active:after {
+            border-top-color: #FF5A5F;
+        }
+        
+        .es-btn.es-btn--primary:not(.es-btn--bordered):not(:hover):not(:active),
+        .es-btn.es-btn--primary:not(.es-btn--bordered):hover,
+        .es-price-marker--active,
+        .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_default, .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_current, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box>div>div.xdsoft_current {
+            background-color: #FF5A5F;
+        }
+        
+        .es-btn.es-btn--primary.es-btn--bordered,
+        .es-btn.es-btn--active .es-icon.es-icon_heart,
+        .es-wishlist-link.es-wishlist-link--active .es-icon {
+            color: #FF5A5F;
+        }
+        
+        button.es-btn--secondary:disabled, .es-btn.es-btn--secondary, .es-btn--secondary[type=submit], button.es-btn--secondary, a.es-btn--secondary {
+            border-color: #13A48E;
+        }
+        
+        .es-secondary-bg {
+            background-color: #13A48E;
+        }
+        
+        .es-primary-bg {
+            background-color: #FF5A5F;
+        }
+        
+        
+        .es-btn.es-btn--secondary:not(.es-btn--bordered), .es-field .select2 .select2-selection__choice {
+            background-color: #13A48E;
+        }
+        
+        .xdsoft_datetimepicker .xdsoft_calendar td:hover, .xdsoft_datetimepicker .xdsoft_timepicker .xdsoft_time_box>div>div:hover {
+            background-color: #13A48E!important;
+        }
+        
+        .es-btn.es-btn--secondary.es-btn--bordered, 
+        .es-btn.es-btn--icon:hover:not([disabled]):not(.es-btn--disabled):not(.es-btn--primary) .es-icon,
+        .xdsoft_datetimepicker .xdsoft_calendar td.xdsoft_today,
+        .es-property-field--post_content .es-property-field__value a,
+        .es-dymanic-content a,
+        .es-hit-limit a, button.es-slick-arrow:not(.slick-disabled):hover {
+            color: #13A48E;
+            background-color: transparent;
+        }
+        
+        .es-btn.es-btn--default:hover:not([disabled]):not(.es-btn--disabled), .es-listing__terms a:hover {
+            color: #13A48E;
+        }
+        
+        .es-btn:hover:not([disabled]):not(.es-btn--disabled) .es-icon.es-icon_heart, .entity-box__delete:hover {
+            color: #FF5A5F!important;
+        }
+        
+        .es-select2__dropdown .select2-results__option--highlighted[aria-selected],
+        .es-field.es-field--checkbox input:checked, .widget .es-field.es-field--checkbox input:checked,
+        .es-field.es-field--radio input:checked, .es-bg-secondary,
+        .es-property-management--form .es-tabs__nav li:hover .es-tabs__numeric,
+        .es-property-management--form .es-tabs__nav li.active .es-tabs__numeric {
+            background-color: #13A48E;
+        }
+        
+        .es-pagination ul li a.page-numbers:hover {
+            border: 2px solid #13A48E;
+            color: #13A48E;
+        }
+
+        .es-field--radio-item-bordered:hover input + label, .es-field--checkbox-item-bordered:hover input + label {
+            border-color:rgba(19, 164, 142, 0.4);
+        }
+
+        .es-field--radio-item-bordered input:checked + label,
+        .widget .es-field--radio-item-bordered input:checked + label,
+        .es-field--checkbox-item-bordered input:checked + label,
+        .widget .es-field--checkbox-item-bordered input:checked + label,
+        .es-field.es-field--checkbox input:checked,
+        .es-field.es-field--radio input:checked,
+        body .es-field textarea:focus, body .es-field.es-field--select select:focus, body .es-field input[type=email]:focus, body .es-field input[type=text]:focus, body .es-field input[type=password]:focus, body .es-field input[type=number]:focus {
+            border-color:#13A48E;
+        }
+
+        .es-field--radio-item-bordered input:checked + label .es-icon,
+        .es-field--checkbox-item-bordered input:checked + label .es-icon,
+        .es-field a.es-field__show-more,
+        .es-section__content p a,
+        .es-secondary-color,
+        a.es-secondary-color:active,
+        a.es-secondary-color:hover,
+        a.es-secondary-color,
+        .es-profile__menu a:hover,
+        .widget .es-secondary-color,
+         a.es-secondary-color,
+         a.es-secondary-color.es-toggle-pwd,
+         a.es-secondary-color-hover:hover,
+        .es-property-field__value a:hover,
+        .es-agent-field__value a,
+        .es-privacy-policy-container a,
+        .es-auth a:not(.es-btn),
+        .es-powered a,
+        .es-preferred-contact--whatsapp a {
+            color:#13A48E;
+        }.es-listing__meta-bedrooms path {fill: #DADADA}.es-listing__meta-bathrooms path {fill: #DADADA}.es-listing__meta-area path {fill: #DADADA}.es-media, .es-file, .es-listing, .es-agent-single, .es-agency-single, .es-widget-wrap *:not(.es-icon):not(.fa):not(.heading-font),
+            .es-select2__dropdown, .es-single, .es-btn, button.es-btn[disabled]:hover .mfp-wrap.es-property-magnific,
+            .es-field input, .es-field select, .es-field textarea, .es-magnific-popup:not(.es-icon),
+            .es-magnific-popup:not(.fa), .es-listings-filter, .es-search, .content-font, .es-profile,
+            .es-property-magnific .mfp-counter, .es-property-magnific .mfp-title,
+            .xdsoft_datetimepicker, .es-component, .es-auth, .es-entity, .es-entities--grid .es-entity .es-entity__title,
+            .es-review-form, .es-review-form .es-field__label, .es-field .es-field__strlen, .es-entities-list {
+                font-family: 'Open Sans', sans-serif;
+            }
+            .es-listing h1, .es-listing h2, .es-listing h3, .es-listing h4, .es-listing h5, .es-listing h6,
+            .es-search h2, .es-search h3, .es-search h4, .es-search h5, .es-search h6, .heading-font,
+            .es-price, .es-property-section .es-property-section__title,
+            .es-entity-section__title,
+            .widget .es-widget-wrap .es-widget__title, .es-widget__title,
+            .es-magnific-popup h1, .es-magnific-popup h2, .es-magnific-popup h3, .es-magnific-popup h4,
+            .es-magnific-popup h5, .es-magnific-popup h6, .es-entity .es-entity__title,
+            .es-review-form h3.es-review-form__title {
+                font-family: 'Lato';
+            }
+            
+/*# sourceURL=es-frontend-inline-css */
+</style>
+<link rel='stylesheet' id='partikulier-style-css' href='http://localhost:8090/wp-content/themes/partikulier/assets/css/style.css?ver=6.17.0' media='all' />
+<script id="jquery-core-js" src="http://localhost:8090/wp-includes/js/jquery/jquery.min.js?ver=3.7.1"></script>
+<script id="jquery-migrate-js" src="http://localhost:8090/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.4.1"></script>
+</head>
+
+<body class="home blog wp-embed-responsive wp-theme-partikulier">
+
+<a class="pk-skip-link" href="#main-content">Aller au contenu</a>
+
+<!-- Topbar style Woo Shop -->
+<div class="pk-topbar" role="banner-top">
+	<div class="pk-container pk-topbar-inner">
+		<span class="pk-topbar-promo">Annonces 100% gratuites — Publiez en 2 minutes sans commission</span>
+		<div class="pk-topbar-contact">
+			<a href="http://localhost:8090/deposer-une-annonce/">Déposer une annonce</a>
+			<a href="http://localhost:8090/annonces/">Toutes les annonces</a>
+							<a href="http://localhost:8090/wp-login.php?redirect_to=http%3A%2F%2Flocalhost%3A8090%2Fmes-annonces%2F">Se connecter</a>
+					</div>
+	</div>
+</div>
+
+<header class="pk-site-header" id="site-header">
+	<div class="pk-container pk-header-inner">
+		<div class="pk-header-brand">
+						<a class="pk-logo-text" href="http://localhost:8090/" rel="home" aria-label="Partikulier, retour a l accueil">
+				<span class="pk-logo-name">partikulier<span class="pk-logo-tld">.com</span></span>
+			</a>
+						</div>
+
+		<div class="pk-header-search">
+			<form class="pk-search-bar" action="http://localhost:8090/annonces/" method="get">
+				<select name="es_type" aria-label="Type de bien">
+					<option value="">Type de bien</option>
+					<option value="appartement">Appartement</option><option value="appartements">Appartements</option><option value="condos">Condos</option><option value="loft">Loft</option><option value="maison">Maison</option><option value="maisons">Maisons</option><option value="maisons-de-ville">Maisons de ville</option><option value="multifamily">Multifamily</option><option value="studio">Studio</option><option value="terrain">Terrain</option><option value="terre">Terre</option>				</select>
+				<input type="search" name="s" placeholder="Ville, code postal, quartier…" aria-label="Rechercher une ville">
+				<button type="submit" aria-label="Rechercher">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+				</button>
+			</form>
+		</div>
+
+		<div class="pk-header-actions">
+								<div class="pk-lang" data-pk-lang>
+						<button type="button" class="pk-lang-toggle" aria-expanded="false" aria-haspopup="true" aria-label="Choisir la langue">
+							<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><path d="M0 0h8v16H0z" fill="#0055a4"/><path d="M8 0h8v16H8z" fill="#fff"/><path d="M16 0h8v16h-8z" fill="#ef4135"/></svg>							<span class="pk-lang-code">FR</span>
+						</button>
+						<ul class="pk-lang-menu" hidden>
+															<li class="is-current">
+									<a href="http://localhost:8090/" lang="fr-FR" hreflang="fr-FR">
+										<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><path d="M0 0h8v16H0z" fill="#0055a4"/><path d="M8 0h8v16H8z" fill="#fff"/><path d="M16 0h8v16h-8z" fill="#ef4135"/></svg>										<span class="pk-lang-abbr">FR</span>
+										<span class="pk-lang-name">Français</span>
+									</a>
+								</li>
+															<li>
+									<a href="http://localhost:8090/en/" lang="en-US" hreflang="en-US">
+										<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><rect width="24" height="16" rx="2" fill="#fff"/><path d="M0 1h24M0 4h24M0 7h24M0 10h24M0 13h24" stroke="#b22234" stroke-width="1.5"/><path d="M0 0h10v9H0z" fill="#3c3b6e"/><circle cx="2" cy="2" r=".35" fill="#fff"/><circle cx="5" cy="2" r=".35" fill="#fff"/><circle cx="8" cy="2" r=".35" fill="#fff"/><circle cx="3.5" cy="4.5" r=".35" fill="#fff"/><circle cx="6.5" cy="4.5" r=".35" fill="#fff"/><circle cx="2" cy="7" r=".35" fill="#fff"/><circle cx="5" cy="7" r=".35" fill="#fff"/><circle cx="8" cy="7" r=".35" fill="#fff"/></svg>										<span class="pk-lang-abbr">EN</span>
+										<span class="pk-lang-name">English</span>
+									</a>
+								</li>
+															<li>
+									<a href="http://localhost:8090/ar/" lang="ar" hreflang="ar">
+										<svg class="pk-flag" viewBox="0 0 24 16" aria-hidden="true" focusable="false"><rect width="24" height="16" rx="2" fill="#c1272d"/><path d="M12 3.7l1.1 3.4h3.6l-2.9 2.1 1.1 3.4-2.9-2.1-2.9 2.1 1.1-3.4-2.9-2.1h3.6z" fill="none" stroke="#006233" stroke-width=".8"/></svg>										<span class="pk-lang-abbr">AR</span>
+										<span class="pk-lang-name">العربية</span>
+									</a>
+								</li>
+													</ul>
+					</div>
+								<a class="pk-header-icon" href="http://localhost:8090/favoris/" aria-label="Favoris">
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+			</a>
+							<a class="pk-header-icon pk-header-cta pk-btn pk-btn-primary pk-btn-sm" href="http://localhost:8090/deposer-une-annonce/">
+					Déposer une annonce				</a>
+						<button class="pk-nav-toggle" type="button" aria-expanded="false" aria-controls="pk-mobile-menu" aria-label="Ouvrir le menu">
+				<span class="pk-nav-toggle-bar" aria-hidden="true"></span>
+				<span class="pk-nav-toggle-bar" aria-hidden="true"></span>
+				<span class="pk-nav-toggle-bar" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+
+	<nav class="pk-main-nav" aria-label="Menu principal">
+		<div class="pk-container">
+			<ul class="pk-menu"><li class="pk-menu-item pk-current"><a href="http://localhost:8090/">Accueil</a></li><li class="pk-menu-item"><a href="http://localhost:8090/annonces/">Annonces</a></li><li class="pk-menu-item"><a href="http://localhost:8090/deposer-une-annonce/">Déposer une annonce</a></li></ul>			</div>
+		</nav>
+
+		<div class="pk-mobile-menu" id="pk-mobile-menu" hidden>
+			</div>
+</header>
+
+<main id="main-content" class="pk-main">
+<section class="pk-editorial-hero" aria-label="Recherche principale">
+	<div class="pk-editorial-hero__media"><img src="http://localhost:8090/wp-content/themes/partikulier/assets/img/hero.jpg" alt="Maison lumineuse à vendre entre particuliers" width="1600" height="686" fetchpriority="high" decoding="async"><div class="pk-editorial-hero__veil"></div></div>
+	<div class="pk-container pk-editorial-hero__inner">
+		<div class="pk-editorial-hero__copy">
+			<p class="pk-editorial-kicker">Annonces 100% gratuites — Publiez en 2 minutes sans commission</p>
+			<h1>Vendez et louez <span class="pk-hero-accent">entre particuliers.</span></h1>
+			<p class="pk-editorial-hero__intro">Déposez votre annonce immobilière gratuitement, sans commission, sans intermédiaire. Directement aux acheteurs et locataires.</p>
+			<div class="pk-editorial-actions"><a class="pk-btn pk-btn-primary" href="http://localhost:8090/deposer-une-annonce/">Publier gratuitement<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a><a class="pk-btn pk-btn-light" href="http://localhost:8090/annonces/">Chercher par ville<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></a></div>
+		</div>
+		<div class="pk-editorial-search"><p class="pk-editorial-search__hint"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>Commencez par une ville, un quartier ou un code postal.</p><form class="pk-search pk-search-hero" action="http://localhost:8090/annonces/" method="get" role="search" aria-label="Rechercher un bien immobilier">
+	<div class="pk-search-field pk-search-type">
+		<label class="pk-search-label" for="pk-s-action">Achat ou location</label>
+		<select name="es_action" id="pk-s-action">
+			<option value="">Tout</option>
+														<option value="a-louer">A louer</option>
+													<option value="a-vendre">À vendre</option>
+					</select>
+	</div>
+
+	<div class="pk-search-field pk-search-type">
+		<label class="pk-search-label" for="pk-s-type">Type de bien</label>
+		<select name="es_type" id="pk-s-type">
+			<option value="">Tous</option>
+														<option value="appartement">Appartement</option>
+													<option value="loft">Loft</option>
+													<option value="maison">Maison</option>
+													<option value="studio">Studio</option>
+					</select>
+	</div>
+
+	<div class="pk-search-field pk-search-city">
+		<label class="pk-search-label" for="pk-s-city">Ville</label>
+		<select name="es_city" id="pk-s-city">
+			<option value="">Toutes les villes</option>
+														<option value="rabat">Rabat</option>
+													<option value="casablanca">Casablanca</option>
+													<option value="agadir">Agadir</option>
+													<option value="tanger">Tanger</option>
+													<option value="marrakech">Marrakech</option>
+					</select>
+	</div>
+
+	<div class="pk-search-field pk-search-budget">
+		<label class="pk-search-label" for="pk-s-budget">Budget max</label>
+		<select name="es_price_max" id="pk-s-budget">
+			<option value="">Illimité</option>
+							<option value="100000">100 000 €</option>
+							<option value="200000">200 000 €</option>
+							<option value="300000">300 000 €</option>
+							<option value="400000">400 000 €</option>
+							<option value="500000">500 000 €</option>
+							<option value="750000">750 000 €</option>
+							<option value="1000000">1 000 000 €</option>
+							<option value="1500000">1 500 000 €</option>
+					</select>
+	</div>
+
+	<div class="pk-search-action">
+		<button type="submit" class="pk-btn pk-btn-search">
+			Rechercher		</button>
+	</div>
+</form><ul class="pk-hero-trust"><li>Zéro commission</li><li>Vendeur identifié</li><li>Contact direct</li></ul></div>
+	</div>
+</section>
+
+<section class="pk-editorial-section pk-editorial-section--featured"><div class="pk-container"><div class="pk-editorial-heading"><p class="pk-editorial-kicker">Annonce à la une</p><h2>Des biens choisis pour leur lumière.</h2><p>Un accès direct aux annonces publiées par leurs propriétaires.</p></div>
+<a class="pk-editorial-feature" href="http://localhost:8090/annonce/rabat/studio-calme-proche-des-gares/"><img src="http://localhost:8090/wp-content/uploads/2026/08/h1-6.jpg" width="1600" height="900" alt="Studio calme proche des gares" loading="lazy" decoding="async"><span class="pk-editorial-feature__veil"></span><span class="pk-editorial-feature__content"><strong>Studio calme proche des gares</strong><small>Rabat</small></span></a></div></section>
+
+<section class="pk-editorial-section pk-editorial-section--tint"><div class="pk-container"><div class="pk-editorial-heading pk-editorial-heading--row"><div><p class="pk-editorial-kicker">Fraîchement publiées</p><h2>Les dernières annonces</h2><p>Des biens ajoutés récemment par leurs propriétaires.</p></div><a class="pk-editorial-link" href="http://localhost:8090/annonces/">Voir toutes les annonces <span aria-hidden="true">→</span></a></div><div class="pk-editorial-cards"><article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
+	<a class="pk-card-media" href="http://localhost:8090/annonce/rabat/studio-calme-proche-des-gares/" tabindex="-1" aria-hidden="true">
+						<picture>
+											<source type="image/avif" srcset="http://localhost:8090/wp-content/uploads/2026/08/h1-6-640x480.jpg.avif">
+										<img src="http://localhost:8090/wp-content/uploads/2026/08/h1-6-640x480.jpg" width="640" height="480" alt="Studio calme proche des gares" loading="lazy" decoding="async" fetchpriority="low">
+				</picture>
+						<span class="pk-card-price" itemprop="price">
+			850 000 MAD		</span>
+					<span class="pk-card-badge pk-badge-a-vendre">À vendre</span>
+			</a>
+
+	<span class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="http://localhost:8090/annonce/rabat/studio-calme-proche-des-gares/" aria-label="Aperçu rapide">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+		</a>
+		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="12" aria-label="Ajouter aux favoris">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		</button>
+	</span>
+
+	<div class="pk-card-body">
+		<h3 class="pk-card-title">
+			<a href="http://localhost:8090/annonce/rabat/studio-calme-proche-des-gares/" itemprop="url">
+				<span itemprop="name">Studio calme proche des gares</span>
+			</a>
+		</h3>
+				<p class="pk-card-topline">
+							<span class="pk-card-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+					<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+					<span itemprop="addressLocality">Rabat</span>
+				</span>
+						<span class="pk-card-role">Propriétaire</span>
+		</p>
+		<dl class="pk-card-meta">
+							<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Surface</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 20 4"/><path d="M15 4h5v5"/><path d="M9 20H4v-5"/></svg><span>28 m²</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Composition</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span>Studio · 1 salon</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Salles de bains</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M7 12V6a2 2 0 0 1 4 0"/></svg><span>1 salle de bains</span></dd>
+				</div>
+									<div class="pk-card-meta-item">
+				<dt class="screen-reader-text">Type</dt>
+				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span>Studio</span></dd>
+			</div>
+		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact direct</span><a class="pk-card-cta" href="http://localhost:8090/annonce/rabat/studio-calme-proche-des-gares/">Voir l&#039;annonce<span aria-hidden="true"> ↗</span></a></div>
+	</div>
+</article><article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
+	<a class="pk-card-media" href="http://localhost:8090/annonce/agadir/maison-de-ville-avec-cour-arboree/" tabindex="-1" aria-hidden="true">
+						<picture>
+											<source type="image/avif" srcset="http://localhost:8090/wp-content/uploads/2026/08/h2-7-640x480.jpg.avif">
+										<img src="http://localhost:8090/wp-content/uploads/2026/08/h2-7-640x480.jpg" width="640" height="480" alt="Maison de ville avec cour arborée" loading="lazy" decoding="async" fetchpriority="low">
+				</picture>
+						<span class="pk-card-price" itemprop="price">
+			2 850 000 MAD		</span>
+					<span class="pk-card-badge pk-badge-a-vendre">À vendre</span>
+			</a>
+
+	<span class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="http://localhost:8090/annonce/agadir/maison-de-ville-avec-cour-arboree/" aria-label="Aperçu rapide">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+		</a>
+		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="11" aria-label="Ajouter aux favoris">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		</button>
+	</span>
+
+	<div class="pk-card-body">
+		<h3 class="pk-card-title">
+			<a href="http://localhost:8090/annonce/agadir/maison-de-ville-avec-cour-arboree/" itemprop="url">
+				<span itemprop="name">Maison de ville avec cour arborée</span>
+			</a>
+		</h3>
+				<p class="pk-card-topline">
+							<span class="pk-card-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+					<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+					<span itemprop="addressLocality">Agadir</span>
+				</span>
+						<span class="pk-card-role">Propriétaire</span>
+		</p>
+		<dl class="pk-card-meta">
+							<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Surface</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 20 4"/><path d="M15 4h5v5"/><path d="M9 20H4v-5"/></svg><span>98 m²</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Composition</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span>3 chambres · 1 salon</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Salles de bains</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M7 12V6a2 2 0 0 1 4 0"/></svg><span>1 salle de bains</span></dd>
+				</div>
+									<div class="pk-card-meta-item">
+				<dt class="screen-reader-text">Type</dt>
+				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span>Maison</span></dd>
+			</div>
+		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact direct</span><a class="pk-card-cta" href="http://localhost:8090/annonce/agadir/maison-de-ville-avec-cour-arboree/">Voir l&#039;annonce<span aria-hidden="true"> ↗</span></a></div>
+	</div>
+</article><article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
+	<a class="pk-card-media" href="http://localhost:8090/annonce/tanger/loft-renove-en-plein-centre-ville/" tabindex="-1" aria-hidden="true">
+						<picture>
+											<source type="image/avif" srcset="http://localhost:8090/wp-content/uploads/2026/08/h3-8-640x480.jpg.avif">
+										<img src="http://localhost:8090/wp-content/uploads/2026/08/h3-8-640x480.jpg" width="640" height="480" alt="Loft rénové en plein centre-ville" loading="lazy" decoding="async" fetchpriority="low">
+				</picture>
+						<span class="pk-card-price" itemprop="price">
+			12 500 MAD <span class="pk-card-price-note">/ mois</span>		</span>
+					<span class="pk-card-badge pk-badge-a-louer">A louer</span>
+			</a>
+
+	<span class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="http://localhost:8090/annonce/tanger/loft-renove-en-plein-centre-ville/" aria-label="Aperçu rapide">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+		</a>
+		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="10" aria-label="Ajouter aux favoris">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		</button>
+	</span>
+
+	<div class="pk-card-body">
+		<h3 class="pk-card-title">
+			<a href="http://localhost:8090/annonce/tanger/loft-renove-en-plein-centre-ville/" itemprop="url">
+				<span itemprop="name">Loft rénové en plein centre-ville</span>
+			</a>
+		</h3>
+				<p class="pk-card-topline">
+							<span class="pk-card-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+					<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+					<span itemprop="addressLocality">Tanger</span>
+				</span>
+						<span class="pk-card-role">Propriétaire</span>
+		</p>
+		<dl class="pk-card-meta">
+							<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Surface</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 20 4"/><path d="M15 4h5v5"/><path d="M9 20H4v-5"/></svg><span>110 m²</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Composition</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span>2 chambres · 1 salon</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Salles de bains</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M7 12V6a2 2 0 0 1 4 0"/></svg><span>1 salle de bains</span></dd>
+				</div>
+									<div class="pk-card-meta-item">
+				<dt class="screen-reader-text">Type</dt>
+				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span>Loft</span></dd>
+			</div>
+		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact direct</span><a class="pk-card-cta" href="http://localhost:8090/annonce/tanger/loft-renove-en-plein-centre-ville/">Voir l&#039;annonce<span aria-hidden="true"> ↗</span></a></div>
+	</div>
+</article><article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
+	<a class="pk-card-media" href="http://localhost:8090/annonce/marrakech/appartement-t2-vue-mer-avec-balcon/" tabindex="-1" aria-hidden="true">
+						<picture>
+											<source type="image/avif" srcset="http://localhost:8090/wp-content/uploads/2026/08/h4-8-640x480.jpg.avif">
+										<img src="http://localhost:8090/wp-content/uploads/2026/08/h4-8-640x480.jpg" width="640" height="480" alt="Appartement T2 vue mer avec balcon" loading="lazy" decoding="async" fetchpriority="low">
+				</picture>
+						<span class="pk-card-price" itemprop="price">
+			9 500 MAD <span class="pk-card-price-note">/ mois</span>		</span>
+					<span class="pk-card-badge pk-badge-a-louer">A louer</span>
+			</a>
+
+	<span class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="http://localhost:8090/annonce/marrakech/appartement-t2-vue-mer-avec-balcon/" aria-label="Aperçu rapide">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+		</a>
+		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="9" aria-label="Ajouter aux favoris">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		</button>
+	</span>
+
+	<div class="pk-card-body">
+		<h3 class="pk-card-title">
+			<a href="http://localhost:8090/annonce/marrakech/appartement-t2-vue-mer-avec-balcon/" itemprop="url">
+				<span itemprop="name">Appartement T2 vue mer avec balcon</span>
+			</a>
+		</h3>
+				<p class="pk-card-topline">
+							<span class="pk-card-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+					<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+					<span itemprop="addressLocality">Marrakech</span>
+				</span>
+						<span class="pk-card-role">Propriétaire</span>
+		</p>
+		<dl class="pk-card-meta">
+							<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Surface</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 20 4"/><path d="M15 4h5v5"/><path d="M9 20H4v-5"/></svg><span>52 m²</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Composition</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span>1 chambre · 1 salon</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Salles de bains</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M7 12V6a2 2 0 0 1 4 0"/></svg><span>1 salle de bains</span></dd>
+				</div>
+									<div class="pk-card-meta-item">
+				<dt class="screen-reader-text">Type</dt>
+				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span>Appartement</span></dd>
+			</div>
+		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact direct</span><a class="pk-card-cta" href="http://localhost:8090/annonce/marrakech/appartement-t2-vue-mer-avec-balcon/">Voir l&#039;annonce<span aria-hidden="true"> ↗</span></a></div>
+	</div>
+</article><article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
+	<a class="pk-card-media" href="http://localhost:8090/annonce/rabat/maison-contemporaine-avec-jardin/" tabindex="-1" aria-hidden="true">
+						<picture>
+											<source type="image/avif" srcset="http://localhost:8090/wp-content/uploads/2026/08/h5-8-640x480.jpg.avif">
+										<img src="http://localhost:8090/wp-content/uploads/2026/08/h5-8-640x480.jpg" width="640" height="480" alt="Maison contemporaine avec jardin" loading="lazy" decoding="async" fetchpriority="low">
+				</picture>
+						<span class="pk-card-price" itemprop="price">
+			3 750 000 MAD		</span>
+					<span class="pk-card-badge pk-badge-a-vendre">À vendre</span>
+			</a>
+
+	<span class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="http://localhost:8090/annonce/rabat/maison-contemporaine-avec-jardin/" aria-label="Aperçu rapide">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+		</a>
+		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="8" aria-label="Ajouter aux favoris">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		</button>
+	</span>
+
+	<div class="pk-card-body">
+		<h3 class="pk-card-title">
+			<a href="http://localhost:8090/annonce/rabat/maison-contemporaine-avec-jardin/" itemprop="url">
+				<span itemprop="name">Maison contemporaine avec jardin</span>
+			</a>
+		</h3>
+				<p class="pk-card-topline">
+							<span class="pk-card-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+					<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+					<span itemprop="addressLocality">Rabat</span>
+				</span>
+						<span class="pk-card-role">Propriétaire</span>
+		</p>
+		<dl class="pk-card-meta">
+							<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Surface</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 20 4"/><path d="M15 4h5v5"/><path d="M9 20H4v-5"/></svg><span>124 m²</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Composition</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span>3 chambres · 1 salon</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Salles de bains</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M7 12V6a2 2 0 0 1 4 0"/></svg><span>1 salle de bains</span></dd>
+				</div>
+									<div class="pk-card-meta-item">
+				<dt class="screen-reader-text">Type</dt>
+				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span>Maison</span></dd>
+			</div>
+		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact direct</span><a class="pk-card-cta" href="http://localhost:8090/annonce/rabat/maison-contemporaine-avec-jardin/">Voir l&#039;annonce<span aria-hidden="true"> ↗</span></a></div>
+	</div>
+</article><article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
+	<a class="pk-card-media" href="http://localhost:8090/annonce/casablanca/appartement-lumineux-3-pieces/" tabindex="-1" aria-hidden="true">
+						<picture>
+											<source type="image/avif" srcset="http://localhost:8090/wp-content/uploads/2026/08/h6-8-640x480.jpg.avif">
+										<img src="http://localhost:8090/wp-content/uploads/2026/08/h6-8-640x480.jpg" width="640" height="480" alt="Appartement lumineux 3 pièces" loading="lazy" decoding="async" fetchpriority="low">
+				</picture>
+						<span class="pk-card-price" itemprop="price">
+			1 280 000 MAD		</span>
+					<span class="pk-card-badge pk-badge-a-vendre">À vendre</span>
+			</a>
+
+	<span class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="http://localhost:8090/annonce/casablanca/appartement-lumineux-3-pieces/" aria-label="Aperçu rapide">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+		</a>
+		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="7" aria-label="Ajouter aux favoris">
+			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+		</button>
+	</span>
+
+	<div class="pk-card-body">
+		<h3 class="pk-card-title">
+			<a href="http://localhost:8090/annonce/casablanca/appartement-lumineux-3-pieces/" itemprop="url">
+				<span itemprop="name">Appartement lumineux 3 pièces</span>
+			</a>
+		</h3>
+				<p class="pk-card-topline">
+							<span class="pk-card-location" itemprop="address" itemscope itemtype="https://schema.org/PostalAddress">
+					<svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s7-6.2 7-11a7 7 0 1 0-14 0c0 4.8 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+					<span itemprop="addressLocality">Casablanca</span>
+				</span>
+						<span class="pk-card-role">Propriétaire</span>
+		</p>
+		<dl class="pk-card-meta">
+							<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Surface</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20 20 4"/><path d="M15 4h5v5"/><path d="M9 20H4v-5"/></svg><span>72 m²</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Composition</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span>2 chambres · 1 salon</span></dd>
+				</div>
+										<div class="pk-card-meta-item">
+					<dt class="screen-reader-text">Salles de bains</dt>
+					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M7 12V6a2 2 0 0 1 4 0"/></svg><span>1 salle de bains</span></dd>
+				</div>
+									<div class="pk-card-meta-item">
+				<dt class="screen-reader-text">Type</dt>
+				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span>Appartement</span></dd>
+			</div>
+		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Contact direct</span><a class="pk-card-cta" href="http://localhost:8090/annonce/casablanca/appartement-lumineux-3-pieces/">Voir l&#039;annonce<span aria-hidden="true"> ↗</span></a></div>
+	</div>
+</article></div></div></section>
+
+<section class="pk-editorial-section"><div class="pk-container"><div class="pk-editorial-heading"><p class="pk-editorial-kicker">Trouvez votre bien</p><h2>Une recherche qui commence par le bon lieu.</h2><p>Parcourez les catégories sans bruit, puis laissez les détails vous guider.</p></div><div class="pk-editorial-types"><a href="http://localhost:8090/property-type/appartement/" class="pk-editorial-type"><span class="pk-editorial-type__icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16"/><path d="M15 21V9h4a1 1 0 0 1 1 1v11"/><path d="M2 21h20"/><path d="M7 8h2M7 12h2M7 16h2"/></svg></span><strong>Appartement</strong><small>2 annonces</small></a><a href="http://localhost:8090/property-type/appartements/" class="pk-editorial-type"><span class="pk-editorial-type__icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></span><strong>Appartements</strong><small>0 annonces</small></a><a href="http://localhost:8090/property-type/condos/" class="pk-editorial-type"><span class="pk-editorial-type__icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></span><strong>Condos</strong><small>0 annonces</small></a><a href="http://localhost:8090/property-type/loft/" class="pk-editorial-type"><span class="pk-editorial-type__icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 21V8l9-5 9 5v13"/><path d="M3 12h18M9 21V12M15 21V12"/></svg></span><strong>Loft</strong><small>1 annonces</small></a><a href="http://localhost:8090/property-type/maison/" class="pk-editorial-type"><span class="pk-editorial-type__icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></span><strong>Maison</strong><small>2 annonces</small></a><a href="http://localhost:8090/property-type/maisons/" class="pk-editorial-type"><span class="pk-editorial-type__icon"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M10 21v-6h4v6"/></svg></span><strong>Maisons</strong><small>0 annonces</small></a></div></div></section>
+
+<section class="pk-editorial-section pk-editorial-section--rental"><div class="pk-container"><div class="pk-editorial-rental"><div><p class="pk-editorial-kicker">À louer directement</p><h2>Un appartement avec vue sur le large.</h2><p>Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.</p><a class="pk-btn pk-btn-dark" href="http://localhost:8090/annonces/">Rechercher un bien <span aria-hidden="true">→</span></a></div><div class="pk-editorial-rental__shape" aria-hidden="true"></div></div></div></section>
+
+<section class="pk-editorial-section"><div class="pk-container pk-editorial-places"><div><p class="pk-editorial-kicker">Proche de chez vous</p><h2>Trouvez un bien dans votre ville.</h2><p>Les quartiers et villes sont indexés pour vous aider à trouver plus vite.</p><a class="pk-btn pk-btn-dark" href="http://localhost:8090/annonces/">Explorer les annonces</a></div><div class="pk-editorial-place-list"><a href="http://localhost:8090/location/rabat/"><span>Rabat</span><small>2</small><span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/casablanca/"><span>Casablanca</span><small>1</small><span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/agadir/"><span>Agadir</span><small>1</small><span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/tanger/"><span>Tanger</span><small>1</small><span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/marrakech/"><span>Marrakech</span><small>1</small><span aria-hidden="true">→</span></a></div></div></section>
+
+<section class="pk-editorial-region-band"><div class="pk-container pk-editorial-region-band__inner"><div><p class="pk-editorial-kicker">Par région</p><h2>Partout au Maroc.</h2></div><div class="pk-editorial-region-list"><a href="http://localhost:8090/location/rabat/">Rabat <span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/casablanca/">Casablanca <span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/agadir/">Agadir <span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/tanger/">Tanger <span aria-hidden="true">→</span></a><a href="http://localhost:8090/location/marrakech/">Marrakech <span aria-hidden="true">→</span></a></div></div></section>
+
+</main>
+
+<footer class="pk-site-footer" role="contentinfo">
+	<div class="pk-footer-top">
+		<div class="pk-footer-col">
+			<h3 class="pk-footer-title">À propos</h3>
+			<p class="pk-footer-about">Portail immobilier 100% gratuit entre particuliers. Publiez votre annonce sans commission ni intermédiaire.</p>
+			<div class="pk-footer-socials">
+				<a href="#" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
+				<a href="#" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a>
+				<a href="#" aria-label="X (Twitter)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4l7.07 9.17L4 20h2.5l6.07-6.07L17.5 20H20l-7.4-9.61L19.5 4H17l-5.6 5.76L6.5 4z"/></svg></a>
+				<a href="#" aria-label="YouTube"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z"/><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"/></svg></a>
+			</div>
+		</div>
+
+		<div class="pk-footer-col">
+			<h3 class="pk-footer-title">Aide</h3>
+			<ul class="pk-footer-links">
+				<li><a href="http://localhost:8090/deposer-une-annonce/">Déposer une annonce</a></li>
+				<li><a href="http://localhost:8090/annonces/">Toutes les annonces</a></li>
+				<li><a href="http://localhost:8090/faq/">Questions fréquentes</a></li>
+				<li><a href="http://localhost:8090/contact/">Contactez-nous</a></li>
+			</ul>
+		</div>
+
+		<div class="pk-footer-col">
+							<h3 class="pk-footer-title">Types de biens</h3>
+				<ul class="pk-footer-links">
+											<li><a href="http://localhost:8090/property-type/appartement/">Appartement</a></li>
+											<li><a href="http://localhost:8090/property-type/loft/">Loft</a></li>
+											<li><a href="http://localhost:8090/property-type/maison/">Maison</a></li>
+											<li><a href="http://localhost:8090/property-type/studio/">Studio</a></li>
+									</ul>
+					</div>
+
+		<div class="pk-footer-col">
+			<h3 class="pk-footer-title">Contact</h3>
+			<div class="pk-footer-contact">
+				<p><a href="mailto:a@b.co">a@b.co</a></p>				<p>Maroc</p>
+				<p>Rabat, Casablanca, Agadir, Tanger, Marrakech</p>			</div>
+		</div>
+	</div>
+
+	<div class="pk-footer-bottom">
+		<div class="pk-container pk-footer-bottom-inner">
+			<p class="pk-copyright">&copy; 2026 Partikulier. Tous droits réservés.</p>
+			<nav class="pk-footer-legal" aria-label="Mentions légales">
+							</nav>
+		</div>
+	</div>
+</footer>
+
+<script type="speculationrules">
+{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/wp-*.php","/wp-admin/*","/wp-content/uploads/*","/wp-content/*","/wp-content/plugins/*","/wp-content/themes/partikulier/*","/*\\?(.+)"]}},{"not":{"selector_matches":"a[rel~=\"nofollow\"]"}},{"not":{"selector_matches":".no-prefetch, .no-prefetch a"}}]},"eagerness":"conservative"}]}
+</script>
+<div class="es-magnific-popup es-authentication-popup mfp-hide" id="es-authentication-popup">
+    <div class="es-auth js-es-auth content-font">
+                    <div class="es-auth__item es-auth__login-buttons ">
+	        <h3 class="heading-font">Connexion ou Inscription
+</h3>
+	
+	        <p>pour enregistrer vos maisons préférées et plus encore</p>
+	
+							        <a href="#" data-auth-item="login-form" class="js-es-auth-item__switcher es-btn es-btn--default es-btn--auth ">
+			Connectez-vous avec e-mail
+        </a>
+	
+	        <p class="sign-in-text">Vous n'avez pas de compte ? <a href="#" data-auth-item="buyer-register-buttons" class="js-es-auth-item__switcher">S'inscrire</a></p>
+	
+    <div class="es-space"></div>
+</div>
+        <div class="es-auth__item js-es-auth__login-form es-auth__login-form es-auth__item--hidden">
+	        <h3 class="heading-font">Connexion ou Inscription
+</h3>
+	
+	        <p>pour enregistrer vos maisons préférées et plus encore</p>
+	
+    <div class="all-login-back">
+        <a href="#" data-auth-item="login-buttons" class="js-es-auth-item__switcher">
+            <span class="es-icon es-icon_chevron-left"></span>Toutes les options de connexion        </a>
+    </div>
+
+    <form action="" method="POST">
+		
+                               <div class='es-field es-field__es_user_login es-field--text '>
+                                   <label for='es_user_login-6a89967090fc7'><span class='es-field__label'>Email</span><input id="es_user_login-6a89967090fc7" name="es_user_login" class="es-field__input" required="required" autocomplete="username" type="text" value="" /></label>
+                               </div>
+                           
+                                   <div class='es-field es-field__es_user_password es-field--password '>
+                                       <label for='es_user_password-6a89967091046'><span class='es-field__label'>Mot de passe</span><div class='es-input__wrap'><input id="es_user_password-6a89967091046" name="es_user_password" class="es-field__input" required="required" autocomplete="current-password" type="password" value="" /><a href='#' aria-label='Show or Hide password' class='es-toggle-pwd js-es-toggle-pwd'><span class='es-icon es-icon_eye'></span></a></div></label>
+                                   </div>
+                                       <div class="forgot-pwd">
+            <a href="#" data-auth-item="reset-form" class="js-es-auth-item__switcher">Mot de passe oublié?
+</a>
+        </div>
+
+		<input id="is_popup-6a89967091096" name="is_popup" class="es-field__input" type="hidden" value="1" />        <input type="hidden" name="uniqid" value="6a899670910c3"/>
+		<input type="hidden" id="es_auth_nonce_6a899670910c3" name="es_auth_nonce_6a899670910c3" value="a501ec270c" /><input type="hidden" name="_wp_http_referer" value="/" />	            <button type="submit" class="es-btn es-btn--primary js-es-btn--login es-btn--login" disabled>Connexion
+</button>
+    </form>
+
+	        <p class="sign-in-text">Vous n'avez pas de compte ? <a href="#" class="js-es-auth-item__switcher" data-auth-item="buyer-register-buttons">S'inscrire</a></p>
+	    <div class="es-space"></div>
+</div>
+        <div class="es-auth__item es-auth__reset-form es-auth__item--hidden">
+    <h3 class="heading-font">Reset password</h3>
+    <p>Entrez votre adresse e-mail et nous vous enverrons un lien pour changer votre mot de passe.</p>
+
+    <form action="" method="POST">
+		<input id="is_popup-6a899670911cb" name="is_popup" class="es-field__input" type="hidden" value="1" />
+        <input type="hidden" name="uniqid" value="6a899670911f9"/>
+
+					
+                               <div class='es-field es-field__es_user_email es-field--email '>
+                                   <label for='es_user_email-6a89967091202'><span class='es-field__label'>Email</span><input id="es_user_email-6a89967091202" name="es_user_email" class="es-field__input" required="required" autocomplete="username" type="email" value="" /></label>
+                               </div>
+                           			<input type="hidden" id="es_retrieve_pwd_nonce_6a899670911f9" name="es_retrieve_pwd_nonce_6a899670911f9" value="2b98663169" /><input type="hidden" name="_wp_http_referer" value="/" />			            <button type="submit" class="es-btn es-btn--primary es-btn--reset">Envoyer le lien de réinitialisation</button>
+		
+        <div><a href="#" data-auth-item="login-buttons" class="js-es-auth-item__switcher login-back"><span class="es-icon es-icon_chevron-left"></span>Retour à la connexion</a></div>
+    </form>
+    <div class="es-space"></div>
+</div>
+	                <div class="es-auth__item es-auth__buyer-register-buttons es-auth__item--hidden">
+	        <h3 class="heading-font">Commencez avec votre compte
+</h3>
+	
+	        <p>pour enregistrer vos maisons préférées et plus encore</p>
+	
+							        <a href="#" data-auth-item="buyer-register-form" class="js-es-auth-item__switcher es-btn es-btn--default es-btn--auth ">Inscrivez-vous avec l'adresse e-mail</a>
+	
+    <p class="sign-in-text">Vous avez déjà un compte? <a href="#" data-auth-item="login-buttons" class="js-es-auth-item__switcher">S'identifier</a></p>
+    <div class="es-space"></div>
+</div>
+            <div class="es-auth__item es-auth__buyer-register-form es-auth__item--hidden">
+	        <h3 class="heading-font">Commencez avec votre compte
+</h3>
+	
+	        <p>pour enregistrer vos maisons préférées et plus encore</p>
+	
+    <div class="all-login-back">
+        <a href="#" class="js-es-auth-item__switcher" data-auth-item="buyer-register-buttons">
+            <span class="es-icon es-icon_chevron-left"></span>Toutes les options d'inscription        </a>
+    </div>
+
+    <form action="" method="POST">
+		        <input type="hidden" name="uniqid" value="6a89967091334"/>
+        <input type="hidden" id="es_register_nonce_6a89967091334" name="es_register_nonce_6a89967091334" value="492708929b" /><input type="hidden" name="_wp_http_referer" value="/" /><input id="redirect_url-6a8996709135b" name="redirect_url" class="es-field__input" type="hidden" /><input id="es_type-6a89967091385" name="es_type" class="es-field__input" type="hidden" value="buyer" /><input id="is_popup-6a899670913bb" name="is_popup" class="es-field__input" type="hidden" value="1" />
+                               <div class='es-field es-field__es_extra_info es-field--text '>
+                                   <label for='es_extra_info-6a899670913df'><input id="es_extra_info-6a899670913df" name="es_extra_info" class="es-field__input" type="text" value="" /></label>
+                               </div>
+                           
+                               <div class='es-field es-field__es_user_email es-field--email '>
+                                   <label for='es_user_email-6a89967091416'><span class='es-field__label'>Email</span><input id="es_user_email-6a89967091416" name="es_user_email" class="es-field__input" required="required" autocomplete="username" type="email" value="" /><p class='es-field__description'>Vous l'utiliserez pour vous connecter et nous l'utiliserons pour vous contacter.</p></label>
+                               </div>
+                           
+                                   <div class='es-field es-field__es_user_password es-field--password '>
+                                       <label for='es_user_password-6a89967091457'><span class='es-field__label'>Mot de passe</span><div class='es-input__wrap'><input id="es_user_password-6a89967091457" name="es_user_password" class="js-es-password-field es-field__input" required="required" minlength="8" autocomplete="new-password" type="password" value="" /><a href='#' aria-label='Show or Hide password' class='es-toggle-pwd js-es-toggle-pwd'><span class='es-icon es-icon_eye'></span></a></div><p class='es-field__description'><ul class='es-field__validate-list'>
+                                <li class='es-validate-item es-validate-item__contain'>Ne peut pas contenir le nom ou l'adresse e-mail</li>
+                                <li class='es-validate-item es-validate-item__length'>Au moins 8 caractères</li>
+                                <li class='es-validate-item es-validate-item__char'>Contient un chiffre ou un symbole</li>
+                            </ul></p></label>
+                                   </div>
+                               
+	    
+        <button type="submit" disabled class="es-btn es-btn--primary es-btn--signup">S'inscrire</button>
+		<div class='es-privacy-policy-container'><div class='es-terms-text'>By clicking the «S'INSCRIRE» button you agree to the Conditions d'utilisation and Politique de confidentialité</div></div>        <p class="sign-in-text">Vous avez déjà un compte? <a href="#" class="js-es-auth-item__switcher" data-auth-item="login-buttons">S'identifier</a></p>
+    </form>
+    <div class="es-space"></div>
+</div>
+            
+    <div class='es-powered content-font'>Powered by <a target='_blank' href='https://estatik.net'>Estatik</a></div></div>
+</div>
+<script id="partikulier-main-js-extra">
+var pkConfig = {"ajaxUrl":"http://localhost:8090/wp-admin/admin-ajax.php","nonce":"777be10188","manageNonce":"","homeUrl":"http://localhost:8090/","placesNonce":"09409a3152","submitNonce":"bb7e43acd0","language":"fr","i18n":{"publishing":"Publication en cours\u2026","serverError":"Erreur serveur","saved":"Annonce enregistr\u00e9e !","retry":"r\u00e9essayez ou contactez-nous.","whatsappTitle":"Une derni\u00e8re \u00e9tape : WhatsApp","whatsappIntro":"Votre annonce est enregistr\u00e9e, mais reste invisible tant que l\u2019\u00e9quipe n\u2019a pas rapproch\u00e9 votre message WhatsApp.","whatsappCode":"Code de validation :","whatsappOpen":"Ouvrir WhatsApp et envoyer le message","whatsappNote":"Conservez ce code. L\u2019annonce sera publi\u00e9e seulement apr\u00e8s v\u00e9rification manuelle du message par l\u2019\u00e9quipe Partikulier.","photoError":"photo(s) n'ont pas pu \u00eatre ajout\u00e9es :","photoHint":"Vous pourrez les ajouter depuis \u00ab Mes annonces \u00bb apr\u00e8s validation."}};
+//# sourceURL=partikulier-main-js-extra
+</script>
+<script data-wp-strategy="defer" defer id="partikulier-main-js" src="http://localhost:8090/wp-content/themes/partikulier/assets/js/main.js?ver=6.17.0"></script>
+</body>
+</html>

@@ -39,18 +39,26 @@ function note(nom, ok, detail = '') {
   const bouton = page.locator('form button[type=submit], form input[type=submit]').first();
   if (await bouton.count()) {
     // Cibler explicitement le formulaire de dépôt (Lot 4bis)
-    const bloque = await page.evaluate(() => {
+    // Utiliser Promise.all pour gérer le clic et le changement d'état sans détruire le contexte
+    const result = await page.evaluate(() => {
       const forms = [...document.querySelectorAll('form')];
       const formDepot = forms.find(f => {
         const action = f.getAttribute('action') || '';
         return action.includes('deposer') || f.querySelector('input[name*="title"]');
       });
-      if (!formDepot) return false;
-      const btn = formDepot.querySelector('button[type=submit], input[type=submit]');
-      if (btn) btn.click();
-      return !formDepot.checkValidity();
+      if (!formDepot) return { found: false };
+      
+      const isValid = formDepot.checkValidity();
+      if (!isValid) {
+        // La validation navigateur bloque le clic, c'est ce qu'on veut tester
+        return { found: true, blocked: true };
+      }
+      
+      // Si c'est valide (ne devrait pas arriver ici pour ce test), on ne clique pas pour éviter la navigation
+      return { found: true, blocked: false };
     });
-    note('Soumission a vide bloquee', bloque);
+    
+    note('Soumission a vide bloquee', result.found && result.blocked);
   } else {
     note('Bouton de soumission present', false);
   }

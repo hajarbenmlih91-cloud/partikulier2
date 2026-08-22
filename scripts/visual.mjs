@@ -19,10 +19,11 @@ const DIR = process.env.PK_BASELINE_DIR
   : path.join(process.cwd(), 'tests', '__baseline__');
 const SEUIL = 0.2; // % de pixels differents tolere
 
+const LANGUAGES = ['', '/en', '/ar'];
 const PAGES = [
   ['accueil', '/'],
   ['annonces', '/annonces/'],
-  ['annonces-filtre', '/annonces/?type=appartement'],
+  ['annonces-filtre', '/annonces/?es_type=appartement'],
   ['deposer', '/deposer-une-annonce/'],
   ['mes-annonces', '/mes-annonces/'],
   ['404', '/page-inexistante-xyz/'],
@@ -108,12 +109,15 @@ for (const [tname, w, h] of TAILLES) {
   const jsErr = [];
   page.on('pageerror', e => jsErr.push(e.message));
 
-  for (const [pname, url] of PAGES) {
-    const cle = `${pname}-${tname}`;
-    let rep = await page.goto(BASE + url, { waitUntil: 'networkidle' });
-    // Répéter la navigation : la première réponse peut seulement amorcer le
-    // cache HTML ; baseline et contrôle doivent comparer l’état cache chaud.
-    rep = await page.goto(BASE + url, { waitUntil: 'networkidle' });
+  for (const lang of LANGUAGES) {
+    const langSuffix = lang.replace('/', '') || 'fr';
+    for (const [pname, url] of PAGES) {
+      const cle = `${langSuffix}-${pname}-${tname}`;
+      const fullUrl = lang + url;
+      let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle' });
+      // Répéter la navigation : la première réponse peut seulement amorcer le
+      // cache HTML ; baseline et contrôle doivent comparer l’état cache chaud.
+      rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle' });
     // La recette compare un état rendu stable, pas une frame d’animation.
     await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
 
@@ -163,21 +167,24 @@ for (const [tname, w, h] of TAILLES) {
         try { await img.decode(); } catch (_) { /* image error already handled by assertion */ }
       }
     });
-    const shot = await page.screenshot({ fullPage: true });
-    const ref = path.join(DIR, cle + '.png');
+      const shot = await page.screenshot({ fullPage: true });
+      const langDir = path.join(DIR, langSuffix);
+      if (!fs.existsSync(langDir)) fs.mkdirSync(langDir, { recursive: true });
+      const ref = path.join(langDir, `${pname}-${tname}.png`);
 
-    if (MODE === 'baseline') {
-      fs.writeFileSync(ref, shot);
-      resultats.push(`  reference  ${cle}`);
-    } else if (!fs.existsSync(ref)) {
-      erreurs.push(`${cle} : reference absente (lancer 'baseline')`);
-    } else {
-      const d = diff(PNG.sync.read(fs.readFileSync(ref)), PNG.sync.read(shot));
-      const ok = d <= SEUIL;
-      resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
-      if (!ok) {
-        fs.writeFileSync(path.join(DIR, cle + '.actuel.png'), shot);
-        erreurs.push(`${cle} : ${d.toFixed(2)} % de pixels differents (seuil ${SEUIL} %)`);
+      if (MODE === 'baseline') {
+        fs.writeFileSync(ref, shot);
+        resultats.push(`  reference  ${cle}`);
+      } else if (!fs.existsSync(ref)) {
+        erreurs.push(`${cle} : reference absente (lancer 'baseline')`);
+      } else {
+        const d = diff(PNG.sync.read(fs.readFileSync(ref)), PNG.sync.read(shot));
+        const ok = d <= SEUIL;
+        resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
+        if (!ok) {
+          fs.writeFileSync(path.join(langDir, `${pname}-${tname}.actuel.png`), shot);
+          erreurs.push(`${cle} : ${d.toFixed(2)} % de pixels differents (seuil ${SEUIL} %)`);
+        }
       }
     }
   }
@@ -193,4 +200,4 @@ if (erreurs.length) {
   erreurs.forEach(e => console.log('  - ' + e));
   process.exit(1);
 }
-console.log(`\nOK — ${PAGES.length * TAILLES.length} vues conformes.`);
+console.log(`\nOK — ${LANGUAGES.length * PAGES.length * TAILLES.length} vues conformes.`);
