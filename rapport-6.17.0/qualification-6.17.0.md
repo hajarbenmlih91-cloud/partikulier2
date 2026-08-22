@@ -1,12 +1,12 @@
 # Rapport de qualification — Partikulier 6.17.0
 
-**Date de la recette :** 21 août 2026. **Base :** thème Partikulier 6.17.0, sandbox WordPress réelle avec Polylang 3.8.7, PHP 8.4 de recette, navigateur mobile Chromium à 390 px. Les preuves brutes sont archivées dans `rapport-6.17.0/preuves/`.
+**Date de la recette :** 22 août 2026. **Base :** thème Partikulier 6.17.0, sandbox WordPress réelle avec Polylang 3.8.7, PHP 8.3 disponible dans la sandbox, navigateur mobile Chromium à 390 px. Les preuves brutes sont archivées dans `rapport-6.17.0/preuves/`.
 
 ## Verdict exécutif
 
 La validation technique dynamique du périmètre i18n/UX est **verte**. Les parcours AR et EN, la détection navigateur, l’exemption des robots, le cache de la racine, les pages localisées, le RTL, la police arabe, le formulaire de dépôt et les contrôles SEO ont été rejoués sur la sandbox active. Le package est intègre et son hash est archivé.
 
-Je ne prononce toutefois pas une signature linguistique définitive « conforme à 100 % au CdC » tant que les **deux attestations de relecture native AR et EN** exigées au §5 et au §6 du CdC v1.5 ne sont pas jointes. La recette technique ne remplace pas cette validation humaine. Les baselines visuelles dédiées AR/EN et la preuve de soumission métier complète doivent également être conservées comme livrables séparés si elles sont requises pour le sign-off de production.
+Je ne prononce toutefois pas une signature linguistique définitive « conforme à 100 % au CdC » tant que les **deux attestations de relecture native AR et EN** exigées au §5 et au §6 du CdC v1.5 ne sont pas jointes. La recette technique ne remplace pas cette validation humaine. La comparaison avec la baseline historique 6.13.1 reste distincte de la reproductibilité 6.17.0 : la baseline historique n’est pas comparable sans snapshot de données identique. Une baseline 6.17.0 générée sur le même snapshot froid est contrôlée à 0,00 % sur 12 vues ; elle ne remplace pas une comparaison historique authentifiée.
 
 ## Corrections livrées pendant cette recette
 
@@ -20,6 +20,8 @@ Les alternates hreflang du thème ont été dédoublonnés : Polylang émet les 
 
 | Contrôle | Résultat | Preuve |
 |---|---:|---|
+| Reproductibilité visuelle 6.17.0 sur snapshot identique | PASS, 12/12 à 0,00 % | `tests/__baseline-6.17.0-cold__/` |
+| Comparaison historique 6.13.1 | NON CONCLUANTE, données/snapshot non identiques | `tests/__baseline-6.13.1__/` |
 | Détection humaine AR/EN/FR et cookie prioritaire | PASS | `preuves/browser-detection.json` |
 | Exemption des six familles de robots | PASS | `preuves/browser-detection.json` |
 | Racine `private, no-store` et `Vary` | PASS | `preuves/browser-detection.json` |
@@ -42,13 +44,13 @@ Les alternates hreflang du thème ont été dédoublonnés : Polylang émet les 
 |---|---|
 | Archive | `partikulier-6.17.0.zip` |
 | Taille | 914 Ko environ |
-| SHA-256 | `1d88fd5634b2af98ccd557d2b18723365ac73c4644192aaa493b196d9dadf263` |
+| SHA-256 | `32315c29cd3373284b1e4b9d92aea679ddab01920d64de1a344bc2a18e547137` |
 | Versions | `style.css`, `functions.php`, `package.json`, `readme.txt` alignés sur `6.17.0` |
 | Intégrité ZIP | `unzip -t` PASS |
 
 ## Réserves de sign-off
 
-La sortie est **techniquement requalifiée après correction de la meta AR**, mais la signature finale de production reste conditionnée à la réception des attestations de relecture native arabe et anglaise prévues explicitement par le CdC. Il faut également conserver une preuve de validation visuelle des baselines AR/EN et, si le client exige la preuve métier complète, un test de soumission de dépôt jusqu’à l’état de modération avec fixture isolée et sans notification externe réelle.
+La sortie est **techniquement requalifiée après correction de la meta AR et du Lot 4bis**, mais la signature finale de production reste conditionnée à la réception des attestations de relecture native arabe et anglaise, à la fermeture du R6 indépendant et à la décision documentaire sur la comparaison historique 6.13.1. Il faut également conserver une preuve de validation visuelle des baselines AR/EN et, si le client exige la preuve métier complète, un test de soumission de dépôt jusqu’à l’état de modération avec fixture isolée et sans notification externe réelle.
 
 Le contrôle SEO utilise des fixtures dont les meta descriptions sont des contenus de test (`Security fixture` et `Manual test`). Elles prouvent la structure, la locale et l’intégrité des balises ; elles ne constituent pas une relecture éditoriale des textes métier. Les textes éditoriaux de la page d’accueil doivent rester remplis et relus dans la page Personnalisation, conformément au Lot 4. La recette automatisée ne remplace pas la relecture humaine native AR/EN.
 
