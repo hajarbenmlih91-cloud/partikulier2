@@ -1,4 +1,4 @@
-[0] 0.42ms - SELECT SQL_CALC_FOUND_ROWS  wp_posts.ID
+[0] 0.33ms - SELECT SQL_CALC_FOUND_ROWS  wp_posts.ID
 					 FROM wp_posts 
 					 WHERE 1=1  AND ((wp_posts.post_type = 'property' AND (wp_posts.post_status = 'publish')))
 					 

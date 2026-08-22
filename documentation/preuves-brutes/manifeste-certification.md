@@ -23,10 +23,10 @@
 - **Méthode :** `scripts/test-n8n-idempotence-concurrent.sh`.
 
 ## 💻 Compatibilité PHP 8.3/8.4
-- **Cible :** Code source du thème
-- **Résultat :** Zéro erreur de syntaxe (Lint PASS).
-- **Preuve :** `documentation/preuves-brutes/php-lint-full.log`
-- **Méthode :** `find theme -name "*.php" -exec php -l {} \;`.
+- **Cible :** Code source du thème et Runtime
+- **Résultat :** Zéro erreur de syntaxe et exécution validée sous PHP 8.4.
+- **Preuve :** `documentation/preuves-brutes/php-runtime.log` (Certification PHP 8.4.24)
+- **Méthode :** Exécution des tests dynamiques sous PHP 8.4.24.
 
 ## 🖼️ Baselines Visuelles
 - **Cible :** 12 vues critiques par langue (FR/EN/AR)

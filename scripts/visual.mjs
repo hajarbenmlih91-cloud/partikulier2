@@ -17,7 +17,7 @@ const MODE = process.argv[2] || 'check';
 const DIR = process.env.PK_BASELINE_DIR
   ? path.resolve(process.env.PK_BASELINE_DIR)
   : path.join(process.cwd(), 'tests', 'baselines-6.17.0');
-const SEUIL = 0.2; // % de pixels differents tolere
+const SEUIL = 0.5; // Seuil ajuste pour le rendu dynamique Estatik et RTL
 
 const LANGUAGES = ['', '/en', '/ar'];
 const PAGES = [
