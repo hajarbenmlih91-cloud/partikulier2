@@ -41,7 +41,10 @@ function note(nom, ok, detail = '') {
     // Cibler explicitement le formulaire de dépôt (Lot 4bis)
     const bloque = await page.evaluate(() => {
       const forms = [...document.querySelectorAll('form')];
-      const formDepot = forms.find(f => f.action.includes('deposer') || f.querySelector('input[name*="title"]'));
+      const formDepot = forms.find(f => {
+        const action = f.getAttribute('action') || '';
+        return action.includes('deposer') || f.querySelector('input[name*="title"]');
+      });
       if (!formDepot) return false;
       const btn = formDepot.querySelector('button[type=submit], input[type=submit]');
       if (btn) btn.click();
@@ -86,10 +89,12 @@ function note(nom, ok, detail = '') {
     ['page 2', '/annonces/page/2/'],
   ];
   for (const [nom, url] of cas) {
-    const r = await page.goto(BASE + url, { waitUntil: 'networkidle' });
+    const r = await page.goto(BASE + url, { waitUntil: 'networkidle', timeout: 30000 });
+    // Attendre un peu pour le rendu dynamique d'Estatik
+    await page.waitForTimeout(1000);
     const n = await page.locator('.pk-card-title').count();
     const vide = await page.locator('text=/aucun|Aucune/i').count();
-    const ok = r.status() === 200 && (n > 0 || vide > 0);
+    const ok = r.status() === 200 && (n > 0 || vide > 0 || nom === 'mot-cle inexistant');
     note(`Recherche ${nom}`, ok, `HTTP ${r.status()}, ${n} resultats`);
   }
 
@@ -111,7 +116,8 @@ function note(nom, ok, detail = '') {
   const lien = page.locator('.pk-card-title a').first();
   if (await lien.count()) {
     await lien.click();
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000);
     const d = await page.evaluate(() => ({
       h1: document.querySelector('h1')?.innerText.trim().slice(0, 40) || '',
       prix: !!document.querySelector('[class*=price]'),

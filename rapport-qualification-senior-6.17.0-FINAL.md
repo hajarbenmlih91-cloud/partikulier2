@@ -12,7 +12,8 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | **SHA-256 ZIP** | `8dd3f1489215821c77c8332934364e981b6559878e8a41dab6c76e68e01071a5` |
 | **Attestation AR** | `documentation/attestations/relecture-arabe.md` |
 | **Attestation EN** | `documentation/attestations/relecture-anglais.md` |
-| **Baselines Visuelles** | `tests/baselines-6.17.0/` |
+| **Baselines Visuelles** | `tests/baselines-6.17.0/` (Certifiées 6.17.0) |
+| **Preuves Brutes** | `documentation/preuves-brutes/` (SQL, SEO, Security) |
 
 ## 🧪 Preuves de Recette Froide
 
@@ -22,7 +23,8 @@ La qualification a été prononcée sur une instance reconstruite à partir du d
 - **Packaging Déterministe** : Le script `scripts/package.sh` a été normalisé (timestamps fixes, ordre trié). Le SHA-256 est désormais reproductible.
 - **Audit Portable** : Le script `scripts/audit-environment.sh` utilise des chemins relatifs et certifie l'intégrité de l'environnement sur n'importe quel clone.
 - **Tests E2E (Playwright)** : Le harnais `scripts/parcours.mjs` a été aligné sur les routes réelles (`/annonces/`) et les paramètres de recherche (`s`, `es_type`). Tous les parcours (Dépôt, Recherche, Fiche, Favoris) sont **PASS**.
-- **Baselines Visuelles** : Des baselines dédiées pour les trois langues (FR/EN/AR) ont été générées et versionnées dans `tests/baselines-6.17.0/`, garantissant une comparaison à 0.00% sur cette version.
+- **Baselines Visuelles** : Des baselines dédiées pour les trois langues (FR/EN/AR) ont été matérialisées dans `tests/baselines-6.17.0/`.
+- **Preuves de Performance** : Archivage des rapports Query Monitor (32 requêtes SQL sur archive) et des logs SEO (200 OK Googlebot) dans `documentation/preuves-brutes/`.
 
 ### 1. SEO & i18n (Lot 3 & 4) — PASS ✅
 - **Routes trilingues** : `/` (FR), `/en/` (EN), `/ar/` (AR) répondent en HTTP 200.
