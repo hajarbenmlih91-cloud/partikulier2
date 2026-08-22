@@ -1,0 +1,12 @@
+# Partikulier — Ignorer les fichiers temporaires et WordPress
+wp/
+*.zip
+*.sha256
+rapport-*.log
+rapport-*.jsonl
+rapport-*.txt
+node_modules/
+install.log
+.DS_Store
+*.actuel.png
+ROUTER

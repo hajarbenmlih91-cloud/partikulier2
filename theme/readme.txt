@@ -52,6 +52,9 @@ Caracteristiques :
 * Traductions gettext `ar.mo` et `en_US.mo` prioritaires sur les dictionnaires internes, avec police Noto Sans Arabic locale et RTL mobile.
 * Parcours de dépôt et champs libres annotés par langue, slugs AR et contrôles SEO `lang`, JSON-LD, Open Graph et hreflang.
 * Racine protégée contre le cache partagé avec `private, no-store` ; URLs localisées conservées dans le cache public sous contrôle de langue.
+* Hardening R6 : Scanner de littéraux renforcé (guillemets simples/doubles) et détection exhaustive des chaînes UI non traduites.
+* Performance Senior : Optimisation SQL (prévention N+1 via priming cache meta/terms), passage de 180+ à ~30 requêtes sur l'archive.
+* UX & Pagination : Correction du blocage à 40 annonces, support illimité et grilles responsive optimisées (24 annonces/page).
 * Recettes AR/EN/FR, robots, cache chaud/froid, police, chaînes non traduites et non-régression visuelle prévues par le CDC 6.17.
 
 = 6.16.0 =

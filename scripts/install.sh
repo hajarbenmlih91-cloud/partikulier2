@@ -102,8 +102,12 @@ if [ -d "$ROOT/mu-plugins" ]; then
   cp -r "$ROOT/mu-plugins/." wp-content/mu-plugins/
 fi
 [ -d wp-content/plugins/estatik ] || wp plugin install estatik >>"$LOG" 2>&1
-wp plugin activate estatik >>"$LOG" 2>&1
+[ -d wp-content/plugins/polylang ] || wp plugin install polylang >>"$LOG" 2>&1
+wp plugin activate estatik polylang >>"$LOG" 2>&1
 wp theme activate partikulier >>"$LOG" 2>&1
+
+# Configuration Polylang (FR/EN/AR)
+wp eval-file "$ROOT/scripts/provision-polylang.php" >>"$LOG" 2>&1
 
 # Réglages sans lesquels le formulaire refuse tous les dépôts.
 wp eval '
