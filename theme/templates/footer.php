@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <footer class="pk-site-footer" role="contentinfo">
 	<div class="pk-footer-top">
 		<div class="pk-footer-col">
-			<h3 class="pk-footer-title"><?php esc_html_e( 'À propos', 'partikulier' ); ?></h3>
+				<h3 class="pk-footer-title"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'À propos', 'À propos', 'partikulier' ) : __( 'À propos', 'partikulier' ) ); ?></h3>
 			<p class="pk-footer-about"><?php echo esc_html( Partikulier_Settings::get( 'footer_about_text' ) ); ?></p>
 			<div class="pk-footer-socials">
 				<a href="#" aria-label="<?php esc_attr_e( 'Facebook', 'partikulier' ); ?>"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a>
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<div class="pk-footer-col">
-			<h3 class="pk-footer-title"><?php esc_html_e( 'Aide', 'partikulier' ); ?></h3>
+				<h3 class="pk-footer-title"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Aide', 'Aide', 'partikulier' ) : __( 'Aide', 'partikulier' ) ); ?></h3>
 			<ul class="pk-footer-links">
 				<li><a href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?></a></li>
 				<li><a href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php esc_html_e( 'Toutes les annonces', 'partikulier' ); ?></a></li>
@@ -42,7 +42,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			$types = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_TYPE_TAXONOMY, 'hide_empty' => true ) );
 			if ( $types && ! is_wp_error( $types ) ) :
 				?>
-				<h3 class="pk-footer-title"><?php esc_html_e( 'Types de biens', 'partikulier' ); ?></h3>
+					<h3 class="pk-footer-title"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Types de biens', 'Types de biens', 'partikulier' ) : __( 'Types de biens', 'partikulier' ) ); ?></h3>
 				<ul class="pk-footer-links">
 					<?php foreach ( $types as $term ) : ?>
 						<li><a href="<?php echo esc_url( pk_term_url( $term ) ); ?>"><?php echo esc_html( $term->name ); ?></a></li>
@@ -52,7 +52,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 
 		<div class="pk-footer-col">
-			<h3 class="pk-footer-title"><?php esc_html_e( 'Contact', 'partikulier' ); ?></h3>
+				<h3 class="pk-footer-title"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Contact', 'Contact', 'partikulier' ) : __( 'Contact', 'partikulier' ) ); ?></h3>
 			<div class="pk-footer-contact">
 				<?php
 				$blog_email = get_option( 'admin_email' );
@@ -74,7 +74,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="pk-footer-bottom">
 		<div class="pk-container pk-footer-bottom-inner">
-			<p class="pk-copyright">&copy; <?php echo esc_html( date_i18n( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php esc_html_e( 'Tous droits réservés.', 'partikulier' ); ?></p>
+				<p class="pk-copyright">&copy; <?php echo esc_html( date_i18n( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Tous droits réservés.', 'Tous droits réservés.', 'partikulier' ) : __( 'Tous droits réservés.', 'partikulier' ) ); ?></p>
 			<nav class="pk-footer-legal" aria-label="<?php esc_attr_e( 'Mentions légales', 'partikulier' ); ?>">
 				<?php
 				wp_nav_menu( array(

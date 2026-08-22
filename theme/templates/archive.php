@@ -46,9 +46,9 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 						esc_html__( '%s à vendre et à louer', 'partikulier' ),
 						esc_html( $queried->name )
 					);
-				} elseif ( is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
-					esc_html_e( 'Toutes les annonces', 'partikulier' );
-				} else {
+					} elseif ( is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || ( is_page() && 'annonces' === get_post_field( 'post_name' ) ) ) {
+						esc_html_e( 'Toutes les annonces', 'partikulier' );
+					} else {
 					single_term_title();
 				}
 				?>

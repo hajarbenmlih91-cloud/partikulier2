@@ -2,3 +2,36 @@
 # Les valeurs Oui/Non sont des valeurs de formulaire internes et ne sont pas
 # des libellés publics ; les noms propres et contenus libres sont hors scan.
 # Les libellés publics doivent être dans gettext et ne doivent pas être ajoutés ici.
+
+# Technical option keys
+pk_automation_auth
+hmac_mode
+off
+log
+enforce
+resend_request_id
+last_resent_at
+event_id
+processed_at
+duplicate
+message
+
+# HTTP Headers and Regex
+authorization
+bearer 
+x_partikulier_timestamp
+sha256=[a-f0-9]{64}
+
+# Internal WordPress and Paths
+wp-admin/includes/upgrade.php
+partikulier
+pk_n8n_settings
+pk_theme_options
+pk_credentials_last_resend_accepted_at
+
+# Form/UI technical states
+Oui
+Non
+Oui/Non
+Aucun
+Tout

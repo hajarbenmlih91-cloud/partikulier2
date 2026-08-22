@@ -101,9 +101,16 @@ if [ -d "$ROOT/mu-plugins" ]; then
   mkdir -p wp-content/mu-plugins
   cp -r "$ROOT/mu-plugins/." wp-content/mu-plugins/
 fi
-[ -d wp-content/plugins/estatik ] || wp plugin install estatik >>"$LOG" 2>&1
-[ -d wp-content/plugins/polylang ] || wp plugin install polylang >>"$LOG" 2>&1
-wp plugin activate estatik polylang >>"$LOG" 2>&1
+# Installation et activation robuste des plugins
+for p in estatik polylang; do
+  if ! wp plugin is-installed $p >/dev/null 2>&1; then
+    wp plugin install $p >>"$LOG" 2>&1
+  fi
+  if ! wp plugin is-active $p >/dev/null 2>&1; then
+    wp plugin activate $p >>"$LOG" 2>&1
+  fi
+done
+
 wp theme activate partikulier >>"$LOG" 2>&1
 
 # Configuration Polylang (FR/EN/AR)

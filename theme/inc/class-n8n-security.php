@@ -195,7 +195,7 @@ class Partikulier_N8n_Security {
 	}
 
 	public static function admin_menu() {
-		add_management_page( 'Réglages n8n', 'Réglages n8n', 'manage_options', 'pk-n8n-settings', array( __CLASS__, 'render_admin' ) );
+		add_management_page( __( 'Réglages n8n', 'partikulier' ), __( 'Réglages n8n', 'partikulier' ), 'manage_options', 'pk-n8n-settings', array( __CLASS__, 'render_admin' ) );
 	}
 
 	public static function save_admin() {
@@ -232,16 +232,16 @@ class Partikulier_N8n_Security {
 		$s = self::settings();
 		$has_env = (bool) ( self::env_secret() || self::env_webhook() );
 		?>
-		<div class="wrap"><h1>Partikulier — Réglages n8n</h1>
-		<?php if ( isset( $_GET['updated'] ) ) : ?><div class="notice notice-success"><p>Réglages enregistrés.</p></div><?php endif; ?>
-		<p><?php echo $has_env ? esc_html__( 'Une partie de la configuration est fournie par l’environnement et n’est pas éditable ici.', 'partikulier' ) : esc_html__( 'Les secrets sont masqués et ne sont jamais réaffichés.', 'partikulier' ); ?></p>
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="pk_save_n8n_settings"><?php wp_nonce_field( 'pk_save_n8n_settings' ); ?>
-		<table class="form-table"><tr><th>Webhook n8n</th><td><input class="regular-text" type="url" name="pk_n8n[n8n_webhook_url]" value="<?php echo $has_env ? '' : esc_attr( $s['n8n_webhook_url'] ?? '' ); ?>" <?php disabled( $has_env ); ?>></td></tr>
-		<tr><th>Secret</th><td><code>••••••••••••••••</code> <input type="password" name="pk_n8n[automation_api_secret]" value="" autocomplete="new-password" placeholder="Remplacer uniquement"></td></tr>
-		<tr><th>Mode HMAC</th><td><select name="pk_n8n[hmac_mode]"><?php foreach ( array( 'off', 'log', 'enforce' ) as $mode ) : ?><option value="<?php echo esc_attr( $mode ); ?>" <?php selected( $s['hmac_mode'] ?? 'off', $mode ); ?>><?php echo esc_html( $mode ); ?></option><?php endforeach; ?></select></td></tr>
-		<tr><th>Quota / jour</th><td><input type="number" min="1" max="10" name="pk_n8n[quota_per_day]" value="<?php echo absint( $s['quota_per_day'] ?? 2 ); ?>"></td></tr>
-		<tr><th>Consentement WhatsApp</th><td><textarea name="pk_n8n[consent_text]" rows="4" class="large-text"><?php echo esc_textarea( $s['consent_text'] ?? '' ); ?></textarea></td></tr>
-		<tr><th>Canal WhatsApp</th><td><input class="regular-text" type="url" name="pk_n8n[channel_url]" value="<?php echo esc_attr( $s['channel_url'] ?? '' ); ?>"></td></tr></table><p><button class="button button-primary">Enregistrer</button></p></form></div>
+			<div class="wrap"><h1><?php esc_html_e( 'Partikulier — Réglages n8n', 'partikulier' ); ?></h1>
+			<?php if ( isset( $_GET['updated'] ) ) : ?><div class="notice notice-success"><p><?php esc_html_e( 'Réglages enregistrés.', 'partikulier' ); ?></p></div><?php endif; ?>
+			<p><?php echo $has_env ? esc_html__( 'Une partie de la configuration est fournie par l’environnement et n’est pas éditable ici.', 'partikulier' ) : esc_html__( 'Les secrets sont masqués et ne sont jamais réaffichés.', 'partikulier' ); ?></p>
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"><input type="hidden" name="action" value="pk_save_n8n_settings"><?php wp_nonce_field( 'pk_save_n8n_settings' ); ?>
+			<table class="form-table"><tr><th><?php esc_html_e( 'Webhook n8n', 'partikulier' ); ?></th><td><input class="regular-text" type="url" name="pk_n8n[n8n_webhook_url]" value="<?php echo $has_env ? '' : esc_attr( $s['n8n_webhook_url'] ?? '' ); ?>" <?php disabled( $has_env ); ?>></td></tr>
+			<tr><th><?php esc_html_e( 'Secret', 'partikulier' ); ?></th><td><code>••••••••••••••••</code> <input type="password" name="pk_n8n[automation_api_secret]" value="" autocomplete="new-password" placeholder="<?php esc_attr_e( 'Remplacer uniquement', 'partikulier' ); ?>"></td></tr>
+			<tr><th><?php esc_html_e( 'Mode HMAC', 'partikulier' ); ?></th><td><select name="pk_n8n[hmac_mode]"><?php foreach ( array( 'off', 'log', 'enforce' ) as $mode ) : ?><option value="<?php echo esc_attr( $mode ); ?>" <?php selected( $s['hmac_mode'] ?? 'off', $mode ); ?>><?php echo esc_html( $mode ); ?></option><?php endforeach; ?></select></td></tr>
+			<tr><th><?php esc_html_e( 'Quota / jour', 'partikulier' ); ?></th><td><input type="number" min="1" max="10" name="pk_n8n[quota_per_day]" value="<?php echo absint( $s['quota_per_day'] ?? 2 ); ?>"></td></tr>
+			<tr><th><?php esc_html_e( 'Consentement WhatsApp', 'partikulier' ); ?></th><td><textarea name="pk_n8n[consent_text]" rows="4" class="large-text"><?php echo esc_textarea( $s['consent_text'] ?? '' ); ?></textarea></td></tr>
+			<tr><th><?php esc_html_e( 'Canal WhatsApp', 'partikulier' ); ?></th><td><input class="regular-text" type="url" name="pk_n8n[channel_url]" value="<?php echo esc_attr( $s['channel_url'] ?? '' ); ?>"></td></tr></table><p><button class="button button-primary"><?php esc_html_e( 'Enregistrer', 'partikulier' ); ?></button></p></form></div>
 		<?php
 	}
 

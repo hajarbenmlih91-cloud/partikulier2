@@ -43,12 +43,14 @@ class Partikulier_Localization {
 			return;
 		}
 
-		if ( $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
-			$query->set( 'update_post_term_cache', true );
-			$query->set( 'update_post_meta_cache', true );
-			// Augmenter la pagination de 10 (Estatik default) à 24 pour limiter le nombre de pages et les requêtes.
-			$query->set( 'posts_per_page', 24 );
-		}
+			if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
+				$query->set( 'update_post_term_cache', true );
+				$query->set( 'update_post_meta_cache', true );
+				// Optimisation senior : forcer 24 par page sur l'archive pour respecter la grille responsive et limiter les requêtes N+1.
+				if ( ! is_admin() && ( $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax() ) ) {
+					$query->set( 'posts_per_page', 24 );
+				}
+			}
 	}
 
 			/**
@@ -223,9 +225,43 @@ class Partikulier_Localization {
 			'back_to_home'             => 'Retour à l’accueil',
 			'property_merits'          => 'Votre bien mérite',
 			'real_estate_agent'        => 'Agent immobilier',
-			'i_wish'                   => 'Je souhaite',
-			'no_registration_required' => 'Aucune inscription obligatoire',
-		);
+				'i_wish'                   => 'Je souhaite',
+				'no_registration_required' => 'Aucune inscription obligatoire',
+				'annonces'                 => 'Annonces',
+				'listing_catalogue'        => 'Le catalogue direct',
+				'showing_x_y_of_z'         => 'Affichage %1$s–%2$s de %3$s résultats',
+				'search_results_for'       => 'Résultats pour « %s »',
+				'listings_in'              => 'Annonces immobilières à %s',
+				'type_for_sale_rent'       => '%s à vendre et à louer',
+				'grid_view'                => 'Vue grille',
+				'list_view'                => 'Vue liste',
+				'sort_by'                  => 'Trier les annonces',
+				'search_hint'              => 'Commencez par une ville, un quartier ou un code postal.',
+				'filter_budget_max'        => 'Budget maximum en euros',
+				'listings_appear_here'     => 'Les premières annonces apparaîtront ici.',
+				'post_free_listing'        => 'Déposez un bien gratuitement pour ouvrir cette sélection.',
+				'no_listings_yet'          => 'Aucune annonce publiée pour le moment.',
+				'post_for_free_arrow'      => 'Publier gratuitement',
+				'find_your_property'       => 'Trouvez votre bien',
+				'search_starts_here'       => 'Une recherche qui commence par le bon lieu.',
+				'browse_categories'        => 'Parcourez les catégories sans bruit, puis laissez les détails vous guider.',
+				'explorer'                 => 'Explorer',
+				'rent_directly'            => 'À louer directement',
+				'apt_with_view'            => 'Un appartement avec vue sur le large.',
+				'discover_properties'      => 'Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.',
+				'search_property'          => 'Rechercher un bien',
+				'near_you'                 => 'Proche de chez vous',
+				'find_in_your_city'        => 'Trouvez un bien dans votre ville.',
+				'indexed_places'           => 'Les quartiers et villes sont indexés pour vous aider à trouver plus vite.',
+				'explore_listings'         => 'Explorer les annonces',
+				'cities_appear_here'       => 'Les villes apparaîtront dès les premières annonces.',
+				'by_region'                => 'Par région',
+				'everywhere_in_morocco'    => 'Partout au Maroc.',
+				'most_recent'              => 'Plus récentes',
+				'price_asc'                => 'Prix croissant',
+				'price_desc'               => 'Prix décroissant',
+				'surface_desc'             => 'Surface décroissante',
+			);
 
 		if ( class_exists( 'Partikulier_Settings' ) ) {
 			foreach ( Partikulier_Settings::fields() as $group ) {
@@ -385,13 +421,57 @@ class Partikulier_Localization {
 					'Agent immobilier' => array( 'fr' => 'Agent immobilier', 'en' => 'Real estate agent', 'ar' => 'وكيل عقاري' ),
 					'Je souhaite' => array( 'fr' => 'Je souhaite', 'en' => 'I want to', 'ar' => 'أرغب في' ),
 					'Aucune inscription obligatoire' => array( 'fr' => 'Aucune inscription obligatoire', 'en' => 'No registration required', 'ar' => 'لا يشترط التسجيل' ),
-					'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
-					'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
-					'Terrain' => array( 'fr' => 'Terrain', 'en' => 'Land', 'ar' => 'أرض' ),
-					'Parking' => array( 'fr' => 'Parking', 'en' => 'Parking', 'ar' => 'موقف سيارات' ),
-					'Immeuble' => array( 'fr' => 'Immeuble', 'en' => 'Building', 'ar' => 'عمارة' ),
-					'Local' => array( 'fr' => 'Local', 'en' => 'Commercial space', 'ar' => 'محل تجاري' ),
-				);
+						'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
+						'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
+						'Terrain' => array( 'fr' => 'Terrain', 'en' => 'Land', 'ar' => 'أرض' ),
+						'Parking' => array( 'fr' => 'Parking', 'en' => 'Parking', 'ar' => 'موقف سيارات' ),
+						'Immeuble' => array( 'fr' => 'Immeuble', 'en' => 'Building', 'ar' => 'عمارة' ),
+						'Local' => array( 'fr' => 'Local', 'en' => 'Commercial space', 'ar' => 'محل تجاري' ),
+						'Loft' => array( 'fr' => 'Loft', 'en' => 'Loft', 'ar' => 'لوفت' ),
+						'Studio' => array( 'fr' => 'Studio', 'en' => 'Studio', 'ar' => 'ستوديو' ),
+						'Le catalogue direct' => array( 'fr' => 'Le catalogue direct', 'en' => 'The direct catalog', 'ar' => 'الدليل المباشر' ),
+						'Affichage %1$s–%2$s de %3$s résultats' => array( 'fr' => 'Affichage %1$s–%2$s de %3$s résultats', 'en' => 'Showing %1$s–%2$s of %3$s results', 'ar' => 'عرض %1$s–%2$s من %3$s نتائج' ),
+						'Résultats pour « %s »' => array( 'fr' => 'Résultats pour « %s »', 'en' => 'Results for "%s"', 'ar' => 'نتائج البحث عن "%s"' ),
+						'Annonces immobilières à %s' => array( 'fr' => 'Annonces immobilières à %s', 'en' => 'Real estate listings in %s', 'ar' => 'إعلانات عقارية في %s' ),
+						'%s à vendre et à louer' => array( 'fr' => '%s à vendre et à louer', 'en' => '%s for sale and rent', 'ar' => '%s للبيع وللكراء' ),
+						'Vue grille' => array( 'fr' => 'Vue grille', 'en' => 'Grid view', 'ar' => 'عرض الشبكة' ),
+						'Vue liste' => array( 'fr' => 'Vue liste', 'en' => 'List view', 'ar' => 'عرض القائمة' ),
+						'Trier les annonces' => array( 'fr' => 'Trier les annonces', 'en' => 'Sort listings', 'ar' => 'ترتيب الإعلانات' ),
+						'Budget maximum en euros' => array( 'fr' => 'Budget maximum en euros', 'en' => 'Maximum budget in euros', 'ar' => 'الميزانية القصوى باليورو' ),
+						'Les premières annonces apparaîtront ici.' => array( 'fr' => 'Les premières annonces apparaîtront ici.', 'en' => 'The first listings will appear here.', 'ar' => 'ستظهر الإعلانات الأولى هنا.' ),
+						'Déposez un bien gratuitement pour ouvrir cette sélection.' => array( 'fr' => 'Déposez un bien gratuitement pour ouvrir cette sélection.', 'en' => 'Post a property for free to open this selection.', 'ar' => 'أضف عقاراً مجاناً لفتح هذه المجموعة.' ),
+						'Aucune annonce publiée pour le moment.' => array( 'fr' => 'Aucune annonce publiée pour le moment.', 'en' => 'No listings published yet.', 'ar' => 'لا توجد إعلانات منشورة حالياً.' ),
+						'Find your property' => array( 'fr' => 'Trouvez votre bien', 'en' => 'Find your property', 'ar' => 'ابحث عن عقارك' ),
+						'Une recherche qui commence par le bon lieu.' => array( 'fr' => 'Une recherche qui commence par le bon lieu.', 'en' => 'A search that starts in the right place.', 'ar' => 'بحث يبدأ من المكان الصحيح.' ),
+						'Parcourez les catégories sans bruit, puis laissez les détails vous guider.' => array( 'fr' => 'Parcourez les catégories sans bruit, puis laissez les détails vous guider.', 'en' => 'Browse categories without noise, then let the details guide you.', 'ar' => 'تصفح الفئات بهدوء، ثم دع التفاصيل ترشدك.' ),
+						'Explorer' => array( 'fr' => 'Explorer', 'en' => 'Explore', 'ar' => 'استكشاف' ),
+						'À louer directement' => array( 'fr' => 'À louer directement', 'en' => 'For rent directly', 'ar' => 'للكراء مباشرة' ),
+						'Un appartement avec vue sur le large.' => array( 'fr' => 'Un appartement avec vue sur le large.', 'en' => 'An apartment with a view of the open sea.', 'ar' => 'شقة مع إطلالة على البحر.' ),
+						'Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.' => array( 'fr' => 'Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.', 'en' => 'Discover properties that prioritize light, space and direct contact.', 'ar' => 'اكتشف العقارات التي تعطي الأولوية للضوء والمساحة والاتصال المباشر.' ),
+						'Rechercher un bien' => array( 'fr' => 'Rechercher un bien', 'en' => 'Search for a property', 'ar' => 'ابحث عن عقار' ),
+						'Proche de chez vous' => array( 'fr' => 'Proche de chez vous', 'en' => 'Near you', 'ar' => 'بالقرب منك' ),
+						'Trouvez un bien dans votre ville.' => array( 'fr' => 'Trouvez un bien dans votre ville.', 'en' => 'Find a property in your city.', 'ar' => 'ابحث عن عقار في مدينتك.' ),
+						'Les quartiers et villes sont indexés pour vous aider à trouver plus vite.' => array( 'fr' => 'Les quartiers et villes sont indexés pour vous aider à trouver plus vite.', 'en' => 'Neighbourhoods and cities are indexed to help you find faster.', 'ar' => 'الأحياء والمدن مفهرسة لمساعدتك في العثور بشكل أسرع.' ),
+						'Explorer les annonces' => array( 'fr' => 'Explorer les annonces', 'en' => 'Explore listings', 'ar' => 'استكشاف الإعلانات' ),
+						'Les villes apparaîtront dès les premières annonces.' => array( 'fr' => 'Les villes apparaîtront dès les premières annonces.', 'en' => 'Cities will appear with the first listings.', 'ar' => 'ستظهر المدن مع الإعلانات الأولى.' ),
+						'Par région' => array( 'fr' => 'Par région', 'en' => 'By region', 'ar' => 'حسب الجهة' ),
+						'Partout au Maroc.' => array( 'fr' => 'Partout au Maroc.', 'en' => 'Everywhere in Morocco.', 'ar' => 'في كل أنحاء المغرب.' ),
+						'Réglages n8n' => array( 'fr' => 'Réglages n8n', 'en' => 'n8n Settings', 'ar' => 'إعدادات n8n' ),
+						'Partikulier — Réglages n8n' => array( 'fr' => 'Partikulier — Réglages n8n', 'en' => 'Partikulier — n8n Settings', 'ar' => 'Partikulier — إعدادات n8n' ),
+						'Réglages enregistrés.' => array( 'fr' => 'Réglages enregistrés.', 'en' => 'Settings saved.', 'ar' => 'تم حفظ الإعدادات.' ),
+						'Webhook n8n' => array( 'fr' => 'Webhook n8n', 'en' => 'n8n Webhook', 'ar' => 'n8n Webhook' ),
+						'Secret' => array( 'fr' => 'Secret', 'en' => 'Secret', 'ar' => 'السر' ),
+						'Remplacer uniquement' => array( 'fr' => 'Remplacer uniquement', 'en' => 'Replace only', 'ar' => 'استبدال فقط' ),
+						'Mode HMAC' => array( 'fr' => 'Mode HMAC', 'en' => 'HMAC Mode', 'ar' => 'وضع HMAC' ),
+						'Quota / jour' => array( 'fr' => 'Quota / jour', 'en' => 'Daily quota', 'ar' => 'الحصة اليومية' ),
+						'Consentement WhatsApp' => array( 'fr' => 'Consentement WhatsApp', 'en' => 'WhatsApp Consent', 'ar' => 'موافقة واتساب' ),
+						'Canal WhatsApp' => array( 'fr' => 'Canal WhatsApp', 'en' => 'WhatsApp Channel', 'ar' => 'قناة واتساب' ),
+						'Enregistrer' => array( 'fr' => 'Enregistrer', 'en' => 'Save', 'ar' => 'حفظ' ),
+						'Plus récentes' => array( 'fr' => 'Plus récentes', 'en' => 'Most recent', 'ar' => 'الأحدث' ),
+						'Prix croissant' => array( 'fr' => 'Prix croissant', 'en' => 'Price: Low to High', 'ar' => 'الثمن: من الأقل إلى الأعلى' ),
+						'Prix décroissant' => array( 'fr' => 'Prix décroissant', 'en' => 'Price: High to Low', 'ar' => 'الثمن: من الأعلى إلى الأقل' ),
+						'Surface décroissante' => array( 'fr' => 'Surface décroissante', 'en' => 'Surface: High to Low', 'ar' => 'المساحة: من الأعلى إلى الأقل' ),
+					);
 			}
 
 		/**
