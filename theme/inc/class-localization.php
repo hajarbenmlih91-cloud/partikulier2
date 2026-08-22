@@ -22,15 +22,33 @@ class Partikulier_Localization {
 	const META_FREE_TEXT_LANGUAGE = '_pk_free_text_language';
 
 	public static function init() {
-			add_action( 'init', array( __CLASS__, 'load_textdomain' ), 5 );
-			add_action( 'wp', array( __CLASS__, 'load_active_textdomain' ), 1 );
-			add_action( 'template_redirect', array( __CLASS__, 'maybe_redirect_browser_language' ), 1 );
-			add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
-			add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
+		add_action( 'init', array( __CLASS__, 'load_textdomain' ), 5 );
+		add_action( 'wp', array( __CLASS__, 'load_active_textdomain' ), 1 );
+		add_action( 'template_redirect', array( __CLASS__, 'maybe_redirect_browser_language' ), 1 );
+		add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
+		add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
 		add_filter( 'gettext_partikulier', array( __CLASS__, 'translate_polylang_string' ), 10, 3 );
 		add_filter( 'pll_get_post_types', array( __CLASS__, 'register_polylang_post_type' ), 10, 2 );
-			add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
-			add_filter( 'pll_preferred_language', array( __CLASS__, 'filter_robot_preferred_language' ), 10, 2 );
+		add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
+		add_filter( 'pll_preferred_language', array( __CLASS__, 'filter_robot_preferred_language' ), 10, 2 );
+		add_action( 'pre_get_posts', array( __CLASS__, 'optimize_property_queries' ) );
+	}
+
+	/**
+	 * Optimise les requêtes de propriétés pour éviter les N+1 (terms/meta cache)
+	 * et ajuste la pagination pour une meilleure performance.
+	 */
+	public static function optimize_property_queries( $query ) {
+		if ( is_admin() || ! $query->is_main_query() ) {
+			return;
+		}
+
+		if ( $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
+			$query->set( 'update_post_term_cache', true );
+			$query->set( 'update_post_meta_cache', true );
+			// Augmenter la pagination de 10 (Estatik default) à 24 pour limiter le nombre de pages et les requêtes.
+			$query->set( 'posts_per_page', 24 );
+		}
 	}
 
 			/**
@@ -192,6 +210,21 @@ class Partikulier_Localization {
 			'living_rooms_plural'      => 'salons',
 			'bathroom'                 => 'salle de bains',
 			'bathrooms_plural'         => 'salles de bains',
+			'display'                  => 'Affichage',
+			'results'                  => 'résultats',
+			'latest'                   => 'Plus récentes',
+			'price_asc'                => 'Prix croissant',
+			'price_desc'               => 'Prix décroissant',
+			'surface_desc'             => 'Surface décroissante',
+			'filters'                  => 'Filtres',
+			'budget_max'               => 'Budget maximum',
+			'apply'                    => 'APPLIQUER',
+			'popular_cities'           => 'Villes populaires',
+			'back_to_home'             => 'Retour à l’accueil',
+			'property_merits'          => 'Votre bien mérite',
+			'real_estate_agent'        => 'Agent immobilier',
+			'i_wish'                   => 'Je souhaite',
+			'no_registration_required' => 'Aucune inscription obligatoire',
 		);
 
 		if ( class_exists( 'Partikulier_Settings' ) ) {
@@ -337,9 +370,29 @@ class Partikulier_Localization {
 					'Les dernières annonces' => array( 'fr' => 'Les dernières annonces', 'en' => 'Latest listings', 'ar' => 'أحدث الإعلانات' ),
 					'Des biens ajoutés récemment par leurs propriétaires.' => array( 'fr' => 'Des biens ajoutés récemment par leurs propriétaires.', 'en' => 'Properties recently added by their owners.', 'ar' => 'عقارات أضافها مالكوها مؤخراً.' ),
 					'Voir toutes les annonces' => array( 'fr' => 'Voir toutes les annonces', 'en' => 'View all listings', 'ar' => 'عرض كل الإعلانات' ),
-
-			);
-		}
+					'Affichage' => array( 'fr' => 'Affichage', 'en' => 'Showing', 'ar' => 'عرض' ),
+					'résultats' => array( 'fr' => 'résultats', 'en' => 'results', 'ar' => 'نتائج' ),
+					'Plus récentes' => array( 'fr' => 'Plus récentes', 'en' => 'Latest', 'ar' => 'الأحدث' ),
+					'Prix croissant' => array( 'fr' => 'Prix croissant', 'en' => 'Price: Low to High', 'ar' => 'السعر: من الأقل للأعلى' ),
+					'Prix décroissant' => array( 'fr' => 'Prix décroissant', 'en' => 'Price: High to Low', 'ar' => 'السعر: من الأعلى للأقل' ),
+					'Surface décroissante' => array( 'fr' => 'Surface décroissante', 'en' => 'Area: High to Low', 'ar' => 'المساحة: من الأعلى للأقل' ),
+					'Filtres' => array( 'fr' => 'Filtres', 'en' => 'Filters', 'ar' => 'تصفية' ),
+					'Budget maximum' => array( 'fr' => 'Budget maximum', 'en' => 'Maximum budget', 'ar' => 'الميزانية القصوى' ),
+					'APPLIQUER' => array( 'fr' => 'APPLIQUER', 'en' => 'APPLY', 'ar' => 'تطبيق' ),
+					'Villes populaires' => array( 'fr' => 'Villes populaires', 'en' => 'Popular cities', 'ar' => 'مدن شعبية' ),
+					'Retour à l’accueil' => array( 'fr' => 'Retour à l’accueil', 'en' => 'Back to home', 'ar' => 'العودة إلى الرئيسية' ),
+					'Votre bien mérite' => array( 'fr' => 'Votre bien mérite', 'en' => 'Your property deserves', 'ar' => 'عقارك يستحق' ),
+					'Agent immobilier' => array( 'fr' => 'Agent immobilier', 'en' => 'Real estate agent', 'ar' => 'وكيل عقاري' ),
+					'Je souhaite' => array( 'fr' => 'Je souhaite', 'en' => 'I want to', 'ar' => 'أرغب في' ),
+					'Aucune inscription obligatoire' => array( 'fr' => 'Aucune inscription obligatoire', 'en' => 'No registration required', 'ar' => 'لا يشترط التسجيل' ),
+					'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
+					'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
+					'Terrain' => array( 'fr' => 'Terrain', 'en' => 'Land', 'ar' => 'أرض' ),
+					'Parking' => array( 'fr' => 'Parking', 'en' => 'Parking', 'ar' => 'موقف سيارات' ),
+					'Immeuble' => array( 'fr' => 'Immeuble', 'en' => 'Building', 'ar' => 'عمارة' ),
+					'Local' => array( 'fr' => 'Local', 'en' => 'Commercial space', 'ar' => 'محل تجاري' ),
+				);
+			}
 
 		/**
 		 * Libellés du formulaire de dépôt utilisés comme repli déterministe lorsque

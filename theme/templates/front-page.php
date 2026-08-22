@@ -8,22 +8,18 @@
 if ( ! defined( 'ABSPATH' ) ) { exit; }
 get_header();
 
-$recent = get_posts( array(
-	'post_type' => PARTIKULIER_ESTATIK_POST_TYPE,
-	'post_status' => 'publish',
-	'posts_per_page' => -1,
-	'no_found_rows' => true,
-	'orderby' => 'date',
-	'order' => 'DESC',
-	'meta_query' => Partikulier_Dashboard::active_listing_meta_query(),
-) );
-// Le tie-breaker PHP rend la fixture stable même si Polylang réécrit l’ORDER BY SQL.
-usort( $recent, static function ( $a, $b ) {
-	$date_compare = strcmp( (string) $b->post_date_gmt, (string) $a->post_date_gmt );
-	return 0 !== $date_compare ? $date_compare : ( (int) $b->ID <=> (int) $a->ID );
-} );
-$recent = array_slice( $recent, 0, 6 );
-$featured = array_slice( $recent, 0, 1 );
+	$recent = get_posts( array(
+		'post_type' => PARTIKULIER_ESTATIK_POST_TYPE,
+		'post_status' => 'publish',
+		'posts_per_page' => 6,
+		'no_found_rows' => true,
+		'orderby' => 'date ID',
+		'order' => 'DESC',
+		'meta_query' => Partikulier_Dashboard::active_listing_meta_query(),
+		'update_post_term_cache' => true,
+		'update_post_meta_cache' => true,
+	) );
+	$featured = ! empty( $recent ) ? array( $recent[0] ) : array();
 // Prefixe pk_home_ : card-property.php et search-form.php ecrasent $types
 // (variables globales partagees par require). Bug constate au rendu :
 // une seule tuile de type s'affichait, vide, apres la boucle des cartes.
@@ -73,7 +69,7 @@ $deposit = pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' );
 
 <section class="pk-editorial-section pk-editorial-section--tint"><div class="pk-container"><div class="pk-editorial-heading pk-editorial-heading--row"><div><p class="pk-editorial-kicker"><?php esc_html_e( 'Fraîchement publiées', 'partikulier' ); ?></p><h2><?php esc_html_e( 'Les dernières annonces', 'partikulier' ); ?></h2><p><?php esc_html_e( 'Des biens ajoutés récemment par leurs propriétaires.', 'partikulier' ); ?></p></div><a class="pk-editorial-link" href="<?php echo esc_url( $archive ); ?>"><?php esc_html_e( 'Voir toutes les annonces', 'partikulier' ); ?> <span aria-hidden="true">→</span></a></div><?php if ( $recent ) : ?><div class="pk-editorial-cards"><?php foreach ( $recent as $property ) { require PARTIKULIER_DIR . '/templates/parts/card-property.php'; } wp_reset_postdata(); ?></div><?php else : ?><div class="pk-editorial-empty pk-editorial-empty--compact"><strong><?php esc_html_e( 'Aucune annonce publiée pour le moment.', 'partikulier' ); ?></strong><a class="pk-editorial-link" href="<?php echo esc_url( $deposit ); ?>"><?php esc_html_e( 'Publier gratuitement', 'partikulier' ); ?> <span aria-hidden="true">→</span></a></div><?php endif; ?></div></section>
 
-<section class="pk-editorial-section"><div class="pk-container"><div class="pk-editorial-heading"><p class="pk-editorial-kicker"><?php esc_html_e( 'Trouvez votre bien', 'partikulier' ); ?></p><h2><?php esc_html_e( 'Une recherche qui commence par le bon lieu.', 'partikulier' ); ?></h2><p><?php esc_html_e( 'Parcourez les catégories sans bruit, puis laissez les détails vous guider.', 'partikulier' ); ?></p></div><div class="pk-editorial-types"><?php if ( ! is_wp_error( $pk_home_types ) && $pk_home_types ) : foreach ( $pk_home_types as $term ) : ?><a href="<?php echo esc_url( pk_term_url( $term, $archive ) ); ?>" class="pk-editorial-type"><span class="pk-editorial-type__icon"><?php echo pk_type_icon( $term->slug ); // phpcs:ignore ?></span><strong><?php echo esc_html( $term->name ); ?></strong><small><?php echo esc_html( number_format_i18n( $term->count ) ); ?> <?php esc_html_e( 'annonces', 'partikulier' ); ?></small></a><?php endforeach; else : foreach ( array( 'Appartement', 'Maison', 'Terrain', 'Parking', 'Immeuble', 'Local' ) as $label ) : ?><a href="<?php echo esc_url( $archive ); ?>" class="pk-editorial-type"><span class="pk-editorial-type__icon"><?php echo pk_type_icon( sanitize_title( $label ) ); // phpcs:ignore ?></span><strong><?php echo esc_html( $label ); ?></strong><small><?php esc_html_e( 'Explorer', 'partikulier' ); ?></small></a><?php endforeach; endif; ?></div></div></section>
+<section class="pk-editorial-section"><div class="pk-container"><div class="pk-editorial-heading"><p class="pk-editorial-kicker"><?php esc_html_e( 'Trouvez votre bien', 'partikulier' ); ?></p><h2><?php esc_html_e( 'Une recherche qui commence par le bon lieu.', 'partikulier' ); ?></h2><p><?php esc_html_e( 'Parcourez les catégories sans bruit, puis laissez les détails vous guider.', 'partikulier' ); ?></p></div><div class="pk-editorial-types"><?php if ( ! is_wp_error( $pk_home_types ) && $pk_home_types ) : foreach ( $pk_home_types as $term ) : ?><a href="<?php echo esc_url( pk_term_url( $term, $archive ) ); ?>" class="pk-editorial-type"><span class="pk-editorial-type__icon"><?php echo pk_type_icon( $term->slug ); // phpcs:ignore ?></span><strong><?php echo esc_html( $term->name ); ?></strong><small><?php echo esc_html( number_format_i18n( $term->count ) ); ?> <?php esc_html_e( 'annonces', 'partikulier' ); ?></small></a><?php endforeach; else : foreach ( array( 'Appartement', 'Maison', 'Terrain', 'Parking', 'Immeuble', 'Local' ) as $label ) : ?><a href="<?php echo esc_url( $archive ); ?>" class="pk-editorial-type"><span class="pk-editorial-type__icon"><?php echo pk_type_icon( sanitize_title( $label ) ); // phpcs:ignore ?></span><strong><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : __( $label, 'partikulier' ) ); ?></strong><small><?php esc_html_e( 'Explorer', 'partikulier' ); ?></small></a><?php endforeach; endif; ?></div></div></section>
 
 <section class="pk-editorial-section pk-editorial-section--rental"><div class="pk-container"><div class="pk-editorial-rental"><div><p class="pk-editorial-kicker"><?php esc_html_e( 'À louer directement', 'partikulier' ); ?></p><h2><?php esc_html_e( 'Un appartement avec vue sur le large.', 'partikulier' ); ?></h2><p><?php esc_html_e( 'Découvrez les biens qui privilégient la lumière, l’espace et le contact direct.', 'partikulier' ); ?></p><a class="pk-btn pk-btn-dark" href="<?php echo esc_url( $archive ); ?>"><?php esc_html_e( 'Rechercher un bien', 'partikulier' ); ?> <span aria-hidden="true">→</span></a></div><div class="pk-editorial-rental__shape" aria-hidden="true"></div></div></div></section>
 

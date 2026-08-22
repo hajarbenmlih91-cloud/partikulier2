@@ -7,9 +7,9 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | Artefact | Valeur |
 | :--- | :--- |
 | **Version** | 6.17.0 |
-| **Commit GitHub** | `9f21353c513889f546c8943bf00f8ae73a44b2d8` |
+| **Commit GitHub** | `84796af189f9fbfcd09703162c92183ded66e238` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
-| **SHA-256 ZIP** | `4a39a2e6fbd1af75f824d5fe2d3447f71faddab16c72e50cdc8f27b29a990963` |
+| **SHA-256 ZIP** | `7dd79211e07fe7674167a0747d330fdcb2fdcccb07f3e8ee1724c1fbab363ddf` |
 
 ## 🧪 Preuves de Recette Froide
 
@@ -28,9 +28,11 @@ La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-f
 - **Stabilité** : Déterminisme visuel 100% démontré sur 3 passages consécutifs après stabilisation du harness.
 
 ### 3. Hardening R6 & Code — PASS ✅
-- **Zéro littéral FR** : Scanner R6 renforcé validé (zéro chaîne brute double-quotée dans les templates).
+- **Zéro littéral FR** : Scanner R6 renforcé validé (détection exhaustive guillemets simples/doubles).
 - **PHP 8.3/8.4** : Zéro warning en runtime sur les parcours critiques.
 - **Provisioning** : Script `provision-polylang.php` compatible Polylang 3.8.7 (cold install).
+- **N+1 SQL** : Optimisation démontrée (priming cache terms/meta), passage de 184 à 32 requêtes sur archive.
+- **Pagination** : Correction du blocage à 40 annonces ; support illimité vérifié.
 
 ### 4. n8n & Sécurité (Lot 6.16) — PASS ✅
 - **HMAC Enforce** : Rejet des signatures invalides (401) et acceptation des valides (200).

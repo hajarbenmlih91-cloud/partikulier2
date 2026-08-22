@@ -58,7 +58,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 				if ( have_posts() ) {
 					printf(
 						/* translators: 1: index premier, 2: index dernier, 3: total */
-						esc_html__( 'Affichage %1$s–%2$s de %3$s résultats', 'partikulier' ),
+							esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Affichage %1$s–%2$s de %3$s résultats', 'Affichage %1$s–%2$s de %3$s résultats', 'partikulier' ) : __( 'Affichage %1$s–%2$s de %3$s résultats', 'partikulier' ) ),
 						'<strong>' . esc_html( number_format_i18n( ( max( 1, (int) $wp_query->query_vars['paged'] ) - 1 ) * (int) $wp_query->query_vars['posts_per_page'] + 1 ) ) . '</strong>',
 						'<strong>' . esc_html( number_format_i18n( ( max( 1, (int) $wp_query->query_vars['paged'] ) - 1 ) * (int) $wp_query->query_vars['posts_per_page'] + (int) $wp_query->post_count ) ) . '</strong>',
 						'<strong>' . esc_html( number_format_i18n( (int) $wp_query->found_posts ) ) . '</strong>'
@@ -95,10 +95,10 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 					}
 					?>
 					<select name="pk_order" onchange="this.form.submit()" aria-label="<?php esc_attr_e( 'Tri', 'partikulier' ); ?>">
-						<option value="recent"<?php selected( empty( $_GET['pk_order'] ) || 'recent' === $_GET['pk_order'] ); ?>><?php esc_html_e( 'Plus récentes', 'partikulier' ); ?></option>
-						<option value="price-asc"<?php selected( 'price-asc' === ( $_GET['pk_order'] ?? '' ) ); ?>><?php esc_html_e( 'Prix croissant', 'partikulier' ); ?></option>
-						<option value="price-desc"<?php selected( 'price-desc' === ( $_GET['pk_order'] ?? '' ) ); ?>><?php esc_html_e( 'Prix décroissant', 'partikulier' ); ?></option>
-						<option value="surface-desc"<?php selected( 'surface-desc' === ( $_GET['pk_order'] ?? '' ) ); ?>><?php esc_html_e( 'Surface décroissante', 'partikulier' ); ?></option>
+							<option value="recent"<?php selected( empty( $_GET['pk_order'] ) || 'recent' === $_GET['pk_order'] ); ?>><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Plus récentes', 'Plus récentes', 'partikulier' ) : __( 'Plus récentes', 'partikulier' ) ); ?></option>
+							<option value="price-asc"<?php selected( 'price-asc' === ( $_GET['pk_order'] ?? '' ) ); ?>><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Prix croissant', 'Prix croissant', 'partikulier' ) : __( 'Prix croissant', 'partikulier' ) ); ?></option>
+							<option value="price-desc"<?php selected( 'price-desc' === ( $_GET['pk_order'] ?? '' ) ); ?>><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Prix décroissant', 'Prix décroissant', 'partikulier' ) : __( 'Prix décroissant', 'partikulier' ) ); ?></option>
+							<option value="surface-desc"<?php selected( 'surface-desc' === ( $_GET['pk_order'] ?? '' ) ); ?>><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Surface décroissante', 'Surface décroissante', 'partikulier' ) : __( 'Surface décroissante', 'partikulier' ) ); ?></option>
 					</select>
 				</form>
 			</div>
@@ -112,8 +112,8 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 
 
 		<div class="pk-archive-layout">
-			<aside class="pk-filters" aria-label="<?php esc_attr_e( 'Filtres', 'partikulier' ); ?>">
-				<h2 class="screen-reader-text"><?php esc_html_e( 'Filtres', 'partikulier' ); ?></h2>
+				<aside class="pk-filters" aria-label="<?php echo esc_attr( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Filtres', 'Filtres', 'partikulier' ) : __( 'Filtres', 'partikulier' ) ); ?>">
+					<h2 class="screen-reader-text"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Filtres', 'Filtres', 'partikulier' ) : __( 'Filtres', 'partikulier' ) ); ?></h2>
 
 				<div class="pk-filter">
 					<h3 class="pk-filter-title"><?php esc_html_e( 'Action', 'partikulier' ); ?></h3>
@@ -163,7 +163,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 						<div class="pk-filter-price">
 							<input type="number" name="pk_price_max" placeholder="<?php esc_attr_e( '€ max', 'partikulier' ); ?>" min="0" aria-label="<?php esc_attr_e( 'Budget maximum en euros', 'partikulier' ); ?>">
 						</div>
-						<button type="submit" class="pk-filter-apply"><?php esc_html_e( 'Appliquer', 'partikulier' ); ?></button>
+							<button type="submit" class="pk-filter-apply"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'APPLIQUER', 'APPLIQUER', 'partikulier' ) : __( 'APPLIQUER', 'partikulier' ) ); ?></button>
 					</form>
 				</div>
 

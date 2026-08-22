@@ -337,10 +337,10 @@ $statuses = self::followup_statuses();
 			LEFT JOIN {$followups} f ON f.lead_id = l.id
 			LEFT JOIN {$limits} lim ON lim.lead_id = l.id AND lim.day_key = %s";
 		$join_params = array( $day );
-		$count_sql = "SELECT COUNT(DISTINCT l.id) {$joins} WHERE {$where}";
-		$count_params = array_merge( $join_params, $params );
-		$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $count_params ) );
-		$offset = ( $filters['page'] - 1 ) * self::PER_PAGE;
+			$count_sql = "SELECT COUNT(l.id) {$joins} WHERE {$where}";
+			$count_params = array_merge( $join_params, $params );
+			$total = (int) $wpdb->get_var( $wpdb->prepare( $count_sql, $count_params ) );
+			$offset = ( $filters['page'] - 1 ) * self::PER_PAGE;
 			$sort_columns = array(
 				'first_seen_at' => 'l.first_seen_at',
 				'last_seen_at'  => 'l.last_seen_at',
