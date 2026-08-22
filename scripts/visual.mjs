@@ -126,6 +126,38 @@ for (const [tname, w, h] of TAILLES) {
       if (v === false) erreurs.push(`${cle} : invariant "${k}" rompu`);
     }
 
+    // Stabiliser le snapshot : les cartes featured peuvent être lazy-loadées hors viewport.
+    // On déclenche leur chargement puis on attend toutes les images et les fonts avant capture.
+    await page.evaluate(async () => {
+      document.querySelectorAll('img[loading="lazy"]').forEach((img) => { img.loading = 'eager'; });
+      const height = Math.max(document.body.scrollHeight, document.documentElement.scrollHeight);
+      for (let y = 0; y < height; y += Math.max(window.innerHeight, 1)) {
+        window.scrollTo(0, y);
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+      }
+      window.scrollTo(0, 0);
+      await Promise.all([...document.images].map((img) => {
+        if (img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise((resolve) => {
+          const finish = () => resolve();
+          img.addEventListener('load', finish, { once: true });
+          img.addEventListener('error', finish, { once: true });
+          if (img.complete) finish();
+        });
+      }));
+      if (document.fonts?.ready) await document.fonts.ready;
+    });
+    await page.waitForTimeout(500);
+    await page.waitForFunction(() => {
+      const img = document.querySelector('.pk-editorial-feature img');
+      return !img || (img.complete && img.naturalWidth > 0);
+    }, null, { timeout: 10000 });
+    await page.evaluate(async () => {
+      const img = document.querySelector('.pk-editorial-feature img');
+      if (img?.decode) {
+        try { await img.decode(); } catch (_) { /* image error already handled by assertion */ }
+      }
+    });
     const shot = await page.screenshot({ fullPage: true });
     const ref = path.join(DIR, cle + '.png');
 
