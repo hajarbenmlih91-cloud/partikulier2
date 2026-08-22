@@ -17,6 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Partikulier_Estatik {
 
 	public static function init() {
+// Desactiver les styles dynamiques Estatik qui causent des requetes N+1.
+add_action( 'wp_enqueue_scripts', function() { remove_action( 'wp_enqueue_scripts', array( 'Es_Assets', 'frontend_assets' ) ); }, 1 );
 		if ( ! self::plugin_active() ) {
 			add_action( 'admin_notices', array( __CLASS__, 'admin_notice' ) );
 			// Si le plugin est installe mais non active, tenter activation.

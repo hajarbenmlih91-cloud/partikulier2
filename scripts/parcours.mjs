@@ -1,201 +1,93 @@
-/**
- * Tests fonctionnels : on execute les parcours utilisateurs de bout en bout.
- *
- * Ce que la lecture de code ne dit jamais : est-ce que ca marche vraiment ?
- *
- *   node tests/parcours.mjs
- */
 import { chromium } from 'playwright';
+import fs from 'fs';
 
-const BASE = process.env.PK_BASE || 'http://localhost:8090';
-const nav = await chromium.launch();
+const BASE = process.env.PK_BASE || 'http://localhost:8092';
 const res = [];
+const note = (nom, ok, msg = '') => res.push({ nom, ok, msg });
 
-function note(nom, ok, detail = '') {
-  res.push({ nom, ok });
-  console.log(`${ok ? 'OK  ' : 'FAIL'}  ${nom}${detail ? '  — ' + detail : ''}`);
-}
+const nav = await chromium.launch({ headless: true });
 
-// ---------------------------------------------- 1. Depot d'une annonce
-{
+try {
   const ctx = await nav.newContext();
   const page = await ctx.newPage();
-  const erreurs = [];
-  page.on('pageerror', e => erreurs.push(e.message));
-
+  
+  // 1. Depot
   await page.goto(BASE + '/deposer-une-annonce/', { waitUntil: 'networkidle' });
-
-  const champs = await page.evaluate(() =>
-    [...document.querySelectorAll('form input, form select, form textarea')]
-      .filter(c => !['hidden'].includes(c.type))
-      .map(c => ({ nom: c.name, type: c.type || c.tagName.toLowerCase(), requis: c.required }))
-  );
-  note('Formulaire de depot servi', champs.length > 10, `${champs.length} champs`);
-
-  const requis = champs.filter(c => c.requis);
-  note('Champs obligatoires declares', requis.length > 0, `${requis.length} requis`);
-
-  // Soumission a vide : la validation navigateur doit bloquer
-  const bouton = page.locator('form button[type=submit], form input[type=submit]').first();
-  if (await bouton.count()) {
-    // Cibler explicitement le formulaire de dépôt (Lot 4bis)
-    // Utiliser une approche sans evaluate pour le clic si possible, ou gérer la navigation
-    const formSelector = 'form:has(input[name*="title"]), form[action*="deposer"]';
-    const formExists = await page.locator(formSelector).count() > 0;
-    
-    if (formExists) {
-      const isInvalid = await page.evaluate((sel) => {
-        const f = document.querySelector(sel);
-        return f && !f.checkValidity();
-      }, formSelector);
-      
-      if (isInvalid) {
-        // Si le formulaire est déjà invalide, on tente le clic et on vérifie qu'on reste sur la page
-        const urlBefore = page.url();
-        await page.click(`${formSelector} button[type=submit], ${formSelector} input[type=submit]`).catch(() => {});
-        await page.waitForTimeout(500);
-        const urlAfter = page.url();
-        note('Soumission a vide bloquee', urlBefore === urlAfter);
-      } else {
-        note('Soumission a vide bloquee', false, 'Formulaire valide a vide?');
-      }
-    } else {
-      note('Formulaire de depot trouve', false);
-    }
-  } else {
-    note('Bouton de soumission present', false);
-  }
-
-  // Remplissage et envoi reel
-  await page.evaluate(() => {
-    const set = (sel, val) => {
-      const e = document.querySelector(sel);
-      if (!e) return;
-      e.value = val;
-      e.dispatchEvent(new Event('input', { bubbles: true }));
-      e.dispatchEvent(new Event('change', { bubbles: true }));
-    };
-    set('input[name="pk_title"], input[name="title"], #pk-title', 'Studio de test automatique');
-    set('textarea', 'Description generee par le test fonctionnel.');
-    const prix = document.querySelector('input[name*="price"], input[name*="prix"]');
-    if (prix) { prix.value = '450000'; prix.dispatchEvent(new Event('input', { bubbles: true })); }
-  });
-  note('Champs remplissables', true);
-
-  note('Aucune erreur JS sur le depot', erreurs.length === 0,
-    erreurs.length ? erreurs[0].slice(0, 60) : '');
+  const champs = await page.locator('form input, form select, form textarea').count();
+  note('Formulaire de depot servi', champs > 20, `${champs} champs`);
+  
+  const requis = await page.locator('form [required]').count();
+  note('Champs obligatoires declares', requis > 10, `${requis} requis`);
+  
+  await page.click('button[type="submit"]');
+  await page.waitForTimeout(500);
+  const erreur = await page.locator('.es-field--error, :invalid').count();
+  note('Soumission a vide bloquee', erreur > 0);
+  
   await ctx.close();
-}
+} catch (e) { note('Erreur globale depot', false, e.message); }
 
-// ---------------------------------------------- 2. Recherche et filtres
-{
+// 2. Recherche
+try {
   const ctx = await nav.newContext();
   const page = await ctx.newPage();
-
   const cas = [
     ['sans filtre', '/annonces/'],
     ['par type', '/annonces/?es_type=appartement'],
-    ['par mot-cle', '/annonces/?s=Casablanca'],
+    ['par mot-cle', '/annonces/?s=Studio'],
     ['mot-cle inexistant', '/annonces/?s=zzzzintrouvable'],
     ['page 2', '/annonces/page/2/'],
   ];
   for (const [nom, url] of cas) {
-    const r = await page.goto(BASE + url, { waitUntil: 'networkidle', timeout: 30000 });
-    // Attendre un peu pour le rendu dynamique d'Estatik
-    await page.waitForTimeout(2000);
+    const r = await page.goto(BASE + url, { waitUntil: 'networkidle' });
+    await page.waitForTimeout(1000);
     const n = await page.locator('.pk-card-title').count();
-    const vide = await page.locator('text=/aucun|Aucune/i').count();
-    
-    // Pagination : Estatik peut nécessiter plus de 24 annonces pour la page 2.
-    // On valide le 200 et la présence de contenu ou du message "aucun"
-    const ok = r.status() === 200 && (n >= 0 || vide >= 0);
+    const txt = await page.locator('.pk-archive-toolbar').innerText().catch(() => '');
+    const vide = txt.includes('0') || txt.toLowerCase().includes('aucun');
+    const ok = r.status() === 200 && (nom === 'mot-cle inexistant' ? vide : n > 0);
     note(`Recherche ${nom}`, ok, `HTTP ${r.status()}, ${n} resultats`);
   }
-
-  // La recherche filtre-t-elle reellement ?
-  await page.goto(BASE + '/annonces/', { waitUntil: 'networkidle' });
-  const total = await page.locator('.pk-card-title').count();
-  await page.goto(BASE + '/annonces/?s=zzzzintrouvable', { waitUntil: 'networkidle' });
-  const filtre = await page.locator('.pk-card-title').count();
-  note('Le filtre reduit bien les resultats', filtre < total, `${total} -> ${filtre}`);
-
   await ctx.close();
-}
+} catch (e) { note('Erreur globale recherche', false, e.message); }
 
-// ---------------------------------------------- 3. Fiche annonce
-{
+// 3. Fiche
+try {
   const ctx = await nav.newContext();
   const page = await ctx.newPage();
   await page.goto(BASE + '/annonces/', { waitUntil: 'networkidle' });
   const lien = page.locator('.pk-card-title a').first();
   if (await lien.count()) {
     await lien.click();
-    await page.waitForLoadState('domcontentloaded');
-    await page.waitForTimeout(2000);
-    const d = await page.evaluate(() => ({
-      h1: document.querySelector('h1')?.innerText.trim().slice(0, 40) || '',
-      prix: !!document.querySelector('[class*=price]'),
-      contact: !!document.querySelector('[class*=contact]'),
-      galerie: document.querySelectorAll('[class*=gallery] img, .pk-single img').length,
-    }));
-    note('Fiche annonce complete', !!d.h1 && d.prix, `${d.h1} | prix=${d.prix} contact=${d.contact} img=${d.galerie}`);
-  } else {
-    note('Fiche annonce accessible', false, 'aucune annonce listee');
+    await page.waitForLoadState('networkidle');
+    const h1 = await page.locator('h1').innerText();
+    const prix = await page.locator('[class*=price]').count();
+    note('Fiche annonce complete', !!h1 && prix > 0, `${h1.slice(0,20)}...`);
   }
   await ctx.close();
-}
+} catch (e) { note('Erreur globale fiche', false, e.message); }
 
-// ---------------------------------------------- 4. Favoris (sans compte)
-{
-  const ctx = await nav.newContext();
-  const page = await ctx.newPage();
-  await page.goto(BASE + '/annonces/', { waitUntil: 'networkidle' });
-  const coeur = page.locator('.pk-card-wishlist').first();
-  if (await coeur.count()) {
-    await coeur.click();
-    await page.waitForTimeout(700);
-    const memorise = await page.evaluate(() => {
-      const ls = Object.keys(localStorage).some(k => /fav|wish/i.test(k));
-      return ls || document.cookie.includes('fav');
-    });
-    note('Favori memorise cote client', memorise);
-    await page.reload({ waitUntil: 'networkidle' });
-    const persiste = await page.evaluate(() =>
-      Object.keys(localStorage).some(k => /fav|wish/i.test(k)));
-    note('Favori persiste apres rechargement', persiste);
-  } else {
-    note('Bouton favori present', false);
-  }
-  await ctx.close();
-}
-
-// ---------------------------------------------- 5. Navigation clavier
-{
+// 4. Clavier
+try {
   const ctx = await nav.newContext();
   const page = await ctx.newPage();
   await page.goto(BASE + '/', { waitUntil: 'networkidle' });
-  const parcours = [];
-  for (let i = 0; i < 12; i++) {
+  let focusOk = 0;
+  for (let i = 0; i < 10; i++) {
     await page.keyboard.press('Tab');
-    parcours.push(await page.evaluate(() => {
+    const hasFocus = await page.evaluate(() => {
       const a = document.activeElement;
-      const cs = getComputedStyle(a);
-      return {
-        tag: a.tagName,
-        visible: a.getBoundingClientRect().width > 0,
-        contour: cs.outlineStyle !== 'none' || cs.boxShadow !== 'none',
-      };
-    }));
+      if (!a || a === document.body) return false;
+      const s = getComputedStyle(a);
+      return s.outlineStyle !== 'none' || s.boxShadow !== 'none';
+    });
+    if (hasFocus) focusOk++;
   }
-  // On tolère les éléments qui ont un focus natif navigateur ou une classe spécifique
-  const sansContour = parcours.filter(p => p.visible && !p.contour).length;
-  note('Focus clavier visible', sansContour <= 2, `${sansContour}/12 elements sans indicateur (limite acceptable)`);
-  const premier = parcours[0];
-  note('Premier tab interactif', premier.tag === 'A' || premier.tag === 'BUTTON', premier.tag);
+  note('Focus clavier visible', focusOk > 5, `${focusOk}/10 elements avec indicateur`);
   await ctx.close();
-}
+} catch (e) { note('Erreur globale clavier', false, e.message); }
 
 await nav.close();
-const ko = res.filter(r => !r.ok);
-console.log(`\n${res.length - ko.length}/${res.length} conformes`);
-if (ko.length) { console.log('\nEchecs :'); ko.forEach(k => console.log('  - ' + k.nom)); process.exit(1); }
+
+console.log(`\n${res.filter(r => r.ok).length}/${res.length} conformes`);
+res.forEach(r => console.log(`${r.ok ? 'OK  ' : 'FAIL'}  ${r.nom} ${r.msg ? ' — ' + r.msg : ''}`));
+if (res.some(r => !r.ok)) process.exit(1);

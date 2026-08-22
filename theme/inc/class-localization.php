@@ -27,7 +27,7 @@ class Partikulier_Localization {
 			add_action( 'template_redirect', array( __CLASS__, 'maybe_redirect_browser_language' ), 1 );
 			add_action( 'init', array( __CLASS__, 'maybe_install' ), 6 );
 			add_action( 'admin_init', array( __CLASS__, 'register_polylang_strings' ) );
-			add_filter( 'gettext_partikulier', array( __CLASS__, 'translate_polylang_string' ), 10, 3 );
+			add_filter( 'gettext', array( __CLASS__, 'translate_polylang_string' ), 10, 3 );
 			add_filter( 'pll_get_post_types', array( __CLASS__, 'register_polylang_post_type' ), 10, 2 );
 			add_filter( 'pll_get_taxonomies', array( __CLASS__, 'register_polylang_taxonomies' ), 10, 2 );
 			add_filter( 'pll_preferred_language', array( __CLASS__, 'filter_robot_preferred_language' ), 10, 2 );

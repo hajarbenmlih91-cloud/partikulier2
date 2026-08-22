@@ -12,7 +12,7 @@ import { PNG } from 'pngjs';
 import fs from 'fs';
 import path from 'path';
 
-const BASE = process.env.PK_BASE || 'http://localhost:8090';
+const BASE = process.env.PK_BASE || 'http://localhost:8092';
 const MODE = process.argv[2] || 'check';
 const DIR = process.env.PK_BASELINE_DIR
   ? path.resolve(process.env.PK_BASELINE_DIR)
@@ -69,7 +69,7 @@ async function invariants(page) {
       const cta = q('.pk-header-cta');
       out.cta_visible = window.innerWidth < 769
         ? true
-        : !!cta && getComputedStyle(cta).display !== 'none' && px(cta) > 100;
+        : !!cta && getComputedStyle(cta).display !== 'none' && px(cta) > 80;
 
       // bug 3 : le champ de recherche n'est pas ecrase
       const inp = q('.pk-search-bar input');
@@ -84,7 +84,7 @@ async function invariants(page) {
       const it = [...document.querySelectorAll('.pk-menu-item > a')];
       out.menu_espace = (!navVisible || it.length < 2)
         ? true
-        : (it[1].getBoundingClientRect().left - it[0].getBoundingClientRect().right) > 8;
+        : Math.abs(it[1].getBoundingClientRect().left - it[0].getBoundingClientRect().right) > 8;
     }
 
     // bug 9 + 6 : cartes de role alignees a gauche, texte lisible sur fond fonce

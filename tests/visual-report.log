@@ -1,0 +1,44 @@
+  ok    fr-accueil-desktop  0.00%
+  ok    fr-annonces-desktop  0.00%
+  ok    fr-annonces-filtre-desktop  0.00%
+  ok    fr-deposer-desktop  0.00%
+  ok    fr-mes-annonces-desktop  0.00%
+  ok    fr-404-desktop  0.00%
+  ok    en-accueil-desktop  0.00%
+  ok    en-annonces-desktop  0.00%
+  ok    en-annonces-filtre-desktop  0.00%
+  ok    en-deposer-desktop  0.00%
+  ok    en-mes-annonces-desktop  0.00%
+  ok    en-404-desktop  0.00%
+  ok    ar-accueil-desktop  0.00%
+  ok    ar-annonces-desktop  0.00%
+  ok    ar-annonces-filtre-desktop  0.00%
+  ok    ar-deposer-desktop  0.00%
+  ok    ar-mes-annonces-desktop  0.00%
+  ok    ar-404-desktop  0.00%
+  ok    fr-accueil-mobile  0.00%
+  ok    fr-annonces-mobile  0.00%
+  ok    fr-annonces-filtre-mobile  0.00%
+  ok    fr-deposer-mobile  0.00%
+  ok    fr-mes-annonces-mobile  0.00%
+  ok    fr-404-mobile  0.00%
+  ok    en-accueil-mobile  0.00%
+  ok    en-annonces-mobile  0.00%
+  ok    en-annonces-filtre-mobile  0.00%
+  ok    en-deposer-mobile  0.00%
+  ok    en-mes-annonces-mobile  0.00%
+  ok    en-404-mobile  0.00%
+  ok    ar-accueil-mobile  0.00%
+  ok    ar-annonces-mobile  0.00%
+  ok    ar-annonces-filtre-mobile  0.00%
+  ok    ar-deposer-mobile  0.00%
+  ok    ar-mes-annonces-mobile  0.00%
+  ok    ar-404-mobile  0.00%
+
+ECHEC :
+  - ar-accueil-desktop : invariant "cta_visible" rompu
+  - ar-accueil-desktop : invariant "menu_espace" rompu
+  - ar-annonces-desktop : invariant "cta_visible" rompu
+  - ar-annonces-desktop : invariant "menu_espace" rompu
+  - ar-404-desktop : invariant "cta_visible" rompu
+  - ar-404-desktop : invariant "menu_espace" rompu
