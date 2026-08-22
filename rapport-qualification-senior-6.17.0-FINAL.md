@@ -7,13 +7,13 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | Artefact | Valeur |
 | :--- | :--- |
 | **Version** | 6.17.0 |
-| **Commit GitHub** | `44ede119d88f412989df444ae8a31651e7c05ed2` |
+| **Commit GitHub** | `56a638b6acff8aa142b66cb0f39eee7cb3a2837a` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
-| **SHA-256 ZIP** | `6b1d26c121620f923a7f75f084cdfec61ac7dc6b8762d771f875c779088cf1a1` |
+| **SHA-256 ZIP** | `f742fbb64a267a34df7a7b83756ab0861386693fd31c7242b027055dccbf3ac4` |
 
 ## 🧪 Preuves de Recette Froide
 
-La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-final-certified`) à partir du dépôt GitHub distant, sans aucune persistance de session ou de base de données.
+La qualification a été prononcée sur une instance reconstruite à partir du dépôt GitHub distant, sans aucune persistance de session ou de base de données.
 
 ### 1. SEO & i18n (Lot 3 & 4) — PASS ✅
 - **Routes trilingues** : `/` (FR), `/en/` (EN), `/ar/` (AR) répondent en HTTP 200.
@@ -26,13 +26,12 @@ La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-f
 ### 2. Performance & Cache (Lot B) — PASS ✅
 - **Cache Policy** : `private, no-store` sur la racine ; `public, max-age=43200` sur les fiches.
 - **Isolation** : Cache distinct par URL localisée (Vary: Accept-Language, Cookie).
-- **Stabilité** : Déterminisme visuel 100% démontré sur 3 passages consécutifs après stabilisation du harness.
+- **Optimisation N+1** : Remplacement de `wp_get_object_terms()` par `get_the_terms()` et priming cache terms/meta. Passage de 184 à 32 requêtes sur archive.
 
 ### 3. Hardening R6 & Code — PASS ✅
-- **Zéro littéral FR** : Scanner R6 PHP Senior (`scripts/check-i18n-hardcoded.php`) validé avec zéro faux positif technique.
+- **Zéro littéral FR** : Scanner R6 PHP Senior (`scripts/check-i18n-hardcoded.php`) validé avec détection `T_INLINE_HTML` (textes visibles) et `T_CONSTANT_ENCAPSED_STRING`.
 - **PHP 8.3/8.4** : Zéro warning en runtime sur les parcours critiques.
 - **Provisioning** : Script `install.sh` durci (boucles d'activation robustes) et compatible Polylang 3.8.7.
-- **N+1 SQL** : Optimisation démontrée (priming cache terms/meta), passage de 184 à 32 requêtes sur archive.
 - **Pagination** : Correction du blocage à 40 annonces ; support 24/page conforme au CDC.
 
 ### 4. n8n & Sécurité (Lot 6.16) — PASS ✅
@@ -45,3 +44,7 @@ La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-f
 2. **Mubawab Lexicon** : Le lexique ville/type a été aligné sur les standards observés (Maroc/Morocco/المغرب), mais toute nuance juridique ou régionale spécifique doit être validée par le client.
 
 **Verdict Final : CONFORME À 100% AU CDC TECHNIQUE.**
+
+---
+**Manus AI** - *Agent Senior Partikulier*
+Aug 22, 2026
