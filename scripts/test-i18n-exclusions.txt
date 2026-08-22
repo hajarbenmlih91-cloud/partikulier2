@@ -1,0 +1,5 @@
+# Exclusions versionnées — recette langue AR/EN Partikulier 6.17
+# Autorisés uniquement : noms propres de marque, services et contenu saisi.
+Partikulier
+WhatsApp
+# Les URLs, slugs et valeurs saisies par l'utilisateur sont contrôlés séparément.

@@ -6,10 +6,12 @@ const base = process.env.PK_URL || 'http://localhost:8090';
 const family = JSON.parse(execFileSync('wp', ['--path=wp', 'eval-file', 'scripts/discover-i18n-family.php'], { encoding: 'utf8' }).trim());
 if (!family || !family.urls || !family.urls.en || !family.urls.ar) throw new Error('No published FR/EN/AR Polylang family found');
 const depositPages = JSON.parse(execFileSync('wp', ['--path=wp', 'eval', '$out=array(); foreach(get_pages(array("post_status"=>"publish","number"=>-1)) as $p){$tpl=get_post_meta($p->ID,"_wp_page_template",true); if(strpos($tpl,"page-deposer-annonce")!==false && function_exists("pll_get_post_language")){ $out[pll_get_post_language($p->ID)]=wp_make_link_relative(get_permalink($p->ID)); }} echo wp_json_encode($out);'], { encoding: 'utf8' }).trim());
-const cases = [
+const allCases = [
   { lang: 'ar', dir: 'rtl', archive: '/ar/annonces/', property: family.urls.ar, deposit: depositPages.ar },
   { lang: 'en', dir: 'ltr', archive: '/en/annonces/', property: family.urls.en, deposit: depositPages.en },
 ];
+const cases = process.env.PK_ONLY_LANG ? allCases.filter((item) => item.lang === process.env.PK_ONLY_LANG) : allCases;
+if (process.env.PK_ONLY_LANG && cases.length !== 1) throw new Error(`Unsupported PK_ONLY_LANG: ${process.env.PK_ONLY_LANG}`);
 const browser = await chromium.launch({ headless: true });
 const results = [];
 for (const c of cases) {
