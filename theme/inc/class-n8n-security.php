@@ -138,7 +138,7 @@ class Partikulier_N8n_Security {
 		}
 		$shared_valid = false;
 		foreach ( $keys as $candidate ) {
-			if ( $provided && hash_equals( (string) $candidate, $provided ) ) {
+			if ( $provided && hash_equals( trim((string) $candidate, '='), trim($provided, '=') ) ) {
 				$shared_valid = true;
 				break;
 			}
@@ -158,8 +158,7 @@ class Partikulier_N8n_Security {
 		if ( $valid && $secret_for_key ) {
 			$path = (string) $request->get_route();
 			$canonical = strtoupper( $request->get_method() ) . "\n" . $path . "\n" . $timestamp . "\n" . $request->get_body();
-", '[NL]', $canonical));
-			$expected = 'sha256=' . hash_hmac( 'sha256', $canonical, $secret_for_key );
+			$expected = 'sha256=' . hash_hmac( 'sha256', $canonical, base64_decode( $secret_for_key ) );
 			$valid = hash_equals( $expected, $signature );
 		}
 		if ( ! $valid ) {

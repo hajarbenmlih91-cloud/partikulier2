@@ -1,13 +1,13 @@
 <?php
 /**
- * Test HMAC sur la vraie route REST WordPress corrigé.
+ * Test HMAC sur la vraie route REST WordPress corrigé (URL directe).
  */
 $wp_dir = getenv('PK_WP_DIR');
 require_once $wp_dir . '/wp-load.php';
 
-$base = getenv('PK_BASE') ?: 'http://localhost:8092';
-$secret = 'senior-real-route-secret';
-$encoded_secret = base64_encode($secret);
+$base = getenv('PK_BASE') ?: 'http://localhost:8093';
+$secret_raw = 'senior-real-route-secret-32bytes-12345';
+$encoded_secret = base64_encode($secret_raw);
 $key_id = 'real-key-1';
 
 update_option('pk_n8n_settings', array(
@@ -25,15 +25,12 @@ $body = json_encode(array(
     'payload' => array('msg' => 'real route test')
 ));
 
-$wp_route = '/wp-json/partikulier/v1/automation-event';
-$canonical = "POST\n" . '/partikulier/v1/automation-event' . "\n" . $timestamp . "\n" . $body;
-echo "CANONICAL_CLIENT: " . str_replace("
-", '[NL]', $canonical) . "
-";
-$sig = 'sha256=' . hash_hmac('sha256', $canonical, $encoded_secret);
+$path = '/partikulier/v1/automation-event';
+$canonical = "POST\n" . $path . "\n" . $timestamp . "\n" . $body;
+$sig = 'sha256=' . hash_hmac('sha256', $canonical, $secret_raw);
 
 echo "BASE=$base\n";
-echo "ROUTE=$wp_route\n";
+echo "ROUTE=/index.php/wp-json$path\n";
 echo "TIMESTAMP=$timestamp\n";
 echo "BODY=$body\n";
 echo "SIGNATURE=$sig\n";

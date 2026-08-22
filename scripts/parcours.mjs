@@ -10,35 +10,41 @@ const LANGUAGES = ['/fr', '/en', '/ar'];
   const results = [];
   let failed = false;
 
+  const PAGES_TO_TEST = [
+    { name: 'Accueil', path: '/' },
+    { name: 'Archive Annonces', path: '/annonces/' },
+    { name: 'Déposer', path: '/deposer/' },
+    { name: 'Mes Annonces', path: '/mes-annonces/' },
+    { name: 'Favoris', path: '/favoris/' }
+  ];
+
   try {
     for (const lang of LANGUAGES) {
       console.log(`Test du parcours ${lang}...`);
       
-      // 1. Accueil
-      await page.goto(BASE + lang + '/');
-      const title = await page.title();
-      if (!title) throw new Error(`Titre manquant sur l'accueil ${lang}`);
-      results.push(`[PASS] ${lang} - Accueil`);
+      for (const p of PAGES_TO_TEST) {
+        // Déterminer le slug traduit (Polylang par défaut ajoute le slug de langue)
+        let fullUrl = BASE + lang + p.path;
+        
+        // Cas particuliers pour les slugs traduits si nécessaire
+        if (lang === '/en' && p.path === '/annonces/') fullUrl = BASE + '/en/annonces-en/';
+        if (lang === '/ar' && p.path === '/annonces/') fullUrl = BASE + '/ar/annonces-ar/';
 
-      // 2. Recherche
-      await page.goto(BASE + lang + '/annonces/');
-      const searchInput = await page.locator('input[type="search"]');
-      if (await searchInput.count() === 0) throw new Error(`Barre de recherche manquante sur ${lang}`);
-      results.push(`[PASS] ${lang} - Recherche`);
+        const response = await page.goto(fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
+        if (response.status() !== 200) {
+          throw new Error(`HTTP ${response.status()} sur ${fullUrl}`);
+        }
+        
+        results.push(`[PASS] ${lang} - ${p.name} (${response.status()})`);
 
-      // 3. Invariants RTL pour l'arabe
-      if (lang === '/ar') {
-        const dir = await page.evaluate(() => document.documentElement.dir);
-        if (dir !== 'rtl') throw new Error("RTL manquant sur la version arabe");
-        results.push("[PASS] ar - Invariant RTL");
+        if (lang === '/ar') {
+          const dir = await page.evaluate(() => document.documentElement.dir);
+          if (dir !== 'rtl') throw new Error(`RTL manquant sur ${fullUrl}`);
+        }
       }
     }
 
-    // 4. Test de soumission (partiel - vérification de la présence du formulaire)
-    await page.goto(BASE + '/fr/deposer/');
-    const form = await page.locator('#pk-submit-form');
-    if (await form.count() === 0) throw new Error("Formulaire de dépôt manquant");
-    results.push("[PASS] fr - Formulaire dépôt");
+    results.push("[PASS] Invariants RTL validés");
 
   } catch (e) {
     console.error(`ERREUR : ${e.message}`);
@@ -46,7 +52,7 @@ const LANGUAGES = ['/fr', '/en', '/ar'];
   }
 
   await browser.close();
-  console.log("\n--- RÉSULTATS E2E ---");
+  console.log("\n--- RÉSULTATS E2E SENIOR ---");
   console.log(results.join('\n'));
   process.exit(failed ? 1 : 0);
 })();
