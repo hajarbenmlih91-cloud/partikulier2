@@ -7,13 +7,13 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | Artefact | Valeur |
 | :--- | :--- |
 | **Version** | 6.17.0 |
-| **Commit GitHub** | `a70111b22e7a1773950664673397946794679467` |
+| **Commit GitHub** | `44ede119d88f412989df444ae8a31651e7c05ed2` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
-| **SHA-256 ZIP** | `9b2f9fd354e5f7fd6672fde72dd3af06ef931493fe51a830b0f6885b8f656910` |
+| **SHA-256 ZIP** | `6b1d26c121620f923a7f75f084cdfec61ac7dc6b8762d771f875c779088cf1a1` |
 
 ## 🧪 Preuves de Recette Froide
 
-La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-final-remote`) à partir du dépôt GitHub distant, sans aucune persistance de session ou de base de données.
+La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-final-certified`) à partir du dépôt GitHub distant, sans aucune persistance de session ou de base de données.
 
 ### 1. SEO & i18n (Lot 3 & 4) — PASS ✅
 - **Routes trilingues** : `/` (FR), `/en/` (EN), `/ar/` (AR) répondent en HTTP 200.
@@ -21,6 +21,7 @@ La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-f
 - **hreflang** : Présence systématique de `fr`, `en`, `ar` et `x-default`.
 - **Googlebot Integrity** : 200 OK sans redirection pour les agents robots (mu-plugin actif).
 - **JSON-LD** : Langue et devises (MAD) cohérentes avec chaque URL localisée.
+- **Localisation exhaustive** : Libellés de tri, bas de page et métadonnées trilingues validés.
 
 ### 2. Performance & Cache (Lot B) — PASS ✅
 - **Cache Policy** : `private, no-store` sur la racine ; `public, max-age=43200` sur les fiches.
@@ -28,11 +29,11 @@ La qualification a été prononcée sur une instance reconstruite (`/tmp/pk617-f
 - **Stabilité** : Déterminisme visuel 100% démontré sur 3 passages consécutifs après stabilisation du harness.
 
 ### 3. Hardening R6 & Code — PASS ✅
-- **Zéro littéral FR** : Scanner R6 renforcé validé (détection exhaustive guillemets simples/doubles).
+- **Zéro littéral FR** : Scanner R6 PHP Senior (`scripts/check-i18n-hardcoded.php`) validé avec zéro faux positif technique.
 - **PHP 8.3/8.4** : Zéro warning en runtime sur les parcours critiques.
-- **Provisioning** : Script `provision-polylang.php` compatible Polylang 3.8.7 (cold install).
+- **Provisioning** : Script `install.sh` durci (boucles d'activation robustes) et compatible Polylang 3.8.7.
 - **N+1 SQL** : Optimisation démontrée (priming cache terms/meta), passage de 184 à 32 requêtes sur archive.
-- **Pagination** : Correction du blocage à 40 annonces ; support illimité vérifié.
+- **Pagination** : Correction du blocage à 40 annonces ; support 24/page conforme au CDC.
 
 ### 4. n8n & Sécurité (Lot 6.16) — PASS ✅
 - **HMAC Enforce** : Rejet des signatures invalides (401) et acceptation des valides (200).
