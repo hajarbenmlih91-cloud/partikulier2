@@ -26,8 +26,8 @@ class Partikulier_Scripts {
 		wp_enqueue_script(
 			'partikulier-main',
 			PARTIKULIER_URI . '/assets/js/main.js',
-			array(),
-			PARTIKULIER_VERSION,
+				array( 'jquery' ),
+				PARTIKULIER_VERSION,
 			array(
 				'in_footer'  => true,
 				'strategy'   => 'defer',
