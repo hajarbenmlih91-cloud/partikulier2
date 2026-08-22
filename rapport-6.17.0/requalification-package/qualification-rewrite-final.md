@@ -39,14 +39,14 @@ Le package installable régénéré est :
 
 ```text
 partikulier-6.17.0.zip
-SHA-256: 1d88fd5634b2af98ccd557d2b18723365ac73c4644192aaa493b196d9dadf263
+SHA-256: 32315c29cd3373284b1e4b9d92aea679ddab01920d64de1a344bc2a18e547137
 ```
 
 Le package thème seul est :
 
 ```text
 partikulier-6.17.0-theme.zip
-SHA-256: 940451dfcd74f4d2bdbe7adbfb81fcf14e076c6181a1bade28b11a6fec19d6b9
+SHA-256: fab29588cdbd6dd51cc4c0542ccab72dccc806983b6de2c9755bbf02841db214
 ```
 
 Le bundle installable contient notamment le thème, `theme/languages/partikulier.pot`, les catalogues `.mo`, le mu-plugin `mu-plugins/partikulier-early-seo.php` et les deux polices Noto Sans Arabic. Les scripts de recette et le présent rapport restent dans le dépôt de développement afin de séparer l’artefact WordPress installable des outils d’audit.
