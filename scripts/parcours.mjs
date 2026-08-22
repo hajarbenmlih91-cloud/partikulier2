@@ -57,7 +57,7 @@ const LANGUAGES = ['/fr', '/en', '/ar'];
   }
 
   await browser.close();
-  console.log("\n--- RÉSULTATS E2E SENIOR v6.17.5 ---");
+  console.log("\n--- RÉSULTATS E2E SENIOR v6.17.7 ---");
   console.log(results.join('\n'));
   process.exit(failed ? 1 : 0);
 })();

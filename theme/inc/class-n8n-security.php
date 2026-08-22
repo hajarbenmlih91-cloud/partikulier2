@@ -1,6 +1,6 @@
 <?php
 /**
- * Sécurité et réglages n8n / WhatsApp pour Partikulier 6.16.
+ * Sécurité et réglages n8n / WhatsApp pour Partikulier 6.17.
  *
  * @package Partikulier
  */
@@ -129,13 +129,15 @@ class Partikulier_N8n_Security {
 	public static function check_automation_secret( WP_REST_Request $request ) {
 		$keys = self::secret_keys();
 		$secret = self::get( 'automation_api_secret' );
-		$provided = (string) $request->get_header( 'x_partikulier_automation' );
+		
+		$provided = self::get_normalized_header( $request, 'X-Partikulier-Automation' );
 		if ( ! $provided ) {
-			$authorization = (string) $request->get_header( 'authorization' );
+			$authorization = self::get_normalized_header( $request, 'Authorization' );
 			if ( 0 === stripos( $authorization, 'bearer ' ) ) {
 				$provided = trim( substr( $authorization, 7 ) );
 			}
 		}
+		
 		$shared_valid = false;
 		foreach ( $keys as $candidate ) {
 			if ( $provided && hash_equals( trim((string) $candidate, '='), trim($provided, '=') ) ) {
@@ -143,24 +145,30 @@ class Partikulier_N8n_Security {
 				break;
 			}
 		}
+		
 		if ( ! $secret || ! $provided || ! $shared_valid ) {
 			return new WP_Error( 'pk_automation_auth', __( 'Requête non autorisée.', 'partikulier' ), array( 'status' => 401 ) );
 		}
+		
 		$mode = self::get( 'hmac_mode', 'off' );
 		if ( 'off' === $mode ) {
 			return true;
 		}
-		$timestamp = (string) $request->get_header( 'x_partikulier_timestamp' );
-		$key_id = (string) $request->get_header( 'x_partikulier_key_id' );
-		$signature = (string) $request->get_header( 'x_partikulier_signature' );
+		
+		$timestamp = self::get_normalized_header( $request, 'X-Partikulier-Timestamp' );
+		$key_id = self::get_normalized_header( $request, 'X-Partikulier-Key-Id' );
+		$signature = self::get_normalized_header( $request, 'X-Partikulier-Signature' );
+		
 		$valid = ctype_digit( $timestamp ) && abs( time() - (int) $timestamp ) <= 300 && preg_match( '/^sha256=[a-f0-9]{64}$/', $signature );
 		$secret_for_key = $keys[ $key_id ] ?? '';
+		
 		if ( $valid && $secret_for_key ) {
 			$path = (string) $request->get_route();
 			$canonical = strtoupper( $request->get_method() ) . "\n" . $path . "\n" . $timestamp . "\n" . $request->get_body();
 			$expected = 'sha256=' . hash_hmac( 'sha256', $canonical, base64_decode( $secret_for_key ) );
 			$valid = hash_equals( $expected, $signature );
 		}
+		
 		if ( ! $valid ) {
 			if ( 'log' === $mode ) {
 				self::audit_failure( $key_id ?: 'missing', 'invalid_signature' );
@@ -260,6 +268,17 @@ class Partikulier_N8n_Security {
 
 	private static function is_https_url( $url ) {
 		return 'https' === strtolower( (string) wp_parse_url( $url, PHP_URL_SCHEME ) );
+	}
+
+	/**
+	 * Récupère un header de manière normalisée (insensible à la casse et aux séparateurs).
+	 */
+	private static function get_normalized_header( $request, $name ) {
+		$value = $request->get_header( strtolower( str_replace( '-', '_', $name ) ) );
+		if ( empty( $value ) ) {
+			$value = $request->get_header( strtolower( $name ) );
+		}
+		return (string) $value;
 	}
 }
 
