@@ -9,7 +9,7 @@ echo "--- Démarrage du test de concurrence HMAC Senior ---"
 for i in {1..5}; do
     echo "Round $i..."
     # Obtenir les paramètres du round
-    VARS=$(PK_WP_DIR=$PK_WP_DIR PK_BASE=$PK_BASE php scripts/test-hmac-senior.php)
+    VARS=$(PK_WP_DIR=$PK_WP_DIR PK_BASE=$PK_BASE php scripts/test-hmac-real-route.php)
     BASE=$(echo "$VARS" | grep "BASE=" | cut -d= -f2)
     ROUTE=$(echo "$VARS" | grep "ROUTE=" | cut -d= -f2)
     SIG=$(echo "$VARS" | grep "SIGNATURE=" | cut -d= -f2)

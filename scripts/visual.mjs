@@ -7,16 +7,27 @@ import pixelmatch from 'pixelmatch';
 const BASE = process.env.PK_BASE || 'http://localhost:8092';
 const DIR = process.env.PK_BASELINE_DIR || path.join(process.cwd(), 'tests', 'baselines-6.17.3');
 const MODE = process.argv[2] === 'baseline' ? 'baseline' : 'check';
-const SEUIL = 0.5; // Retour au seuil senior strict
-const LANGUAGES = ['/fr', '/en', '/ar'];
-const PAGES = [
-  ['accueil', '/'],
-  ['annonces', '/annonces/'],
-  ['deposer', '/deposer/'],
-  ['mes-annonces', '/mes-annonces/'],
-  ['404', '/404-not-found-page']
-];
+const SEUIL = 0.5;
 const TAILLES = [['desktop', 1280, 800], ['mobile', 375, 667]];
+
+// Mapping exact des URLs pour le test
+const SCENARIOS = [
+  { id: 'fr-accueil', url: '/fr/' },
+  { id: 'fr-annonces', url: '/fr/annonces/' },
+  { id: 'fr-deposer', url: '/fr/deposer/' },
+  { id: 'fr-mes-annonces', url: '/fr/mes-annonces/' },
+  { id: 'fr-404', url: '/fr/404-not-found' },
+  { id: 'en-accueil', url: '/en/' },
+  { id: 'en-annonces', url: '/en/annonces-en/' },
+  { id: 'en-deposer', url: '/en/deposer-une-annonce-en/' },
+  { id: 'en-mes-annonces', url: '/en/mes-annonces-en/' },
+  { id: 'en-404', url: '/en/404-not-found' },
+  { id: 'ar-accueil', url: '/ar/' },
+  { id: 'ar-annonces', url: '/ar/annonces-ar/' },
+  { id: 'ar-deposer', url: '/ar/deposer-une-annonce-ar/' },
+  { id: 'ar-mes-annonces', url: '/ar/mes-annonces-ar/' },
+  { id: 'ar-404', url: '/ar/404-not-found' }
+];
 
 function diff(img1, img2) {
   const { width, height } = img1;
@@ -36,57 +47,51 @@ function diff(img1, img2) {
     const context = await nav.newContext({ viewport: { width: w, height: h }, isMobile: tname === 'mobile' });
     const page = await context.newPage();
 
-    for (const lang of LANGUAGES) {
-      const langSuffix = lang.replace('/', '');
-      for (const [pname, url] of PAGES) {
-        const cle = `${langSuffix}-${pname}-${tname}`;
-        const fullUrl = lang + url;
+    for (const sc of SCENARIOS) {
+      const cle = `${sc.id}-${tname}`;
+      const fullUrl = sc.url;
 
-        try {
-          let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
-          
-          // Désactiver les éléments dynamiques pour la stabilité visuelle
-          await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
+      try {
+        let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
+        await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
 
-          if (pname !== '404' && rep.status() !== 200) {
-            erreurs.push(`${cle} : HTTP ${rep.status()} sur ${fullUrl}`);
-            continue;
-          }
+        if (!fullUrl.includes('404') && rep.status() !== 200) {
+          erreurs.push(`${cle} : HTTP ${rep.status()} sur ${fullUrl}`);
+          continue;
+        }
 
-          // Vérification des invariants (Senior requirement)
-          if (langSuffix === 'ar') {
-            const dir = await page.evaluate(() => document.documentElement.dir);
-            if (dir !== 'rtl') erreurs.push(`${cle} : RTL non détecté`);
-          }
+        if (sc.id.startsWith('ar')) {
+          const dir = await page.evaluate(() => document.documentElement.dir);
+          if (dir !== 'rtl') erreurs.push(`${cle} : RTL non détecté`);
+        }
 
-          const shot = await page.screenshot({ fullPage: true });
-          const refDir = path.join(DIR, langSuffix);
-          if (!fs.existsSync(refDir)) fs.mkdirSync(refDir, { recursive: true });
-          const refPath = path.join(refDir, `${pname}-${tname}.png`);
+        const shot = await page.screenshot({ fullPage: true });
+        const lang = sc.id.split('-')[0];
+        const refDir = path.join(DIR, lang);
+        if (!fs.existsSync(refDir)) fs.mkdirSync(refDir, { recursive: true });
+        const refPath = path.join(refDir, `${sc.id.split('-').slice(1).join('-')}-${tname}.png`);
 
-          if (MODE === 'baseline') {
-            fs.writeFileSync(refPath, shot);
-            resultats.push(`  reference  ${cle}`);
+        if (MODE === 'baseline') {
+          fs.writeFileSync(refPath, shot);
+          resultats.push(`  reference  ${cle}`);
+        } else {
+          if (!fs.existsSync(refPath)) {
+            erreurs.push(`${cle} : baseline manquante`);
           } else {
-            if (!fs.existsSync(refPath)) {
-              erreurs.push(`${cle} : baseline manquante`);
+            const img1 = PNG.sync.read(fs.readFileSync(refPath));
+            const img2 = PNG.sync.read(shot);
+            if (img1.width !== img2.width || img1.height !== img2.height) {
+              erreurs.push(`${cle} : dimensions différentes`);
             } else {
-              const img1 = PNG.sync.read(fs.readFileSync(refPath));
-              const img2 = PNG.sync.read(shot);
-
-              if (img1.width !== img2.width || img1.height !== img2.height) {
-                erreurs.push(`${cle} : dimensions différentes`);
-              } else {
-                const d = diff(img1, img2);
-                const ok = d <= SEUIL;
-                resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
-                if (!ok) erreurs.push(`${cle} : écart de ${d.toFixed(2)}%`);
-              }
+              const d = diff(img1, img2);
+              const ok = d <= SEUIL;
+              resultats.push(`  ${ok ? 'ok  ' : 'ECART'}  ${cle}  ${d.toFixed(2)}%`);
+              if (!ok) erreurs.push(`${cle} : écart de ${d.toFixed(2)}%`);
             }
           }
-        } catch (e) {
-          erreurs.push(`${cle} : Erreur - ${e.message}`);
         }
+      } catch (e) {
+        erreurs.push(`${cle} : Erreur - ${e.message}`);
       }
     }
     await context.close();
@@ -94,7 +99,6 @@ function diff(img1, img2) {
 
   await nav.close();
   console.log(resultats.join('\n'));
-
   if (erreurs.length) {
     console.log('\nECHEC :');
     erreurs.forEach(e => console.log('  - ' + e));

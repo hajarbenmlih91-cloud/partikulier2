@@ -1,4 +1,4 @@
-import { chromium, expect } from '@playwright/test';
+import { chromium } from 'playwright';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8092';
 const LANGUAGES = ['/fr', '/en', '/ar'];
