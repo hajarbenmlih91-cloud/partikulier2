@@ -55,7 +55,22 @@ class Partikulier_Scripts {
 			'manageNonce' => is_user_logged_in() ? wp_create_nonce( 'pk_manage_listing' ) : '',
 			'homeUrl'    => home_url( '/' ),
 			'placesNonce' => wp_create_nonce( 'pk_places' ),
-			'submitNonce' => wp_create_nonce( 'pk_submit_listing' ),
+							'submitNonce' => wp_create_nonce( 'pk_submit_listing' ),
+				'language'    => function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr',
+				'i18n'       => array(
+					'publishing' => __( 'Publication en cours…', 'partikulier' ),
+					'serverError' => __( 'Erreur serveur', 'partikulier' ),
+					'saved' => __( 'Annonce enregistrée !', 'partikulier' ),
+					'retry' => __( 'réessayez ou contactez-nous.', 'partikulier' ),
+					'whatsappTitle' => __( 'Une dernière étape : WhatsApp', 'partikulier' ),
+					'whatsappIntro' => __( 'Votre annonce est enregistrée, mais reste invisible tant que l’équipe n’a pas rapproché votre message WhatsApp.', 'partikulier' ),
+					'whatsappCode' => __( 'Code de validation :', 'partikulier' ),
+					'whatsappOpen' => __( 'Ouvrir WhatsApp et envoyer le message', 'partikulier' ),
+					'whatsappNote' => __( 'Conservez ce code. L’annonce sera publiée seulement après vérification manuelle du message par l’équipe Partikulier.', 'partikulier' ),
+					'photoError' => __( "photo(s) n'ont pas pu être ajoutées :", 'partikulier' ),
+					'photoHint' => __( 'Vous pourrez les ajouter depuis « Mes annonces » après validation.', 'partikulier' ),
+				),
+
 		) );
 
 	}

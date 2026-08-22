@@ -329,7 +329,7 @@
 			}
 			e.preventDefault();
 			submitBtn.disabled = true;
-			submitBtn.textContent = "Publication en cours…";
+			submitBtn.textContent = (pkConfig.i18n && pkConfig.i18n.publishing) || "Publication en cours…";
 			setStatus("");
 
 			var fd = new FormData(form);
@@ -337,7 +337,7 @@
 			fetch(pkConfig.ajaxUrl, { method: "POST", body: fd, credentials: "same-origin" })
 				.then(function (res) {
 					return res.json().then(function (data) {
-						if (!res.ok) throw new Error((data && data.data && data.data.message) || "Erreur serveur");
+						if (!res.ok) throw new Error((data && data.data && data.data.message) || ((pkConfig.i18n && pkConfig.i18n.serverError) || "Erreur serveur"));
 						return data;
 					});
 				})
@@ -347,13 +347,13 @@
 						showWhatsAppVerification(payload);
 						return;
 					}
-					setStatus("✔ " + (payload.message || "Annonce enregistrée !"));
+					setStatus("✔ " + (payload.message || ((pkConfig.i18n && pkConfig.i18n.saved) || "Annonce enregistrée !")));
 					window.location.href = payload.url || pkConfig.homeUrl;
 				})
 				.catch(function (err) {
 					submitBtn.disabled = false;
-					submitBtn.textContent = "Demander la validation WhatsApp";
-					setStatus("✘ " + err.message + " — réessayez ou contactez-nous.");
+					submitBtn.textContent = (pkConfig.i18n && pkConfig.i18n.whatsappOpen) || "Demander la validation WhatsApp";
+					setStatus("✘ " + err.message + " — " + ((pkConfig.i18n && pkConfig.i18n.retry) || "réessayez ou contactez-nous."));
 				});
 		});
 	}
@@ -367,7 +367,7 @@
 			var warn = document.createElement("div");
 			warn.className = "pk-photo-errors";
 			var intro = document.createElement("p");
-			intro.textContent = payload.photo_errors.length + " photo(s) n'ont pas pu être ajoutées :";
+			intro.textContent = payload.photo_errors.length + " " + ((pkConfig.i18n && pkConfig.i18n.photoError) || "photo(s) n'ont pas pu être ajoutées :");
 			warn.appendChild(intro);
 			var ul = document.createElement("ul");
 			payload.photo_errors.forEach(function (msg) {
@@ -377,7 +377,7 @@
 			});
 			warn.appendChild(ul);
 			var hint = document.createElement("p");
-			hint.textContent = "Vous pourrez les ajouter depuis « Mes annonces » après validation.";
+			hint.textContent = (pkConfig.i18n && pkConfig.i18n.photoHint) || "Vous pourrez les ajouter depuis « Mes annonces » après validation.";
 			warn.appendChild(hint);
 			form.parentNode.insertBefore(warn, form);
 		}
@@ -387,21 +387,21 @@
 		panel.tabIndex = -1;
 
 		var title = document.createElement("h2");
-		title.textContent = "Une dernière étape : WhatsApp";
+		title.textContent = (pkConfig.i18n && pkConfig.i18n.whatsappTitle) || "Une dernière étape : WhatsApp";
 		var intro = document.createElement("p");
-		intro.textContent = "Votre annonce est enregistrée, mais reste invisible tant que l’équipe n’a pas rapproché votre message WhatsApp.";
+		intro.textContent = (pkConfig.i18n && pkConfig.i18n.whatsappIntro) || "Votre annonce est enregistrée, mais reste invisible tant que l’équipe n’a pas rapproché votre message WhatsApp.";
 		var code = document.createElement("p");
 		code.className = "pk-whatsapp-code";
-		code.textContent = "Code de validation : " + (payload.verification_code || "—");
+		code.textContent = ((pkConfig.i18n && pkConfig.i18n.whatsappCode) || "Code de validation :") + " " + (payload.verification_code || "—");
 		var link = document.createElement("a");
 		link.className = "pk-btn pk-btn-primary";
 		link.href = payload.whatsapp_url;
 		link.target = "_blank";
 		link.rel = "noopener";
-		link.textContent = "Ouvrir WhatsApp et envoyer le message";
+		link.textContent = (pkConfig.i18n && pkConfig.i18n.whatsappOpen) || "Ouvrir WhatsApp et envoyer le message";
 		var note = document.createElement("p");
 		note.className = "pk-form-note";
-		note.textContent = "Conservez ce code. L’annonce sera publiée seulement après vérification manuelle du message par l’équipe Partikulier.";
+		note.textContent = (pkConfig.i18n && pkConfig.i18n.whatsappNote) || "Conservez ce code. L’annonce sera publiée seulement après vérification manuelle du message par l’équipe Partikulier.";
 
 		panel.appendChild(title);
 		panel.appendChild(intro);
@@ -446,7 +446,7 @@
 				fetch(pkConfig.ajaxUrl, { method: "POST", body: fd, credentials: "same-origin" })
 					.then(function (res) {
 						return res.json().then(function (data) {
-							if (!res.ok) throw new Error((data && data.data && data.data.message) || "Erreur serveur");
+							if (!res.ok) throw new Error((data && data.data && data.data.message) || ((pkConfig.i18n && pkConfig.i18n.serverError) || "Erreur serveur"));
 							return data;
 						});
 					})

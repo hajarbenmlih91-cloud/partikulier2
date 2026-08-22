@@ -79,13 +79,23 @@ class Partikulier_WhatsApp_Verification {
 		$post = get_post( absint( $post_id ) );
 
 		// Message personnalisable depuis Apparence › Personnaliser.
-		$template = class_exists( 'Partikulier_Settings' )
-			? (string) Partikulier_Settings::get( 'whatsapp_message' )
-			: '';
+			$template = class_exists( 'Partikulier_Settings' )
+				? (string) Partikulier_Settings::get( 'whatsapp_message' )
+				: '';
 
-		if ( '' === trim( $template ) ) {
-			$template = __( 'Bonjour, je souhaite valider ma demande de publication Partikulier. Mon code est : {code}', 'partikulier' );
-		}
+			$default_template = 'Bonjour, je souhaite valider ma demande de publication Partikulier. Mon code est : {code}';
+			if ( '' === trim( $template ) || $default_template === $template ) {
+				$lang = function_exists( 'pll_get_post_language' ) ? sanitize_key( (string) pll_get_post_language( $post_id, 'slug' ) ) : '';
+				if ( ! $lang ) {
+					$lang = function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : 'fr';
+				}
+				$templates = array(
+					'fr' => $default_template,
+					'en' => 'Hello, I would like to validate my Partikulier listing publication request. My code is: {code}',
+					'ar' => 'مرحباً، أريد التحقق من طلب نشر إعلاني على بارتكولييه. الرمز الخاص بي هو: {code}',
+				);
+				$template = isset( $templates[ $lang ] ) ? $templates[ $lang ] : $templates['fr'];
+			}
 
 		$city = '';
 		if ( $post ) {

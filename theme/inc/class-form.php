@@ -348,7 +348,18 @@ class Partikulier_Form {
 			wp_set_object_terms( $post_id, (int) $city, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
 		}
 
-		// SEO : meta description dediee, plus courte que le texte de l'annonce.
+					// La langue source est celle du formulaire courant, jamais une valeur FR forcée.
+			$requested_lang = isset( $data['pk_language'] ) ? sanitize_key( wp_unslash( $data['pk_language'] ) ) : '';
+			$source_lang = $requested_lang ? $requested_lang : ( function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : 'fr' );
+			if ( ! in_array( $source_lang, array( 'fr', 'en', 'ar' ), true ) ) {
+				$source_lang = 'fr';
+			}
+			if ( function_exists( 'pll_set_post_language' ) ) {
+				pll_set_post_language( $post_id, $source_lang );
+			}
+
+			// SEO : meta description dediee, plus courte que le texte de l'annonce.
+
 		if ( class_exists( 'Partikulier_Listing_Preview' ) ) {
 			$seo_values = Partikulier_Listing_Preview::normalize_input( $data );
 			update_post_meta( $post_id, '_pk_meta_description', Partikulier_Listing_Preview::build_meta_description( $seo_values ) );
@@ -462,7 +473,8 @@ class Partikulier_Form {
 		//     elles par Polylang pour alimenter les balises hreflang. ---
 		if ( class_exists( 'Partikulier_Listing_Translations' ) && Partikulier_Listing_Translations::available() ) {
 			$i18n_values = Partikulier_Listing_Preview::normalize_input( $data );
-			$source_lang = function_exists( 'pll_default_language' ) ? pll_default_language() : 'fr';
+							$source_lang = isset( $source_lang ) ? $source_lang : ( function_exists( 'pll_default_language' ) ? pll_default_language() : 'fr' );
+
 			$extra_note  = isset( $data['pk_extra'] ) ? sanitize_textarea_field( wp_unslash( $data['pk_extra'] ) ) : '';
 
 			Partikulier_Listing_Translations::sync( $post_id, $i18n_values, $source_lang, $extra_note );

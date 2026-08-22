@@ -66,7 +66,9 @@ $types = get_terms( array(
 	<div class="pk-container pk-submit-body">
 		<form class="pk-form pk-steps" id="pk-submit-form" method="post" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" enctype="multipart/form-data" novalidate>
 			<input type="hidden" name="action" value="pk_submit_listing">
-			<input type="hidden" name="pk_form_action" value="pk_submit_listing">
+							<input type="hidden" name="pk_form_action" value="pk_submit_listing">
+				<input type="hidden" name="pk_language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
+
 			<?php if ( $editing_post ) : ?>
 				<input type="hidden" name="pk_edit_id" value="<?php echo (int) $editing_post->ID; ?>">
 			<?php endif; ?>
