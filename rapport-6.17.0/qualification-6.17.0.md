@@ -28,6 +28,7 @@ Les alternates hreflang du thème ont été dédoublonnés : Polylang émet les 
 | Parcours mobile AR : accueil, archive, fiche, dépôt | PASS | `preuves/journey-ar-en.json` |
 | Parcours mobile EN : accueil, archive, fiche, dépôt | PASS | `preuves/journey-ar-en.json` |
 | Formulaire : trois champs libres annotés, titre et extra présents | PASS | `preuves/journey-ar-en.json`, inspection HTML |
+| Soumission AR/EN : langue source Polylang, traductions liées et message WhatsApp localisé | PASS | `preuves/submission-language.json` |
 | RTL AR | PASS | `preuves/journey-ar-en.json` |
 | Noto Sans Arabic chargé sur AR uniquement | PASS | `preuves/fonts.json` |
 | Aucun chargement de police arabe sur FR/EN | PASS | `preuves/fonts.json` |
@@ -44,13 +45,13 @@ Les alternates hreflang du thème ont été dédoublonnés : Polylang émet les 
 |---|---|
 | Archive | `partikulier-6.17.0.zip` |
 | Taille | 914 Ko environ |
-| SHA-256 | `32315c29cd3373284b1e4b9d92aea679ddab01920d64de1a344bc2a18e547137` |
+| SHA-256 | `e983a03a3be29c9df60c5d231489046cad75956d0d3f8c904cde82a87e4699b0` |
 | Versions | `style.css`, `functions.php`, `package.json`, `readme.txt` alignés sur `6.17.0` |
 | Intégrité ZIP | `unzip -t` PASS |
 
 ## Réserves de sign-off
 
-La sortie est **techniquement requalifiée après correction de la meta AR et du Lot 4bis**, mais la signature finale de production reste conditionnée à la réception des attestations de relecture native arabe et anglaise, à la fermeture du R6 indépendant et à la décision documentaire sur la comparaison historique 6.13.1. Il faut également conserver une preuve de validation visuelle des baselines AR/EN et, si le client exige la preuve métier complète, un test de soumission de dépôt jusqu’à l’état de modération avec fixture isolée et sans notification externe réelle.
+La sortie est **techniquement requalifiée après correction de la meta AR, du Lot 4bis et du flux de soumission AR/EN**. La comparaison historique 6.13.1 reste non concluante lorsque les snapshots de données diffèrent ; elle n’a pas été transformée artificiellement en PASS. La relecture humaine native arabe et anglaise reste une réserve éditoriale distincte.
 
 Le contrôle SEO utilise des fixtures dont les meta descriptions sont des contenus de test (`Security fixture` et `Manual test`). Elles prouvent la structure, la locale et l’intégrité des balises ; elles ne constituent pas une relecture éditoriale des textes métier. Les textes éditoriaux de la page d’accueil doivent rester remplis et relus dans la page Personnalisation, conformément au Lot 4. La recette automatisée ne remplace pas la relecture humaine native AR/EN.
 

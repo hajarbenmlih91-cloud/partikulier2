@@ -30,6 +30,7 @@ La recette SEO découvre une famille `properties` publiée réellement dans Poly
 | Parcours navigateur AR | accueil, archive, fiche et dépôt : PASS, `failures: []` |
 | Parcours navigateur EN | accueil, archive, fiche et dépôt : PASS, `failures: []` |
 | Contrôle qualité | 66 fichiers PHP et 2 JavaScript : syntaxe valide; versions alignées en `6.17.0`; R6 positif et négatif PASS |
+| Soumission AR/EN | langue source Polylang correcte, traductions liées et message WhatsApp localisé; `failures: []` |
 
 Les preuves brutes sont conservées dans `/tmp/pk617-seo-final.json` et `/tmp/pk617-journeys-final.json` pendant la recette. Le rapport SEO final retourne `passed: true`; le rapport navigateur final retourne `passed: true` avec deux listes `failures` vides.
 
@@ -39,14 +40,14 @@ Le package installable régénéré est :
 
 ```text
 partikulier-6.17.0.zip
-SHA-256: 32315c29cd3373284b1e4b9d92aea679ddab01920d64de1a344bc2a18e547137
+SHA-256: e983a03a3be29c9df60c5d231489046cad75956d0d3f8c904cde82a87e4699b0
 ```
 
 Le package thème seul est :
 
 ```text
 partikulier-6.17.0-theme.zip
-SHA-256: fab29588cdbd6dd51cc4c0542ccab72dccc806983b6de2c9755bbf02841db214
+SHA-256: 6c5676112bef4ff44cb374c4f4e0756cc73134e187773bd1792acb20046fb3ec
 ```
 
 Le bundle installable contient notamment le thème, `theme/languages/partikulier.pot`, les catalogues `.mo`, le mu-plugin `mu-plugins/partikulier-early-seo.php` et les deux polices Noto Sans Arabic. Les scripts de recette et le présent rapport restent dans le dépôt de développement afin de séparer l’artefact WordPress installable des outils d’audit.
