@@ -8,7 +8,7 @@
       "screens": [
         {
           "name": "home",
-          "url": "http://localhost:8090/ar/",
+          "url": "http://127.0.0.1:8097/ar/",
           "ok": true,
           "html": "ar",
           "dir": "rtl",
@@ -17,15 +17,15 @@
         },
         {
           "name": "archive",
-          "url": "http://localhost:8090/ar/annonces/",
+          "url": "http://127.0.0.1:8097/ar/annonces/",
           "ok": true,
           "property_links": 16,
-          "detail": "property_links=16",
+          "detail": "archive_loaded",
           "http_status": 200
         },
         {
           "name": "property",
-          "url": "http://localhost:8090/ar/annonce/casablanca/maarif/%d8%a5%d8%b9%d9%84%d8%a7%d9%86-%d9%85%d8%aa%d8%b1%d8%ac%d9%85-security-sofia-listing/",
+          "url": "http://127.0.0.1:8097/ar/annonce/casablanca/maarif/security-sofia-listing/",
           "ok": true,
           "html": "ar",
           "dir": "rtl",
@@ -35,7 +35,7 @@
         },
         {
           "name": "deposit",
-          "url": "http://localhost:8090/ar/%d8%a5%d8%b6%d8%a7%d9%81%d8%a9-%d8%a5%d8%b9%d9%84%d8%a7%d9%86/",
+          "url": "http://127.0.0.1:8097/ar/%d8%a5%d8%b6%d8%a7%d9%81%d8%a9-%d8%a5%d8%b9%d9%84%d8%a7%d9%86/",
           "ok": true,
           "html": "ar",
           "dir": "rtl",
@@ -53,7 +53,7 @@
       "screens": [
         {
           "name": "home",
-          "url": "http://localhost:8090/en/",
+          "url": "http://127.0.0.1:8097/en/",
           "ok": true,
           "html": "en-US",
           "dir": null,
@@ -62,15 +62,15 @@
         },
         {
           "name": "archive",
-          "url": "http://localhost:8090/en/annonces/",
+          "url": "http://127.0.0.1:8097/en/annonces/",
           "ok": true,
           "property_links": 20,
-          "detail": "property_links=20",
+          "detail": "archive_loaded",
           "http_status": 200
         },
         {
           "name": "property",
-          "url": "http://localhost:8090/en/annonce/casablanca/maarif/manual-test-en-14/",
+          "url": "http://127.0.0.1:8097/en/annonce/casablanca/maarif/manual-test-en-14/",
           "ok": true,
           "html": "en-US",
           "dir": null,
@@ -80,7 +80,7 @@
         },
         {
           "name": "deposit",
-          "url": "http://localhost:8090/en/submit-a-listing/",
+          "url": "http://127.0.0.1:8097/en/submit-a-listing/",
           "ok": true,
           "html": "en-US",
           "dir": null,
