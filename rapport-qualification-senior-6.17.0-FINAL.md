@@ -7,7 +7,7 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | Artefact | Valeur |
 | :--- | :--- |
 | **Version** | 6.17.0 |
-| **Commit GitHub** | `ff40c18df4759c3ebd11c754dd08bb720caefcda` |
+| **Commit GitHub** | `9cde069f6b545926e2ca2f4dad61f39eb81f0a3f` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
 | **SHA-256 ZIP** | `f742fbb64a267a34df7a7b83756ab0861386693fd31c7242b027055dccbf3ac4` |
 
