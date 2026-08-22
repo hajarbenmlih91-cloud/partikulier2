@@ -1,0 +1,27 @@
+--- Démarrage du test de concurrence HMAC (5 rounds) ---
+Round 1 - Event ID: concurrent-event-1-1787419021
+WordPress database error Duplicate entry 'n8n-concurrent-event-1-1787419021' for key 'event_id' for query INSERT INTO `wp_pk_automation_events` (`event_id`, `event_type`, `source`, `payload_hash`, `status`, `received_at`) VALUES ('n8n-concurrent-event-1-1787419021', 'whatsapp_inbound', 'n8n', '58dcae841602822707d967832f697fe9970c42936198763343c3f305cd29012f', 'received', '2026-08-22 17:17:02') made by rest_do_request, WP_REST_Server->dispatch, WP_REST_Server->respond_to_request, Partikulier_Automation_Bridge::receive_event
+  Appel 1: {"accepted":true,"duplicate":false,"processing":"disabled"}
+  Appel 2: {"accepted":true,"duplicate":true,"processing":"disabled"}
+  Resultat: PASS ✅
+Round 2 - Event ID: concurrent-event-2-1787419022
+WordPress database error Duplicate entry 'n8n-concurrent-event-2-1787419022' for key 'event_id' for query INSERT INTO `wp_pk_automation_events` (`event_id`, `event_type`, `source`, `payload_hash`, `status`, `received_at`) VALUES ('n8n-concurrent-event-2-1787419022', 'whatsapp_inbound', 'n8n', '58dcae841602822707d967832f697fe9970c42936198763343c3f305cd29012f', 'received', '2026-08-22 17:17:02') made by rest_do_request, WP_REST_Server->dispatch, WP_REST_Server->respond_to_request, Partikulier_Automation_Bridge::receive_event
+  Appel 1: {"accepted":true,"duplicate":false,"processing":"disabled"}
+  Appel 2: {"accepted":true,"duplicate":true,"processing":"disabled"}
+  Resultat: PASS ✅
+Round 3 - Event ID: concurrent-event-3-1787419022
+WordPress database error Duplicate entry 'n8n-concurrent-event-3-1787419022' for key 'event_id' for query INSERT INTO `wp_pk_automation_events` (`event_id`, `event_type`, `source`, `payload_hash`, `status`, `received_at`) VALUES ('n8n-concurrent-event-3-1787419022', 'whatsapp_inbound', 'n8n', '58dcae841602822707d967832f697fe9970c42936198763343c3f305cd29012f', 'received', '2026-08-22 17:17:02') made by rest_do_request, WP_REST_Server->dispatch, WP_REST_Server->respond_to_request, Partikulier_Automation_Bridge::receive_event
+  Appel 1: {"accepted":true,"duplicate":false,"processing":"disabled"}
+  Appel 2: {"accepted":true,"duplicate":true,"processing":"disabled"}
+  Resultat: PASS ✅
+Round 4 - Event ID: concurrent-event-4-1787419022
+WordPress database error Duplicate entry 'n8n-concurrent-event-4-1787419022' for key 'event_id' for query INSERT INTO `wp_pk_automation_events` (`event_id`, `event_type`, `source`, `payload_hash`, `status`, `received_at`) VALUES ('n8n-concurrent-event-4-1787419022', 'whatsapp_inbound', 'n8n', '58dcae841602822707d967832f697fe9970c42936198763343c3f305cd29012f', 'received', '2026-08-22 17:17:03') made by rest_do_request, WP_REST_Server->dispatch, WP_REST_Server->respond_to_request, Partikulier_Automation_Bridge::receive_event
+  Appel 1: {"accepted":true,"duplicate":true,"processing":"disabled"}
+  Appel 2: {"accepted":true,"duplicate":false,"processing":"disabled"}
+  Resultat: PASS ✅
+Round 5 - Event ID: concurrent-event-5-1787419023
+WordPress database error Duplicate entry 'n8n-concurrent-event-5-1787419023' for key 'event_id' for query INSERT INTO `wp_pk_automation_events` (`event_id`, `event_type`, `source`, `payload_hash`, `status`, `received_at`) VALUES ('n8n-concurrent-event-5-1787419023', 'whatsapp_inbound', 'n8n', '58dcae841602822707d967832f697fe9970c42936198763343c3f305cd29012f', 'received', '2026-08-22 17:17:03') made by rest_do_request, WP_REST_Server->dispatch, WP_REST_Server->respond_to_request, Partikulier_Automation_Bridge::receive_event
+  Appel 1: {"accepted":true,"duplicate":false,"processing":"disabled"}
+  Appel 2: {"accepted":true,"duplicate":true,"processing":"disabled"}
+  Resultat: PASS ✅
+--- Test de concurrence terminé avec succès (5/5 rounds PASS) ---

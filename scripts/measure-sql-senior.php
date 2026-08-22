@@ -1,18 +1,16 @@
 <?php
 /**
- * Mesure SQL Senior v6.17.5.
+ * Mesure SQL Senior v6.17.6 avec SAVEQUERIES précoce.
  */
-$wp_dir = getenv('PK_WP_DIR');
 define('SAVEQUERIES', true);
+$wp_dir = getenv('PK_WP_DIR') ?: '/home/ubuntu/wp-6172-final';
 require_once $wp_dir . '/wp-load.php';
 
 global $wpdb;
-$wpdb->queries = array();
 
-// Simuler le rendu de l'archive via le template réel
+// Simulation du chargement de l'archive
 ob_start();
 include $wp_dir . '/wp-content/themes/partikulier/templates/archive.php';
 ob_end_clean();
 
-$total = count($wpdb->queries);
-echo "SQL_QUERIES_TOTAL: $total\n";
+echo "SQL_QUERIES_TOTAL: " . count($wpdb->queries) . "\n";

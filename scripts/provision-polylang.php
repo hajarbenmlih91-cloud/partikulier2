@@ -1,7 +1,7 @@
 <?php
 /**
- * Provisioning senior de Polylang autonome v6.17.5.
- * Gère les langues, les options et la liaison des pages.
+ * Provisioning senior de Polylang autonome v6.17.6.
+ * Gère les langues, les options, la liaison des pages et le rafraîchissement des permaliens.
  */
 if (!defined('ABSPATH')) exit;
 
@@ -12,6 +12,7 @@ if (!function_exists('PLL')) {
 $model = PLL()->model;
 $languages = $model->get_languages_list();
 
+// 1. Création des langues si absentes
 if (empty($languages)) {
     echo "Création des langues...\n";
     $model->add_language(array('name' => 'Français', 'slug' => 'fr', 'locale' => 'fr_FR', 'rtl' => 0, 'term_group' => 0));
@@ -23,50 +24,55 @@ if (empty($languages)) {
     update_option('polylang', $options);
 }
 
-// Configuration des types de post et taxonomies
+// 2. Configuration des types de post et taxonomies
 $options = get_option('polylang');
 $options['post_types'] = array_unique(array_merge((array)($options['post_types'] ?? array()), array('properties', 'page')));
 $options['taxonomies'] = array_unique(array_merge((array)($options['taxonomies'] ?? array()), array('es_type', 'es_category', 'es_location')));
-$options['force_lang'] = 1; 
-$options['rewrite'] = 1;    
+$options['force_lang'] = 1; // Ajouter le slug de langue à l'URL
+$options['rewrite'] = 1;    // Supprimer /language/ de l'URL
+$options['hide_default'] = 0; // Ne pas cacher la langue par défaut pour éviter les 404 asymétriques
 update_option('polylang', $options);
 
-// Liaison des pages critiques
+// 3. Liaison des pages critiques
 $pages_to_sync = array(
-    'deposer' => array('en' => 'deposer-en', 'ar' => 'deposer-ar', 'title_en' => 'Submit', 'title_ar' => 'إضافة إعلان'),
-    'mes-annonces' => array('en' => 'mes-annonces-en', 'ar' => 'mes-annonces-ar', 'title_en' => 'My listings', 'title_ar' => 'إعلاناتي'),
-    'favoris' => array('en' => 'favoris-en', 'ar' => 'favoris-ar', 'title_en' => 'Favorites', 'title_ar' => 'المفضلة')
+    'deposer' => array(
+        'fr' => array('title' => 'Déposer une annonce', 'slug' => 'deposer'),
+        'en' => array('title' => 'Submit a listing', 'slug' => 'deposer-en'),
+        'ar' => array('title' => 'إضافة إعلان', 'slug' => 'deposer-ar')
+    ),
+    'mes-annonces' => array(
+        'fr' => array('title' => 'Mes annonces', 'slug' => 'mes-annonces'),
+        'en' => array('title' => 'My listings', 'slug' => 'mes-annonces-en'),
+        'ar' => array('title' => 'إعلاناتي', 'slug' => 'mes-annonces-ar')
+    ),
+    'favoris' => array(
+        'fr' => array('title' => 'Favoris', 'slug' => 'favoris'),
+        'en' => array('title' => 'Favorites', 'slug' => 'favoris-en'),
+        'ar' => array('title' => 'المفضلة', 'slug' => 'favoris-ar')
+    )
 );
 
-foreach ($pages_to_sync as $fr_slug => $translations) {
-    $fr_page = get_page_by_path($fr_slug, OBJECT, 'page');
-    if (!$fr_page) continue;
+foreach ($pages_to_sync as $key => $translations) {
+    $trans_ids = array();
     
-    pll_set_post_language($fr_page->ID, 'fr');
-    $trans_ids = array('fr' => $fr_page->ID);
-    
-    foreach (array('en', 'ar') as $lang) {
-        $slug = $translations[$lang];
-        $title = $translations['title_' . $lang];
-        
-        $existing = get_page_by_path($slug, OBJECT, 'page');
-        if (!$existing) {
+    foreach ($translations as $lang => $data) {
+        $page = get_page_by_path($data['slug'], OBJECT, 'page');
+        if (!$page) {
             $id = wp_insert_post(array(
-                'post_title' => $title,
-                'post_name' => $slug,
+                'post_title' => $data['title'],
+                'post_name' => $data['slug'],
                 'post_status' => 'publish',
                 'post_type' => 'page'
             ));
         } else {
-            $id = $existing->ID;
+            $id = $page->ID;
         }
-        
         pll_set_post_language($id, $lang);
         $trans_ids[$lang] = $id;
     }
-    
     pll_save_post_translations($trans_ids);
 }
 
+// 4. Rafraîchissement des permaliens
 flush_rewrite_rules(true);
 echo "PROVISIONING_DONE\n";

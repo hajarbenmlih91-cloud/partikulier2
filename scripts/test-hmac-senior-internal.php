@@ -1,43 +1,38 @@
 <?php
 /**
- * Test HMAC & Idempotence Senior v6.17.5 via simulation interne (Body corrigé).
+ * Test interne HMAC Senior v6.17.6.
  */
-$wp_dir = getenv('PK_WP_DIR');
+$wp_dir = getenv('PK_WP_DIR') ?: '/home/ubuntu/wp-6172-final';
 require_once $wp_dir . '/wp-load.php';
 
-$secret_raw = 'senior-real-route-secret-32bytes-12345';
-$encoded_secret = base64_encode($secret_raw);
+$event_id_base = $argv[1] ?? 'concurrent-event-' . time();
+$event_id = 'n8n-' . $event_id_base;
+$timestamp = time();
+$secret_brut = 'real-secret-brut-123';
+$secret_b64 = base64_encode($secret_brut);
 $key_id = 'real-key-1';
 
-update_option('pk_n8n_settings', array(
-    'automation_api_secret' => $encoded_secret,
-    'hmac_mode' => 'enforce',
-    'active_key_id' => $key_id
-));
-
-$event_id = 'n8n-evt-' . uniqid();
-$timestamp = time();
-$body = json_encode(array(
+$request = new WP_REST_Request('POST', '/partikulier/v1/automation-event');
+$payload = array(
     'event_id' => $event_id,
     'event_type' => 'whatsapp_inbound',
     'source' => 'n8n',
-    'payload' => array('msg' => 'senior test')
-));
-$path = '/partikulier/v1/automation-event';
-$canonical = "POST\n" . $path . "\n" . $timestamp . "\n" . $body;
-$sig = 'sha256=' . hash_hmac('sha256', $canonical, $secret_raw);
+    'payload' => array('message' => 'Hello')
+);
+$body = json_encode($payload);
+$request->set_body($body);
 
-// Simuler 2 appels REST
-for ($i = 1; $i <= 2; $i++) {
-    $request = new WP_REST_Request('POST', $path);
-    $request->set_header('x-partikulier-automation', $encoded_secret);
-    $request->set_header('x-partikulier-key-id', $key_id);
-    $request->set_header('x-partikulier-timestamp', (string)$timestamp);
-    $request->set_header('x-partikulier-signature', $sig);
-    $request->set_body($body);
-    $request->set_header('Content-Type', 'application/json');
-    
-    $response = rest_do_request($request);
-    $data = $response->get_data();
-    echo "Appel $i: " . json_encode($data) . "\n";
-}
+// Signature HMAC
+$canonical = 'POST' . "\n" . '/partikulier/v1/automation-event' . "\n" . $timestamp . "\n" . $body;
+$signature = 'sha256=' . hash_hmac('sha256', $canonical, $secret_brut);
+
+$request->set_header('X-Partikulier-Automation', $secret_b64);
+$request->set_header('X-Partikulier-Key-Id', $key_id);
+$request->set_header('X-Partikulier-Timestamp', $timestamp);
+$request->set_header('X-Partikulier-Signature', $signature);
+$request->set_header('Content-Type', 'application/json');
+
+$response = rest_do_request($request);
+$data = $response->get_data();
+
+echo json_encode($data) . "\n";
