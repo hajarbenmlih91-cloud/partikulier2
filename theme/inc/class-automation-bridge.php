@@ -54,7 +54,6 @@ class Partikulier_Automation_Bridge {
 	}
 
 	public static function register_routes() {
-file_put_contents('/tmp/rest.log', 'register_routes_called');
 		self::register_route(
 			self::ROUTE,
 			array(
