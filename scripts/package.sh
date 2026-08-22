@@ -39,16 +39,12 @@ cat > "$STAGE/INSTALL.md" <<'EOF'
 Décompresser `theme/` dans `wp-content/themes/partikulier/` et `mu-plugins/` dans `wp-content/mu-plugins/`. Le mu-plugin est obligatoire : il protège la racine contre la redirection navigateur des robots avant le chargement du thème.
 EOF
 
-# Déterminisme : normaliser les dates des fichiers avant compression
-find "$STAGE" -exec touch -t 202608220000 {} +
-find "$T" -exec touch -t 202608220000 {} +
+# Archive thème historique
+( cd "$T" && zip -rq "$THEME_OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
 
-# Déterminisme strict : supprimer les attributs étendus et utiliser les options de zip pour ignorer les métadonnées
-( cd "$STAGE" && zip -Xrq "$OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
+# Bundle de livraison complet
+( cd "$STAGE" && zip -rq "$OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
 rm -rf "$STAGE"
-
-# Normaliser également le zip du thème seul
-( cd "$T" && zip -Xrq "$THEME_OUT" . -x '.git/*' 'node_modules/*' '.DS_Store' )
 
 unzip -t "$OUT" >/dev/null 2>&1 || { echo "Archive corrompue."; exit 1; }
 unzip -t "$THEME_OUT" >/dev/null 2>&1 || { echo "Archive thème corrompue."; exit 1; }
