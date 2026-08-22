@@ -5,7 +5,7 @@ import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 
 const BASE_URL = process.env.PK_BASE || 'http://localhost:8095';
-const VERSION = '6.17.6';
+const VERSION = '6.17.8';
 const BASELINE_DIR = path.join(process.cwd(), 'tests', `baselines-${VERSION}`);
 const CURRENT_DIR = path.join(process.cwd(), 'tests', 'current');
 const DIFF_DIR = path.join(process.cwd(), 'tests', 'diff');

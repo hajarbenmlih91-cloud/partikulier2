@@ -5,7 +5,7 @@ Tags: real-estate, property, listings, immobilier, performance, avif
 Requires at least: 6.0
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 6.17.7
+Stable tag: 6.17.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,7 +47,7 @@ Caracteristiques :
 
 == Changelog ==
 
-= 6.17.7 =
+= 6.17.8 =
 * Fix: Senior CDC v1.5 compliance (N+1, RTL, slugs, pagination, HMAC proofs)
 * Fix: PHP 8.4 runtime support
 * Fix: N+1 SQL optimization (106 -> 91 queries)
@@ -55,7 +55,7 @@ Caracteristiques :
 * Fix: Arabic meta descriptions localization
 * Fix: RTL visual invariants in header and menu
 
-= 6.17.7 =
+= 6.17.8 =
 * i18n trilingue : détection Polylang du navigateur, cookie prioritaire et exemption Googlebot/Bingbot.
 * Traductions gettext `ar.mo` et `en_US.mo` prioritaires sur les dictionnaires internes, avec police Noto Sans Arabic locale et RTL mobile.
 * Parcours de dépôt et champs libres annotés par langue, slugs AR et contrôles SEO `lang`, JSON-LD, Open Graph et hreflang.
