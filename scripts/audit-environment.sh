@@ -24,16 +24,19 @@ else
     echo "❌ ERREUR: WP-CLI est manquant"
 fi
 
+# Racine du paquet calculée dynamiquement
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
 echo -e "\n[4] Dépendances Node.js (E2E & Visual)"
-if [ -f "/home/ubuntu/partikulier2/package.json" ]; then
+if [ -f "$ROOT/package.json" ]; then
     echo "- package.json détecté"
-    grep -E "playwright|pixelmatch|canvas" /home/ubuntu/partikulier2/package.json | sed 's/^[[:space:]]*/  /'
+    grep -E "playwright|pixelmatch|canvas" "$ROOT/package.json" | sed 's/^[[:space:]]*/  /'
 else
     echo "⚠️ package.json absent dans le dossier courant"
 fi
 
 echo -e "\n[5] Inventaire des Scripts de Recette"
-SCRIPTS_DIR="/home/ubuntu/partikulier2/scripts"
+SCRIPTS_DIR="$ROOT/scripts"
 if [ -d "$SCRIPTS_DIR" ]; then
     echo "- Dossier scripts/ détecté"
     echo "- Scanner R6: $([ -f "$SCRIPTS_DIR/check-i18n-hardcoded.php" ] && echo "✅" || echo "❌")"
@@ -46,8 +49,8 @@ else
 fi
 
 echo -e "\n[6] Artefacts de Livraison"
-ZIP_PATH="/home/ubuntu/partikulier2/partikulier-6.17.0.zip"
-REPORT_PATH="/home/ubuntu/partikulier2/rapport-qualification-senior-6.17.0-FINAL.md"
+ZIP_PATH="$ROOT/partikulier-6.17.0.zip"
+REPORT_PATH="$ROOT/rapport-qualification-senior-6.17.0-FINAL.md"
 
 if [ -f "$ZIP_PATH" ]; then
     echo "- ZIP: $(basename "$ZIP_PATH") ✅"

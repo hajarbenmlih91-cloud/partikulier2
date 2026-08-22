@@ -38,11 +38,14 @@ function note(nom, ok, detail = '') {
   // Soumission a vide : la validation navigateur doit bloquer
   const bouton = page.locator('form button[type=submit], form input[type=submit]').first();
   if (await bouton.count()) {
-    await bouton.click().catch(() => {});
-    await page.waitForTimeout(600);
+    // Cibler explicitement le formulaire de dépôt (Lot 4bis)
     const bloque = await page.evaluate(() => {
-      const f = document.querySelector('form');
-      return f ? !f.checkValidity() : false;
+      const forms = [...document.querySelectorAll('form')];
+      const formDepot = forms.find(f => f.action.includes('deposer') || f.querySelector('input[name*="title"]'));
+      if (!formDepot) return false;
+      const btn = formDepot.querySelector('button[type=submit], input[type=submit]');
+      if (btn) btn.click();
+      return !formDepot.checkValidity();
     });
     note('Soumission a vide bloquee', bloque);
   } else {
@@ -78,7 +81,7 @@ function note(nom, ok, detail = '') {
   const cas = [
     ['sans filtre', '/annonces/'],
     ['par type', '/annonces/?es_type=appartement'],
-    ['par mot-cle', '/annonces/?s=casablanca'],
+    ['par mot-cle', '/annonces/?s=Casablanca'],
     ['mot-cle inexistant', '/annonces/?s=zzzzintrouvable'],
     ['page 2', '/annonces/page/2/'],
   ];

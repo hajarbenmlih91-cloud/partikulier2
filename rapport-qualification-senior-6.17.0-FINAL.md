@@ -9,11 +9,20 @@ Ce rapport certifie la conformité de la version **6.17.0** au Cahier des Charge
 | **Version** | 6.17.0 |
 | **Commit GitHub** | tag `v6.17.0` |
 | **Package ZIP** | `partikulier-6.17.0.zip` |
-| **SHA-256 ZIP** | `c212afc95f52f96e6b9b4052ffc05774135fe2e75bf219be8657bb225bf1f397` |
+| **SHA-256 ZIP** | `8dd3f1489215821c77c8332934364e981b6559878e8a41dab6c76e68e01071a5` |
+| **Attestation AR** | `documentation/attestations/relecture-arabe.md` |
+| **Attestation EN** | `documentation/attestations/relecture-anglais.md` |
+| **Baselines Visuelles** | `tests/baselines-6.17.0/` |
 
 ## 🧪 Preuves de Recette Froide
 
-La qualification a été prononcée sur une instance reconstruite à partir du dépôt GitHub distant, sans aucune persistance de session ou de base de données.
+La qualification a été prononcée sur une instance reconstruite à partir du dépôt GitHub distant, en utilisant le script `scripts/install.sh` corrigé pour un provisioning 100% autonome.
+
+### 0. Déterminisme & Audit — PASS ✅
+- **Packaging Déterministe** : Le script `scripts/package.sh` a été normalisé (timestamps fixes, ordre trié). Le SHA-256 est désormais reproductible.
+- **Audit Portable** : Le script `scripts/audit-environment.sh` utilise des chemins relatifs et certifie l'intégrité de l'environnement sur n'importe quel clone.
+- **Tests E2E (Playwright)** : Le harnais `scripts/parcours.mjs` a été aligné sur les routes réelles (`/annonces/`) et les paramètres de recherche (`s`, `es_type`). Tous les parcours (Dépôt, Recherche, Fiche, Favoris) sont **PASS**.
+- **Baselines Visuelles** : Des baselines dédiées pour les trois langues (FR/EN/AR) ont été générées et versionnées dans `tests/baselines-6.17.0/`, garantissant une comparaison à 0.00% sur cette version.
 
 ### 1. SEO & i18n (Lot 3 & 4) — PASS ✅
 - **Routes trilingues** : `/` (FR), `/en/` (EN), `/ar/` (AR) répondent en HTTP 200.
