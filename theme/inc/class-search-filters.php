@@ -34,6 +34,26 @@ class Partikulier_Search_Filters {
 
 	public static function init() {
 		add_action( 'pre_get_posts', array( __CLASS__, 'apply_filters' ), 20 );
+		add_filter( 'posts_orderby', array( __CLASS__, 'stable_property_order' ), 999, 2 );
+	}
+
+	/**
+	 * Ajoute un départage SQL déterministe après les réécritures Estatik/Polylang.
+	 *
+	 * @param string   $orderby Clause ORDER BY courante.
+	 * @param WP_Query $query   Requête courante.
+	 * @return string
+	 */
+	public static function stable_property_order( $orderby, $query ) {
+		if ( is_admin() || ! $query->is_main_query() || ! self::is_property_query( $query ) ) {
+			return $orderby;
+		}
+		global $wpdb;
+		$posts = $wpdb->posts;
+		// Estatik peut remplacer ORDER BY plus tôt dans la chaîne de hooks.
+		// Pour les archives de propriétés, le contrat reste date DESC avec ID DESC
+		// comme départage déterministe, quelle que soit la clause précédente.
+		return $posts . '.post_date DESC, ' . $posts . '.ID DESC';
 	}
 
 	/**
@@ -48,6 +68,12 @@ class Partikulier_Search_Filters {
 
 		if ( ! self::is_property_query( $query ) ) {
 			return;
+		}
+
+		// Les fixtures et les annonces créées à la même seconde doivent rester
+		// dans un ordre stable ; l’ID ne remplace pas le tri par date, il le départage.
+		if ( ! $query->get( 'orderby' ) || 'date' === $query->get( 'orderby' ) ) {
+			$query->set( 'orderby', array( 'date' => 'DESC', 'ID' => 'DESC' ) );
 		}
 
 		// --- Filtres de taxonomie (achat/location, type de bien, ville) ---

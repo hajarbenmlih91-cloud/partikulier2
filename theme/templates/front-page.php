@@ -11,17 +11,19 @@ get_header();
 $recent = get_posts( array(
 	'post_type' => PARTIKULIER_ESTATIK_POST_TYPE,
 	'post_status' => 'publish',
-	'posts_per_page' => 6,
+	'posts_per_page' => -1,
 	'no_found_rows' => true,
+	'orderby' => 'date',
+	'order' => 'DESC',
 	'meta_query' => Partikulier_Dashboard::active_listing_meta_query(),
 ) );
-$featured = get_posts( array(
-	'post_type' => PARTIKULIER_ESTATIK_POST_TYPE,
-	'post_status' => 'publish',
-	'posts_per_page' => 1,
-	'no_found_rows' => true,
-	'meta_query' => Partikulier_Dashboard::active_listing_meta_query(),
-) );
+// Le tie-breaker PHP rend la fixture stable même si Polylang réécrit l’ORDER BY SQL.
+usort( $recent, static function ( $a, $b ) {
+	$date_compare = strcmp( (string) $b->post_date_gmt, (string) $a->post_date_gmt );
+	return 0 !== $date_compare ? $date_compare : ( (int) $b->ID <=> (int) $a->ID );
+} );
+$recent = array_slice( $recent, 0, 6 );
+$featured = array_slice( $recent, 0, 1 );
 // Prefixe pk_home_ : card-property.php et search-form.php ecrasent $types
 // (variables globales partagees par require). Bug constate au rendu :
 // une seule tuile de type s'affichait, vide, apres la boucle des cartes.

@@ -110,7 +110,12 @@ for (const [tname, w, h] of TAILLES) {
 
   for (const [pname, url] of PAGES) {
     const cle = `${pname}-${tname}`;
-    const rep = await page.goto(BASE + url, { waitUntil: 'networkidle' });
+    let rep = await page.goto(BASE + url, { waitUntil: 'networkidle' });
+    // Répéter la navigation : la première réponse peut seulement amorcer le
+    // cache HTML ; baseline et contrôle doivent comparer l’état cache chaud.
+    rep = await page.goto(BASE + url, { waitUntil: 'networkidle' });
+    // La recette compare un état rendu stable, pas une frame d’animation.
+    await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
 
     // bug 1 : la page de depot doit servir son formulaire, pas un gabarit vide
     if (pname === 'deposer') {
