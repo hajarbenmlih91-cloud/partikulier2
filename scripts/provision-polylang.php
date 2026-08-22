@@ -87,6 +87,11 @@ foreach ( $structure_pages as $page_slug => $titles ) {
         $source_id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_name' => $page_slug, 'post_title' => $titles['fr'], 'post_content' => '' ), true );
         if ( is_wp_error( $source_id ) ) { fwrite( STDERR, $source_id->get_error_message() . "\\n" ); exit( 1 ); }
         $source = get_post( $source_id );
+    } else {
+        // Une page WordPress préexistante peut être en brouillon ou porter un slug historique.
+        // Le provisioning doit la rendre publiable et canonique de façon idempotente.
+        wp_update_post( array( 'ID' => $source->ID, 'post_status' => 'publish', 'post_name' => $page_slug, 'post_title' => $titles['fr'] ) );
+        $source = get_post( $source->ID );
     }
     pll_set_post_language( $source->ID, 'fr' );
     $template_map = array(
@@ -115,7 +120,17 @@ foreach ( $structure_pages as $page_slug => $titles ) {
     }
     pll_save_post_translations( $translations );
 }
-require_once __DIR__ . '/provision-polylang-taxonomies.php';
+$taxonomy_script = '';
+foreach ( array(
+    __DIR__ . '/provision-polylang-taxonomies.php',
+    ( function_exists( 'getcwd' ) ? getcwd() . '/scripts/provision-polylang-taxonomies.php' : '' ),
+    ( defined( 'ABSPATH' ) ? dirname( ABSPATH ) . '/scripts/provision-polylang-taxonomies.php' : '' ),
+    ( defined( 'ABSPATH' ) ? ABSPATH . 'scripts/provision-polylang-taxonomies.php' : '' ),
+) as $candidate ) {
+    if ( $candidate && is_file( $candidate ) ) { $taxonomy_script = $candidate; break; }
+}
+if ( ! $taxonomy_script ) { fwrite( STDERR, "Polylang taxonomy provisioning script unavailable\\n" ); exit( 1 ); }
+require_once $taxonomy_script;
 // Polylang peut réécrire ses options pendant le provisioning : la détection
 // navigateur est donc forcée une dernière fois, puis vérifiée avant le rapport.
 $final_option = get_option( 'polylang', array() );
@@ -138,6 +153,10 @@ if ( empty( get_option( 'polylang', array() )['browser'] ) ) {
 // Estatik, Polylang, les traductions et les taxonomies sont maintenant en place.
 // Le flush final doit donc refleter l’etat complet, et non un etat intermediaire.
 flush_rewrite_rules( false );
+// Invalider explicitement les caches persistants : sur un premier provisioning,
+// get_option('rewrite_rules') peut encore exposer la table antérieure au flush.
+wp_cache_delete( 'rewrite_rules', 'options' );
+wp_cache_delete( 'polylang', 'options' );
 // Rejouer le flush via WP-CLI après la mutation complète : cela force une
 // reconstruction des règles dans un cycle WP-CLI final et évite une table
 // partielle lorsque Polylang vient d'être provisionné dans le même processus.
@@ -148,6 +167,8 @@ if ( defined( 'WP_CLI' ) && WP_CLI && class_exists( 'WP_CLI' ) && method_exists(
         exit( 1 );
     }
 }
+wp_cache_delete( 'rewrite_rules', 'options' );
+if ( function_exists( 'wp_cache_flush' ) ) { wp_cache_flush(); }
 $rewrite_rules = (array) get_option( 'rewrite_rules', array() );
 $rewrite_checks = array(
     'polylang_language_rules' => false,
