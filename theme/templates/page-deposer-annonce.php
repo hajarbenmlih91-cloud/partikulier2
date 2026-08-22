@@ -70,7 +70,7 @@ $types = get_terms( array(
 				<input type="hidden" name="pk_language" value="<?php echo esc_attr( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' ); ?>">
 
 			<?php if ( $editing_post ) : ?>
-				<input type="hidden" name="pk_edit_id" value="<?php echo (int) $editing_post->ID; ?>">
+				<input type="hidden" name="pk_edit_id" value="<?php echo esc_attr( (string) $editing_post->ID ); ?>">
 			<?php endif; ?>
 			<?php wp_nonce_field( 'pk_submit_listing', 'nonce' ); ?>
 

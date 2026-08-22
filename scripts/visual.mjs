@@ -5,11 +5,10 @@ import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8092';
-const DIR = process.env.PK_BASELINE_DIR || path.join(process.cwd(), 'tests', 'baselines-6.17.2');
+const DIR = process.env.PK_BASELINE_DIR || path.join(process.cwd(), 'tests', 'baselines-6.17.3');
 const MODE = process.argv[2] === 'baseline' ? 'baseline' : 'check';
-const SEUIL = 10.0;
-
-const LANGUAGES = ['/fr/index.php', '/en/index.php', '/ar/index.php'];
+const SEUIL = 0.5; // Retour au seuil senior strict
+const LANGUAGES = ['/fr', '/en', '/ar'];
 const PAGES = [
   ['accueil', '/'],
   ['annonces', '/annonces/'],
@@ -36,20 +35,28 @@ function diff(img1, img2) {
   for (const [tname, w, h] of TAILLES) {
     const context = await nav.newContext({ viewport: { width: w, height: h }, isMobile: tname === 'mobile' });
     const page = await context.newPage();
-    
+
     for (const lang of LANGUAGES) {
-      const langSuffix = lang.split('/')[1];
+      const langSuffix = lang.replace('/', '');
       for (const [pname, url] of PAGES) {
         const cle = `${langSuffix}-${pname}-${tname}`;
         const fullUrl = lang + url;
-        
+
         try {
           let rep = await page.goto(BASE + fullUrl, { waitUntil: 'networkidle', timeout: 30000 });
-          await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
           
+          // Désactiver les éléments dynamiques pour la stabilité visuelle
+          await page.addStyleTag({ content: `*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important;caret-color:transparent!important}` });
+
           if (pname !== '404' && rep.status() !== 200) {
             erreurs.push(`${cle} : HTTP ${rep.status()} sur ${fullUrl}`);
             continue;
+          }
+
+          // Vérification des invariants (Senior requirement)
+          if (langSuffix === 'ar') {
+            const dir = await page.evaluate(() => document.documentElement.dir);
+            if (dir !== 'rtl') erreurs.push(`${cle} : RTL non détecté`);
           }
 
           const shot = await page.screenshot({ fullPage: true });
@@ -66,6 +73,7 @@ function diff(img1, img2) {
             } else {
               const img1 = PNG.sync.read(fs.readFileSync(refPath));
               const img2 = PNG.sync.read(shot);
+
               if (img1.width !== img2.width || img1.height !== img2.height) {
                 erreurs.push(`${cle} : dimensions différentes`);
               } else {
@@ -83,8 +91,10 @@ function diff(img1, img2) {
     }
     await context.close();
   }
+
   await nav.close();
   console.log(resultats.join('\n'));
+
   if (erreurs.length) {
     console.log('\nECHEC :');
     erreurs.forEach(e => console.log('  - ' + e));
