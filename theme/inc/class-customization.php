@@ -135,22 +135,23 @@ class Partikulier_Customization {
 		return array(
 			'home_title' => array(
 				'fr' => 'Vendez et louez entre particuliers.',
-				'en' => '',
-				'ar' => '',
-			),
-			'home_intro' => array(
-				'fr' => 'Déposez votre annonce immobilière gratuitement, sans commission, sans intermédiaire. Directement aux acheteurs et locataires.',
-				'en' => '',
-				'ar' => '',
-			),
-			'hero_alt' => array(
-				'fr' => 'Maison moderne à vendre, annonces immobilières entre particuliers',
-				'en' => '',
-				'ar' => '',
-			),
-			'badge_1' => array( 'fr' => 'Zéro commission', 'en' => '', 'ar' => '' ),
-			'badge_2' => array( 'fr' => 'Vendeur identifié', 'en' => '', 'ar' => '' ),
-			'badge_3' => array( 'fr' => 'Contact direct', 'en' => '', 'ar' => '' ),
+									'en' => 'Buy and rent directly from private owners.',
+					'ar' => 'اشترِ واكترِ مباشرة من المالكين.',
+				),
+				'home_intro' => array(
+					'fr' => 'Déposez votre annonce immobilière gratuitement, sans commission, sans intermédiaire. Directement aux acheteurs et locataires.',
+					'en' => 'Post your property for free, with no commission or middleman. Reach buyers and tenants directly.',
+					'ar' => 'أضف عقارك مجاناً، بدون عمولة أو وسيط. تواصل مباشرة مع المشترين والمستأجرين.',
+				),
+				'hero_alt' => array(
+					'fr' => 'Maison moderne à vendre, annonces immobilières entre particuliers',
+					'en' => 'Modern house for sale, private-owner property listings',
+					'ar' => 'منزل عصري للبيع، إعلانات عقارية من المالك مباشرة',
+				),
+				'badge_1' => array( 'fr' => 'Zéro commission', 'en' => 'No commission', 'ar' => 'بدون عمولة' ),
+				'badge_2' => array( 'fr' => 'Vendeur identifié', 'en' => 'Verified seller', 'ar' => 'بائع موثوق' ),
+				'badge_3' => array( 'fr' => 'Contact direct', 'en' => 'Direct contact', 'ar' => 'اتصال مباشر' ),
+
 		);
 	}
 

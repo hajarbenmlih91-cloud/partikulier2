@@ -76,7 +76,7 @@ while ( have_posts() ) :
 					</button>
 				</div>
 				<?php if ( $single_actions && ! is_wp_error( $single_actions ) ) : ?>
-					<span class="pk-single-badge pk-badge-<?php echo esc_attr( sanitize_title( $single_actions[0]->name ) ); ?>"><?php echo esc_html( $single_actions[0]->name ); ?></span>
+					<span class="pk-single-badge pk-badge-<?php echo esc_attr( sanitize_title( $single_actions[0]->name ) ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $single_actions[0]->name ) : $single_actions[0]->name ); ?></span>
 				<?php endif; ?>
 			</div>
 

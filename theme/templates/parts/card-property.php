@@ -86,7 +86,7 @@ if ( $price ) {
 			<?php echo $price_html; ?>
 		</span>
 		<?php if ( $action ) : ?>
-			<span class="pk-card-badge pk-badge-<?php echo esc_attr( sanitize_title( $action ) ); ?>"><?php echo esc_html( $action ); ?></span>
+			<span class="pk-card-badge pk-badge-<?php echo esc_attr( sanitize_title( $action ) ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $action ) : $action ); ?></span>
 		<?php endif; ?>
 	</a>
 

@@ -35,7 +35,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 			<option value=""><?php esc_html_e( 'Tout', 'partikulier' ); ?></option>
 				<?php foreach ( (array) $actions as $term ) : ?>
 					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
-					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( $term->name ); ?></option>
+					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
 			<?php endforeach; ?>
 		</select>
 	</div>
@@ -46,7 +46,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 			<option value=""><?php esc_html_e( 'Tous', 'partikulier' ); ?></option>
 				<?php foreach ( (array) $types as $term ) : ?>
 					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
-					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( $term->name ); ?></option>
+					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
 			<?php endforeach; ?>
 		</select>
 	</div>
@@ -57,7 +57,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 			<option value=""><?php esc_html_e( 'Toutes les villes', 'partikulier' ); ?></option>
 				<?php foreach ( (array) $cities as $term ) : ?>
 					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
-					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( $term->name ); ?></option>
+					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
 			<?php endforeach; ?>
 		</select>
 	</div>

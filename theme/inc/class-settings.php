@@ -232,9 +232,43 @@ class Partikulier_Settings {
 		}
 
 		if ( isset( $opts[ $key ] ) && '' !== (string) $opts[ $key ] ) {
-			return (string) $opts[ $key ];
+				$value = (string) $opts[ $key ];
+				$translated = self::localized_default( $key, $value, $current );
+				return '' !== $translated ? $translated : $value;
+			}
+		$translated = self::localized_default( $key, $fallback, $current );
+		return '' !== $translated ? $translated : $fallback;
+	}
+
+	/**
+	 * Traductions natives des valeurs par défaut du personnalisateur.
+	 * Une valeur localisée enregistrée garde toujours la priorité.
+	 */
+	private static function localized_default( $key, $value, $language ) {
+		$map = array(
+			'site_tagline' => array( 'en' => 'Buy and rent directly from private owners.', 'ar' => 'اشترِ واكترِ مباشرة من المالكين' ),
+			'site_intro' => array( 'en' => 'Post your property for free, with no commission or middleman. Reach buyers and tenants directly.', 'ar' => 'أضف عقارك مجاناً، بدون عمولة أو وسيط. تواصل مباشرة مع المشترين والمستأجرين.' ),
+			'btn_deposit' => array( 'en' => 'Post for free', 'ar' => 'أضف إعلاناً مجاناً' ),
+			'btn_listings' => array( 'en' => 'Search by city', 'ar' => 'ابحث حسب المدينة' ),
+			'topbar_text' => array( 'en' => '100% free listings — Publish in 2 minutes with no commission', 'ar' => 'إعلانات مجانية 100٪ — أضف إعلانك خلال دقيقتين بدون عمولة' ),
+			'service1_name' => array( 'en' => 'Free listings', 'ar' => 'إعلانات مجانية' ), 'service1_desc' => array( 'en' => 'Publish at no cost', 'ar' => 'انشر بدون تكلفة' ),
+			'service2_name' => array( 'en' => 'No commission', 'ar' => 'بدون عمولة' ), 'service2_desc' => array( 'en' => 'No middleman', 'ar' => 'بدون وسيط' ),
+			'service3_name' => array( 'en' => 'Video visits available', 'ar' => 'زيارات عبر الفيديو' ), 'service3_desc' => array( 'en' => 'Visit remotely', 'ar' => 'زر عن بُعد' ),
+			'service4_name' => array( 'en' => 'Online in 2 minutes', 'ar' => 'متاح خلال دقيقتين' ), 'service4_desc' => array( 'en' => 'No registration required', 'ar' => 'بدون تسجيل' ),
+			'section_types_kicker' => array( 'en' => 'Find your property', 'ar' => 'اعثر على عقارك' ), 'section_types_title' => array( 'en' => 'Property types', 'ar' => 'أنواع العقارات' ),
+			'section_types_desc' => array( 'en' => 'Explore listings by property category.', 'ar' => 'استكشف الإعلانات حسب فئة العقار.' ),
+			'section_recent_kicker' => array( 'en' => 'Recently published', 'ar' => 'أضيفت حديثاً' ), 'section_recent_title' => array( 'en' => 'Latest listings', 'ar' => 'أحدث الإعلانات' ),
+		);
+		$defaults = array();
+		foreach ( self::fields() as $group ) {
+			foreach ( $group['fields'] as $field_key => $field ) {
+				$defaults[ $field_key ] = $field['default'];
+			}
 		}
-		return $fallback;
+		if ( isset( $map[ $key ][ $language ], $defaults[ $key ] ) && (string) $value === (string) $defaults[ $key ] ) {
+			return $map[ $key ][ $language ];
+		}
+		return '';
 	}
 
 	/**
@@ -265,6 +299,12 @@ class Partikulier_Settings {
 			}
 		}
 
+		if ( $is_editorial && 'fr' !== self::current_language() ) {
+			$localized_default = self::localized_default( $key, $value, self::current_language() );
+			if ( '' !== $localized_default ) {
+				$value = $localized_default;
+			}
+		}
 		if ( $is_editorial && isset( $opts['localized'] ) && is_array( $opts['localized'] ) ) {
 			return $value;
 		}

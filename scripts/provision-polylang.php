@@ -75,7 +75,11 @@ $structure_pages = array(
     'favoris' => array( 'fr' => 'Favoris', 'en' => 'Favorites', 'ar' => 'المفضلة' ),
     'mes-annonces' => array( 'fr' => 'Mes annonces', 'en' => 'My listings', 'ar' => 'إعلاناتي' ),
     'politique-de-confidentialite' => array( 'fr' => 'Politique de confidentialité — contenu en attente de validation juridique', 'en' => 'Privacy policy — pending legal validation', 'ar' => 'سياسة الخصوصية — في انتظار المصادقة القانونية' ),
+    'confidentialite' => array( 'fr' => 'Confidentialité — contenu en attente de validation juridique', 'en' => 'Privacy — pending legal validation', 'ar' => 'الخصوصية — في انتظار المصادقة القانونية' ),
     'conditions-utilisation' => array( 'fr' => 'Conditions générales — contenu en attente de validation juridique', 'en' => 'Terms of use — pending legal validation', 'ar' => 'شروط الاستخدام — في انتظار المصادقة القانونية' ),
+    'faq' => array( 'fr' => 'Questions fréquentes', 'en' => 'Frequently asked questions', 'ar' => 'الأسئلة الشائعة' ),
+    'contact' => array( 'fr' => 'Contact', 'en' => 'Contact', 'ar' => 'اتصل بنا' ),
+    'mentions-legales' => array( 'fr' => 'Mentions légales — contenu en attente de validation juridique', 'en' => 'Legal notice — pending legal validation', 'ar' => 'الإشعار القانوني — في انتظار المصادقة القانونية' ),
 );
 foreach ( $structure_pages as $page_slug => $titles ) {
     $source = get_page_by_path( $page_slug, OBJECT, 'page' );
@@ -98,11 +102,11 @@ foreach ( $structure_pages as $page_slug => $titles ) {
         $existing = pll_get_post_translations( $source->ID );
         $translated_id = ! empty( $existing[ $slug_lang ] ) ? (int) $existing[ $slug_lang ] : 0;
         if ( ! $translated_id ) {
-            $translated_id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $titles[ $slug_lang ], 'post_content' => '' ), true );
+            $translated_id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_name' => $page_slug . '-' . $slug_lang, 'post_title' => $titles[ $slug_lang ], 'post_content' => '' ), true );
             if ( is_wp_error( $translated_id ) ) { fwrite( STDERR, $translated_id->get_error_message() . "\\n" ); exit( 1 ); }
             pll_set_post_language( $translated_id, $slug_lang );
         } else {
-            wp_update_post( array( 'ID' => $translated_id, 'post_title' => $titles[ $slug_lang ], 'post_status' => 'publish' ) );
+            wp_update_post( array( 'ID' => $translated_id, 'post_name' => $page_slug . '-' . $slug_lang, 'post_title' => $titles[ $slug_lang ], 'post_status' => 'publish' ) );
         }
         if ( isset( $template_map[ $page_slug ] ) ) {
             update_post_meta( $translated_id, '_wp_page_template', $template_map[ $page_slug ] );

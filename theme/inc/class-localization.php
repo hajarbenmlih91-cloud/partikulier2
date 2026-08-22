@@ -211,7 +211,23 @@ class Partikulier_Localization {
 	 * Traduit une chaîne publique explicitement enregistrée, sinon conserve la
 	 * valeur d’origine. Cela protège les textes libres et les réglages personnalisés.
 	 */
-	public static function translate_public_string( $string ) {
+			public static function translate_taxonomy_label( $label ) {
+			$map = array(
+				'A louer' => array( 'fr' => 'A louer', 'en' => 'For rent', 'ar' => 'للإيجار' ),
+				'A vendre' => array( 'fr' => 'A vendre', 'en' => 'For sale', 'ar' => 'للبيع' ),
+				'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
+				'Appartements' => array( 'fr' => 'Appartements', 'en' => 'Apartments', 'ar' => 'شقق' ),
+				'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
+				'Maisons' => array( 'fr' => 'Maisons', 'en' => 'Houses', 'ar' => 'منازل' ),
+				'Rabat' => array( 'fr' => 'Rabat', 'en' => 'Rabat', 'ar' => 'الرباط' ),
+				'Casablanca' => array( 'fr' => 'Casablanca', 'en' => 'Casablanca', 'ar' => 'الدار البيضاء' ),
+			);
+			$language = self::current_language();
+			return isset( $map[ $label ][ $language ] ) ? $map[ $label ][ $language ] : $label;
+		}
+
+		public static function translate_public_string( $string ) {
+
 		if ( ! function_exists( 'pll__' ) || ! in_array( $string, self::public_chrome_strings(), true ) ) {
 			return $string;
 		}
@@ -297,7 +313,31 @@ class Partikulier_Localization {
 				'Contact' => array( 'fr' => 'Contact', 'en' => 'Contact', 'ar' => 'اتصل بنا' ),
 				'Maroc' => array( 'fr' => 'Maroc', 'en' => 'Morocco', 'ar' => 'المغرب' ),
 				'Tous droits réservés.' => array( 'fr' => 'Tous droits réservés.', 'en' => 'All rights reserved.', 'ar' => 'جميع الحقوق محفوظة.' ),
-				'Mentions légales' => array( 'fr' => 'Mentions légales', 'en' => 'Legal notices', 'ar' => 'الإشعارات القانونية' ),
+									'Mentions légales' => array( 'fr' => 'Mentions légales', 'en' => 'Legal notices', 'ar' => 'الإشعارات القانونية' ),
+					'Accueil' => array( 'fr' => 'Accueil', 'en' => 'Home', 'ar' => 'الرئيسية' ),
+					'Annonces' => array( 'fr' => 'Annonces', 'en' => 'Listings', 'ar' => 'الإعلانات' ),
+					'Toutes les villes' => array( 'fr' => 'Toutes les villes', 'en' => 'All cities', 'ar' => 'كل المدن' ),
+					'Vendeur identifié' => array( 'fr' => 'Vendeur identifié', 'en' => 'Verified seller', 'ar' => 'بائع موثوق' ),
+					'Zéro commission' => array( 'fr' => 'Zéro commission', 'en' => 'No commission', 'ar' => 'بدون عمولة' ),
+					'Contact direct' => array( 'fr' => 'Contact direct', 'en' => 'Direct contact', 'ar' => 'اتصال مباشر' ),
+					'Commencez par une ville, un quartier ou un code postal.' => array( 'fr' => 'Commencez par une ville, un quartier ou un code postal.', 'en' => 'Start with a city, neighbourhood or postcode.', 'ar' => 'ابدأ بمدينة أو حي أو رمز بريدي.' ),
+					'Vendez et louez entre particuliers.' => array( 'fr' => 'Vendez et louez entre particuliers.', 'en' => 'Buy and rent directly from private owners.', 'ar' => 'اشترِ واكترِ مباشرة من المالكين.' ),
+					'Déposez votre annonce immobilière gratuitement, sans commission, sans intermédiaire. Directement aux acheteurs et locataires.' => array( 'fr' => 'Déposez votre annonce immobilière gratuitement, sans commission, sans intermédiaire. Directement aux acheteurs et locataires.', 'en' => 'Post your property for free, with no commission or middleman. Reach buyers and tenants directly.', 'ar' => 'أضف عقارك مجاناً، بدون عمولة أو وسيط. تواصل مباشرة مع المشترين والمستأجرين.' ),
+					'Publier gratuitement' => array( 'fr' => 'Publier gratuitement', 'en' => 'Post for free', 'ar' => 'أضف إعلاناً مجاناً' ),
+					'Chercher par ville' => array( 'fr' => 'Chercher par ville', 'en' => 'Search by city', 'ar' => 'ابحث حسب المدينة' ),
+					'Achat ou location' => array( 'fr' => 'Achat ou location', 'en' => 'Buy or rent', 'ar' => 'شراء أو إيجار' ),
+					'Tout' => array( 'fr' => 'Tout', 'en' => 'All', 'ar' => 'الكل' ),
+					'A louer' => array( 'fr' => 'A louer', 'en' => 'For rent', 'ar' => 'للإيجار' ),
+					'Budget max' => array( 'fr' => 'Budget max', 'en' => 'Maximum budget', 'ar' => 'الميزانية القصوى' ),
+					'Illimité' => array( 'fr' => 'Illimité', 'en' => 'No limit', 'ar' => 'بدون حد' ),
+					'Annonce à la une' => array( 'fr' => 'Annonce à la une', 'en' => 'Featured listing', 'ar' => 'إعلان مميز' ),
+					'Des biens choisis pour leur lumière.' => array( 'fr' => 'Des biens choisis pour leur lumière.', 'en' => 'Properties selected for their light.', 'ar' => 'عقارات مختارة لإضاءتها.' ),
+					'Un accès direct aux annonces publiées par leurs propriétaires.' => array( 'fr' => 'Un accès direct aux annonces publiées par leurs propriétaires.', 'en' => 'Direct access to listings published by their owners.', 'ar' => 'وصول مباشر إلى الإعلانات المنشورة من مالكيها.' ),
+					'Fraîchement publiées' => array( 'fr' => 'Fraîchement publiées', 'en' => 'Recently published', 'ar' => 'أضيفت حديثاً' ),
+					'Les dernières annonces' => array( 'fr' => 'Les dernières annonces', 'en' => 'Latest listings', 'ar' => 'أحدث الإعلانات' ),
+					'Des biens ajoutés récemment par leurs propriétaires.' => array( 'fr' => 'Des biens ajoutés récemment par leurs propriétaires.', 'en' => 'Properties recently added by their owners.', 'ar' => 'عقارات أضافها مالكوها مؤخراً.' ),
+					'Voir toutes les annonces' => array( 'fr' => 'Voir toutes les annonces', 'en' => 'View all listings', 'ar' => 'عرض كل الإعلانات' ),
+
 			);
 		}
 
