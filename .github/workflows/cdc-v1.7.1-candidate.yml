@@ -77,6 +77,13 @@ jobs:
       - name: Secret scan
         run: bash scripts/scan-secrets.sh documentation/secrets-scan-v1.7.1.json
 
+      - name: Generate honest qualification report
+        env:
+          PK_COMMIT: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python3 scripts/qualification-report-v1.7.1.py
+
   cold-acceptance:
     name: Cold WordPress MariaDB HTTP acceptance
     needs: static-contracts
@@ -122,6 +129,14 @@ jobs:
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_RUN_ID: ${{ github.run_id }}
         run: bash scripts/ci-cold-acceptance-v1.7.1.sh
+
+      - name: Generate honest qualification report after acceptance
+        if: always()
+        env:
+          PK_COMMIT: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python3 scripts/qualification-report-v1.7.1.py
 
       - name: Collect volatile CI evidence sidecar
         if: always()

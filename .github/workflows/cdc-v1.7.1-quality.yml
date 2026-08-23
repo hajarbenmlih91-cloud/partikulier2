@@ -52,6 +52,13 @@ jobs:
       - name: Secret scan
         run: bash scripts/scan-secrets.sh documentation/secrets-scan-v1.7.1.json
 
+      - name: Generate honest qualification report
+        env:
+          PK_COMMIT: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python3 scripts/qualification-report-v1.7.1.py
+
       - name: SBOM consistency
         run: npm sbom --sbom-format=cyclonedx --omit=dev > /tmp/sbom.json && jq -e '.bomFormat == "CycloneDX" and (.components|length)>0' /tmp/sbom.json
 

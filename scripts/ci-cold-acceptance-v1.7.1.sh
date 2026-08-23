@@ -42,8 +42,8 @@ wait_for_http() {
 wait_for_http
 
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/core-contract.php" > "$ROOT/documentation/core-contract-v${VERSION}.json"
-PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/routes-contract.mjs" > "$ROOT/documentation/routes-contract-v${VERSION}.json" 2> "$ROOT/documentation/routes-contract-v${VERSION}.summary.log"
-PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/parcours.mjs" > "$ROOT/documentation/e2e-v${VERSION}.json" 2> "$ROOT/documentation/e2e-v${VERSION}.summary.log"
+PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/routes-contract.mjs" > "$ROOT/documentation/routes-contract-v${VERSION}.json" 2> "$ROOT/documentation/routes-contract-v${VERSION}.summary.log"
+PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/parcours.mjs" > "$ROOT/documentation/e2e-v${VERSION}.json" 2> "$ROOT/documentation/e2e-v${VERSION}.summary.log"
 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" node "$ROOT/scripts/visual-contract-v1.7.1.mjs" > "$ROOT/documentation/visual-contract-v${VERSION}.json" 2> "$ROOT/documentation/visual-contract-v${VERSION}.summary.log"
 # Les baselines sont versionnées dans Git : la CI ne les régénère jamais et
 # produit seulement une fiche de contrôle non ambiguë.

@@ -5,6 +5,7 @@ const contractPath = new URL('../tests/routes-contract.json', import.meta.url);
 const contract = JSON.parse(fs.readFileSync(contractPath, 'utf8'));
 const base = process.env.PK_BASE || contract.base;
 const commit = process.env.PK_COMMIT || 'uncommitted';
+const version = process.env.PK_VERSION || contract.version;
 const scenarios = [{ name: 'root', ...contract.root }, ...contract.routes];
 const results = [];
 const MAX_REDIRECTS = 8;
@@ -80,6 +81,6 @@ for (const scenario of scenarios) {
 
 const passed = results.filter((r) => r.result === 'PASS').length;
 const failed = results.length - passed;
-console.log(JSON.stringify({ version: contract.version, commit, base, total: results.length, passed, failed, results }, null, 2));
-console.error(`E2E_ROUTE_SUMMARY version=${contract.version} commit=${commit} total=${results.length} pass=${passed} fail=${failed}`);
+console.log(JSON.stringify({ version, contract_version: contract.version, commit, base, total: results.length, passed, failed, results }, null, 2));
+console.error(`E2E_ROUTE_SUMMARY version=${version} contract_version=${contract.version} commit=${commit} total=${results.length} pass=${passed} fail=${failed}`);
 process.exit(failed === 0 ? 0 : 1);
