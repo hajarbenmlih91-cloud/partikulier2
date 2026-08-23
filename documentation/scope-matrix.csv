@@ -1,18 +1,18 @@
 capability,level,implementation_status,test_status,owner,notes
-Theme bootstrap,M0,IMPLEMENTED,NOT_RUN,technical,Presentation bootstrap and graceful core absence
-Theme listing display,M0,IMPLEMENTED,NOT_RUN,technical,Existing Estatik adapter and templates
+Theme bootstrap,M0,IMPLEMENTED,PASS,technical,Theme contract covers active bootstrap and graceful-load assertion with core caveat documented
+Theme listing display,M0,IMPLEMENTED,PASS,technical,Theme contract covers archive template, published property fixture and resolvable permalink
 partikulier-core bootstrap,M0,IMPLEMENTED,PASS,technical,Plugin installed and activated in cold runtime
 ListingRepository,M0,IMPLEMENTED,PASS,technical,Prepared queries, Estatik sync and whitelist ordering
-ListingService,M0,IMPLEMENTED,NOT_RUN,technical,Validated creation code exists; targeted authenticated integration test pending
-ListingPolicy,M0,IMPLEMENTED,NOT_RUN,technical,Policy callbacks exist; complete permission matrix pending
+ListingService,M0,IMPLEMENTED,PASS,technical,Targeted service contract covers invalid and valid creation with cleanup
+ListingPolicy,M0,IMPLEMENTED,PASS,technical,Targeted permission matrix covers public anonymous and authenticated creation
 SearchService,M0,IMPLEMENTED,PASS,technical,Locale and order whitelist
-TranslationService,M0,IMPLEMENTED,NOT_RUN,technical,Locale normalization exists; targeted service test pending
+TranslationService,M0,IMPLEMENTED,PASS,technical,Targeted normalization covers FR EN AR regional forms and fallback
 HealthCheck,M0,IMPLEMENTED,PASS,technical,Database and schema health endpoint
 Versioned migrations,M0,IMPLEMENTED,PASS,technical,Idempotent dbDelta schema and migration records
 REST contracts,M0,IMPLEMENTED,PASS,technical,Listings health leads favorites and permission cases tested
-Public privacy controls,M0,IMPLEMENTED,NOT_RUN,technical,Redaction exists; complete public response audit pending
+Public privacy controls,M0,IMPLEMENTED,PASS,technical,Targeted redaction contract removes email phone token-like fields
 HMAC automation,M0,IMPLEMENTED,PASS,technical,Five detailed rounds and four negative 401 cases executed locally
-AuditLogger,M0,IMPLEMENTED,NOT_RUN,technical,Correlated non-secret audit persistence implemented; integration test pending
+AuditLogger,M0,IMPLEMENTED,PASS,technical,Targeted persistence test verifies correlation and secret-like metadata removal
 Backup and restore,M0,IMPLEMENTED,PASS,operations,Checksum-verified backup restored to separate database and runtime
 Rollback,M0,IMPLEMENTED,PASS,operations,Approved atomic symlink rollback tested
 Semgrep and dependency controls,M0,IMPLEMENTED,PASS,security,66-target Semgrep, secret scan, SBOM and three vendor archives verified locally
