@@ -67,7 +67,7 @@ payload = {
     "source_ref": os.environ.get("GITHUB_REF", "local"),
     "run_id": os.environ.get("GITHUB_RUN_ID", "local"),
     "generated_at_utc": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-    "status": "PASS" if not errors else "FAIL",
+    "status": "PASS" if ultra == "PASS" and not errors else ("FAIL" if errors or technical == "FAIL" else "BLOCKED"),
     "decision": decision,
     "labels": {"TECHNICAL_RELEASE": technical, "UX_CONTENT": ux_content, "COMMERCIAL_RELEASE": commercial, "ULTRA_PREMIUM": ultra},
     "scope_counts": {"M0": len(m0), "M1": len(m1), "M2": len(m2)},
@@ -75,6 +75,7 @@ payload = {
     "package_sha256": args.package_sha256 or None,
     "human_validation": "PENDING_NOT_SIMULATED",
     "release_policy": "No tag or release is authorized by this report alone.",
+    "status_semantics": "PASS means all qualification labels pass; BLOCKED means the report is valid but required scope or human approval remains outstanding.",
 }
 output = ROOT / args.output
 output.parent.mkdir(parents=True, exist_ok=True)

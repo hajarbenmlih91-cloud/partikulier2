@@ -67,11 +67,16 @@ rm -f "$OUT" "$THEME_OUT" "$EVIDENCE_OUT"
 ( cd "$STAGE" && find . -type f -print | sort | zip -Xrq "$OUT" -@ )
 unzip -tq "$OUT" >/dev/null
 unzip -tq "$THEME_OUT" >/dev/null
-sha256sum "$OUT" > "$OUT.sha256"
-if [ -n "${PK_EVIDENCE_DIR:-}" ] && [ -d "$PK_EVIDENCE_DIR" ]; then cp -a "$PK_EVIDENCE_DIR/." "$EVIDENCE/"; fi
+( cd "$(dirname "$OUT")" && sha256sum "$(basename "$OUT")" ) > "$OUT.sha256"
+  if [ -n "${PK_EVIDENCE_DIR:-}" ] && [ -d "$PK_EVIDENCE_DIR" ]; then cp -a "$PK_EVIDENCE_DIR/." "$EVIDENCE/"; fi
+if [ -f "$EVIDENCE/qualification-v1.7.1.json" ]; then
+  package_sha="$(cut -d' ' -f1 "$OUT.sha256")"
+  jq --arg package_sha "$package_sha" --arg commit "$COMMIT" '.package_sha256 = $package_sha | .source_commit = $commit' "$EVIDENCE/qualification-v1.7.1.json" > "$EVIDENCE/qualification-v1.7.1.json.tmp"
+  mv "$EVIDENCE/qualification-v1.7.1.json.tmp" "$EVIDENCE/qualification-v1.7.1.json"
+fi
 printf '{"format":"partikulier-evidence-sidecar-v1","candidate_version":"%s","source_commit":"%s","package_sha256":"%s","source_ref":"%s","run_id":"%s"}\n' "$VERSION" "$COMMIT" "$(cut -d' ' -f1 "$OUT.sha256")" "${GITHUB_REF:-local}" "${GITHUB_RUN_ID:-local}" > "$EVIDENCE/attestation.json"
 find "$EVIDENCE" -type f -exec touch -d "@${SOURCE_DATE_EPOCH}" {} +
 tar --sort=name --mtime="@${SOURCE_DATE_EPOCH}" --owner=0 --group=0 --numeric-owner -czf "$EVIDENCE_OUT" -C "$EVIDENCE" .
-sha256sum "$EVIDENCE_OUT" > "$EVIDENCE_OUT.sha256"
+( cd "$(dirname "$EVIDENCE_OUT")" && sha256sum "$(basename "$EVIDENCE_OUT")" ) > "$EVIDENCE_OUT.sha256"
 for required in INSTALL.md partikulier-core/partikulier-core.php partikulier-core/migrations/001_initial.sql scripts/install.sh scripts/backup.sh scripts/restore.sh scripts/rollback.sh documentation/candidate-$VERSION.json documentation/scope-matrix.csv documentation/capacity-envelope.json documentation/data-contract.json documentation/dependency-manifest-v1.7.1.json documentation/sbom-v1.7.1.json documentation/visual-scenarios-v1.7.1.json; do unzip -l "$OUT" | grep -E "[[:space:]]${required//./\\.}$" >/dev/null || { echo "Bundle incomplet: $required" >&2; exit 1; }; done
 printf 'PRODUCT=%s\nPRODUCT_SHA256=%s\nEVIDENCE=%s\nEVIDENCE_SHA256=%s\nSOURCE_COMMIT=%s\n' "$OUT" "$(cut -d' ' -f1 "$OUT.sha256")" "$EVIDENCE_OUT" "$(cut -d' ' -f1 "$EVIDENCE_OUT.sha256")" "$COMMIT"
