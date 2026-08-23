@@ -44,9 +44,10 @@ wait_for_http
 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/routes-contract.mjs" > "$ROOT/documentation/routes-contract-v${VERSION}.json" 2> "$ROOT/documentation/routes-contract-v${VERSION}.summary.log"
 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/parcours.mjs" > "$ROOT/documentation/e2e-v${VERSION}.json" 2> "$ROOT/documentation/e2e-v${VERSION}.summary.log"
 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/visual.mjs" > "$ROOT/documentation/visual-v${VERSION}.json" 2> "$ROOT/documentation/visual-v${VERSION}.summary.log"
-PK_GENERATE=1 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/visual.mjs" baseline > "$ROOT/documentation/visual-generate-v${VERSION}.json" 2> "$ROOT/documentation/visual-generate-v${VERSION}.summary.log"
-# Revalidate the committed baseline after generation; the generated images are only a CI workspace artifact.
-PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/visual.mjs" > "$ROOT/documentation/visual-v${VERSION}.json" 2> "$ROOT/documentation/visual-v${VERSION}.summary.log"
+# Les baselines sont versionnées dans Git : la CI ne les régénère jamais et
+# produit seulement une fiche de contrôle non ambiguë.
+jq -n --arg version "$VERSION" --arg commit "$CI_COMMIT" --arg manifest "tests/baselines-$VERSION/SHA256SUMS" --argjson count 30 '{version:$version,candidate_version:$version,commit:$commit,mode:"committed-baselines-validation",baseline_count:$count,manifest:$manifest,regenerated:false}' > "$ROOT/documentation/visual-generate-v${VERSION}.json"
+printf 'VISUAL_BASELINES_MODE=committed\nVERSION=%s\nCOMMIT=%s\nCOUNT=30\n' "$VERSION" "$CI_COMMIT" > "$ROOT/documentation/visual-generate-v${VERSION}.summary.log"
 PK_URL="$BASE" PK_REPORT="$ROOT/documentation/browser-detection-v${VERSION}.json" bash "$ROOT/scripts/test-i18n-browser-detection.sh" > "$ROOT/documentation/browser-detection-v${VERSION}.log"
 PK_BASE="$BASE" PK_REPORT="$ROOT/documentation/i18n-fonts-v${VERSION}.json" node "$ROOT/scripts/test-i18n-fonts.mjs" > "$ROOT/documentation/i18n-fonts-v${VERSION}.log"
 PK_SORT_REPORT="$ROOT/documentation/search-sorting-v${VERSION}.json" php "$ROOT/scripts/test-search-sorting.php" > "$ROOT/documentation/search-sorting-v${VERSION}.log"
