@@ -57,7 +57,7 @@ fi
 for dependency_zip in "$POLYLANG_ZIP" "$QUERY_MONITOR_ZIP"; do
   [ -f "$dependency_zip" ] || { echo "Dépendance vendor absente : $dependency_zip" >&2; exit 2; }
   [ -f "${dependency_zip}.sha256" ] || { echo "Checksum dépendance absente : ${dependency_zip}.sha256" >&2; exit 2; }
-  ( cd "$(dirname "$dependency_zip")" && sha256sum --check --strict "$(basename "${dependency_zip}.sha256")" )
+  sha256sum --check --strict "${dependency_zip}.sha256"
 done
 
 export DEBIAN_FRONTEND=noninteractive
