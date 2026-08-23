@@ -1,5 +1,5 @@
 {
-  "version": "6.17.14",
+  "version": "6.17.15",
   "base": "http://localhost:8090",
   "root": {
     "path": "/",

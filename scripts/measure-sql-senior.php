@@ -17,7 +17,7 @@ $queries = array();
 foreach ( (array) $wpdb->queries as $query ) {
     $queries[] = array( 'sql' => (string) ( $query[0] ?? '' ), 'time' => (float) ( $query[1] ?? 0 ), 'caller' => (string) ( $query[2] ?? '' ) );
 }
-$version = getenv( 'PK_VERSION' ) ?: '6.17.14';
+$version = getenv( 'PK_VERSION' ) ?: '6.17.15';
 $payload = array(
     'version' => $version,
     'scope' => 'mesure du template d’archive sous SAVEQUERIES',

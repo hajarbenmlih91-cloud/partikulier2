@@ -6,6 +6,7 @@ set -u
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WP_DIR="${PK_WP_DIR:-$ROOT/wp}"
 PORT="${PK_PORT:-8090}"
+SERVER_LOG="${PK_SERVER_LOG:-$WP_DIR/partikulier-server.log}"
 
 [ -f "$WP_DIR/index.php" ] || { echo "WordPress absent. Lancez d'abord : bash scripts/install.sh"; exit 1; }
 
@@ -20,7 +21,7 @@ if ss -ltn 2>/dev/null | grep -q ":$PORT "; then
 fi
 
 cd "$WP_DIR" || exit 1
-nohup php -S 0.0.0.0:"$PORT" router.php >/dev/null 2>&1 &
+nohup php -S 0.0.0.0:"$PORT" router.php >"$SERVER_LOG" 2>&1 &
 sleep 2
 
 if ss -ltn 2>/dev/null | grep -q ":$PORT "; then

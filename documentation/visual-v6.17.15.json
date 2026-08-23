@@ -1,0 +1,311 @@
+{
+  "version": "6.17.15",
+  "commit": "ci-6.17.15",
+  "base": "http://localhost:8099",
+  "mode": "CHECK",
+  "total": 30,
+  "passed": 30,
+  "failed": 0,
+  "results": [
+    {
+      "name": "fr-accueil-desktop",
+      "http": 200,
+      "final_path": "/fr/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-accueil-mobile",
+      "http": 200,
+      "final_path": "/fr/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-accueil-desktop",
+      "http": 200,
+      "final_path": "/en/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-accueil-mobile",
+      "http": 200,
+      "final_path": "/en/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-accueil-desktop",
+      "http": 200,
+      "final_path": "/ar/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-accueil-mobile",
+      "http": 200,
+      "final_path": "/ar/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-annonces-desktop",
+      "http": 200,
+      "final_path": "/fr/annonces/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-annonces-mobile",
+      "http": 200,
+      "final_path": "/fr/annonces/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-annonces-desktop",
+      "http": 200,
+      "final_path": "/en/annonces/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-annonces-mobile",
+      "http": 200,
+      "final_path": "/en/annonces/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-annonces-desktop",
+      "http": 200,
+      "final_path": "/ar/annonces/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-annonces-mobile",
+      "http": 200,
+      "final_path": "/ar/annonces/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-deposer-desktop",
+      "http": 200,
+      "final_path": "/fr/deposer/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-deposer-mobile",
+      "http": 200,
+      "final_path": "/fr/deposer/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-deposer-desktop",
+      "http": 200,
+      "final_path": "/en/deposer-en/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-deposer-mobile",
+      "http": 200,
+      "final_path": "/en/deposer-en/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-deposer-desktop",
+      "http": 200,
+      "final_path": "/ar/deposer-ar/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-deposer-mobile",
+      "http": 200,
+      "final_path": "/ar/deposer-ar/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-mes-annonces-desktop",
+      "http": 302,
+      "final_path": "/wp-login.php",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-mes-annonces-mobile",
+      "http": 302,
+      "final_path": "/wp-login.php",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-mes-annonces-desktop",
+      "http": 302,
+      "final_path": "/wp-login.php",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-mes-annonces-mobile",
+      "http": 302,
+      "final_path": "/wp-login.php",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-mes-annonces-desktop",
+      "http": 302,
+      "final_path": "/wp-login.php",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-mes-annonces-mobile",
+      "http": 302,
+      "final_path": "/wp-login.php",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-favoris-desktop",
+      "http": 200,
+      "final_path": "/fr/favoris/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-favoris-mobile",
+      "http": 200,
+      "final_path": "/fr/favoris/",
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-favoris-desktop",
+      "http": 200,
+      "final_path": "/en/favoris-en/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-favoris-mobile",
+      "http": 200,
+      "final_path": "/en/favoris-en/",
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-favoris-desktop",
+      "http": 200,
+      "final_path": "/ar/favoris-ar/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-favoris-mobile",
+      "http": 200,
+      "final_path": "/ar/favoris-ar/",
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    }
+  ]
+}

@@ -7,7 +7,7 @@ URL="${PK_HMAC_URL:-$BASE/wp-json/partikulier/v1/automation-event}"
 ROUTE="/partikulier/v1/automation-event"
 KEY_ID="${PK_HMAC_KEY_ID:-env}"
 SECRET_B64="${PARTIKULIER_N8N_SECRET:-}"
-VERSION="${PK_VERSION:-6.17.14}"
+VERSION="${PK_VERSION:-6.17.15}"
 LOG="${PK_HMAC_LOG:-$ROOT/documentation/hmac-http-v${VERSION}.json}"
 ROUNDS=5
 [ -n "$SECRET_B64" ] || { echo 'PARTIKULIER_N8N_SECRET absent (valeur Base64 exigée)' >&2; exit 2; }

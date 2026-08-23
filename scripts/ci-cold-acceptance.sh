@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${PK_VERSION:-6.17.14}"
+VERSION="${PK_VERSION:-6.17.15}"
 PORT="${PK_PORT:-8090}"
 BASE="${PK_BASE:-http://localhost:${PORT}}"
 RUNTIME="${PK_WP_DIR:-$ROOT/.runtime/ci-wp-${VERSION}}"
@@ -20,14 +20,17 @@ rm -rf "$RUNTIME"
 
 bash "$ROOT/scripts/install-tooling.sh"
 bash "$ROOT/scripts/install.sh" > "$ROOT/documentation/install-v${VERSION}-final.log"
-bash "$ROOT/scripts/start.sh"
+PK_SERVER_LOG="$ROOT/documentation/server-v${VERSION}.log" bash "$ROOT/scripts/start.sh"
 
 wait_for_http() {
   for _ in $(seq 1 30); do
-    if curl --fail --silent --show-error "$BASE/fr/" >/dev/null; then return 0; fi
+    if curl --fail --silent --show-error --connect-timeout 2 --max-time 5 "$BASE/fr/" >/dev/null; then return 0; fi
     sleep 1
   done
   echo "WordPress non disponible sur $BASE" >&2
+  ss -ltnp || true
+  pgrep -af 'php -S' || true
+  if [ -f "$PK_WP_DIR/partikulier-server.log" ]; then tail -100 "$PK_WP_DIR/partikulier-server.log" >&2; fi
   exit 1
 }
 wait_for_http
