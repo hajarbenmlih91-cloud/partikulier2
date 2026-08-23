@@ -37,6 +37,7 @@ $payload = [
     'status' => $failed ? 'FAIL' : 'PASS',
     'exit_code' => $failed ? 1 : 0,
     'tests' => $results,
+    'total' => count($results),
     'passed' => count($results) - count($failed),
     'failed' => count($failed),
     'limitations' => ['core absence assertion verifies theme loadability contract but does not hot-toggle plugins in the same process'],

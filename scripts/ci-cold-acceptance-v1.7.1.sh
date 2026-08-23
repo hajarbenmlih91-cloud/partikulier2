@@ -78,6 +78,9 @@ bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/docume
 
 PK_WP_DIR="$RUNTIME" PK_MIN_LISTINGS=1000 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/scripts/provision-load-fixture.php" > "$ROOT/documentation/load-fixture-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_LOAD_REPORT="$ROOT/documentation/load-test-v${VERSION}.json" bash "$ROOT/scripts/load-test-http.sh" > "$ROOT/documentation/load-test-v${VERSION}.log"
+# These reports are created after the first stamp; stamp them again so every
+# candidate JSON carries the same exact commit field before gate evaluation.
+bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/documentation/provenance-v${VERSION}-final.log"
 
 for report in "$ROOT"/documentation/*"v${VERSION}".json; do jq empty "$report"; done
 jq -e '.passed == true and (.orders|length) == 3' "$ROOT/documentation/search-sorting-v${VERSION}.json" >/dev/null

@@ -97,6 +97,7 @@ $payload = [
     'status' => $failed ? 'FAIL' : 'PASS',
     'exit_code' => $failed ? 1 : 0,
     'tests' => $results,
+    'total' => count($results),
     'passed' => count($results) - count($failed),
     'failed' => count($failed),
     'artifacts' => ['partikulier-core/src', 'documentation/data-contract.json'],

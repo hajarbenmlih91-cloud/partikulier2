@@ -66,6 +66,7 @@ $payload = [
     'status' => $failed ? 'FAIL' : 'PASS',
     'exit_code' => $failed ? 1 : 0,
     'tests' => $results,
+    'total' => count($results),
     'passed' => count($results) - count($failed),
     'failed' => count($failed),
     'limitations' => ['theme bootstrap/display and production cache proxy behavior are separate gates'],
