@@ -1,0 +1,18 @@
+{
+  "version": "6.17.16",
+  "candidate_version": "6.17.16",
+  "commit": "af237442eecd2e823604ac81145fb83bac56590c",
+  "scope": "mesure du template d’archive sous SAVEQUERIES",
+  "runs": [
+    49,
+    45,
+    45
+  ],
+  "threshold": 56,
+  "all_below_threshold": true,
+  "trace_files": [
+    "documentation/sql-trace-v6.17.16-run1.json",
+    "documentation/sql-trace-v6.17.16-run2.json",
+    "documentation/sql-trace-v6.17.16-run3.json"
+  ]
+}

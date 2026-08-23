@@ -5,7 +5,7 @@ Tags: real-estate, property, listings, immobilier, performance, avif
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 6.17.15
+Stable tag: 6.17.16
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -47,7 +47,7 @@ Caracteristiques :
 
 == Changelog ==
 
-= 6.17.15 =
+= 6.17.16 =
 * Revue senior : migration idempotente de l’ancien slug `deposer-une-annonce` vers `/deposer/` et exclusion des espaces privés du cache public.
 * Reproductibilité renforcée : sorties JSON strictes, suivi des chaînes de redirection, WP-CLI vérifié par SHA-512, `npm ci` et contrôle Node 22.
 

@@ -1,0 +1,150 @@
+name: CDC fermé Partikulier 6.17.16
+
+on:
+  push:
+    branches: ["main", "fix/cdc-v6.17.16"]
+    tags: ["v6.17.16"]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  PK_VERSION: 6.17.16
+  NODE_MAJOR: 22
+  SEMGREP_VERSION: 1.132.0
+
+jobs:
+  static-contracts:
+    name: Static contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring,xml,curl,zip,mysql,gd,intl,bcmath
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: python3 -m pip install --user --break-system-packages "semgrep==${SEMGREP_VERSION}"
+      - run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - run: bash scripts/check.sh
+      - run: bash -n scripts/*.sh
+      - run: for f in scripts/*.mjs; do node --check "$f"; done
+      - run: for f in scripts/*.php; do php -l "$f"; done
+      - run: npx --no-install playwright install --with-deps chromium
+      - run: cd vendor-artifacts && sha256sum -c --strict estatik-4.3.4.zip.sha256
+      - run: unzip -p vendor-artifacts/estatik-4.3.4.zip estatik/estatik.php | grep -E -m1 'Version:[[:space:]]+4\.3\.4'
+      - run: test "$(find tests/baselines-${PK_VERSION} -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 30
+      - run: test -s tests/baselines-${PK_VERSION}/SHA256SUMS
+      - run: node -e "JSON.parse(require('fs').readFileSync('tests/routes-contract.json','utf8')); JSON.parse(require('fs').readFileSync('documentation/e2e-v' + process.env.PK_VERSION + '.json','utf8'))"
+      - name: Run exact Semgrep scope
+        run: |
+          bash scripts/run-semgrep-v6.17.16.sh "$RUNNER_TEMP/semgrep-static-v6.17.16.json"
+          jq -e '.acceptance.targets_scanned == 66 and .acceptance.raw_targets_scanned == 66 and .acceptance.blocking_findings == 0 and .acceptance.errors_count == 0' "$RUNNER_TEMP/semgrep-static-v6.17.16.json"
+
+  cold-acceptance:
+    name: Cold WordPress acceptance
+    needs: static-contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: cd vendor-artifacts && sha256sum -c --strict estatik-4.3.4.zip.sha256
+      - name: Run fresh environment and all acceptance suites
+        env:
+          PK_VERSION: 6.17.16
+          PK_PORT: 8090
+          PK_BASE: http://localhost:8090
+          PK_DB_NAME: partikulier_ci_61712
+          PK_DB_USER: partikulier_ci
+          PK_DB_PASS: ci-only-sql-password
+          PK_ADMIN_USER: ciadmin
+          PK_ADMIN_PASS: ci-only-admin-password
+          PK_ADMIN_EMAIL: ci@example.test
+        run: bash scripts/ci-cold-acceptance.sh
+      - name: Collect cold acceptance evidence
+        if: always()
+        run: tar -czf "cold-acceptance-v${PK_VERSION}.tar.gz" documentation/install-tooling.log documentation/server-v${PK_VERSION}.log documentation/*"v${PK_VERSION}"* tests/baselines-${PK_VERSION} 2>/dev/null || tar -czf "cold-acceptance-v${PK_VERSION}.tar.gz" documentation/*"v${PK_VERSION}"* tests/baselines-${PK_VERSION}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cold-acceptance-v6.17.16
+          path: cold-acceptance-v6.17.16.tar.gz
+          if-no-files-found: error
+
+  package:
+    name: Reproducible package
+    needs: [static-contracts, cold-acceptance]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: cold-acceptance-v6.17.16
+      - run: tar -xzf cold-acceptance-v6.17.16.tar.gz
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Build canonical package
+        run: bash scripts/package.sh 6.17.16
+      - name: Record first package identity
+        run: printf 'commit=%s\n' "$GITHUB_SHA" > documentation/package-v6.17.16-first.log && sha256sum partikulier-6.17.16.zip >> documentation/package-v6.17.16-first.log
+      - name: Rebuild canonical package with reproducibility proof
+        run: bash scripts/package.sh 6.17.16
+      - name: Verify canonical package
+        run: sha256sum partikulier-6.17.16.zip > partikulier-6.17.16.zip.sha256 && sha256sum -c partikulier-6.17.16.zip.sha256 && unzip -tq partikulier-6.17.16.zip
+      - name: Rebuild from detached checkout and compare bytes
+        run: |
+          tmp="$RUNNER_TEMP/partikulier-detached"
+          git worktree add --detach "$tmp" "$GITHUB_SHA"
+          cp documentation/package-v6.17.16-first.log "$tmp/documentation/package-v6.17.16-first.log"
+          cp cold-acceptance-v6.17.16.tar.gz "$RUNNER_TEMP/cold-acceptance-v6.17.16.tar.gz"
+          tar -xzf "$RUNNER_TEMP/cold-acceptance-v6.17.16.tar.gz" -C "$tmp"
+          (cd "$tmp" && npm ci --ignore-scripts --no-audit --no-fund && bash scripts/package.sh 6.17.16)
+          cmp --silent partikulier-6.17.16.zip "$tmp/partikulier-6.17.16.zip"
+          {
+            echo "REPRODUCIBLE=PASS"
+            echo "commit=$GITHUB_SHA"
+            echo "branch_build=$(sha256sum partikulier-6.17.16.zip | cut -d' ' -f1)"
+            echo "detached_build=$(sha256sum "$tmp/partikulier-6.17.16.zip" | cut -d' ' -f1)"
+          } | tee reproducibility-v6.17.16.log
+      - run: unzip -l partikulier-6.17.16.zip | grep -q 'vendor-artifacts/estatik-4.3.4.zip.sha256'
+      - run: unzip -l partikulier-6.17.16.zip | grep -q 'documentation/senior-code-review-v6.17.16.md'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-v6.17.16
+          path: |
+            partikulier-6.17.16.zip
+            partikulier-6.17.16-theme.zip
+            partikulier-6.17.16.zip.sha256
+            reproducibility-v6.17.16.log
+          if-no-files-found: error
+
+  release:
+    name: Publish release after acceptance
+    needs: package
+    if: github.event_name == 'push' && github.ref == 'refs/tags/v6.17.16'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-v6.17.16
+      - name: Verify release artifact
+        run: sha256sum -c partikulier-6.17.16.zip.sha256 && unzip -tq partikulier-6.17.16.zip
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create v6.17.16 partikulier-6.17.16.zip partikulier-6.17.16-theme.zip partikulier-6.17.16.zip.sha256 --title 'Partikulier v6.17.16 — acceptance froide' --notes-file documentation/release-notes-v6.17.16.md

@@ -15,9 +15,8 @@ pgrep -x mariadbd >/dev/null || (sudo mariadbd-safe --datadir=/var/lib/mysql --u
 for i in $(seq 1 20); do sudo mariadb -e "SELECT 1" >/dev/null 2>&1 && break; sleep 1; done
 
 if ss -ltn 2>/dev/null | grep -q ":$PORT "; then
-  echo "Le port $PORT est déjà occupé — le site tourne probablement déjà."
-  echo "http://localhost:$PORT"
-  exit 0
+  echo "Le port $PORT est déjà occupé : refus de réutiliser une instance inconnue." >&2
+  exit 1
 fi
 
 cd "$WP_DIR" || exit 1

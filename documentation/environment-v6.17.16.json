@@ -1,0 +1,56 @@
+{
+  "candidate_version": "6.17.16",
+  "base_version": "6.17.7",
+  "review_parent": "6.17.13@7177dcf611ab22f22d289e8d3faf3e0c9c14abcb",
+  "wordpress": "7.1",
+  "php": "8.3.6",
+  "mariadb": "10.11.14",
+  "node": "22.13.0",
+  "npm": "10.9.2",
+  "wp_cli": "2.12.0",
+  "estatik": "4.3.4",
+  "polylang": "3.8.7",
+  "query_monitor": "4.0.7",
+  "semgrep": "1.132.0",
+  "playwright": "1.62.1",
+  "browser": "Chromium 151.0.7922.71",
+  "os": "Ubuntu 24.04 amd64",
+  "database_fixture": {
+    "post_type": "properties",
+    "published_listings": 30
+  },
+  "polylang_config": {
+    "languages": [
+      "fr",
+      "en",
+      "ar"
+    ],
+    "default": "fr",
+    "force_lang": 1,
+    "hide_default": 0,
+    "browser_detection": 1
+  },
+  "review_checks": {
+    "legacy_slug_migration": "pass",
+    "private_route_cache_exclusion": "pass",
+    "strict_json_harness_output": "pass",
+    "wpcli_sha512_verification": "pass",
+    "estatik_artifact_sha256": "pass",
+    "cold_acceptance_orchestrator": "pass"
+  },
+  "server_scope": "PHP built-in server adapter for the cold recipe; production equivalence is limited to HTTP behavior exercised here.",
+  "acceptance_port": 8099,
+  "acceptance_orchestrator": "scripts/ci-cold-acceptance.sh",
+  "sources": {
+    "wordpress": "https://wordpress.org/download/",
+    "estatik_official_directory": "https://wordpress.org/plugins/estatik/",
+    "estatik_artifact": "vendor-artifacts/estatik-4.3.4.zip",
+    "estatik_sha256": "9aad4e7b0bd0f35e3a918a0cf68a3dbfef473df09ca8e6b3a471bb4213e965d5",
+    "polylang": "https://downloads.wordpress.org/plugin/polylang.3.8.7.zip",
+    "query_monitor": "https://downloads.wordpress.org/plugin/query-monitor.4.0.7.zip"
+  },
+  "supply_chain_note": "Estatik 4.3.4 est embarqué et vérifié avant installation. Le SHA-256 garantit l’identité de l’archive utilisée ; il ne remplace pas une signature éditeur indépendante.",
+  "fallback_note": "Le téléchargement générique est désactivé par défaut. PK_ALLOW_UNPINNED_ESTATIK=1 l’active uniquement comme mode explicitement non reproductible.",
+  "measured_at_utc": "2026-08-23T15:20:00Z",
+  "commit": "af237442eecd2e823604ac81145fb83bac56590c"
+}

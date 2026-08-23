@@ -1,0 +1,56 @@
+{
+  "version": "6.17.16",
+  "base": "http://localhost:8100",
+  "passed": true,
+  "checks": [
+    {
+      "lang": "ar",
+      "path": "/ar/",
+      "expectedFont": true,
+      "expectedDir": "rtl",
+      "ok": true,
+      "requests": 2,
+      "requestUrls": [
+        "http://localhost:8100/wp-content/themes/partikulier/assets/fonts/NotoSansArabic-SemiBold.woff2",
+        "http://localhost:8100/wp-content/themes/partikulier/assets/fonts/NotoSansArabic-Regular.woff2"
+      ],
+      "fontsCheck": true,
+      "family": "\"Noto Sans Arabic\"",
+      "htmlLang": "ar",
+      "dir": "rtl",
+      "readyState": "loaded"
+    },
+    {
+      "lang": "fr",
+      "path": "/fr/",
+      "expectedFont": null,
+      "expectedDir": "ltr",
+      "ok": true,
+      "requests": 1,
+      "requestUrls": [
+        "http://localhost:8100/wp-content/themes/partikulier/assets/fonts/NotoSansArabic-Regular.woff2"
+      ],
+      "fontsCheck": true,
+      "family": "\"Noto Sans Arabic\"",
+      "htmlLang": "fr-FR",
+      "dir": "ltr",
+      "readyState": "loading"
+    },
+    {
+      "lang": "en",
+      "path": "/en/",
+      "expectedFont": null,
+      "expectedDir": "ltr",
+      "ok": true,
+      "requests": 1,
+      "requestUrls": [
+        "http://localhost:8100/wp-content/themes/partikulier/assets/fonts/NotoSansArabic-Regular.woff2"
+      ],
+      "fontsCheck": true,
+      "family": "\"Noto Sans Arabic\"",
+      "htmlLang": "en-US",
+      "dir": "ltr",
+      "readyState": "loading"
+    }
+  ]
+}

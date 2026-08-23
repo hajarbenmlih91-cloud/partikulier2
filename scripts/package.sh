@@ -66,6 +66,7 @@ for proof in \
   documentation/semgrep-v$VERSION.json \
   documentation/semgrep-version-v$VERSION.txt \
   documentation/check-v$VERSION.log \
+  documentation/provenance-v$VERSION.log \
   documentation/install-tooling.log \
   documentation/install-v$VERSION-final.log; do
   [ -f "$ROOT/$proof" ] || { echo "Preuve requise absente : $proof" >&2; exit 1; }
@@ -90,8 +91,8 @@ Ce bundle est autosuffisant pour la revue et la recette. Il contient le thème, 
 ## Provenance
 
 - Candidate : $VERSION
-- Branche source : $(git branch --show-current)
 - Commit source : $(git rev-parse HEAD)
+- Source ref : commit immuable (branche et checkout détaché équivalents)
 - BASE_COMMIT : $BASE_COMMIT
 
 ## Recette froide
@@ -128,8 +129,8 @@ cat > "$STAGE/documentation/candidate-$VERSION.json" <<EOF
 {
   "candidate_version": "$VERSION",
   "base_commit": "$BASE_COMMIT",
-  "source_branch": "$(git branch --show-current)",
   "source_commit": "$(git rev-parse HEAD)",
+  "source_ref_policy": "commit-only; branch-independent package",
   "bundle_scope": "theme + mu-plugins + scripts + tests + documentation proofs + CI + Semgrep",
   "required_proofs": ["routes-contract", "e2e", "visual-30", "browser-detection", "i18n-fonts", "hmac-http", "sql-3-runs", "semgrep"]
 }
@@ -150,10 +151,10 @@ unzip -tq "$OUT" >/dev/null
 unzip -tq "$THEME_OUT" >/dev/null
 required=(
   INSTALL.md scripts/check.sh scripts/package.sh scripts/install.sh scripts/start.sh scripts/ci-cold-acceptance.sh scripts/routes-contract.mjs scripts/parcours.mjs scripts/visual.mjs
-  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS vendor-artifacts/estatik-4.3.4.zip vendor-artifacts/estatik-4.3.4.zip.sha256
+  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php scripts/stamp-provenance.sh tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS vendor-artifacts/estatik-4.3.4.zip vendor-artifacts/estatik-4.3.4.zip.sha256
   documentation/candidate-$VERSION.json documentation/routes-contract-v$VERSION.json documentation/e2e-v$VERSION.json
   documentation/visual-v$VERSION.json documentation/search-sorting-v$VERSION.json documentation/hmac-http-v$VERSION.json documentation/sql-v$VERSION-summary.json
-  documentation/semgrep-v$VERSION.json documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/estatik-artifact-v4.3.4.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
+  documentation/semgrep-v$VERSION.json documentation/provenance-v$VERSION.log documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/estatik-artifact-v4.3.4.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
 )
 for entry in "${required[@]}"; do
   unzip -l "$OUT" | grep -E "[[:space:]]${entry//./\\.}$" >/dev/null || { echo "Bundle incomplet : $entry" >&2; exit 1; }

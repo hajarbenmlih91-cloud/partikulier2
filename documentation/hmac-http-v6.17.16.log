@@ -1,0 +1,110 @@
+{
+  "version": "6.17.16",
+  "candidate_version": "6.17.16",
+  "commit": "af237442eecd2e823604ac81145fb83bac56590c",
+  "base": "http://localhost:8100",
+  "url": "http://localhost:8100/wp-json/partikulier/v1/automation-event",
+  "canonicalization": "POST\\\\nREST_ROUTE\\\\nTIMESTAMP\\\\nBODY; HMAC-SHA256 over Base64-decoded secret",
+  "rounds": 5,
+  "rounds_detail": [
+    {
+      "round": 1,
+      "http_codes": [
+        200,
+        200
+      ],
+      "duplicate": [
+        false,
+        true
+      ],
+      "event_id_sha256": "c22d21322d3b0e2be23ed38ede736de7262c22730b1435f5d92e8797d707f995",
+      "body_sha256": "9d78edc089ee77c9f3a2689c0dd7d780e6c7c51fd352af70246f346233df5efb"
+    },
+    {
+      "round": 2,
+      "http_codes": [
+        200,
+        200
+      ],
+      "duplicate": [
+        false,
+        true
+      ],
+      "event_id_sha256": "8ed4a3f74b723c8e9f40efa65c11e249845dc35a59a6c10d5c3a46c831f3fe66",
+      "body_sha256": "54f5e83fe27b82210d8425ee839a97c659a564acc2bfaed4315e90d5bdb0a44c"
+    },
+    {
+      "round": 3,
+      "http_codes": [
+        200,
+        200
+      ],
+      "duplicate": [
+        true,
+        false
+      ],
+      "event_id_sha256": "9d2d94f8123c12ddb3b4372378fbd334b5ac069ea08b2e9dc98a1489ec0f5607",
+      "body_sha256": "075cf50e23b626868f0b8df7dafba260b6bd80c26d06bd11679fe3e93496009c"
+    },
+    {
+      "round": 4,
+      "http_codes": [
+        200,
+        200
+      ],
+      "duplicate": [
+        false,
+        true
+      ],
+      "event_id_sha256": "cd76e60b50063faf4f24fef4a4dff732f1a25997d832a27de437a4f3a2b29b05",
+      "body_sha256": "036c841d23f641dd8a3ee30d8dea4bc1ea06bb2cc90a58977f6dba284b7f4f01"
+    },
+    {
+      "round": 5,
+      "http_codes": [
+        200,
+        200
+      ],
+      "duplicate": [
+        false,
+        true
+      ],
+      "event_id_sha256": "e43323fd3199e21148909b5515b1ea467ffd78d3b60b2bcf21d5db66eff7e67e",
+      "body_sha256": "11c003dd08b7e082922bfca161787a21ed15bc75934b72be3def25d4e072378c"
+    }
+  ],
+  "concurrent": {
+    "http_200_each_round": true,
+    "duplicate_false": 5,
+    "duplicate_true": 5
+  },
+  "negative": {
+    "invalid_secret": "401",
+    "invalid_signature": "401",
+    "expired_timestamp": "401",
+    "missing_shared_header": "401",
+    "details": [
+      {
+        "case": "invalid_secret",
+        "http_code": 401,
+        "body_sha256": "45a0e6c67051cfe3dd121c73804e80314da1a30c6971fd673fee495e02a32abc"
+      },
+      {
+        "case": "invalid_signature",
+        "http_code": 401,
+        "body_sha256": "26d3fe3c51b0550d9d3aeab3869d817074c2aa57b1e9bb53cc8b15d9bb8530db"
+      },
+      {
+        "case": "expired_timestamp",
+        "http_code": 401,
+        "body_sha256": "ade856344c846ff00bd1a47d467a8de2361d0d735af9fb5e3f17ebdf8f2a9a3b"
+      },
+      {
+        "case": "missing_shared_header",
+        "http_code": 401,
+        "body_sha256": "80c9a835c8f5561aeef511ba4b9b4cd27b26573bc22b15c95247bf32978db7ee"
+      }
+    ]
+  },
+  "secret_included": false
+}

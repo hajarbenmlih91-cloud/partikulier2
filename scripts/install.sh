@@ -120,6 +120,10 @@ if ! wp core is-installed >/dev/null 2>&1; then
   wp site switch-language fr_FR >>"$LOG" 2>&1
   wp rewrite structure '/%postname%/' --hard >>"$LOG" 2>&1
 fi
+# Une recette peut être relancée avec un port différent : les options d’URL
+# doivent suivre l’instance courante, sinon WordPress redirige vers une ancienne.
+wp option update home "$URL" >>"$LOG" 2>&1
+wp option update siteurl "$URL" >>"$LOG" 2>&1
 
 # Routeur : php -S ne gère pas seul les jolies URL.
 cat > "$WP_DIR/router.php" <<'ROUTER'
