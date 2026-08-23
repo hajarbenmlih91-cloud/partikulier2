@@ -1,0 +1,21 @@
+>>> 1/7 paquets système
+>>> 2/7 base de données
+>>> 3/7 WP-CLI
+>>> 4/7 WordPress
+>>> 5/7 thème et plugin
+estatik-4.3.4.zip: OK
+>>> 6/7 données de démonstration
+>>> 7/7 terminé
+
+  Annonces en base : 30
+  WordPress        : 7.1
+  Estatik          : 4.3.4
+  Polylang         : 3.8.7
+  Query Monitor    : 4.0.7
+  WordPress dir    : /home/ubuntu/work/partikulier2/.runtime/v612-ci-final
+  Journal          : /home/ubuntu/work/partikulier2/install.log
+
+  Démarrer le site :  bash scripts/start.sh
+  Adresse          :  http://localhost:8095
+  Administration   :  http://localhost:8095/wp-admin  (identifiants fournis par PK_ADMIN_USER/PK_ADMIN_PASS)
+

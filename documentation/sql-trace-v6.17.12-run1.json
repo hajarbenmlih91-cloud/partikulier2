@@ -1,0 +1,273 @@
+{
+    "version": "6.17.12",
+    "scope": "mesure du template d’archive sous SAVEQUERIES",
+    "url_or_template": "/fr/annonces/ -> theme/templates/archive.php",
+    "fixture": {
+        "post_type": "properties",
+        "annonces": 30
+    },
+    "plugins_actifs": [
+        "akismet/akismet.php",
+        "estatik/estatik.php",
+        "hello.php",
+        "polylang/polylang.php",
+        "query-monitor/query-monitor.php"
+    ],
+    "cache_state": {
+        "theme_cache_cleared_before_run": true,
+        "object_cache": "default"
+    },
+    "wordpress": "7.1",
+    "php": "8.3.6",
+    "savequeries": true,
+    "queries_total": 49,
+    "queries": [
+        {
+            "sql": "SELECT option_name, option_value FROM wp_options WHERE autoload IN ( 'yes', 'on', 'auto-on', 'auto' )",
+            "time": 0.0006649494171142578,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), wp_not_installed, is_blog_installed, wp_load_alloptions"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'polylang' LIMIT 1",
+            "time": 0.0005409717559814453,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('plugins_loaded'), WP_Hook->do_action, WP_Hook->apply_filters, Polylang->init, WP_Syntex\\Polylang\\Options\\Options->__construct, WP_Syntex\\Polylang\\Options\\Options->init_options_for_current_blog, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'WPLANG' LIMIT 1",
+            "time": 0.0002529621124267578,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('plugins_loaded'), WP_Hook->do_action, WP_Hook->apply_filters, Polylang->init, Polylang->init_context, PLL_Frontend->init, PLL_Choose_Lang_Url->init, PLL_Choose_Lang->init, PLL_Choose_Lang->set_language, do_action('pll_language_defined'), WP_Hook->do_action, WP_Hook->apply_filters, PLL_OLT_Manager->load_textdomains, get_locale, get_option"
+        },
+        {
+            "sql": "SELECT term_id, meta_key, meta_value FROM wp_termmeta WHERE term_id IN (88) ORDER BY meta_id ASC",
+            "time": 0.00019288063049316406,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('plugins_loaded'), WP_Hook->do_action, WP_Hook->apply_filters, Polylang->init, Polylang->init_context, PLL_Frontend->init, PLL_Choose_Lang_Url->init, PLL_Choose_Lang->init, PLL_Choose_Lang->set_language, do_action('pll_language_defined'), WP_Hook->do_action, WP_Hook->apply_filters, PLL_Base->load_strings_translations, PLL_MO->import_from_db, get_term_meta, get_metadata, get_metadata_raw, update_meta_cache"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_required_pages_migration' LIMIT 1",
+            "time": 0.0003070831298828125,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Required_Pages::maybe_migrate_legacy_slugs, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_owner_insights_db_version' LIMIT 1",
+            "time": 0.000102996826171875,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Owner_Insights::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = '_pk_n8n_settings_migration_state' LIMIT 1",
+            "time": 0.00010204315185546875,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_N8n_Security::maybe_migrate, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_buyer_qualification_db_version' LIMIT 1",
+            "time": 7.987022399902344e-5,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Buyer_Qualification::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_premium_db_version' LIMIT 1",
+            "time": 6.794929504394531e-5,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Premium::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_n8n_hmac_audit_db_version' LIMIT 1",
+            "time": 8.988380432128906e-5,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_N8n_Security::maybe_install_audit_table, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_localization_db_version' LIMIT 1",
+            "time": 9.584426879882812e-5,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Localization::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_saved_alerts_db_version' LIMIT 1",
+            "time": 6.604194641113281e-5,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Saved_Alerts::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_automation_bridge_db_version' LIMIT 1",
+            "time": 6.103515625e-5,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Automation_Bridge::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_payment_foundation_db_version' LIMIT 1",
+            "time": 0.0002589225769042969,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Payment_Foundation::maybe_install, get_option"
+        },
+        {
+            "sql": "SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_site_transient_wp_theme_files_patterns-62c9284f81dd3253836b39e4243ca70c','_site_transient_timeout_wp_theme_files_patterns-62c9284f81dd3253836b39e4243ca70c')",
+            "time": 0.0003020763397216797,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, _register_theme_block_patterns, WP_Theme->get_block_patterns, WP_Theme->get_pattern_cache, get_site_transient, wp_prime_site_option_caches, wp_prime_network_option_caches, wp_prime_option_caches"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'can_compress_scripts' LIMIT 1",
+            "time": 0.0002739429473876953,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Es_My_Listing_Block->register, wp_register_script, wp_scripts, WP_Scripts->__construct, WP_Scripts->init, do_action_ref_array('wp_default_scripts'), WP_Hook->do_action, WP_Hook->apply_filters, wp_default_packages, wp_register_tinymce_scripts, script_concat_settings, get_site_option, get_network_option, get_option"
+        },
+        {
+            "sql": "SELECT * FROM wp_estatik_fb_fields WHERE entity_name='property' ORDER BY `order` ASC",
+            "time": 0.0001919269561767578,
+            "caller": "require_once('wp-load.php'), require_once('wp-config.php'), require_once('wp-settings.php'), do_action('init'), WP_Hook->do_action, WP_Hook->apply_filters, Es_My_Listing_Block->register, es_get_available_search_fields, es_get_entity_fields, Es_Fields_Builder::get_items"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'es_google_maps_api_key' LIMIT 1",
+            "time": 0.00023508071899414062,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, Partikulier_Scripts::dns_prefetch, get_option"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id\n\t\t\t WHERE tt.taxonomy IN ('wp_theme') AND t.name IN ('partikulier')\n\t\t\t \n\t\t\t LIMIT 1",
+            "time": 0.00041222572326660156,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_print_font_faces, WP_Font_Face_Resolver::get_fonts_from_theme_json, wp_get_global_settings, WP_Theme_JSON_Resolver::get_merged_data, WP_Theme_JSON_Resolver::get_user_data, WP_Theme_JSON_Resolver::get_user_data_from_wp_global_styles, WP_Query->query, WP_Query->get_posts, WP_Tax_Query->get_sql, WP_Tax_Query->get_sql_clauses, WP_Tax_Query->get_sql_for_query, WP_Tax_Query->get_sql_for_clause, WP_Tax_Query->clean_query, WP_Tax_Query->transform_query, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT   wp_posts.ID\n\t\t\t\t\t FROM wp_posts \n\t\t\t\t\t WHERE 1=1  AND ( \n  0 = 1\n) AND wp_posts.post_type = 'wp_global_styles' AND ((wp_posts.post_status = 'publish'))\n\t\t\t\t\t GROUP BY wp_posts.ID\n\t\t\t\t\t ORDER BY wp_posts.post_date DESC\n\t\t\t\t\t LIMIT 0, 1",
+            "time": 0.00013494491577148438,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), wp_head, do_action('wp_head'), WP_Hook->do_action, WP_Hook->apply_filters, wp_print_font_faces, WP_Font_Face_Resolver::get_fonts_from_theme_json, wp_get_global_settings, WP_Theme_JSON_Resolver::get_merged_data, WP_Theme_JSON_Resolver::get_user_data, WP_Theme_JSON_Resolver::get_user_data_from_wp_global_styles, WP_Query->query, WP_Query->get_posts"
+        },
+        {
+            "sql": "SELECT DISTINCT t.term_id, tr.object_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id\n\t\t\t WHERE tt.taxonomy IN ('language', 'post_translations') AND tr.object_id IN (3)\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.0002720355987548828,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), body_class, get_body_class, is_privacy_policy, WP_Query->is_privacy_policy, get_option, apply_filters('option_wp_page_for_privacy_policy'), WP_Hook->apply_filters, PLL_Filters->translate_page_for_privacy_policy, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'site_logo' LIMIT 1",
+            "time": 0.00011301040649414062,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), body_class, get_body_class, has_custom_logo, get_theme_mod, apply_filters('theme_mod_custom_logo'), WP_Hook->apply_filters, _override_custom_logo_theme_mod, get_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'pk_theme_options' LIMIT 1",
+            "time": 0.00010919570922851562,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), Partikulier_Settings::get, get_option"
+        },
+        {
+            "sql": "\n\t\tSELECT ID, post_name, post_parent, post_type\n\t\tFROM wp_posts\n\t\tWHERE post_name IN ('deposer')\n\t\tAND post_type IN ('page','attachment')\n\t",
+            "time": 0.00017309188842773438,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, get_page_by_path"
+        },
+        {
+            "sql": "SELECT * FROM wp_posts WHERE ID = 4 LIMIT 1",
+            "time": 0.0001239776611328125,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, get_page_by_path, get_post, WP_Post::get_instance"
+        },
+        {
+            "sql": "SELECT DISTINCT t.term_id, tr.object_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id\n\t\t\t WHERE tt.taxonomy IN ('language', 'post_translations') AND tr.object_id IN (4)\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.00023293495178222656,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, pll_get_post, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (88,99)",
+            "time": 0.0001728534698486328,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, pll_get_post, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms, _prime_term_caches"
+        },
+        {
+            "sql": "\n\t\tSELECT ID, post_name, post_parent, post_type\n\t\tFROM wp_posts\n\t\tWHERE post_name IN ('annonces')\n\t\tAND post_type IN ('page','attachment')\n\t",
+            "time": 0.00015497207641601562,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_properties_archive_url, pk_page_url, get_page_by_path"
+        },
+        {
+            "sql": "\n\t\tSELECT ID, post_name, post_parent, post_type\n\t\tFROM wp_posts\n\t\tWHERE post_name IN ('mes-annonces')\n\t\tAND post_type IN ('page','attachment')\n\t",
+            "time": 0.0001399517059326172,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, get_page_by_path"
+        },
+        {
+            "sql": "SELECT * FROM wp_posts WHERE ID = 5 LIMIT 1",
+            "time": 0.0001068115234375,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, get_page_by_path, get_post, WP_Post::get_instance"
+        },
+        {
+            "sql": "SELECT DISTINCT t.term_id, tr.object_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id\n\t\t\t WHERE tt.taxonomy IN ('language', 'post_translations') AND tr.object_id IN (5)\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.00019288063049316406,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, pll_get_post, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (100)",
+            "time": 0.0001239776611328125,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, pll_get_post, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms, _prime_term_caches"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = t.term_id\n\t\t\t WHERE tt.taxonomy IN ('es_type') AND pll_tr.term_taxonomy_id IN ( 89 )\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.0002009868621826172,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), Partikulier_Geo::property_type_options, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "\n\t\tSELECT ID, post_name, post_parent, post_type\n\t\tFROM wp_posts\n\t\tWHERE post_name IN ('favoris')\n\t\tAND post_type IN ('page','attachment')\n\t",
+            "time": 0.00014901161193847656,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, get_page_by_path"
+        },
+        {
+            "sql": "SELECT * FROM wp_posts WHERE ID = 6 LIMIT 1",
+            "time": 0.00011301040649414062,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, get_page_by_path, get_post, WP_Post::get_instance"
+        },
+        {
+            "sql": "SELECT DISTINCT t.term_id, tr.object_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id\n\t\t\t WHERE tt.taxonomy IN ('language', 'post_translations') AND tr.object_id IN (6)\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.0002079010009765625,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, pll_get_post, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT t.*, tt.* FROM wp_terms AS t INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id WHERE t.term_id IN (101)",
+            "time": 0.00011801719665527344,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_header, locate_template, load_template, require_once('/themes/partikulier/header.php'), require('/themes/partikulier/templates/header.php'), pk_page_url, pll_get_post, PLL_Translated_Object->get, PLL_Translatable_Object->get_language, PLL_Translatable_Object->get_object_term, PLL_Translatable_Object->get_object_terms, PLL_Translatable_Object->get_from_object_term_cache, PLL_Translatable_Object->update_object_term_cache, wp_get_object_terms, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms, _prime_term_caches"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = t.term_id\n\t\t\t WHERE tt.taxonomy IN ('es_type') AND tt.count > 0 AND pll_tr.term_taxonomy_id IN ( 89 )\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.00020003318786621094,
+            "caller": "include('/themes/partikulier/templates/archive.php'), require('/themes/partikulier/templates/parts/search-form.php'), get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = t.term_id\n\t\t\t WHERE tt.taxonomy IN ('es_category') AND tt.count > 0 AND pll_tr.term_taxonomy_id IN ( 89 )\n\t\t\t ORDER BY t.name ASC\n\t\t\t ",
+            "time": 0.00017595291137695312,
+            "caller": "include('/themes/partikulier/templates/archive.php'), require('/themes/partikulier/templates/parts/search-form.php'), get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = t.term_id\n\t\t\t WHERE tt.taxonomy IN ('es_location') AND tt.count > 0 AND pll_tr.term_taxonomy_id IN ( 89 )\n\t\t\t ORDER BY tt.count DESC\n\t\t\t LIMIT 40",
+            "time": 0.0001671314239501953,
+            "caller": "include('/themes/partikulier/templates/archive.php'), require('/themes/partikulier/templates/parts/search-form.php'), get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = t.term_id\n\t\t\t WHERE tt.taxonomy IN ('es_location') AND tt.count > 0 AND pll_tr.term_taxonomy_id IN ( 89 )\n\t\t\t ORDER BY tt.count DESC\n\t\t\t LIMIT 6",
+            "time": 0.00018596649169921875,
+            "caller": "include('/themes/partikulier/templates/archive.php'), Partikulier_Geo::top_cities, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "\n\t\tSELECT ID, post_name, post_parent, post_type\n\t\tFROM wp_posts\n\t\tWHERE post_name IN ('faq')\n\t\tAND post_type IN ('page','attachment')\n\t",
+            "time": 0.00015592575073242188,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), pk_page_url, get_page_by_path"
+        },
+        {
+            "sql": "\n\t\tSELECT ID, post_name, post_parent, post_type\n\t\tFROM wp_posts\n\t\tWHERE post_name IN ('contact')\n\t\tAND post_type IN ('page','attachment')\n\t",
+            "time": 0.00012803077697753906,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), pk_page_url, get_page_by_path"
+        },
+        {
+            "sql": "SELECT  t.term_id\n\t\t\t FROM wp_terms AS t  INNER JOIN wp_term_taxonomy AS tt ON t.term_id = tt.term_id INNER JOIN wp_term_relationships AS pll_tr ON pll_tr.object_id = t.term_id\n\t\t\t WHERE tt.taxonomy IN ('es_location') AND tt.count > 0 AND pll_tr.term_taxonomy_id IN ( 89 )\n\t\t\t ORDER BY tt.count DESC\n\t\t\t LIMIT 5",
+            "time": 0.00022101402282714844,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), Partikulier_Geo::top_cities, get_terms, WP_Term_Query->query, WP_Term_Query->get_terms"
+        },
+        {
+            "sql": "SELECT option_name, option_value FROM wp_options WHERE option_name IN ('_transient_timeout_wp_styles_for_blocks')",
+            "time": 0.00021910667419433594,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), wp_footer, do_action('wp_footer'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_global_styles, wp_add_global_styles_for_blocks, set_transient, wp_prime_option_caches"
+        },
+        {
+            "sql": "SELECT autoload FROM wp_options WHERE option_name = '_transient_wp_styles_for_blocks' LIMIT 1",
+            "time": 0.00010204315185546875,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), wp_footer, do_action('wp_footer'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_global_styles, wp_add_global_styles_for_blocks, set_transient, update_option"
+        },
+        {
+            "sql": "SHOW FULL COLUMNS FROM `wp_options`",
+            "time": 0.0004420280456542969,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), wp_footer, do_action('wp_footer'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_global_styles, wp_add_global_styles_for_blocks, set_transient, update_option"
+        },
+        {
+            "sql": "UPDATE `wp_options` SET `option_value` = 'a:2:{s:4:\\\"hash\\\";s:32:\\\"6254b00580535a847daf7ab9b8443f8a\\\";s:6:\\\"blocks\\\";a:9:{s:32:\\\"832dc2d864d79097d8b8b493ad93453b\\\";s:0:\\\"\\\";s:32:\\\"45d3e0c4afcbd8cf25cb1ba51abfb3d7\\\";s:46:\\\":root :where(.wp-block-icon svg){width: 24px;}\\\";s:32:\\\"feca6e996f694be2d29599793228e0d7\\\";s:0:\\\"\\\";s:32:\\\"5eef131663eddaf830554df656fc2968\\\";s:324:\\\":where(.wp-block-gallery.is-layout-flex){gap: var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) );}:where(.wp-block-gallery.is-layout-grid){gap: var( --wp--style--gallery-gap-default, var( --gallery-block--gutter-size, var( --wp--style--block-gap, 0.5em ) ) );}\\\";s:32:\\\"c99c05932c6685777ec5b856698fcc7d\\\";s:118:\\\":where(.wp-block-latest-posts.is-layout-flex){gap: 1.25em;}:where(.wp-block-latest-posts.is-layout-grid){gap: 1.25em;}\\\";s:32:\\\"dec8d648f30b13caec8e61374591787d\\\";s:120:\\\":where(.wp-block-post-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-post-template.is-layout-grid){gap: 1.25em;}\\\";s:32:\\\"6c35533f7a92cce94808323603db9fc8\\\";s:120:\\\":where(.wp-block-term-template.is-layout-flex){gap: 1.25em;}:where(.wp-block-term-template.is-layout-grid){gap: 1.25em;}\\\";s:32:\\\"6a0505cd5c78a87ed77570cda43c1132\\\";s:102:\\\":where(.wp-block-columns.is-layout-flex){gap: 2em;}:where(.wp-block-columns.is-layout-grid){gap: 2em;}\\\";s:32:\\\"25a66f156386551185570f72a9f7d44e\\\";s:69:\\\":root :where(.wp-block-pullquote){font-size: 1.5em;line-height: 1.6;}\\\";}}' WHERE `option_name` = '_transient_wp_styles_for_blocks'",
+            "time": 0.000698089599609375,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), wp_footer, do_action('wp_footer'), WP_Hook->do_action, WP_Hook->apply_filters, wp_enqueue_global_styles, wp_add_global_styles_for_blocks, set_transient, update_option"
+        },
+        {
+            "sql": "SELECT option_value FROM wp_options WHERE option_name = 'es_flash_authenticate' LIMIT 1",
+            "time": 0.00011706352233886719,
+            "caller": "include('/themes/partikulier/templates/archive.php'), get_footer, locate_template, load_template, require_once('/themes/partikulier/footer.php'), require('/themes/partikulier/templates/footer.php'), wp_footer, do_action('wp_footer'), WP_Hook->do_action, WP_Hook->apply_filters, es_authentication_popup, es_load_template, include('/plugins/estatik/templates/front/popup/authentication.php'), Es_Authentication_Shortcode->get_content, es_load_template, include('/plugins/estatik/templates/front/shortcodes/authentication/authentication.php'), Es_Flash_Message->render_messages, Es_Flash_Message->get_messages, get_option"
+        }
+    ],
+    "output_bytes": 41991,
+    "measured_at_utc": "2026-08-23T14:44:01+00:00"
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fabrique le bundle autosuffisant du CDC fermé et l’archive thème historique.
-# Usage : bash scripts/package.sh 6.17.11
+# Usage : bash scripts/package.sh 6.17.12
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME="$ROOT/theme"
@@ -27,11 +27,12 @@ THEME_OUT="$ROOT/partikulier-$VERSION-theme.zip"
 rm -f "$OUT" "$THEME_OUT"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
-mkdir -p "$STAGE/theme" "$STAGE/mu-plugins" "$STAGE/scripts" "$STAGE/tests" "$STAGE/documentation" "$STAGE/.semgrep" "$STAGE/.github/workflows"
+mkdir -p "$STAGE/theme" "$STAGE/mu-plugins" "$STAGE/scripts" "$STAGE/tests" "$STAGE/documentation" "$STAGE/.semgrep" "$STAGE/.github/workflows" "$STAGE/vendor-artifacts"
 
 cp -a "$THEME/." "$STAGE/theme/"
 cp -a "$ROOT/mu-plugins/." "$STAGE/mu-plugins/"
 cp -a "$ROOT/scripts/." "$STAGE/scripts/"
+cp -a "$ROOT/vendor-artifacts/." "$STAGE/vendor-artifacts/"
 cp -a "$ROOT/tests/routes-contract.json" "$STAGE/tests/routes-contract.json"
 cp -a "$ROOT/tests/baselines-$VERSION" "$STAGE/tests/baselines-$VERSION"
 cp -a "$ROOT/.semgrep/." "$STAGE/.semgrep/"
@@ -47,6 +48,7 @@ for proof in \
   documentation/validation-v$VERSION.md \
   documentation/senior-code-review-v$VERSION.md \
   documentation/release-notes-v$VERSION.md \
+  documentation/estatik-artifact-v4.3.4.md \
   documentation/environment-v$VERSION.json \
   documentation/routes-contract-v$VERSION.json \
   documentation/e2e-v$VERSION.json \
@@ -102,7 +104,7 @@ PK_WP_DIR="\$PWD/.runtime/wp-$VERSION" PK_DB_NAME=partikulier$VERSION PK_DB_USER
 PK_WP_DIR="\$PWD/.runtime/wp-$VERSION" PK_PORT=8090 bash scripts/start.sh
 \`\`\`
 
-Le provisioning attend WordPress 7.1, Estatik 4.3.4, Polylang 3.8.7, Query Monitor 4.0.7 et 30 annonces publiées. Les secrets de recette sont éphémères et ne doivent jamais être commités.
+Le provisioning attend WordPress 7.1, Estatik 4.3.4, Polylang 3.8.7, Query Monitor 4.0.7 et 30 annonces publiées. L’archive Estatik est embarquée dans \`vendor-artifacts/\` et vérifiée par SHA-256. Les secrets de recette sont éphémères et ne doivent jamais être commités. Le fallback générique exige explicitement \`PK_ALLOW_UNPINNED_ESTATIK=1\` et ne constitue pas une recette reproductible.
 
 ## Contrôles livrés
 
@@ -147,11 +149,11 @@ find "$STAGE" -type f -print | sort | xargs touch -t 202608220000
 unzip -tq "$OUT" >/dev/null
 unzip -tq "$THEME_OUT" >/dev/null
 required=(
-  INSTALL.md scripts/check.sh scripts/package.sh scripts/install.sh scripts/routes-contract.mjs scripts/parcours.mjs scripts/visual.mjs
-  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS
+  INSTALL.md scripts/check.sh scripts/package.sh scripts/install.sh scripts/start.sh scripts/ci-cold-acceptance.sh scripts/routes-contract.mjs scripts/parcours.mjs scripts/visual.mjs
+  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS vendor-artifacts/estatik-4.3.4.zip vendor-artifacts/estatik-4.3.4.zip.sha256
   documentation/candidate-$VERSION.json documentation/routes-contract-v$VERSION.json documentation/e2e-v$VERSION.json
   documentation/visual-v$VERSION.json documentation/search-sorting-v$VERSION.json documentation/hmac-http-v$VERSION.json documentation/sql-v$VERSION-summary.json
-  documentation/semgrep-v$VERSION.json documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
+  documentation/semgrep-v$VERSION.json documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/estatik-artifact-v4.3.4.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
 )
 for entry in "${required[@]}"; do
   unzip -l "$OUT" | grep -E "[[:space:]]${entry//./\\.}$" >/dev/null || { echo "Bundle incomplet : $entry" >&2; exit 1; }

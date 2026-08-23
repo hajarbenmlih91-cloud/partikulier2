@@ -33,9 +33,24 @@ DB_PASS_SQL="$(printf '%s' "$DB_PASS" | sed "s/'/''/g")"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME_SRC="$ROOT/theme"
 WP_DIR="${PK_WP_DIR:-$ROOT/wp}"
+ESTATIK_ZIP="${PK_ESTATIK_ZIP:-$ROOT/vendor-artifacts/estatik-${ESTATIK_VERSION}.zip}"
+ESTATIK_URL="${PK_ESTATIK_URL:-https://downloads.wordpress.org/plugin/estatik.zip}"
+ESTATIK_SHA256="${PK_ESTATIK_SHA256:-}"
+ESTATIK_REPRODUCIBLE=1
 PORT="${PK_PORT:-8090}"
 URL="http://localhost:$PORT"
 LOG="$ROOT/install.log"
+
+# Échec rapide : une recette sans artefact vérifiable ne doit pas provisionner
+# une base et un WordPress partiels avant de découvrir le défaut.
+if [ -f "$ESTATIK_ZIP" ]; then
+  [ -f "${ESTATIK_ZIP}.sha256" ] || { echo "Checksum Estatik absent : ${ESTATIK_ZIP}.sha256" >&2; exit 2; }
+elif [ -n "$ESTATIK_SHA256" ]; then
+  [ -n "$ESTATIK_URL" ] || { echo "PK_ESTATIK_URL manquant avec PK_ESTATIK_SHA256" >&2; exit 2; }
+elif [ "${PK_ALLOW_UNPINNED_ESTATIK:-0}" != 1 ]; then
+  echo "Artefact Estatik vérifié absent ; fallback non reproductible non activé" >&2
+  exit 2
+fi
 
 export DEBIAN_FRONTEND=noninteractive
 echo "=== $(date) ===" > "$LOG"
@@ -133,7 +148,29 @@ install_pinned_plugin() {
   [ "$(wp plugin get "$slug" --field=version 2>/dev/null || true)" = "$version" ] || { echo "Plugin $slug != $version" | tee -a "$LOG"; exit 1; }
   wp plugin activate "$slug" >>"$LOG" 2>&1 || true
 }
-install_pinned_plugin estatik "$ESTATIK_VERSION" "https://downloads.wordpress.org/plugin/estatik.zip"
+if [ -f "$ESTATIK_ZIP" ]; then
+  checksum_file="${ESTATIK_ZIP}.sha256"
+  [ -f "$checksum_file" ] || { echo "Checksum Estatik absent : $checksum_file" | tee -a "$LOG" >&2; exit 1; }
+  ( cd "$(dirname "$ESTATIK_ZIP")" && sha256sum --check --strict "$(basename "$checksum_file")" ) | tee -a "$LOG"
+  ESTATIK_SOURCE="$ESTATIK_ZIP"
+elif [ -n "$ESTATIK_SHA256" ]; then
+  curl -fsSL --retry 3 --retry-all-errors "$ESTATIK_URL" -o /tmp/estatik-${ESTATIK_VERSION}.zip
+  printf '%s  %s\n' "$ESTATIK_SHA256" "/tmp/estatik-${ESTATIK_VERSION}.zip" | sha256sum --check --strict
+  ESTATIK_SOURCE="/tmp/estatik-${ESTATIK_VERSION}.zip"
+elif [ "${PK_ALLOW_UNPINNED_ESTATIK:-0}" = 1 ]; then
+  echo "AVERTISSEMENT : Estatik utilise une URL générique sans checksum (mode non reproductible explicite)." | tee -a "$LOG" >&2
+  ESTATIK_REPRODUCIBLE=0
+  ESTATIK_SOURCE="$ESTATIK_URL"
+else
+  echo "Artefact Estatik vérifié absent. Fournir PK_ESTATIK_ZIP, ou PK_ESTATIK_URL + PK_ESTATIK_SHA256. Pour le fallback générique non reproductible, définir PK_ALLOW_UNPINNED_ESTATIK=1." | tee -a "$LOG" >&2
+  exit 2
+fi
+install_pinned_plugin estatik "$ESTATIK_VERSION" "$ESTATIK_SOURCE"
+if [ -f "$ESTATIK_SOURCE" ]; then
+  ESTATIK_ACTUAL_SHA256="$(sha256sum "$ESTATIK_SOURCE" | awk '{print $1}')"
+  echo "ESTATIK_SHA256=$ESTATIK_ACTUAL_SHA256" | tee -a "$LOG"
+fi
+[ "$ESTATIK_REPRODUCIBLE" -eq 1 ] || echo "ESTATIK_REPRODUCIBLE=0" >>"$LOG"
 install_pinned_plugin polylang "$POLYLANG_VERSION" "https://downloads.wordpress.org/plugin/polylang.$POLYLANG_VERSION.zip"
 install_pinned_plugin query-monitor "$QUERY_MONITOR_VERSION" "https://downloads.wordpress.org/plugin/query-monitor.$QUERY_MONITOR_VERSION.zip"
 

@@ -1,0 +1,155 @@
+{
+  "version": "1.132.0",
+  "results": [],
+  "errors": [],
+  "paths": {
+    "scanned": [
+      "theme/inc/class-buyer-qualification.php",
+      "theme/inc/class-lead-retention.php",
+      "theme/inc/class-listing-approval.php"
+    ]
+  },
+  "time": {
+    "rules": [],
+    "rules_parse_time": 0.002488851547241211,
+    "profiling_times": {
+      "config_time": 0.1275651454925537,
+      "core_time": 0.2912161350250244,
+      "ignores_time": 0.0000667572021484375,
+      "total_time": 0.41914868354797363
+    },
+    "parsing_time": {
+      "total_time": 0.0,
+      "per_file_time": {
+        "mean": 0.0,
+        "std_dev": 0.0
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.0,
+        "count_ratio": 0.0
+      },
+      "very_slow_files": []
+    },
+    "scanning_time": {
+      "total_time": 0.0022170543670654297,
+      "per_file_time": {
+        "mean": 0.0007390181223551432,
+        "std_dev": 1.1517588265835206E-8
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.0,
+        "count_ratio": 0.0
+      },
+      "very_slow_files": []
+    },
+    "matching_time": {
+      "total_time": 0.0,
+      "per_file_and_rule_time": {
+        "mean": 0.0,
+        "std_dev": 0.0
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.0,
+        "count_ratio": 0.0
+      },
+      "very_slow_rules_on_files": []
+    },
+    "tainting_time": {
+      "total_time": 0.0,
+      "per_def_and_rule_time": {
+        "mean": 0.0,
+        "std_dev": 0.0
+      },
+      "very_slow_stats": {
+        "time_ratio": 0.0,
+        "count_ratio": 0.0
+      },
+      "very_slow_rules_on_defs": []
+    },
+    "fixpoint_timeouts": [],
+    "targets": [],
+    "total_bytes": 0,
+    "max_memory_bytes": 65591552
+  },
+  "engine_requested": "OSS",
+  "skipped_rules": [],
+  "acceptance": {
+    "commit": "e1b59edf0c8f6b5bc15509c86a86bf2772159087",
+    "command": "semgrep --config .semgrep/partikulier.yml --json --output documentation/semgrep-v6.17.12.json theme",
+    "rules_used": [
+      "partikulier-no-direct-automation-route-in-business-module"
+    ],
+    "targets_scanned": 66,
+    "target_files": [
+      "theme/estatik4/front/property/archive.php",
+      "theme/estatik4/front/property/content-archive.php",
+      "theme/estatik4/front/property/single.php",
+      "theme/estatik4/front/shortcodes/search/main.php",
+      "theme/footer.php",
+      "theme/front-page.php",
+      "theme/functions.php",
+      "theme/header.php",
+      "theme/inc/class-automation-bridge.php",
+      "theme/inc/class-avif.php",
+      "theme/inc/class-buyer-qualification.php",
+      "theme/inc/class-cache.php",
+      "theme/inc/class-customization.php",
+      "theme/inc/class-dashboard.php",
+      "theme/inc/class-estatik.php",
+      "theme/inc/class-form.php",
+      "theme/inc/class-geo.php",
+      "theme/inc/class-jsonld.php",
+      "theme/inc/class-lead-retention.php",
+      "theme/inc/class-leads-admin.php",
+      "theme/inc/class-listing-approval.php",
+      "theme/inc/class-listing-i18n.php",
+      "theme/inc/class-listing-preview.php",
+      "theme/inc/class-listing-translations.php",
+      "theme/inc/class-listing-urls.php",
+      "theme/inc/class-localization.php",
+      "theme/inc/class-morocco-places.php",
+      "theme/inc/class-n8n-security.php",
+      "theme/inc/class-optimization.php",
+      "theme/inc/class-owner-insights.php",
+      "theme/inc/class-page-doctor.php",
+      "theme/inc/class-page-templates.php",
+      "theme/inc/class-payment-foundation.php",
+      "theme/inc/class-place-requests.php",
+      "theme/inc/class-premium.php",
+      "theme/inc/class-required-pages.php",
+      "theme/inc/class-saved-alerts.php",
+      "theme/inc/class-scripts.php",
+      "theme/inc/class-search-filters.php",
+      "theme/inc/class-security.php",
+      "theme/inc/class-seo.php",
+      "theme/inc/class-settings.php",
+      "theme/inc/class-sitemap.php",
+      "theme/inc/class-theme-setup.php",
+      "theme/inc/class-upgrade-wizard.php",
+      "theme/inc/class-whatsapp-verification.php",
+      "theme/index.php",
+      "theme/page.php",
+      "theme/templates/404.php",
+      "theme/templates/archive.php",
+      "theme/templates/footer.php",
+      "theme/templates/front-page.php",
+      "theme/templates/header.php",
+      "theme/templates/page-deposer-annonce.php",
+      "theme/templates/page-favoris.php",
+      "theme/templates/page-mes-annonces.php",
+      "theme/templates/page.php",
+      "theme/templates/parts/card-property.php",
+      "theme/templates/parts/helpers.php",
+      "theme/templates/parts/menu.php",
+      "theme/templates/parts/search-form.php",
+      "theme/templates/search.php",
+      "theme/templates/single.php",
+      "theme/tests/diagnostic-site.php",
+      "theme/tests/reparer-taxonomies.php",
+      "theme/tests/traduire-annonces.php"
+    ],
+    "bytes_analyzed": 704437,
+    "blocking_findings": 0,
+    "errors_count": 0
+  }
+}

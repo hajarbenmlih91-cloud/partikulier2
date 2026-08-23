@@ -25,7 +25,7 @@ sleep 2
 
 if ss -ltn 2>/dev/null | grep -q ":$PORT "; then
   echo "Site démarré : http://localhost:$PORT"
-  echo "Administration : http://localhost:$PORT/wp-admin  (admin / admin)"
+  echo "Administration : http://localhost:$PORT/wp-admin  (identifiants fournis par PK_ADMIN_USER/PK_ADMIN_PASS)"
 else
   echo "Échec du démarrage. Vérifiez que PHP est installé et que le port $PORT est libre."
   exit 1

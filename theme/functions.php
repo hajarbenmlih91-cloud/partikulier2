@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PARTIKULIER_VERSION', '6.17.11' );
+define( 'PARTIKULIER_VERSION', '6.17.12' );
 
 add_filter(
     'language_attributes',
