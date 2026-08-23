@@ -78,7 +78,7 @@ try {
       if (!navigated) errors.push('navigation sans réponse');
       if (scenario.expected_http === 200 && htmlLang !== scenario.locale) errors.push(`lang=${htmlLang}, attendu=${scenario.locale}`);
       if (scenario.expected_dir !== htmlDir) errors.push(`dir=${htmlDir}, attendu=${scenario.expected_dir}`);
-      await page.screenshot({ path: output, fullPage: true });
+      await page.screenshot({ path: output, fullPage: false });
       if (generate) {
         results.push({ id: scenario.id, status: errors.length ? 'FAIL' : 'GENERATED', errors });
       } else {

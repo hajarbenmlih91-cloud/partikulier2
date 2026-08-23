@@ -20,13 +20,14 @@
     },
     "baseline_policy": {
       "type": "object",
-      "required": ["directory", "manifest", "regenerate_in_ci", "approval_required_for_rebaseline", "status"],
+      "required": ["directory", "manifest", "regenerate_in_ci", "approval_required_for_rebaseline", "status", "capture_mode"],
       "properties": {
-        "directory": { "const": "tests/baselines-1.7.1" },
-        "manifest": { "const": "tests/baselines-1.7.1/SHA256SUMS" },
+        "directory": { "const": "tests/baselines-6.17.17" },
+        "manifest": { "const": "tests/baselines-6.17.17/SHA256SUMS" },
         "regenerate_in_ci": { "const": false },
         "approval_required_for_rebaseline": { "const": true },
-        "status": { "enum": ["PENDING_BASELINE_CAPTURE", "APPROVED"] }
+        "status": { "enum": ["PENDING_BASELINE_CAPTURE", "APPROVED"] },
+        "capture_mode": { "const": "viewport_only" }
       },
       "additionalProperties": false
     },

@@ -38,6 +38,7 @@ if data.get("contract_version") != "1.7.1": errors.append("contract_version_inva
 if data.get("scenario_count") != 30: errors.append("scenario_count_invalid")
 if data.get("locales") != ["fr", "en", "ar"]: errors.append("locales_invalid")
 if data.get("baseline_policy", {}).get("regenerate_in_ci") is not False: errors.append("baseline_regeneration_must_be_false")
+if data.get("baseline_policy", {}).get("capture_mode") != "viewport_only": errors.append("capture_mode_must_be_viewport_only")
 if len(scenarios) != 30: errors.append(f"scenario_count_actual:{len(scenarios)}")
 
 seen = set()

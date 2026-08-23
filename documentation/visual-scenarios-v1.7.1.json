@@ -12,7 +12,8 @@
     "manifest": "tests/baselines-6.17.17/SHA256SUMS",
     "regenerate_in_ci": false,
     "approval_required_for_rebaseline": true,
-    "status": "PENDING_BASELINE_CAPTURE"
+    "status": "PENDING_BASELINE_CAPTURE",
+    "capture_mode": "viewport_only"
   },
   "scenarios": [
     { "id": "home-fr-desktop", "page": "home", "locale": "fr", "viewport": "desktop", "authenticated": false, "url": "/fr/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-fr-desktop.png" },
