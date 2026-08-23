@@ -1,16 +1,16 @@
-name: CDC fermé Partikulier 6.17.12
+name: CDC fermé Partikulier 6.17.13
 
 on:
   push:
-    branches: ["main", "fix/cdc-v6.17.12"]
-    tags: ["v6.17.12"]
+    branches: ["main", "fix/cdc-v6.17.13"]
+    tags: ["v6.17.13"]
   pull_request:
 
 permissions:
   contents: read
 
 env:
-  PK_VERSION: 6.17.12
+  PK_VERSION: 6.17.13
   NODE_MAJOR: 22
   SEMGREP_VERSION: 1.132.0
 
@@ -36,7 +36,7 @@ jobs:
       - run: for f in scripts/*.mjs; do node --check "$f"; done
       - run: for f in scripts/*.php; do php -l "$f"; done
       - run: npx --no-install playwright install --with-deps chromium
-      - run: sha256sum -c vendor-artifacts/estatik-4.3.4.zip.sha256
+      - run: cd vendor-artifacts && sha256sum -c --strict estatik-4.3.4.zip.sha256
       - run: unzip -p vendor-artifacts/estatik-4.3.4.zip estatik/estatik.php | grep -E -m1 'Version:[[:space:]]+4\.3\.4'
       - run: test "$(find tests/baselines-${PK_VERSION} -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 30
       - run: test -s tests/baselines-${PK_VERSION}/SHA256SUMS
@@ -54,10 +54,10 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: sha256sum -c vendor-artifacts/estatik-4.3.4.zip.sha256
+      - run: cd vendor-artifacts && sha256sum -c --strict estatik-4.3.4.zip.sha256
       - name: Run fresh environment and all acceptance suites
         env:
-          PK_VERSION: 6.17.12
+          PK_VERSION: 6.17.13
           PK_PORT: 8090
           PK_BASE: http://localhost:8090
           PK_DB_NAME: partikulier_ci_61712
@@ -71,8 +71,8 @@ jobs:
         run: tar -czf "cold-acceptance-v${PK_VERSION}.tar.gz" documentation/install-tooling.log documentation/*"v${PK_VERSION}"* tests/baselines-${PK_VERSION}
       - uses: actions/upload-artifact@v4
         with:
-          name: cold-acceptance-v6.17.12
-          path: cold-acceptance-v6.17.12.tar.gz
+          name: cold-acceptance-v6.17.13
+          path: cold-acceptance-v6.17.13.tar.gz
           if-no-files-found: error
 
   package:
@@ -83,32 +83,32 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: cold-acceptance-v6.17.12
-      - run: tar -xzf cold-acceptance-v6.17.12.tar.gz
+          name: cold-acceptance-v6.17.13
+      - run: tar -xzf cold-acceptance-v6.17.13.tar.gz
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: npm
       - run: npm ci --ignore-scripts --no-audit --no-fund
-      - run: bash scripts/package.sh 6.17.12
-      - run: sha256sum partikulier-6.17.12.zip > partikulier-6.17.12.zip.sha256
-      - run: sha256sum -c partikulier-6.17.12.zip.sha256
-      - run: unzip -tq partikulier-6.17.12.zip
-      - run: unzip -l partikulier-6.17.12.zip | grep -q 'vendor-artifacts/estatik-4.3.4.zip.sha256'
-      - run: unzip -l partikulier-6.17.12.zip | grep -q 'documentation/senior-code-review-v6.17.12.md'
+      - run: bash scripts/package.sh 6.17.13
+      - run: sha256sum partikulier-6.17.13.zip > partikulier-6.17.13.zip.sha256
+      - run: sha256sum -c partikulier-6.17.13.zip.sha256
+      - run: unzip -tq partikulier-6.17.13.zip
+      - run: unzip -l partikulier-6.17.13.zip | grep -q 'vendor-artifacts/estatik-4.3.4.zip.sha256'
+      - run: unzip -l partikulier-6.17.13.zip | grep -q 'documentation/senior-code-review-v6.17.13.md'
       - uses: actions/upload-artifact@v4
         with:
-          name: package-v6.17.12
+          name: package-v6.17.13
           path: |
-            partikulier-6.17.12.zip
-            partikulier-6.17.12-theme.zip
-            partikulier-6.17.12.zip.sha256
+            partikulier-6.17.13.zip
+            partikulier-6.17.13-theme.zip
+            partikulier-6.17.13.zip.sha256
           if-no-files-found: error
 
   release:
     name: Publish release after acceptance
     needs: package
-    if: github.event_name == 'push' && github.ref == 'refs/tags/v6.17.12'
+    if: github.event_name == 'push' && github.ref == 'refs/tags/v6.17.13'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -116,10 +116,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
-          name: package-v6.17.12
+          name: package-v6.17.13
       - name: Verify release artifact
-        run: sha256sum -c partikulier-6.17.12.zip.sha256 && unzip -tq partikulier-6.17.12.zip
+        run: sha256sum -c partikulier-6.17.13.zip.sha256 && unzip -tq partikulier-6.17.13.zip
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create v6.17.12 partikulier-6.17.12.zip partikulier-6.17.12-theme.zip partikulier-6.17.12.zip.sha256 --title 'Partikulier v6.17.12 — acceptance froide' --notes-file documentation/release-notes-v6.17.12.md
+        run: gh release create v6.17.13 partikulier-6.17.13.zip partikulier-6.17.13-theme.zip partikulier-6.17.13.zip.sha256 --title 'Partikulier v6.17.13 — acceptance froide' --notes-file documentation/release-notes-v6.17.13.md

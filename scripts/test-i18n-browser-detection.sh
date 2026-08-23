@@ -2,7 +2,7 @@
 set -u
 
 BASE_URL="${PK_URL:-http://localhost:8090}"
-VERSION="${PK_VERSION:-6.17.12}"
+VERSION="${PK_VERSION:-6.17.13}"
 REPORT="${PK_REPORT:-/tmp/partikulier-${VERSION}-browser-detection.json}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT

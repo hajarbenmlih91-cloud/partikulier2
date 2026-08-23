@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${PK_VERSION:-6.17.12}"
+VERSION="${PK_VERSION:-6.17.13}"
 PORT="${PK_PORT:-8090}"
 BASE="${PK_BASE:-http://localhost:${PORT}}"
 RUNTIME="${PK_WP_DIR:-$ROOT/.runtime/ci-wp-${VERSION}}"
@@ -19,7 +19,7 @@ mkdir -p "$ROOT/documentation" "$ROOT/.runtime"
 rm -rf "$RUNTIME"
 
 bash "$ROOT/scripts/install-tooling.sh"
-bash "$ROOT/scripts/install.sh" > "$ROOT/documentation/install-${VERSION}-final.log"
+bash "$ROOT/scripts/install.sh" > "$ROOT/documentation/install-v${VERSION}-final.log"
 bash "$ROOT/scripts/start.sh"
 
 wait_for_http() {
@@ -47,11 +47,11 @@ PARTIKULIER_N8N_SECRET="$SECRET_B64" PK_HMAC_LOG="$ROOT/documentation/hmac-http-
 for run in 1 2 3; do
   PK_SQL_REPORT="$ROOT/documentation/sql-trace-v${VERSION}-run${run}.json" php "$ROOT/scripts/measure-sql-senior.php" > "$ROOT/documentation/sql-v${VERSION}-run${run}.log"
 done
-jq -n --arg version "$VERSION" \
-  --slurpfile a "$ROOT/documentation/sql-trace-v${VERSION}-run1.json" \
-  --slurpfile b "$ROOT/documentation/sql-trace-v${VERSION}-run2.json" \
-  --slurpfile c "$ROOT/documentation/sql-trace-v${VERSION}-run3.json" \
-  '{version:$version,scope:"mesure du template d’archive sous SAVEQUERIES",runs:[$a[0].queries_total,$b[0].queries_total,$c[0].queries_total],threshold:56,all_below_threshold:([$a[0].queries_total,$b[0].queries_total,$c[0].queries_total]|all(. <= 56)),trace_files:["documentation/sql-trace-v"+$version+"-run1.json","documentation/sql-trace-v"+$version+"-run2.json","documentation/sql-trace-v"+$version+"-run3.json"]}' > "$ROOT/documentation/sql-v${VERSION}-summary.json"
+q1="$(jq -er '.queries_total' "$ROOT/documentation/sql-trace-v${VERSION}-run1.json")"
+q2="$(jq -er '.queries_total' "$ROOT/documentation/sql-trace-v${VERSION}-run2.json")"
+q3="$(jq -er '.queries_total' "$ROOT/documentation/sql-trace-v${VERSION}-run3.json")"
+jq -n --arg version "$VERSION" --argjson q1 "$q1" --argjson q2 "$q2" --argjson q3 "$q3" \
+  '{version:$version,scope:"mesure du template d’archive sous SAVEQUERIES",runs:[$q1,$q2,$q3],threshold:56,all_below_threshold:([$q1,$q2,$q3]|all(. <= 56)),trace_files:["documentation/sql-trace-v"+$version+"-run1.json","documentation/sql-trace-v"+$version+"-run2.json","documentation/sql-trace-v"+$version+"-run3.json"]}' > "$ROOT/documentation/sql-v${VERSION}-summary.json"
 
 bash "$ROOT/scripts/run-semgrep-v${VERSION}.sh" "$ROOT/documentation/semgrep-v${VERSION}.json" > "$ROOT/documentation/semgrep-v${VERSION}.log"
 semgrep --version > "$ROOT/documentation/semgrep-version-v${VERSION}.txt"
