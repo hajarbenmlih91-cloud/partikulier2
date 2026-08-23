@@ -26,7 +26,11 @@ sudo mariadb -e "DROP DATABASE IF EXISTS \`${DB_NAME}\`;" >/dev/null 2>&1 || tru
 
 bash "$ROOT/scripts/install-tooling.sh"
 bash "$ROOT/scripts/install.sh" > "$ROOT/documentation/install-v${VERSION}-final.log"
-PK_SERVER_LOG="$ROOT/documentation/server-v${VERSION}.log" bash "$ROOT/scripts/start.sh"
+if [ "${PK_SERVER_MODE:-dev}" = "reference" ]; then
+  PK_SERVER_LOG="$ROOT/documentation/server-v${VERSION}.log" PK_PHP_WORKERS="${PK_PHP_WORKERS:-4}" bash "$ROOT/scripts/start-reference-web.sh"
+else
+  PK_SERVER_LOG="$ROOT/documentation/server-v${VERSION}.log" bash "$ROOT/scripts/start.sh"
+fi
 
 wait_for_http() {
   for _ in $(seq 1 30); do

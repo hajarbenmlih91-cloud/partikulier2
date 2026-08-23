@@ -107,6 +107,11 @@ jobs:
           node-version: '22'
           cache: npm
 
+      - name: Install reference web stack
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y -qq nginx php8.3-fpm
+
       - name: Verify vendor archives and install Node dependencies
         run: |
           sha256sum -c --strict vendor-artifacts/polylang-3.8.7.zip.sha256
@@ -126,6 +131,8 @@ jobs:
           PK_ADMIN_USER: ciadmin
           PK_ADMIN_PASS: ci-only-admin-password
           PK_ADMIN_EMAIL: ci@example.test
+          PK_SERVER_MODE: reference
+          PK_PHP_WORKERS: "4"
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_RUN_ID: ${{ github.run_id }}
         run: bash scripts/ci-cold-acceptance-v1.7.1.sh
