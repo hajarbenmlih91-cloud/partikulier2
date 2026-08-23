@@ -16,6 +16,7 @@
     "start": "bash scripts/start.sh"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "playwright": "^1.62.1",
     "pngjs": "^7.0.0"
   },

@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <a class="pk-skip-link" href="#main-content"><?php esc_html_e( 'Aller au contenu', 'partikulier' ); ?></a>
 
 <!-- Topbar style Woo Shop -->
-<div class="pk-topbar" role="banner-top">
+<div class="pk-topbar" role="banner">
 	<div class="pk-container pk-topbar-inner">
 		<span class="pk-topbar-promo"><?php echo esc_html( Partikulier_Settings::get( 'topbar_text' ) ); ?></span>
 		<div class="pk-topbar-contact">

@@ -10,6 +10,29 @@
 (function () {
 	"use strict";
 
+	/* ---------- Accessibilite Estatik ----------
+	   Estatik peut rendre le champ d'informations complementaires avec un id
+	   dynamique mais sans label associe. On ajoute un nom accessible seulement
+	   si le plugin n'en a pas deja fourni, y compris apres injection AJAX. */
+	function labelEstatikExtraInfo() {
+		var lang = (document.documentElement.lang || "fr").toLowerCase().slice(0, 2);
+		var labels = {
+			fr: "Informations complémentaires",
+			en: "Additional information",
+			ar: "معلومات إضافية"
+		};
+		var label = labels[lang] || labels.fr;
+		document.querySelectorAll('input[id^="es_extra_info-"], textarea[id^="es_extra_info-"], select[id^="es_extra_info-"]').forEach(function (field) {
+			var associatedLabel = field.id ? document.querySelector('label[for="' + CSS.escape(field.id) + '"]') : null;
+			var hasLabel = field.getAttribute("aria-label") || field.getAttribute("aria-labelledby") || (associatedLabel && associatedLabel.textContent.trim());
+			if (!hasLabel) field.setAttribute("aria-label", label);
+		});
+	}
+	labelEstatikExtraInfo();
+	if (window.MutationObserver && document.body) {
+		new MutationObserver(labelEstatikExtraInfo).observe(document.body, { childList: true, subtree: true });
+	}
+
 	/* ---------- Menu mobile ---------- */
 	var toggle = document.querySelector(".pk-nav-toggle");
 	var mobileMenu = document.getElementById("pk-mobile-menu");
@@ -127,7 +150,7 @@
 			var saved = [];
 			try { saved = JSON.parse(window.localStorage.getItem("pk_wishlist") || "[]"); } catch (x) { saved = []; }
 
-			document.querySelectorAll(".pk-card-wishlist").forEach(function (b) {
+		document.querySelectorAll(".pk-card-wishlist").forEach(function (b) {
 				// Etat au chargement : un favori deja enregistre s'affiche rouge.
 				var currentId = b.getAttribute("data-post-id");
 				if (saved.indexOf(currentId) !== -1) {
@@ -220,7 +243,7 @@
 			};
 			var syncWishlistUI = function () {
 			var list = getWishlist();
-			document.querySelectorAll(".pk-card-wishlist").forEach(function (btn) {
+		document.querySelectorAll(".pk-card-wishlist").forEach(function (btn) {
 				var active = list.indexOf(btn.getAttribute("data-post-id")) !== -1;
 				btn.classList.toggle("pk-wish-active", active);
 				btn.setAttribute("aria-pressed", active ? "true" : "false");

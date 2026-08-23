@@ -43,6 +43,6 @@ Une approbation finale indique identité ou rôle, conflit d’intérêts, péri
 
 ## A10 — Critère de label
 
-`TECHNICAL_RELEASE = PASS` exige toutes les gates M0, la cohérence commit–preuves–asset et le statut `SOURCE_TO_RELEASE_REPRODUCIBLE` si celui-ci est annoncé. `UX_CONTENT = PASS` exige la revue UX et les attestations natives. `COMMERCIAL_RELEASE = PASS` exige la décision produit/client. `ULTRA_PREMIUM = PASS` exige les trois décisions, la charge 1 000 annonces, les opérations backup/restore/rollback et l’absence de réserve bloquante.
+`TECHNICAL_STATUS = PASS` signifie que les gates techniques M0 et les preuves de candidate sont passées ; il ne signifie pas qu’une release finale est publiée. `RELEASE_STATUS = CANDIDATE` reste obligatoire tant qu’un tag immuable, un asset publié et leur comparaison finale ne sont pas approuvés. `UX_CONTENT = PASS` exige la revue UX et les attestations natives. `COMMERCIAL_RELEASE = PASS` exige la décision produit/client. `ULTRA_PREMIUM = PASS` exige les trois décisions, la charge 1 000 annonces, les opérations backup/restore/rollback et l’absence de réserve bloquante.
 
 Tant qu’une de ces conditions manque, la seule formulation autorisée est **RELEASE CANDIDATE** ou **CONFORME TECHNIQUEMENT SOUS RÉSERVES**.

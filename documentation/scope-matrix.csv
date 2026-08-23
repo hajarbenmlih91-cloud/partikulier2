@@ -17,7 +17,8 @@ Backup and restore,M0,IMPLEMENTED,PASS,operations,Checksum-verified backup resto
 Rollback,M0,IMPLEMENTED,PASS,operations,Approved atomic symlink rollback tested
 Semgrep and dependency controls,M0,IMPLEMENTED,PASS,security,66-target Semgrep, secret scan, SBOM and three vendor archives verified locally
 FR EN AR visible content,M1,NOT_IMPLEMENTED,NOT_RUN,content,Automated checks exist; native attestations absent
-Accessibility WCAG 2.2 AA,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Manual and automated accessibility gate absent
+Accessibility automated DOM gate,M1,IMPLEMENTED,PASS,technical,axe-core Playwright WCAG 2 A/AA 2.1 AA and 2.2 AA on FR EN AR home at 375x667 and 1280x800; does not replace independent manual review
+Accessibility WCAG 2.2 AA independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Manual keyboard screen-reader or equivalent review and independent WCAG decision remain required
 Visual design system,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Existing visual baselines exist; token/component review incomplete
 UX independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Three independent reviewers required
 Load test 1000 listings,M1,IMPLEMENTED,PASS,performance,1000 local listings with 30 warmups and 100 measured requests

@@ -1,5 +1,6 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
+import { AxeBuilder } from '@axe-core/playwright';
 
 const base = process.env.PK_BASE ?? 'http://localhost:8090';
 const version = process.env.PK_VERSION ?? '1.7.1';
@@ -14,11 +15,15 @@ const cases = [
 const browser = await chromium.launch({ headless: true });
 const tests = [];
 for (const [id, locale, width, height] of cases) {
-  const page = await browser.newPage({ viewport: { width, height } });
+  const context = await browser.newContext({ viewport: { width, height } });
+  const page = await context.newPage();
   const url = `${base}/${locale}/`;
   let response;
   try {
     response = await page.goto(url, { waitUntil: 'networkidle', timeout: 30000 });
+    const axeResults = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa', 'wcag22aa'])
+      .analyze();
     const checks = await page.evaluate(() => {
       const html = document.documentElement;
       const visible = (el) => !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length);
@@ -38,13 +43,19 @@ for (const [id, locale, width, height] of cases) {
         visible_focusable: document.querySelectorAll('a[href],button,input,select,textarea,[tabindex]:not([tabindex="-1"])').length,
       };
     });
+    const axeViolations = axeResults.violations.map((violation) => ({
+      id: violation.id,
+      impact: violation.impact,
+      help: violation.help,
+      nodes: violation.nodes.map((node) => ({ target: node.target, html: node.html })),
+    }));
     const expectedDir = locale === 'ar' ? 'rtl' : 'ltr';
-    const ok = response?.status() === 200 && checks.lang.toLowerCase().startsWith(locale) && checks.dir === expectedDir && checks.title && checks.unlabeled_buttons === 0 && checks.unlabeled_inputs === 0 && checks.images_without_alt === 0;
-    tests.push({ id, locale, viewport: `${width}x${height}`, url, status: ok ? 'PASS' : 'FAIL', http_status: response?.status() ?? 0, checks });
+    const ok = response?.status() === 200 && checks.lang.toLowerCase().startsWith(locale) && checks.dir === expectedDir && checks.title && checks.unlabeled_buttons === 0 && checks.unlabeled_inputs === 0 && checks.images_without_alt === 0 && axeViolations.length === 0;
+    tests.push({ id, locale, viewport: `${width}x${height}`, url, status: ok ? 'PASS' : 'FAIL', http_status: response?.status() ?? 0, checks, axe: { violations: axeViolations.length, details: axeViolations } });
   } catch (error) {
     tests.push({ id, locale, viewport: `${width}x${height}`, url, status: 'FAIL', error: String(error) });
   }
-  await page.close();
+  await context.close();
 }
 await browser.close();
 const failed = tests.filter(t => t.status !== 'PASS');
