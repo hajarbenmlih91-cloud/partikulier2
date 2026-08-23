@@ -25,6 +25,7 @@ require_once __DIR__ . '/src/SearchService.php';
 require_once __DIR__ . '/src/TranslationService.php';
 require_once __DIR__ . '/src/HealthCheck.php';
 require_once __DIR__ . '/src/Services.php';
+require_once __DIR__ . '/src/RateLimiter.php';
 require_once __DIR__ . '/src/RestController.php';
 
 use Partikulier\Core\Database\Migrator;

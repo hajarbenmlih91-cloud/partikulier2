@@ -1,0 +1,49 @@
+{
+  "contract_id": "visual-scenarios",
+  "contract_version": "1.7.1",
+  "scenario_count": 30,
+  "locales": ["fr", "en", "ar"],
+  "viewports": {
+    "desktop": { "width": 1280, "height": 800 },
+    "mobile": { "width": 375, "height": 667 }
+  },
+  "baseline_policy": {
+    "directory": "tests/baselines-6.17.17",
+    "manifest": "tests/baselines-6.17.17/SHA256SUMS",
+    "regenerate_in_ci": false,
+    "approval_required_for_rebaseline": true,
+    "status": "PENDING_BASELINE_CAPTURE"
+  },
+  "scenarios": [
+    { "id": "home-fr-desktop", "page": "home", "locale": "fr", "viewport": "desktop", "authenticated": false, "url": "/fr/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-fr-desktop.png" },
+    { "id": "home-fr-mobile", "page": "home", "locale": "fr", "viewport": "mobile", "authenticated": false, "url": "/fr/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-fr-mobile.png" },
+    { "id": "home-en-desktop", "page": "home", "locale": "en", "viewport": "desktop", "authenticated": false, "url": "/en/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-en-desktop.png" },
+    { "id": "home-en-mobile", "page": "home", "locale": "en", "viewport": "mobile", "authenticated": false, "url": "/en/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-en-mobile.png" },
+    { "id": "home-ar-desktop", "page": "home", "locale": "ar", "viewport": "desktop", "authenticated": false, "url": "/ar/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-ar-desktop.png" },
+    { "id": "home-ar-mobile", "page": "home", "locale": "ar", "viewport": "mobile", "authenticated": false, "url": "/ar/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/home-ar-mobile.png" },
+    { "id": "archive-fr-desktop", "page": "archive", "locale": "fr", "viewport": "desktop", "authenticated": false, "url": "/fr/annonces/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/archive-fr-desktop.png" },
+    { "id": "archive-fr-mobile", "page": "archive", "locale": "fr", "viewport": "mobile", "authenticated": false, "url": "/fr/annonces/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/archive-fr-mobile.png" },
+    { "id": "archive-en-desktop", "page": "archive", "locale": "en", "viewport": "desktop", "authenticated": false, "url": "/en/annonces/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/archive-en-desktop.png" },
+    { "id": "archive-en-mobile", "page": "archive", "locale": "en", "viewport": "mobile", "authenticated": false, "url": "/en/annonces/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/archive-en-mobile.png" },
+    { "id": "archive-ar-desktop", "page": "archive", "locale": "ar", "viewport": "desktop", "authenticated": false, "url": "/ar/annonces/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/archive-ar-desktop.png" },
+    { "id": "archive-ar-mobile", "page": "archive", "locale": "ar", "viewport": "mobile", "authenticated": false, "url": "/ar/annonces/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/archive-ar-mobile.png" },
+    { "id": "single-fr-desktop", "page": "single", "locale": "fr", "viewport": "desktop", "authenticated": false, "url": "/fr/annonce/fixture-property/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/single-fr-desktop.png" },
+    { "id": "single-fr-mobile", "page": "single", "locale": "fr", "viewport": "mobile", "authenticated": false, "url": "/fr/annonce/fixture-property/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/single-fr-mobile.png" },
+    { "id": "single-en-desktop", "page": "single", "locale": "en", "viewport": "desktop", "authenticated": false, "url": "/en/annonce/fixture-property/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/single-en-desktop.png" },
+    { "id": "single-en-mobile", "page": "single", "locale": "en", "viewport": "mobile", "authenticated": false, "url": "/en/annonce/fixture-property/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/single-en-mobile.png" },
+    { "id": "single-ar-desktop", "page": "single", "locale": "ar", "viewport": "desktop", "authenticated": false, "url": "/ar/annonce/fixture-property/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/single-ar-desktop.png" },
+    { "id": "single-ar-mobile", "page": "single", "locale": "ar", "viewport": "mobile", "authenticated": false, "url": "/ar/annonce/fixture-property/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/single-ar-mobile.png" },
+    { "id": "deposer-fr-desktop", "page": "deposer", "locale": "fr", "viewport": "desktop", "authenticated": false, "url": "/fr/deposer/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/deposer-fr-desktop.png" },
+    { "id": "deposer-fr-mobile", "page": "deposer", "locale": "fr", "viewport": "mobile", "authenticated": false, "url": "/fr/deposer/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/deposer-fr-mobile.png" },
+    { "id": "deposer-en-desktop", "page": "deposer", "locale": "en", "viewport": "desktop", "authenticated": false, "url": "/en/deposer-en/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/deposer-en-desktop.png" },
+    { "id": "deposer-en-mobile", "page": "deposer", "locale": "en", "viewport": "mobile", "authenticated": false, "url": "/en/deposer-en/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/deposer-en-mobile.png" },
+    { "id": "deposer-ar-desktop", "page": "deposer", "locale": "ar", "viewport": "desktop", "authenticated": false, "url": "/ar/deposer-ar/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/deposer-ar-desktop.png" },
+    { "id": "deposer-ar-mobile", "page": "deposer", "locale": "ar", "viewport": "mobile", "authenticated": false, "url": "/ar/deposer-ar/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/deposer-ar-mobile.png" },
+    { "id": "favoris-fr-desktop", "page": "favoris", "locale": "fr", "viewport": "desktop", "authenticated": false, "url": "/fr/favoris/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/favoris-fr-desktop.png" },
+    { "id": "favoris-fr-mobile", "page": "favoris", "locale": "fr", "viewport": "mobile", "authenticated": false, "url": "/fr/favoris/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/favoris-fr-mobile.png" },
+    { "id": "favoris-en-desktop", "page": "favoris", "locale": "en", "viewport": "desktop", "authenticated": false, "url": "/en/favoris-en/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/favoris-en-desktop.png" },
+    { "id": "favoris-en-mobile", "page": "favoris", "locale": "en", "viewport": "mobile", "authenticated": false, "url": "/en/favoris-en/", "expected_http": 200, "expected_dir": "ltr", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/favoris-en-mobile.png" },
+    { "id": "favoris-ar-desktop", "page": "favoris", "locale": "ar", "viewport": "desktop", "authenticated": false, "url": "/ar/favoris-ar/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/favoris-ar-desktop.png" },
+    { "id": "favoris-ar-mobile", "page": "favoris", "locale": "ar", "viewport": "mobile", "authenticated": false, "url": "/ar/favoris-ar/", "expected_http": 200, "expected_dir": "rtl", "fixture": "cold-estatik-fixture", "baseline": "tests/baselines-6.17.17/favoris-ar-mobile.png" }
+  ]
+}

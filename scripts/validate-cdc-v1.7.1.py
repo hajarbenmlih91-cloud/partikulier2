@@ -22,6 +22,8 @@ for rel in [
     'documentation/schemas/evidence.schema.json',
     'documentation/schemas/scope-matrix.schema.json',
     'documentation/schemas/capacity-envelope.schema.json',
+    'documentation/schemas/visual-scenarios.schema.json',
+    'documentation/visual-scenarios-v1.7.1.json',
 ]: require(ROOT / rel)
 
 levels = {'M0', 'M1', 'M2'}

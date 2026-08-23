@@ -1,0 +1,249 @@
+name: cdc-v1.7.1-candidate
+
+on:
+  push:
+    branches: ["implementation/cdc-v1.7.1"]
+    tags: ["v6.17.17"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PK_VERSION: "6.17.17"
+  NODE_MAJOR: "22"
+  SEMGREP_VERSION: "1.132.0"
+  SOURCE_DATE_EPOCH: "1767225600"
+
+jobs:
+  static-contracts:
+    name: Static contracts and dependency gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring,xml,curl,zip,mysql,gd,intl,bcmath
+          tools: composer
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install locked Node dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: Syntax gates
+        run: |
+          find scripts -maxdepth 1 -type f -name '*.sh' -print0 | xargs -0 -n1 bash -n
+          find theme mu-plugins partikulier-core scripts -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+          find scripts -maxdepth 1 -type f -name '*.mjs' -print0 | xargs -0 -n1 -r -n1 node --check
+
+      - name: Validate CDC and exact visual scenario contract
+        run: |
+          python3 scripts/validate-cdc-v1.7.1.py
+          python3 scripts/validate-visual-contract-v1.7.1.py
+          python3 -m json.tool documentation/visual-scenarios-v1.7.1.json >/dev/null
+          python3 -m json.tool documentation/schemas/visual-scenarios.schema.json >/dev/null
+
+      - name: Verify pinned dependencies and SBOM
+        run: |
+          bash scripts/verify-dependencies.sh documentation/dependency-manifest-v1.7.1.json
+          test -s documentation/sbom-v1.7.1.json
+          test -s documentation/sbom-v1.7.1.sha256
+          sha256sum -c documentation/sbom-v1.7.1.sha256
+          npm sbom --sbom-format=cyclonedx --omit=dev > "$RUNNER_TEMP/npm-sbom.json"
+          jq -e '.bomFormat == "CycloneDX" and (.components|length)>0' "$RUNNER_TEMP/npm-sbom.json"
+
+      - name: Install pinned Semgrep and scan exact scope
+        run: |
+          python3 -m pip install --user --break-system-packages "semgrep==${SEMGREP_VERSION}"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          semgrep --version
+          PK_COMMIT="$GITHUB_SHA" bash scripts/run-semgrep-v1.7.1.sh "$RUNNER_TEMP/semgrep-v1.7.1.json"
+          jq -e '.acceptance.targets_scanned == 66 and .acceptance.raw_targets_scanned == 66 and .acceptance.blocking_findings == 0 and .acceptance.errors_count == 0 and (.acceptance.commit|test("^[0-9a-f]{40}$"))' "$RUNNER_TEMP/semgrep-v1.7.1.json"
+
+      - name: Secret scan
+        run: bash scripts/scan-secrets.sh documentation/secrets-scan-v1.7.1.json
+
+  cold-acceptance:
+    name: Cold WordPress MariaDB HTTP acceptance
+    needs: static-contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring,xml,curl,zip,mysql,gd,intl,bcmath
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Verify vendor archives and install Node dependencies
+        run: |
+          cd vendor-artifacts
+          sha256sum -c --strict polylang-3.8.7.zip.sha256
+          sha256sum -c --strict query-monitor-4.0.7.zip.sha256
+          sha256sum -c --strict estatik-4.3.4.zip.sha256
+          cd ..
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx --no-install playwright install --with-deps chromium
+
+      - name: Run fresh environment and all candidate acceptance suites
+        env:
+          PK_VERSION: "6.17.17"
+          PK_PORT: "8090"
+          PK_BASE: http://localhost:8090
+          PK_DB_NAME: partikulier_ci_61717
+          PK_DB_USER: partikulier_ci
+          PK_DB_PASS: ci-only-sql-password
+          PK_ADMIN_USER: ciadmin
+          PK_ADMIN_PASS: ci-only-admin-password
+          PK_ADMIN_EMAIL: ci@example.test
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: bash scripts/ci-cold-acceptance-v1.7.1.sh
+
+      - name: Collect volatile CI evidence sidecar
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/cdc-evidence"
+          cp -a documentation/. "$RUNNER_TEMP/cdc-evidence/" 2>/dev/null || true
+          cp -a tests/current-* tests/diff-* "$RUNNER_TEMP/cdc-evidence/" 2>/dev/null || true
+          tar --sort=name --mtime="@${SOURCE_DATE_EPOCH}" --owner=0 --group=0 --numeric-owner -czf "cold-acceptance-v1.7.1.tar.gz" -C "$RUNNER_TEMP/cdc-evidence" .
+
+      - name: Upload cold acceptance evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdc-v1.7.1-cold-${{ github.sha }}
+          path: cold-acceptance-v1.7.1.tar.gz
+          if-no-files-found: error
+
+  deterministic-package:
+    name: Deterministic package and source-to-source reproducibility
+    needs: [static-contracts, cold-acceptance]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download cold evidence for sidecar only
+        uses: actions/download-artifact@v4
+        with:
+          name: cdc-v1.7.1-cold-${{ github.sha }}
+          path: "$RUNNER_TEMP/cold"
+
+      - name: Prepare evidence sidecar
+        run: |
+          mkdir -p "$RUNNER_TEMP/evidence"
+          tar -xzf "$RUNNER_TEMP/cold/cold-acceptance-v1.7.1.tar.gz" -C "$RUNNER_TEMP/evidence"
+
+      - name: Build product and CI evidence sidecar
+        env:
+          PK_COMMIT: ${{ github.sha }}
+          PK_EVIDENCE_DIR: ${{ runner.temp }}/evidence
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: |
+          bash scripts/package-deterministic-v1.7.1.sh "$PK_VERSION"
+          sha256sum -c "partikulier-${PK_VERSION}-deterministic.zip.sha256"
+          unzip -tq "partikulier-${PK_VERSION}-deterministic.zip"
+          python3 scripts/validate-visual-contract-v1.7.1.py --require-baselines
+
+      - name: Rebuild from detached checkout and compare bytes
+        env:
+          PK_COMMIT: ${{ github.sha }}
+        run: |
+          tmp="$RUNNER_TEMP/partikulier-detached"
+          git worktree add --detach "$tmp" "$GITHUB_SHA"
+          (cd "$tmp" && SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" PK_COMMIT="$GITHUB_SHA" bash scripts/package-deterministic-v1.7.1.sh "$PK_VERSION")
+          cmp --silent "partikulier-${PK_VERSION}-deterministic.zip" "$tmp/partikulier-${PK_VERSION}-deterministic.zip"
+          jq -n --arg commit "$GITHUB_SHA" --arg package "$(sha256sum "partikulier-${PK_VERSION}-deterministic.zip" | cut -d' ' -f1)" --arg version "$PK_VERSION" '{test_id:"PACKAGE-REPRO-001",candidate_version:$version,source_commit:$commit,status:"PASS",branch_sha256:$package,detached_sha256:$package,comparison:"cmp byte-identical",source_to_release_reproducible:"PENDING_UNTIL_RELEASE_ASSET_COMPARE"}' > reproducibility-v1.7.1.json
+
+      - name: Upload product, checksums and sidecars
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdc-v1.7.1-package-${{ github.sha }}
+          path: |
+            partikulier-6.17.17-deterministic.zip
+            partikulier-6.17.17-theme.zip
+            partikulier-6.17.17-deterministic.zip.sha256
+            partikulier-6.17.17-evidence.tar.gz
+            partikulier-6.17.17-evidence.tar.gz.sha256
+            reproducibility-v1.7.1.json
+          if-no-files-found: error
+
+  release:
+    name: Publish only from an explicitly approved immutable tag
+    needs: deterministic-package
+    if: github.event_name == 'push' && github.ref == 'refs/tags/v6.17.17'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout exact tag source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download deterministic package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: cdc-v1.7.1-package-${{ github.sha }}
+          path: release-assets
+
+      - name: Verify package before publication
+        working-directory: release-assets
+        run: |
+          sha256sum -c partikulier-6.17.17-deterministic.zip.sha256
+          unzip -tq partikulier-6.17.17-deterministic.zip
+          test "$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)" = "$GITHUB_SHA"
+
+      - name: Create GitHub release from exact artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            "release-assets/partikulier-6.17.17-deterministic.zip" \
+            "release-assets/partikulier-6.17.17-theme.zip" \
+            "release-assets/partikulier-6.17.17-deterministic.zip.sha256" \
+            "release-assets/partikulier-6.17.17-evidence.tar.gz" \
+            "release-assets/partikulier-6.17.17-evidence.tar.gz.sha256" \
+            --title "Partikulier v6.17.17 — CDC v1.7.1 candidate" \
+            --notes "Publication conditionnée au succès intégral des gates CI. Les validations humaines UX, langues natives et commerciales restent des décisions séparées."
+
+      - name: Download published asset and compare bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/release-download"
+          gh release download "$GITHUB_REF_NAME" --pattern 'partikulier-6.17.17-deterministic.zip' --dir "$RUNNER_TEMP/release-download" --clobber
+          cmp --silent release-assets/partikulier-6.17.17-deterministic.zip "$RUNNER_TEMP/release-download/partikulier-6.17.17-deterministic.zip"
+          jq -n --arg version "$PK_VERSION" --arg commit "$GITHUB_SHA" --arg sha "$(sha256sum release-assets/partikulier-6.17.17-deterministic.zip | cut -d' ' -f1)" --arg run "$GITHUB_RUN_ID" '{test_id:"SOURCE-RELEASE-001",candidate_version:$version,source_commit:$commit,run_id:$run,status:"PASS",package_sha256:$sha,release_asset_sha256:$sha,comparison:"cmp byte-identical",source_to_release_reproducible:"PASS"}' > release-attestation-v1.7.1.json
+          gh release upload "$GITHUB_REF_NAME" release-attestation-v1.7.1.json --clobber

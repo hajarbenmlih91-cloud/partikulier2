@@ -26,7 +26,7 @@ for file in package.json package-lock.json; do [ -f "$ROOT/$file" ] && cp -a "$R
 for file in \
   'Cahierdeschargescontractuel—PartikulierUltra-Premiumv1.7.md' \
   'Cahierdeschargescontractuel—PartikulierUltra-Premiumv1.7.1.md' \
-  scope-matrix.csv capacity-envelope.json compatibility-matrix.json data-contract.json technical-design.md implementation-deviations.md operations-runbook-v1.7.1.md dependency-manifest-v1.7.1.json sbom-v1.7.1.json sbom-v1.7.1.sha256; do
+  scope-matrix.csv capacity-envelope.json compatibility-matrix.json data-contract.json technical-design.md implementation-deviations.md operations-runbook-v1.7.1.md dependency-manifest-v1.7.1.json sbom-v1.7.1.json sbom-v1.7.1.sha256 visual-scenarios-v1.7.1.json; do
   [ -f "$ROOT/documentation/$file" ] || { echo "Documentation stable absente: $file" >&2; exit 1; }
   mkdir -p "$STAGE/documentation"
   cp -a "$ROOT/documentation/$file" "$STAGE/documentation/$file"
@@ -73,5 +73,5 @@ printf '{"format":"partikulier-evidence-sidecar-v1","candidate_version":"%s","so
 find "$EVIDENCE" -type f -exec touch -d "@${SOURCE_DATE_EPOCH}" {} +
 tar --sort=name --mtime="@${SOURCE_DATE_EPOCH}" --owner=0 --group=0 --numeric-owner -czf "$EVIDENCE_OUT" -C "$EVIDENCE" .
 sha256sum "$EVIDENCE_OUT" > "$EVIDENCE_OUT.sha256"
-for required in INSTALL.md partikulier-core/partikulier-core.php partikulier-core/migrations/001_initial.sql scripts/install.sh scripts/backup.sh scripts/restore.sh scripts/rollback.sh documentation/candidate-$VERSION.json documentation/scope-matrix.csv documentation/capacity-envelope.json documentation/data-contract.json documentation/dependency-manifest-v1.7.1.json documentation/sbom-v1.7.1.json; do unzip -l "$OUT" | grep -E "[[:space:]]${required//./\\.}$" >/dev/null || { echo "Bundle incomplet: $required" >&2; exit 1; }; done
+for required in INSTALL.md partikulier-core/partikulier-core.php partikulier-core/migrations/001_initial.sql scripts/install.sh scripts/backup.sh scripts/restore.sh scripts/rollback.sh documentation/candidate-$VERSION.json documentation/scope-matrix.csv documentation/capacity-envelope.json documentation/data-contract.json documentation/dependency-manifest-v1.7.1.json documentation/sbom-v1.7.1.json documentation/visual-scenarios-v1.7.1.json; do unzip -l "$OUT" | grep -E "[[:space:]]${required//./\\.}$" >/dev/null || { echo "Bundle incomplet: $required" >&2; exit 1; }; done
 printf 'PRODUCT=%s\nPRODUCT_SHA256=%s\nEVIDENCE=%s\nEVIDENCE_SHA256=%s\nSOURCE_COMMIT=%s\n' "$OUT" "$(cut -d' ' -f1 "$OUT.sha256")" "$EVIDENCE_OUT" "$(cut -d' ' -f1 "$EVIDENCE_OUT.sha256")" "$COMMIT"

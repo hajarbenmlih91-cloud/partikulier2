@@ -26,3 +26,4 @@ partikulier-pro,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Optional module; never imp
 Payments and orders,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly outside current technical release until implemented
 Commercial approval,M2,NOT_IMPLEMENTED,NOT_RUN,product,Human product decision required
 Observability and health,M0,IMPLEMENTED,PASS,operations,Health response no secrets tested; alert delivery remains a separate production approval
+REST rate limiting,M0,IMPLEMENTED,PASS,security,Per-route transient limiter with 429 response; shared production cache and proxy identity remain operational validations

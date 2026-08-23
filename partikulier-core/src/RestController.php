@@ -16,6 +16,7 @@ final class RestController
     private HealthCheck $health;
     private LeadService $leads;
     private FavoriteService $favorites;
+    private RateLimiter $rateLimiter;
 
     public function __construct()
     {
@@ -26,6 +27,7 @@ final class RestController
         $this->service = new ListingService($this->repository, $audit);
         $this->leads = new LeadService();
         $this->favorites = new FavoriteService();
+        $this->rateLimiter = new RateLimiter();
         $this->health = new HealthCheck();
         add_action('rest_api_init', [$this, 'registerRoutes']);
     }
@@ -35,19 +37,19 @@ final class RestController
         register_rest_route('partikulier/v1', '/listings', [
             'methods' => 'GET',
             'callback' => [$this, 'listings'],
-            'permission_callback' => [$this->policy, 'canReadPublic'],
+            'permission_callback' => [$this, 'guardPublic'],
             'args' => $this->listArgs(),
         ]);
         register_rest_route('partikulier/v1', '/listings/(?P<id>[0-9]+)', [
             'methods' => 'GET',
             'callback' => [$this, 'listing'],
-            'permission_callback' => [$this->policy, 'canReadPublic'],
+            'permission_callback' => [$this, 'guardPublic'],
             'args' => ['id' => ['required' => true, 'validate_callback' => static fn($value): bool => ctype_digit((string) $value)]],
         ]);
         register_rest_route('partikulier/v1', '/listings', [
             'methods' => 'POST',
             'callback' => [$this, 'createListing'],
-            'permission_callback' => [$this->policy, 'canCreate'],
+            'permission_callback' => [$this, 'guardWrite'],
             'args' => [
                 'title' => ['required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'],
                 'description' => ['required' => true, 'type' => 'string', 'sanitize_callback' => 'sanitize_textarea_field'],
@@ -59,7 +61,7 @@ final class RestController
         register_rest_route('partikulier/v1', '/leads', [
             'methods' => 'POST',
             'callback' => [$this, 'createLead'],
-            'permission_callback' => [$this->policy, 'canReadPublic'],
+            'permission_callback' => [$this, 'guardLead'],
             'args' => [
                 'email' => ['required' => true, 'type' => 'string'],
                 'message' => ['required' => true, 'type' => 'string'],
@@ -68,14 +70,34 @@ final class RestController
         register_rest_route('partikulier/v1', '/favorites', [
             'methods' => 'POST',
             'callback' => [$this, 'toggleFavorite'],
-            'permission_callback' => [$this->policy, 'canReadPrivate'],
+            'permission_callback' => [$this, 'guardPrivate'],
             'args' => ['listing_id' => ['required' => true, 'type' => 'integer', 'minimum' => 1]],
         ]);
         register_rest_route('partikulier/v1', '/health', [
             'methods' => 'GET',
             'callback' => fn(): WP_REST_Response => new WP_REST_Response($this->health->get(), 200),
-            'permission_callback' => [$this->policy, 'canReadPublic'],
+            'permission_callback' => [$this, 'guardPublic'],
         ]);
+    }
+
+    public function guardPublic(WP_REST_Request $request): bool|WP_Error
+    {
+        return $this->rateLimiter->guard($request, 'public', $this->policy->canReadPublic(), 120, 60);
+    }
+
+    public function guardWrite(WP_REST_Request $request): bool|WP_Error
+    {
+        return $this->rateLimiter->guard($request, 'write', $this->policy->canCreate(), 30, 60);
+    }
+
+    public function guardLead(WP_REST_Request $request): bool|WP_Error
+    {
+        return $this->rateLimiter->guard($request, 'lead', $this->policy->canReadPublic(), 10, 60);
+    }
+
+    public function guardPrivate(WP_REST_Request $request): bool|WP_Error
+    {
+        return $this->rateLimiter->guard($request, 'private', $this->policy->canReadPrivate(), 60, 60);
     }
 
     private function listArgs(): array

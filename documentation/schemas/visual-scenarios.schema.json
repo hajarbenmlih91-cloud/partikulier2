@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://partikulier.invalid/schemas/visual-scenarios-v1.7.1.json",
+  "title": "Partikulier CDC v1.7.1 visual scenarios",
+  "type": "object",
+  "required": ["contract_id", "contract_version", "scenario_count", "locales", "viewports", "baseline_policy", "scenarios"],
+  "properties": {
+    "contract_id": { "const": "visual-scenarios" },
+    "contract_version": { "const": "1.7.1" },
+    "scenario_count": { "const": 30 },
+    "locales": { "const": ["fr", "en", "ar"] },
+    "viewports": {
+      "type": "object",
+      "required": ["desktop", "mobile"],
+      "properties": {
+        "desktop": { "$ref": "#/$defs/viewport" },
+        "mobile": { "$ref": "#/$defs/viewport" }
+      },
+      "additionalProperties": false
+    },
+    "baseline_policy": {
+      "type": "object",
+      "required": ["directory", "manifest", "regenerate_in_ci", "approval_required_for_rebaseline", "status"],
+      "properties": {
+        "directory": { "const": "tests/baselines-1.7.1" },
+        "manifest": { "const": "tests/baselines-1.7.1/SHA256SUMS" },
+        "regenerate_in_ci": { "const": false },
+        "approval_required_for_rebaseline": { "const": true },
+        "status": { "enum": ["PENDING_BASELINE_CAPTURE", "APPROVED"] }
+      },
+      "additionalProperties": false
+    },
+    "scenarios": {
+      "type": "array",
+      "minItems": 30,
+      "maxItems": 30,
+      "items": { "$ref": "#/$defs/scenario" }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "viewport": {
+      "type": "object",
+      "required": ["width", "height"],
+      "properties": { "width": { "type": "integer", "minimum": 1 }, "height": { "type": "integer", "minimum": 1 } },
+      "additionalProperties": false
+    },
+    "scenario": {
+      "type": "object",
+      "required": ["id", "page", "locale", "viewport", "authenticated", "url", "expected_http", "expected_dir", "fixture", "baseline"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^(home|archive|single|deposer|favoris)-(fr|en|ar)-(desktop|mobile)$" },
+        "page": { "enum": ["home", "archive", "single", "deposer", "favoris"] },
+        "locale": { "enum": ["fr", "en", "ar"] },
+        "viewport": { "enum": ["desktop", "mobile"] },
+        "authenticated": { "type": "boolean" },
+        "url": { "type": "string", "pattern": "^/" },
+        "expected_http": { "const": 200 },
+        "expected_dir": { "enum": ["ltr", "rtl"] },
+        "fixture": { "type": "string", "minLength": 1 },
+        "baseline": { "type": "string", "pattern": "^tests/baselines-6\\.17\\.17/.+\\.png$" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

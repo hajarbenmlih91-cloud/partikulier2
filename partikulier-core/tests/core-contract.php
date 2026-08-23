@@ -24,6 +24,14 @@ $assert = static function (string $id, bool $ok, string $detail = '') use (&$res
 $health = rest_do_request(new WP_REST_Request('GET', '/partikulier/v1/health'));
 $assert('CORE-HEALTH-001', $health->get_status() === 200 && ($health->get_data()['status'] ?? '') === 'ok', 'health status');
 
+$rateLimiter = new \Partikulier\Core\RateLimiter();
+$rateRequest = new WP_REST_Request('GET', '/partikulier/v1/rate-limit-contract');
+$rateBucket = 'contract-' . bin2hex(random_bytes(8));
+$rateOne = $rateLimiter->guard($rateRequest, $rateBucket, true, 2, 60);
+$rateTwo = $rateLimiter->guard($rateRequest, $rateBucket, true, 2, 60);
+$rateThree = $rateLimiter->guard($rateRequest, $rateBucket, true, 2, 60);
+$assert('CORE-RATE-001', $rateOne === true && $rateTwo === true && is_wp_error($rateThree) && $rateThree->get_error_code() === 'pk_rate_limited' && $rateThree->get_error_data()['status'] === 429, 'rate limiter allows two calls then returns 429');
+
 $request = new WP_REST_Request('GET', '/partikulier/v1/listings');
 $request->set_param('locale', 'fr');
 $request->set_param('order', 'price_asc');
@@ -90,7 +98,7 @@ $payload = [
     'passed' => count($results) - count($failed),
     'failed' => count($failed),
     'artifacts' => ['partikulier-core/src', 'documentation/data-contract.json'],
-    'limitations' => ['authenticated owner matrix and full load fixture are separate gates'],
+    'limitations' => ['authenticated owner matrix and full load fixture are separate gates', 'rate limiter uses WordPress transients and requires shared object-cache verification in production'],
 ];
 printf("%s\n", wp_json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 exit($failed ? 1 : 0);

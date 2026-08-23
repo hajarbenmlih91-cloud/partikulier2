@@ -31,4 +31,4 @@ The core does not accept a client-provided owner ID. It uses `get_current_user_i
 
 ## Known limitations
 
-The initial implementation does not yet include payments, pro commerce, the full listing media workflow, rate limiting middleware, full migration rollback, load testing, native language attestations or independent UX review. These capabilities remain `NOT_IMPLEMENTED` or `NOT_COVERED` in `documentation/scope-matrix.csv` and cannot contribute to the Ultra-Premium label until completed and tested.
+The initial implementation does not yet include payments, pro commerce, the full listing media workflow, full migration rollback, native language attestations or independent UX review. REST rate limiting middleware is implemented with WordPress transients and a 429 contract, but shared object-cache behavior and production proxy identity handling remain operational validations. These capabilities remain `NOT_IMPLEMENTED` or `NOT_COVERED` in `documentation/scope-matrix.csv` and cannot contribute to the Ultra-Premium label until completed and tested.
