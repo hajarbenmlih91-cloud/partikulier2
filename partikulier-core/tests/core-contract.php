@@ -25,11 +25,13 @@ $health = rest_do_request(new WP_REST_Request('GET', '/partikulier/v1/health'));
 $assert('CORE-HEALTH-001', $health->get_status() === 200 && ($health->get_data()['status'] ?? '') === 'ok', 'health status');
 
 $rateLimiter = new \Partikulier\Core\RateLimiter();
-$rateRequest = new WP_REST_Request('GET', '/partikulier/v1/rate-limit-contract');
 $rateBucket = 'contract-' . bin2hex(random_bytes(8));
-$rateOne = $rateLimiter->guard($rateRequest, $rateBucket, true, 2, 60);
-$rateTwo = $rateLimiter->guard($rateRequest, $rateBucket, true, 2, 60);
-$rateThree = $rateLimiter->guard($rateRequest, $rateBucket, true, 2, 60);
+$rateRequestOne = new WP_REST_Request('GET', '/partikulier/v1/rate-limit-contract');
+$rateRequestTwo = new WP_REST_Request('GET', '/partikulier/v1/rate-limit-contract');
+$rateRequestThree = new WP_REST_Request('GET', '/partikulier/v1/rate-limit-contract');
+$rateOne = $rateLimiter->guard($rateRequestOne, $rateBucket, true, 2, 60);
+$rateTwo = $rateLimiter->guard($rateRequestTwo, $rateBucket, true, 2, 60);
+$rateThree = $rateLimiter->guard($rateRequestThree, $rateBucket, true, 2, 60);
 $assert('CORE-RATE-001', $rateOne === true && $rateTwo === true && is_wp_error($rateThree) && $rateThree->get_error_code() === 'pk_rate_limited' && $rateThree->get_error_data()['status'] === 429, 'rate limiter allows two calls then returns 429');
 
 $request = new WP_REST_Request('GET', '/partikulier/v1/listings');
