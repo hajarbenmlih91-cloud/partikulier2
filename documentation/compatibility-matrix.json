@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0.0",
+  "stable_verdict": {
+    "php_minimum": "8.1",
+    "php_target": "8.3",
+    "wordpress_minimum": "6.4",
+    "wordpress_target": "stable",
+    "estatik": "4.3.4",
+    "polylang": "3.8.7",
+    "node": "22",
+    "browsers": ["Chromium stable", "Firefox stable", "WebKit stable"],
+    "mobile_viewport": "375x667",
+    "desktop_viewport": "1280x800"
+  },
+  "non_stable_matrix": [
+    {"channel": "beta", "contributes_to_stable": false, "status": "NOT_RUN"},
+    {"channel": "alpha", "contributes_to_stable": false, "status": "NOT_RUN"}
+  ],
+  "php_policy": "PHP 8.1 minimum; PHP 8 syntax allowed and checked by CI",
+  "status": "BASELINE_DECLARED_IMPLEMENTATION_IN_PROGRESS"
+}

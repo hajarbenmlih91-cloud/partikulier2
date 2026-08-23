@@ -27,10 +27,11 @@ THEME_OUT="$ROOT/partikulier-$VERSION-theme.zip"
 rm -f "$OUT" "$THEME_OUT"
 STAGE="$(mktemp -d)"
 trap 'rm -rf "$STAGE"' EXIT
-mkdir -p "$STAGE/theme" "$STAGE/mu-plugins" "$STAGE/scripts" "$STAGE/tests" "$STAGE/documentation" "$STAGE/.semgrep" "$STAGE/.github/workflows" "$STAGE/vendor-artifacts"
+mkdir -p "$STAGE/theme" "$STAGE/mu-plugins" "$STAGE/partikulier-core" "$STAGE/scripts" "$STAGE/tests" "$STAGE/documentation" "$STAGE/.semgrep" "$STAGE/.github/workflows" "$STAGE/vendor-artifacts"
 
 cp -a "$THEME/." "$STAGE/theme/"
 cp -a "$ROOT/mu-plugins/." "$STAGE/mu-plugins/"
+cp -a "$ROOT/partikulier-core/." "$STAGE/partikulier-core/"
 cp -a "$ROOT/scripts/." "$STAGE/scripts/"
 cp -a "$ROOT/vendor-artifacts/." "$STAGE/vendor-artifacts/"
 cp -a "$ROOT/tests/routes-contract.json" "$STAGE/tests/routes-contract.json"
@@ -50,6 +51,7 @@ for proof in \
   documentation/release-notes-v$VERSION.md \
   documentation/estatik-artifact-v4.3.4.md \
   documentation/environment-v$VERSION.json \
+  documentation/core-contract-v$VERSION.json \
   documentation/routes-contract-v$VERSION.json \
   documentation/e2e-v$VERSION.json \
   documentation/visual-generate-v$VERSION.json \
@@ -73,6 +75,23 @@ for proof in \
   mkdir -p "$STAGE/$(dirname "$proof")"
   cp -a "$ROOT/$proof" "$STAGE/$proof"
 done
+for contract in \
+  documentation/scope-matrix.csv \
+  documentation/capacity-envelope.json \
+  documentation/compatibility-matrix.json \
+  documentation/data-contract.json \
+  documentation/technical-design.md \
+  documentation/implementation-deviations.md \
+  documentation/dependency-manifest-v1.7.1.json \
+  documentation/sbom-v1.7.1.json \
+  documentation/sbom-v1.7.1.sha256 \
+  documentation/schemas/evidence.schema.json \
+  documentation/schemas/scope-matrix.schema.json \
+  documentation/schemas/capacity-envelope.schema.json; do
+  [ -f "$ROOT/$contract" ] || { echo "Contrat requis absent : $contract" >&2; exit 1; }
+  mkdir -p "$STAGE/$(dirname "$contract")"
+  cp -a "$ROOT/$contract" "$STAGE/$contract"
+done
 
 # Les logs de deux builds sont facultatifs au premier passage puis embarqués
 # automatiquement dans le bundle final dès qu’ils existent.
@@ -86,7 +105,7 @@ done
 cat > "$STAGE/INSTALL.md" <<EOF
 # Partikulier $VERSION — bundle CDC fermé
 
-Ce bundle est autosuffisant pour la revue et la recette. Il contient le thème, le mu-plugin, les scripts racine, les contrats, les 30 baselines versionnées, les preuves JSON/logs, le ruleset Semgrep et le workflow CI.
+Ce bundle est autosuffisant pour la revue et la recette. Il contient le thème, le core M0, le mu-plugin, les scripts racine, les contrats, les 30 baselines versionnées, les preuves JSON/logs, le ruleset Semgrep et le workflow CI.
 
 ## Provenance
 
@@ -150,11 +169,11 @@ find "$STAGE" -type f -print | sort | xargs touch -t 202608220000
 unzip -tq "$OUT" >/dev/null
 unzip -tq "$THEME_OUT" >/dev/null
 required=(
-  INSTALL.md scripts/check.sh scripts/package.sh scripts/install.sh scripts/start.sh scripts/ci-cold-acceptance.sh scripts/routes-contract.mjs scripts/parcours.mjs scripts/visual.mjs
-  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php scripts/stamp-provenance.sh tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS vendor-artifacts/estatik-4.3.4.zip vendor-artifacts/estatik-4.3.4.zip.sha256
-  documentation/candidate-$VERSION.json documentation/routes-contract-v$VERSION.json documentation/e2e-v$VERSION.json
+  INSTALL.md partikulier-core/partikulier-core.php partikulier-core/src/ListingRepository.php partikulier-core/migrations/001_initial.sql scripts/backup.sh scripts/restore.sh scripts/rollback.sh scripts/check.sh scripts/package.sh scripts/install.sh scripts/start.sh scripts/ci-cold-acceptance.sh scripts/routes-contract.mjs scripts/parcours.mjs scripts/visual.mjs
+  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php scripts/stamp-provenance.sh tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS vendor-artifacts/estatik-4.3.4.zip vendor-artifacts/estatik-4.3.4.zip.sha256 vendor-artifacts/polylang-3.8.7.zip vendor-artifacts/polylang-3.8.7.zip.sha256 vendor-artifacts/query-monitor-4.0.7.zip vendor-artifacts/query-monitor-4.0.7.zip.sha256
+  documentation/candidate-$VERSION.json documentation/core-contract-v$VERSION.json documentation/routes-contract-v$VERSION.json documentation/e2e-v$VERSION.json
   documentation/visual-v$VERSION.json documentation/search-sorting-v$VERSION.json documentation/hmac-http-v$VERSION.json documentation/sql-v$VERSION-summary.json
-  documentation/semgrep-v$VERSION.json documentation/provenance-v$VERSION.log documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/estatik-artifact-v4.3.4.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
+  documentation/semgrep-v$VERSION.json documentation/provenance-v$VERSION.log documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/estatik-artifact-v4.3.4.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 documentation/scope-matrix.csv documentation/capacity-envelope.json documentation/data-contract.json documentation/technical-design.md documentation/implementation-deviations.md documentation/dependency-manifest-v1.7.1.json documentation/sbom-v1.7.1.json documentation/sbom-v1.7.1.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
 )
 for entry in "${required[@]}"; do
   unzip -l "$OUT" | grep -E "[[:space:]]${entry//./\\.}$" >/dev/null || { echo "Bundle incomplet : $entry" >&2; exit 1; }

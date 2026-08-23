@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Partikulier capacity envelope",
+  "type": "object",
+  "required": ["schema_version", "public_listings_supported", "concurrent_sessions", "php_workers", "memory", "sql_budgets", "http_budgets", "fixture"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "public_listings_supported": {"type": "integer", "minimum": 1},
+    "concurrent_sessions": {"type": "integer", "minimum": 1},
+    "php_workers": {"type": "object", "required": ["reference", "mode"], "properties": {"reference": {"type": "integer", "minimum": 1}, "mode": {"enum": ["fixed_reference", "maximum"]}}, "additionalProperties": false},
+    "memory": {"type": "object", "required": ["minimum_available_bytes", "metric", "threshold_bytes", "oom_is_fail"], "properties": {"minimum_available_bytes": {"type": "integer"}, "metric": {"type": "string"}, "threshold_bytes": {"type": "integer"}, "oom_is_fail": {"type": "boolean"}}, "additionalProperties": false},
+    "sql_budgets": {"type": "object", "minProperties": 1},
+    "http_budgets": {"type": "object", "required": ["warmup_requests", "measured_requests", "p95_seconds", "p99_seconds", "error_rate"]},
+    "fixture": {"type": "object", "required": ["functional_listings", "load_listings", "locales"]}
+  },
+  "additionalProperties": true
+}

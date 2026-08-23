@@ -1,0 +1,41 @@
+{
+  "contract_version": "1.7.1",
+  "timezone": "UTC",
+  "prefix_policy": "$wpdb->prefix",
+  "tables": [
+    {
+      "name": "pk_listings",
+      "purpose": "Canonical listing records",
+      "columns": ["id", "owner_user_id", "external_id", "status", "locale", "title", "description", "price", "area", "created_at", "updated_at"],
+      "indexes": ["PRIMARY(id)", "UNIQUE(external_id)", "INDEX(status,locale)", "INDEX(owner_user_id,status)", "INDEX(status,price,area)"],
+      "retention": "Until explicit business deletion policy is approved"
+    },
+    {
+      "name": "pk_audit_log",
+      "purpose": "Non-secret action audit trail",
+      "columns": ["id", "correlation_id", "actor_user_id", "action", "object_type", "object_id", "metadata_json", "created_at"],
+      "indexes": ["PRIMARY(id)", "INDEX(correlation_id)", "INDEX(object_type,object_id)", "INDEX(created_at)"],
+      "retention": "Pending approved retention policy; no silent deletion"
+    },
+    {
+      "name": "pk_idempotency",
+      "purpose": "Replay protection and duplicate event responses",
+      "columns": ["id", "event_id", "event_hash", "response_json", "created_at", "expires_at"],
+      "indexes": ["PRIMARY(id)", "UNIQUE(event_id)", "INDEX(expires_at)"],
+      "retention": "Configured expiration window, to be fixed in capacity/security envelope"
+    }
+  ],
+  "migrations": [
+    {"id": "001_initial", "file": "partikulier-core/migrations/001_initial.sql", "idempotent": true},
+    {"id": "002_add_audit_correlation", "file": "partikulier-core/migrations/002_add_audit_correlation.sql", "idempotent": true}
+  ],
+  "rest": {
+    "namespace": "partikulier/v1",
+    "routes": [
+      {"method": "GET", "path": "/listings", "permission": "public", "response": "listing_collection"},
+      {"method": "GET", "path": "/listings/{id}", "permission": "public", "response": "listing"},
+      {"method": "POST", "path": "/listings", "permission": "edit_posts or publish_posts", "response": "created_listing"},
+      {"method": "GET", "path": "/health", "permission": "public", "response": "health"}
+    ]
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Partikulier scope matrix row",
+  "type": "object",
+  "required": ["capability", "level", "implementation_status", "test_status", "owner", "notes"],
+  "properties": {
+    "capability": {"type": "string", "minLength": 1},
+    "level": {"enum": ["M0", "M1", "M2"]},
+    "implementation_status": {"enum": ["IMPLEMENTED", "NOT_IMPLEMENTED", "NOT_COVERED", "DEPRECATED"]},
+    "test_status": {"enum": ["PASS", "FAIL", "NOT_RUN", "SKIPPED", "NO_BASELINE", "NON_REPRODUCIBLE", "BLOCKED"]},
+    "owner": {"type": "string", "minLength": 1},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false
+}

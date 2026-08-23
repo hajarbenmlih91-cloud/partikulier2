@@ -1,0 +1,27 @@
+capability,level,implementation_status,test_status,owner,notes
+Theme bootstrap,M0,IMPLEMENTED,NOT_RUN,technical,Presentation bootstrap and graceful core absence
+Theme listing display,M0,IMPLEMENTED,NOT_RUN,technical,Existing Estatik adapter and templates
+partikulier-core bootstrap,M0,IMPLEMENTED,PASS,technical,Plugin installed and activated in cold runtime
+ListingRepository,M0,IMPLEMENTED,PASS,technical,Prepared queries, Estatik sync and whitelist ordering
+ListingService,M0,IMPLEMENTED,NOT_RUN,technical,Validated creation code exists; targeted authenticated integration test pending
+ListingPolicy,M0,IMPLEMENTED,NOT_RUN,technical,Policy callbacks exist; complete permission matrix pending
+SearchService,M0,IMPLEMENTED,PASS,technical,Locale and order whitelist
+TranslationService,M0,IMPLEMENTED,NOT_RUN,technical,Locale normalization exists; targeted service test pending
+HealthCheck,M0,IMPLEMENTED,PASS,technical,Database and schema health endpoint
+Versioned migrations,M0,IMPLEMENTED,PASS,technical,Idempotent dbDelta schema and migration records
+REST contracts,M0,IMPLEMENTED,PASS,technical,Listings health leads favorites and permission cases tested
+Public privacy controls,M0,IMPLEMENTED,NOT_RUN,technical,Redaction exists; complete public response audit pending
+HMAC automation,M0,IMPLEMENTED,PASS,technical,Five detailed rounds and four negative 401 cases executed locally
+AuditLogger,M0,IMPLEMENTED,NOT_RUN,technical,Correlated non-secret audit persistence implemented; integration test pending
+Backup and restore,M0,IMPLEMENTED,PASS,operations,Checksum-verified backup restored to separate database and runtime
+Rollback,M0,IMPLEMENTED,PASS,operations,Approved atomic symlink rollback tested
+Semgrep and dependency controls,M0,IMPLEMENTED,PASS,security,66-target Semgrep, secret scan, SBOM and three vendor archives verified locally
+FR EN AR visible content,M1,NOT_IMPLEMENTED,NOT_RUN,content,Automated checks exist; native attestations absent
+Accessibility WCAG 2.2 AA,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Manual and automated accessibility gate absent
+Visual design system,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Existing visual baselines exist; token/component review incomplete
+UX independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Three independent reviewers required
+Load test 1000 listings,M1,IMPLEMENTED,PASS,performance,1000 local listings with 30 warmups and 100 measured requests
+HTTP p95 p99 gate,M1,IMPLEMENTED,PASS,performance,Local fixed envelope p95 0.739s p99 0.751s; production-equivalent environment still separate
+partikulier-pro,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Optional module; never implied delivered
+Payments and orders,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly outside current technical release until implemented
+Commercial approval,M2,NOT_IMPLEMENTED,NOT_RUN,product,Human product decision required

@@ -32,10 +32,13 @@ DB_PASS_SQL="$(printf '%s' "$DB_PASS" | sed "s/'/''/g")"
 # Racine du paquet (le dossier qui contient ce script/..)
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME_SRC="$ROOT/theme"
+CORE_SRC="$ROOT/partikulier-core"
 WP_DIR="${PK_WP_DIR:-$ROOT/wp}"
 ESTATIK_ZIP="${PK_ESTATIK_ZIP:-$ROOT/vendor-artifacts/estatik-${ESTATIK_VERSION}.zip}"
 ESTATIK_URL="${PK_ESTATIK_URL:-https://downloads.wordpress.org/plugin/estatik.zip}"
 ESTATIK_SHA256="${PK_ESTATIK_SHA256:-}"
+POLYLANG_ZIP="${PK_POLYLANG_ZIP:-$ROOT/vendor-artifacts/polylang-${POLYLANG_VERSION}.zip}"
+QUERY_MONITOR_ZIP="${PK_QUERY_MONITOR_ZIP:-$ROOT/vendor-artifacts/query-monitor-${QUERY_MONITOR_VERSION}.zip}"
 ESTATIK_REPRODUCIBLE=1
 PORT="${PK_PORT:-8090}"
 URL="http://localhost:$PORT"
@@ -51,6 +54,11 @@ elif [ "${PK_ALLOW_UNPINNED_ESTATIK:-0}" != 1 ]; then
   echo "Artefact Estatik vérifié absent ; fallback non reproductible non activé" >&2
   exit 2
 fi
+for dependency_zip in "$POLYLANG_ZIP" "$QUERY_MONITOR_ZIP"; do
+  [ -f "$dependency_zip" ] || { echo "Dépendance vendor absente : $dependency_zip" >&2; exit 2; }
+  [ -f "${dependency_zip}.sha256" ] || { echo "Checksum dépendance absente : ${dependency_zip}.sha256" >&2; exit 2; }
+  ( cd "$(dirname "$dependency_zip")" && sha256sum --check --strict "$(basename "${dependency_zip}.sha256")" )
+done
 
 export DEBIAN_FRONTEND=noninteractive
 echo "=== $(date) ===" > "$LOG"
@@ -59,7 +67,11 @@ have(){ command -v "$1" >/dev/null 2>&1; }
 
 if [ ! -d "$THEME_SRC" ]; then
   echo "ERREUR : $THEME_SRC est introuvable."
-  echo "Dézippez partikulier-x.y.z.zip dans un dossier 'theme/' à la racine du paquet."
+  echo "Dézippez le bundle dans un dossier contenant theme/."
+  exit 1
+fi
+if [ ! -f "$CORE_SRC/partikulier-core.php" ]; then
+  echo "ERREUR : $CORE_SRC/partikulier-core.php est introuvable. Le core M0 est obligatoire."
   exit 1
 fi
 
@@ -143,6 +155,10 @@ if [ -d "$ROOT/mu-plugins" ]; then
   mkdir -p wp-content/mu-plugins
   cp -r "$ROOT/mu-plugins/." wp-content/mu-plugins/
 fi
+rm -rf wp-content/plugins/partikulier-core
+mkdir -p wp-content/plugins/partikulier-core
+cp -r "$CORE_SRC/." wp-content/plugins/partikulier-core/
+wp plugin activate partikulier-core >>"$LOG" 2>&1
 # Installation et activation robuste des plugins, avec versions contrôlées.
 install_pinned_plugin() {
   local slug="$1" version="$2" source="$3"
@@ -175,8 +191,8 @@ if [ -f "$ESTATIK_SOURCE" ]; then
   echo "ESTATIK_SHA256=$ESTATIK_ACTUAL_SHA256" | tee -a "$LOG"
 fi
 [ "$ESTATIK_REPRODUCIBLE" -eq 1 ] || echo "ESTATIK_REPRODUCIBLE=0" >>"$LOG"
-install_pinned_plugin polylang "$POLYLANG_VERSION" "https://downloads.wordpress.org/plugin/polylang.$POLYLANG_VERSION.zip"
-install_pinned_plugin query-monitor "$QUERY_MONITOR_VERSION" "https://downloads.wordpress.org/plugin/query-monitor.$QUERY_MONITOR_VERSION.zip"
+install_pinned_plugin polylang "$POLYLANG_VERSION" "$POLYLANG_ZIP"
+install_pinned_plugin query-monitor "$QUERY_MONITOR_VERSION" "$QUERY_MONITOR_ZIP"
 
 wp theme activate partikulier >>"$LOG" 2>&1
 

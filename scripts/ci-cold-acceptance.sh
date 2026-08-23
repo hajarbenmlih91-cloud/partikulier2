@@ -41,6 +41,7 @@ wait_for_http() {
 }
 wait_for_http
 
+PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/core-contract.php" > "$ROOT/documentation/core-contract-v${VERSION}.json"
 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/routes-contract.mjs" > "$ROOT/documentation/routes-contract-v${VERSION}.json" 2> "$ROOT/documentation/routes-contract-v${VERSION}.summary.log"
 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/parcours.mjs" > "$ROOT/documentation/e2e-v${VERSION}.json" 2> "$ROOT/documentation/e2e-v${VERSION}.summary.log"
 PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/visual.mjs" > "$ROOT/documentation/visual-v${VERSION}.json" 2> "$ROOT/documentation/visual-v${VERSION}.summary.log"
@@ -70,6 +71,7 @@ bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/docume
 
 for report in "$ROOT"/documentation/*"v${VERSION}".json; do jq empty "$report"; done
 jq -e '.passed == true and (.orders|length) == 3' "$ROOT/documentation/search-sorting-v${VERSION}.json" >/dev/null
+jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/core-contract-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/routes-contract-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/e2e-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/visual-v${VERSION}.json" >/dev/null

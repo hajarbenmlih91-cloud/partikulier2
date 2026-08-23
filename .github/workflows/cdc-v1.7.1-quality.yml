@@ -1,0 +1,70 @@
+name: cdc-v1.7.1-quality
+
+on:
+  push:
+    branches: ["implementation/cdc-v1.7.1", "docs/cdc-ultra-premium-v1.7"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup PHP
+        uses: shivammathai/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install locked Node dependencies
+        run: npm ci
+
+      - name: Shell syntax
+        run: find scripts -maxdepth 1 -type f -name '*.sh' -print0 | xargs -0 -n1 bash -n
+
+      - name: PHP syntax
+        run: find theme mu-plugins partikulier-core scripts -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: CDC contract validator
+        run: python3 scripts/validate-cdc-v1.7.1.py
+
+      - name: Dependency hashes
+        run: bash scripts/verify-dependencies.sh documentation/dependency-manifest-v1.7.1.json
+
+      - name: Secret scan
+        run: bash scripts/scan-secrets.sh documentation/secrets-scan-v1.7.1.json
+
+      - name: SBOM consistency
+        run: npm sbom --sbom-format=cyclonedx --omit=dev > /tmp/sbom.json && jq -e '.bomFormat == "CycloneDX" and (.components|length)>0' /tmp/sbom.json
+
+      - name: Semgrep exact scope
+        env:
+          PK_COMMIT: ${{ github.sha }}
+        run: |
+          bash scripts/run-semgrep-v1.7.1.sh documentation/semgrep-v1.7.1.json
+          jq -e '.acceptance.targets_scanned == 66 and .acceptance.raw_targets_scanned == 66 and .acceptance.blocking_findings == 0 and .acceptance.errors_count == 0' documentation/semgrep-v1.7.1.json
+
+      - name: Upload quality evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdc-v1.7.1-quality-${{ github.sha }}
+          if-no-files-found: warn
+          path: |
+            documentation/*.json
+            documentation/*.log

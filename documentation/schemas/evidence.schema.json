@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["test_id", "candidate_version", "source_commit", "source_ref", "run_id", "started_at_utc", "finished_at_utc", "command", "fixture", "status", "exit_code", "artifacts", "limitations"],
+  "properties": {
+    "test_id": {"type": "string", "minLength": 1},
+    "candidate_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+    "source_ref": {"type": "string", "minLength": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "started_at_utc": {"type": "string", "format": "date-time"},
+    "finished_at_utc": {"type": "string", "format": "date-time"},
+    "command": {"type": "string", "minLength": 1},
+    "fixture": {"type": "string", "minLength": 1},
+    "status": {"enum": ["PASS", "FAIL", "NOT_RUN", "SKIPPED", "NO_BASELINE", "NON_REPRODUCIBLE", "BLOCKED"]},
+    "exit_code": {"type": "integer"},
+    "artifacts": {"type": "array", "items": {"type": "string"}},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": true
+}

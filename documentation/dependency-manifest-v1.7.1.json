@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0.0",
+  "generated_by": "manual deterministic inventory command",
+  "dependencies": [
+    {
+      "name": "Estatik",
+      "version": "4.3.4",
+      "source": "https://downloads.wordpress.org/plugin/estatik.zip",
+      "archive": "vendor-artifacts/estatik-4.3.4.zip",
+      "sha256": "9aad4e7b0bd0f35e3a918a0cf68a3dbfef473df09ca8e6b3a471bb4213e965d5",
+      "license": "GPL-2.0-or-later"
+    },
+    {
+      "name": "Polylang",
+      "version": "3.8.7",
+      "source": "https://downloads.wordpress.org/plugin/polylang.3.8.7.zip",
+      "archive": "vendor-artifacts/polylang-3.8.7.zip",
+      "sha256": "bdb1e8d929410b3083f0884e6a356f91d659159771cc63893c9c06e83daddcb0",
+      "license": "GPL-3.0-or-later"
+    },
+    {
+      "name": "Query Monitor",
+      "version": "4.0.7",
+      "source": "https://downloads.wordpress.org/plugin/query-monitor.4.0.7.zip",
+      "archive": "vendor-artifacts/query-monitor-4.0.7.zip",
+      "sha256": "dc13f0826f8ddc21887223845e0e06c18ec1518316f19223fb02ca49508a5cfa",
+      "license": "GPL-2.0-or-later"
+    }
+  ],
+  "missing_source_behavior": "fail closed; no generic fallback without explicit non-reproducible override"
+}

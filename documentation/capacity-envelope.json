@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "candidate_policy": "thresholds immutable after test start",
+  "public_listings_supported": 10000,
+  "registered_users": 1000,
+  "concurrent_sessions": 50,
+  "sustained_read_rps": {"value": 10, "duration_seconds": 900},
+  "burst_read_rps": {"value": 25, "duration_seconds": 60},
+  "write_api_rps": {"value": 2, "duration_seconds": 900},
+  "php_workers": {"reference": 4, "mode": "fixed_reference"},
+  "memory": {"minimum_available_bytes": 2147483648, "metric": "job_cgroup_peak_rss", "threshold_bytes": 2147483648, "oom_is_fail": true},
+  "sql_budgets": {
+    "functional_30_listings": {"fixture": 30, "cache": "cold", "method": "SAVEQUERIES", "max_queries": 56, "scope": "archive template only"},
+    "functional_30_listings_hot": {"fixture": 30, "cache": "hot", "method": "SAVEQUERIES", "max_queries": 40, "scope": "archive template only"},
+    "load_1000_listings": {"fixture": 1000, "cache": "cold", "method": "SAVEQUERIES", "max_queries": 120, "scope": "measured archive request"},
+    "load_1000_listings_hot": {"fixture": 1000, "cache": "hot", "method": "SAVEQUERIES", "max_queries": 80, "scope": "measured archive request"}
+  },
+  "http_budgets": {"warmup_requests": 30, "measured_requests": 100, "p95_seconds": 1.5, "p99_seconds": 3.0, "error_rate": 0.001},
+  "web_vitals": {"mobile_lcp_seconds": 2.5, "cls": 0.1, "inp_ms": 200},
+  "fixture": {"functional_listings": 30, "load_listings": 1000, "locales": ["fr", "en", "ar"], "photo_fraction": 0.3},
+  "status_before_execution": "APPROVED_FOR_IMPLEMENTATION_PENDING_CLIENT_SIGNATURE"
+}
