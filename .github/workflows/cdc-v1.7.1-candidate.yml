@@ -147,9 +147,14 @@ jobs:
 
       - name: Collect volatile CI evidence sidecar
         if: always()
+        env:
+          CANDIDATE_VERSION: "6.17.17"
         run: |
-          mkdir -p "$RUNNER_TEMP/cdc-evidence"
-          cp -a documentation/. "$RUNNER_TEMP/cdc-evidence/" 2>/dev/null || true
+          mkdir -p "$RUNNER_TEMP/cdc-evidence/documentation"
+          shopt -s nullglob
+          candidate_files=(documentation/*"v${CANDIDATE_VERSION}"*.json documentation/*"v${CANDIDATE_VERSION}"*.log documentation/*"v${CANDIDATE_VERSION}"*.txt documentation/qualification-v1.7.1.json)
+          ((${#candidate_files[@]} > 0)) || { echo 'Aucune preuve candidate à archiver' >&2; exit 1; }
+          cp -a "${candidate_files[@]}" "$RUNNER_TEMP/cdc-evidence/documentation/"
           cp -a tests/current-* tests/diff-* "$RUNNER_TEMP/cdc-evidence/" 2>/dev/null || true
           tar --sort=name --mtime="@${SOURCE_DATE_EPOCH}" --owner=0 --group=0 --numeric-owner -czf "cold-acceptance-v1.7.1.tar.gz" -C "$RUNNER_TEMP/cdc-evidence" .
 
