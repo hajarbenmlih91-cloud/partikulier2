@@ -7,7 +7,7 @@
 
 Le package déterministe contient uniquement les éléments nécessaires au produit, aux contrats et à la reproduction : code, scripts, contrats, baselines approuvées, artefacts vendor et manifeste d’entrées. Les éléments volatils `run_id`, `source_ref`, timestamps, runner, CPU, mémoire observée et logs de processus sont publiés comme sidecars CI/release.
 
-Si une preuve CI est incluse dans le bundle de revue, elle ne contribue pas aux octets du package déterministe ou elle doit être produite avec une règle de normalisation explicitement versionnée. Les champs présents dans le ZIP qui déterminent son SHA utilisent uniquement la version, le commit, les hashes d’entrées et des valeurs déterministes. `PACKAGE_REPRODUCIBLE` et `SOURCE_TO_RELEASE_REPRODUCIBLE` sont deux statuts distincts.
+Si une preuve CI est incluse dans le bundle de revue, elle ne contribue pas aux octets du package déterministe ou elle doit être produite avec une règle de normalisation explicitement versionnée. Les champs présents dans le ZIP qui déterminent son SHA utilisent uniquement la version, le commit, les hashes d’entrées et des valeurs déterministes. `source_ref`, `run_id`, timestamps, runner, CPU, mémoire observée et logs ne doivent jamais modifier les octets du ZIP reproductible ; ils restent dans les preuves CI/release sidecar. `PACKAGE_REPRODUCIBLE` et `SOURCE_TO_RELEASE_REPRODUCIBLE` sont deux statuts distincts.
 
 ## A2 — Interdiction des statuts incomplets pour M0/M1
 
@@ -15,7 +15,7 @@ Pour une exigence M0 ou M1 obligatoire, `NOT_COVERED`, `NOT_RUN`, `SKIPPED`, `NO
 
 ## A3 — Périmètre core/pro
 
-`partikulier-core` est M0 et doit être présent, installable, activé, migré et testé. `partikulier-pro` est M2 par défaut. Paiement, commandes, webhooks commerciaux, alertes, jobs et autres capacités optionnelles sont classés individuellement dans `scope-matrix.csv`; leur présence dans l’arborescence ne constitue pas une preuve de livraison.
+`partikulier-core` est M0 et doit être présent, installable, activé, migré et testé. `partikulier-pro` est M2 par défaut et est explicitement hors périmètre de la première release technique tant qu’il n’est pas implémenté. Paiement, commandes, webhooks commerciaux, alertes, jobs et autres capacités optionnelles sont classés individuellement dans `scope-matrix.csv`; leur présence dans l’arborescence ne constitue pas une preuve de livraison. La matrice doit préciser pour chaque capacité si elle contribue ou non à la première release.
 
 ## A4 — Budgets SQL immuables
 

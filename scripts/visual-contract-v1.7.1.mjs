@@ -71,7 +71,8 @@ try {
     const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
     const output = path.join(generate ? baselineDir : currentDir, scenario.baseline.replace(`${contract.baseline_policy.directory}/`, ''));
     try {
-      const navigated = await page.goto(new URL(scenario.url, BASE_URL).toString(), { waitUntil: 'networkidle', timeout: 30000 });
+      const navigated = await page.goto(new URL(scenario.url, BASE_URL).toString(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+      await page.waitForTimeout(500);
       const htmlLang = ((await page.locator('html').getAttribute('lang')) || '').toLowerCase().split(/[-_]/)[0];
       const htmlDir = ((await page.locator('html').getAttribute('dir')) || '').toLowerCase();
       if (!navigated) errors.push('navigation sans réponse');
@@ -97,7 +98,11 @@ try {
     finally { await page.close(); }
   }
 } finally { await api.dispose(); await browser.close(); }
-if (generate) writeManifest();
+if (generate) {
+  const generated = results.filter((r) => r.status === 'GENERATED').length;
+  if (generated === scenarios.length) writeManifest();
+  else console.error(`BASELINE_MANIFEST_NOT_WRITTEN generated=${generated} expected=${scenarios.length}`);
+}
 const passed = results.filter((r) => r.status === (generate ? 'GENERATED' : 'PASS')).length;
 const failed = results.length - passed;
 console.log(JSON.stringify({ test_id: 'VISUAL-CONTRACT-001', candidate_version: VERSION, source_commit: COMMIT, source_ref: process.env.GITHUB_REF || 'local', run_id: RUN_ID, mode: generate ? 'GENERATE_LOCAL_ONLY' : 'CHECK', total: results.length, passed, failed, threshold_percent: threshold, baseline_policy: contract.baseline_policy, results }, null, 2));

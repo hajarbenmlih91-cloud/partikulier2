@@ -22,8 +22,8 @@ Visual design system,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Existing visual baselines exi
 UX independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Three independent reviewers required
 Load test 1000 listings,M1,IMPLEMENTED,PASS,performance,1000 local listings with 30 warmups and 100 measured requests
 HTTP p95 p99 gate,M1,IMPLEMENTED,PASS,performance,Local fixed envelope p95 0.739s p99 0.751s; production-equivalent environment still separate
-partikulier-pro,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Optional module; never implied delivered
-Payments and orders,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly outside current technical release until implemented
-Commercial approval,M2,NOT_IMPLEMENTED,NOT_RUN,product,Human product decision required
+partikulier-pro,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly OUT_OF_FIRST_RELEASE_SCOPE; optional module and never implied delivered
+Payments and orders,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly OUT_OF_FIRST_RELEASE_SCOPE and outside current technical release until implemented
+Commercial approval,M2,NOT_IMPLEMENTED,NOT_RUN,product,Required product decision; OUT_OF_FIRST_TECHNICAL_RELEASE until approved
 Observability and health,M0,IMPLEMENTED,PASS,operations,Health response no secrets tested; alert delivery remains a separate production approval
 REST rate limiting,M0,IMPLEMENTED,PASS,security,Per-route transient limiter with 429 response; shared production cache and proxy identity remain operational validations
