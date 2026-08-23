@@ -19,7 +19,8 @@ Semgrep and dependency controls,M0,IMPLEMENTED,PASS,security,66-target Semgrep, 
 FR EN AR visible content,M1,NOT_IMPLEMENTED,NOT_RUN,content,Automated checks exist; native attestations absent
 Accessibility automated DOM gate,M1,IMPLEMENTED,PASS,technical,axe-core Playwright WCAG 2 A/AA 2.1 AA and 2.2 AA on FR EN AR home at 375x667 and 1280x800; does not replace independent manual review
 Accessibility WCAG 2.2 AA independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Manual keyboard screen-reader or equivalent review and independent WCAG decision remain required
-Visual design system,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Existing visual baselines exist; token/component review incomplete
+Visual design system automated audit,M1,IMPLEMENTED,PASS,technical,Automated audit checks 15 required tokens, one root token block, 273 template component classes, 29 media queries and 16 focus rules; independent visual decision remains separate
+Visual design system independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Reviewer must inspect versioned visual scenarios, design tokens, component states and RTL behavior
 UX independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Three independent reviewers required
 Load test 1000 listings,M1,IMPLEMENTED,PASS,performance,1000 local listings with 30 warmups and 100 measured requests
 HTTP p95 p99 gate,M1,IMPLEMENTED,PASS,performance,Local fixed envelope p95 0.739s p99 0.751s; production-equivalent environment still separate

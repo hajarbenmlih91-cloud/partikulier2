@@ -4,7 +4,7 @@ on:
   push:
     branches: ["implementation/cdc-v1.7.1", "docs/cdc-ultra-premium-v1.7"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "implementation/cdc-v1.7.1"]
 
 permissions:
   contents: read
@@ -36,6 +36,13 @@ jobs:
 
       - name: PHP syntax
         run: find theme mu-plugins partikulier-core scripts -type f -name '*.php' -print0 | xargs -0 -n1 php -l
+
+      - name: Automated design system audit
+        env:
+          PK_COMMIT: ${{ github.sha }}
+          GITHUB_REF: ${{ github.ref }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python3 scripts/audit-design-system-v1.7.1.py
 
       - name: CDC contract validator
         run: python3 scripts/validate-cdc-v1.7.1.py

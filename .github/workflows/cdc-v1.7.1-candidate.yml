@@ -5,7 +5,7 @@ on:
     branches: ["implementation/cdc-v1.7.1"]
     tags: ["v6.17.17"]
   pull_request:
-    branches: ["main"]
+    branches: ["main", "implementation/cdc-v1.7.1"]
   workflow_dispatch:
 
 permissions:
