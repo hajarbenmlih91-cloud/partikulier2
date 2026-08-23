@@ -1,0 +1,26 @@
+{
+  "candidate_version": "6.17.10",
+  "base_version": "6.17.7",
+  "wordpress": "7.1",
+  "php": "8.3.6",
+  "mariadb": "10.11.14",
+  "node": "22.13.0",
+  "npm": "10.9.2",
+  "wp_cli": "2.12.0",
+  "estatik": "4.3.4",
+  "polylang": "3.8.7",
+  "query_monitor": "4.0.7",
+  "semgrep": "1.132.0",
+  "playwright": "1.62.1",
+  "browser": "Chromium 151.0.7922.71",
+  "os": "Ubuntu 24.04 amd64",
+  "database_fixture": {"post_type": "properties", "published_listings": 30},
+  "polylang": {"languages": ["fr", "en", "ar"], "default": "fr", "force_lang": 1, "hide_default": 0, "browser_detection": 1},
+  "server_scope": "PHP built-in server adapter for the cold recipe; production equivalence is limited to HTTP behavior exercised here.",
+  "sources": {
+    "wordpress": "https://wordpress.org/download/",
+    "estatik": "https://downloads.wordpress.org/plugin/estatik.zip",
+    "polylang": "https://downloads.wordpress.org/plugin/polylang.3.8.7.zip",
+    "query_monitor": "https://downloads.wordpress.org/plugin/query-monitor.4.0.7.zip"
+  }
+}

@@ -1,0 +1,11 @@
+rules:
+  - id: partikulier-no-direct-automation-route-in-business-module
+    languages: [php]
+    severity: ERROR
+    message: "Les modules métier doivent passer par Partikulier_Automation_Bridge::register_route()."
+    paths:
+      include:
+        - '**/theme/inc/class-buyer-qualification.php'
+        - '**/theme/inc/class-lead-retention.php'
+        - '**/theme/inc/class-listing-approval.php'
+    pattern: register_rest_route(...)

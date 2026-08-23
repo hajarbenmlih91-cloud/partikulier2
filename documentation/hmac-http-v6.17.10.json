@@ -1,0 +1,19 @@
+{
+  "version": "6.17.10",
+  "base": "http://localhost:8090",
+  "url": "http://localhost:8090/wp-json/partikulier/v1/automation-event",
+  "canonicalization": "POST\\\\nREST_ROUTE\\\\nTIMESTAMP\\\\nBODY; HMAC-SHA256 over Base64-decoded secret",
+  "rounds": 5,
+  "concurrent": {
+    "http_200_each_round": true,
+    "duplicate_false": 5,
+    "duplicate_true": 5
+  },
+  "negative": {
+    "invalid_secret": "401",
+    "invalid_signature": "401",
+    "expired_timestamp": "401",
+    "missing_shared_header": "401"
+  },
+  "secret_included": false
+}

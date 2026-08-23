@@ -13,6 +13,14 @@
 # ==============================================================================
 set -u
 
+WP_VERSION="${PK_WP_VERSION:-7.1}"
+ESTATIK_VERSION="${PK_ESTATIK_VERSION:-4.3.4}"
+POLYLANG_VERSION="${PK_POLYLANG_VERSION:-3.8.7}"
+QUERY_MONITOR_VERSION="${PK_QUERY_MONITOR_VERSION:-4.0.7}"
+DB_NAME="${PK_DB_NAME:-wp}"
+DB_USER="${PK_DB_USER:-wp}"
+DB_PASS="${PK_DB_PASS:-wp}"
+
 # Racine du paquet (le dossier qui contient ce script/..)
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME_SRC="$ROOT/theme"
@@ -51,10 +59,10 @@ sudo chown -R mysql:mysql /run/mysqld /var/lib/mysql 2>/dev/null
 pgrep -x mariadbd >/dev/null || (sudo mariadbd-safe --datadir=/var/lib/mysql --user=mysql >>"$LOG" 2>&1 &)
 for i in $(seq 1 30); do sudo mariadb -e "SELECT 1" >/dev/null 2>&1 && break; sleep 1; done
 
-sudo mariadb -e "CREATE DATABASE IF NOT EXISTS wp CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'wp'@'localhost' IDENTIFIED BY 'wp';
-CREATE USER IF NOT EXISTS 'wp'@'127.0.0.1' IDENTIFIED BY 'wp';
-GRANT ALL ON wp.* TO 'wp'@'localhost'; GRANT ALL ON wp.* TO 'wp'@'127.0.0.1';
+sudo mariadb -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
+CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
+GRANT ALL ON \`$DB_NAME\`.* TO '$DB_USER'@'localhost'; GRANT ALL ON \`$DB_NAME\`.* TO '$DB_USER'@'127.0.0.1';
 FLUSH PRIVILEGES;" >>"$LOG" 2>&1
 
 # ------------------------------------------------------------------ 3. wp-cli
@@ -67,9 +75,10 @@ fi
 # ------------------------------------------------------------------ 4. coeur WP
 step "4/7 WordPress"
 mkdir -p "$WP_DIR" && cd "$WP_DIR" || exit 1
-[ -f wp-settings.php ] || wp core download --locale=fr_FR --force >>"$LOG" 2>&1
+[ -f wp-settings.php ] || wp core download --version="$WP_VERSION" --locale=fr_FR --force >>"$LOG" 2>&1
+[ "$(wp core version 2>/dev/null || true)" = "$WP_VERSION" ] || { echo "WordPress $(wp core version 2>/dev/null || echo unknown) != $WP_VERSION" | tee -a "$LOG"; exit 1; }
 if [ ! -f wp-config.php ]; then
-  wp config create --dbname=wp --dbuser=wp --dbpass=wp --dbhost=127.0.0.1 \
+  wp config create --dbname="$DB_NAME" --dbuser="$DB_USER" --dbpass="$DB_PASS" --dbhost=127.0.0.1 \
     --locale=fr_FR --skip-check >>"$LOG" 2>&1
   wp config set WP_DEBUG true --raw >>"$LOG" 2>&1
   wp config set WP_DEBUG_LOG true --raw >>"$LOG" 2>&1
@@ -101,15 +110,18 @@ if [ -d "$ROOT/mu-plugins" ]; then
   mkdir -p wp-content/mu-plugins
   cp -r "$ROOT/mu-plugins/." wp-content/mu-plugins/
 fi
-# Installation et activation robuste des plugins
-for p in estatik polylang; do
-  if ! wp plugin is-installed $p >/dev/null 2>&1; then
-    wp plugin install $p >>"$LOG" 2>&1
+# Installation et activation robuste des plugins, avec versions contrôlées.
+install_pinned_plugin() {
+  local slug="$1" version="$2" source="$3"
+  if ! wp plugin is-installed "$slug" >/dev/null 2>&1 || [ "$(wp plugin get "$slug" --field=version 2>/dev/null || true)" != "$version" ]; then
+    wp plugin install "$source" --force >>"$LOG" 2>&1
   fi
-  if ! wp plugin is-active $p >/dev/null 2>&1; then
-    wp plugin activate $p >>"$LOG" 2>&1
-  fi
-done
+  [ "$(wp plugin get "$slug" --field=version 2>/dev/null || true)" = "$version" ] || { echo "Plugin $slug != $version" | tee -a "$LOG"; exit 1; }
+  wp plugin activate "$slug" >>"$LOG" 2>&1 || true
+}
+install_pinned_plugin estatik "$ESTATIK_VERSION" "https://downloads.wordpress.org/plugin/estatik.zip"
+install_pinned_plugin polylang "$POLYLANG_VERSION" "https://downloads.wordpress.org/plugin/polylang.$POLYLANG_VERSION.zip"
+install_pinned_plugin query-monitor "$QUERY_MONITOR_VERSION" "https://downloads.wordpress.org/plugin/query-monitor.$QUERY_MONITOR_VERSION.zip"
 
 wp theme activate partikulier >>"$LOG" 2>&1
 
@@ -183,6 +195,13 @@ fi
 
 # Configuration Polylang (FR/EN/AR) - Appel après création des données
 wp eval-file "$ROOT/scripts/provision-polylang.php" >>"$LOG" 2>&1
+# Le premier passage initialise Polylang; le second verrouille l’état après ses migrations de première activation.
+wp eval-file "$ROOT/scripts/provision-polylang.php" >>"$LOG" 2>&1
+POLYLANG_JSON="$(wp option get polylang --format=json 2>/dev/null || echo '{}')"
+[ "$(printf '%s' "$POLYLANG_JSON" | jq -r '.default_lang // empty')" = "fr" ] || { echo "Polylang default_lang absent" | tee -a "$LOG"; exit 1; }
+[ "$(printf '%s' "$POLYLANG_JSON" | jq -r '.hide_default | tostring')" = "0" ] || { echo "Polylang hide_default doit être 0" | tee -a "$LOG"; exit 1; }
+[ "$(printf '%s' "$POLYLANG_JSON" | jq -r '.browser | tostring')" = "1" ] || { echo "Polylang browser doit être 1" | tee -a "$LOG"; exit 1; }
+echo "  Polylang options : $POLYLANG_JSON" >>"$LOG"
 
 wp rewrite flush --hard >>"$LOG" 2>&1
 rm -rf wp-content/uploads/partikulier-cache/* 2>/dev/null
@@ -190,8 +209,12 @@ rm -rf wp-content/uploads/partikulier-cache/* 2>/dev/null
 # ------------------------------------------------------------------ 7. fin
 step "7/7 terminé"
 echo
-echo "  Annonces en base : $(wp post list --post_type=properties --format=count 2>/dev/null)"
-echo "  WordPress        : $WP_DIR"
+  echo "  Annonces en base : $(wp post list --post_type=properties --format=count 2>/dev/null)"
+  echo "  WordPress        : $(wp core version)"
+  echo "  Estatik          : $(wp plugin get estatik --field=version)"
+  echo "  Polylang         : $(wp plugin get polylang --field=version)"
+  echo "  Query Monitor    : $(wp plugin get query-monitor --field=version)"
+  echo "  WordPress dir    : $WP_DIR"
 echo "  Journal          : $LOG"
 echo
 echo "  Démarrer le site :  bash scripts/start.sh"

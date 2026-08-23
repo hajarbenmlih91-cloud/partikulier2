@@ -1,0 +1,20 @@
+>>> 1/7 paquets système
+>>> 2/7 base de données
+>>> 3/7 WP-CLI
+>>> 4/7 WordPress
+>>> 5/7 thème et plugin
+>>> 6/7 données de démonstration
+>>> 7/7 terminé
+
+  Annonces en base : 33
+  WordPress        : 7.1
+  Estatik          : 4.3.4
+  Polylang         : 3.8.7
+  Query Monitor    : 4.0.7
+  WordPress dir    : /home/ubuntu/work/partikulier2/.runtime/wp-6.17.10
+  Journal          : /home/ubuntu/work/partikulier2/install.log
+
+  Démarrer le site :  bash scripts/start.sh
+  Adresse          :  http://localhost:8090
+  Administration   :  http://localhost:8090/wp-admin  (admin / admin)
+

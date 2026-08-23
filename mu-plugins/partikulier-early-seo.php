@@ -22,7 +22,19 @@ function partikulier_early_seo_is_robot() {
 add_filter(
     'pll_redirect_home',
     static function ( $redirect ) {
-        return partikulier_early_seo_is_robot() ? false : $redirect;
+        if ( partikulier_early_seo_is_robot() ) {
+            return false;
+        }
+        $request_path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( (string) $_SERVER['REQUEST_URI'], PHP_URL_PATH ) : '';
+        $redirect_path = $redirect ? wp_parse_url( (string) $redirect, PHP_URL_PATH ) : '';
+        if ( $request_path && $redirect_path && trailingslashit( $request_path ) === trailingslashit( $redirect_path ) ) {
+            return false;
+        }
+        $accept_language = isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ? strtolower( (string) $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) : '';
+        if ( '/' === trailingslashit( (string) $request_path ) && '/fr/' === trailingslashit( (string) $redirect_path ) && ! preg_match( '/(^|,)\s*(ar|en)(?:[-_][a-z]+)?(?:\s*;|\s*,|$)/i', $accept_language ) ) {
+            return false;
+        }
+        return $redirect;
     },
     10,
     1

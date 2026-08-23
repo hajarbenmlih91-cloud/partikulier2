@@ -10,7 +10,8 @@ failures=()
 checks=()
 add_check() {
   local name="$1" passed="$2" detail="$3"
-  checks+=("$(printf '{\"name\":\"%s\",\"passed\":%s,\"detail\":\"%s\"}' "$name" "$passed" "${detail//\"/\\\"}")")
+  detail="${detail//$'\n'/ }"; detail="${detail//$'\r'/ }"; detail="${detail//\\/\\\\}"; detail="${detail//\"/\\\"}"
+  checks+=("$(printf '{\"name\":\"%s\",\"passed\":%s,\"detail\":\"%s\"}' "$name" "$passed" "$detail")")
   [ "$passed" = true ] || failures+=("$name: $detail")
 }
 run_case() {
@@ -40,7 +41,9 @@ for ua in "Googlebot/2.1" "bingbot/2.0" "YandexBot/3.0" "DuckDuckBot/1.0" "Apple
 done
 
 printf '{"passed":%s,"failures":[' "$([ "${#failures[@]}" -eq 0 ] && echo true || echo false)" > "$REPORT"
-printf '%s' "$(printf '"%s",' "${failures[@]}" | sed 's/,$//')" >> "$REPORT"
+if [ "${#failures[@]}" -gt 0 ]; then
+  printf '%s' "$(printf '"%s",' "${failures[@]}" | sed 's/,$//')" >> "$REPORT"
+fi
 printf '],"checks":[' >> "$REPORT"
 printf '%s,' "${checks[@]}" | sed 's/,$//' >> "$REPORT"
 printf ']}\n' >> "$REPORT"

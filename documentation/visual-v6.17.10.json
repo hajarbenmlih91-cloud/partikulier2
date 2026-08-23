@@ -1,0 +1,281 @@
+{
+  "version": "6.17.10",
+  "commit": "uncommitted",
+  "base": "http://localhost:8090",
+  "mode": "CHECK",
+  "total": 30,
+  "passed": 30,
+  "failed": 0,
+  "results": [
+    {
+      "name": "fr-accueil-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-accueil-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-accueil-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-accueil-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-accueil-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-accueil-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-annonces-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-annonces-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-annonces-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-annonces-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-annonces-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-annonces-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-deposer-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-deposer-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-deposer-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-deposer-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-deposer-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-deposer-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-mes-annonces-desktop",
+      "http": 302,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-mes-annonces-mobile",
+      "http": 302,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-mes-annonces-desktop",
+      "http": 302,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-mes-annonces-mobile",
+      "http": 302,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-mes-annonces-desktop",
+      "http": 302,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-mes-annonces-mobile",
+      "http": 302,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-favoris-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "fr-favoris-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "fr",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-favoris-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "en-favoris-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "en",
+      "dir": "ltr",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-favoris-desktop",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    },
+    {
+      "name": "ar-favoris-mobile",
+      "http": 200,
+      "status": "OK",
+      "lang": "ar",
+      "dir": "rtl",
+      "diff": "0.00%",
+      "errors": []
+    }
+  ]
+}

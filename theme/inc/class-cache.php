@@ -105,7 +105,7 @@ class Partikulier_Cache {
 	 */
 	public static function store_cache( $html ) {
 		// Ne pas cacher une page avec la barre d'admin ou des erreurs.
-		if ( is_admin_bar_showing() || http_response_code() >= 400 || self::response_sets_cookie() ) {
+		if ( is_admin_bar_showing() || http_response_code() >= 400 || self::response_sets_cookie() || '' === trim( (string) $html ) ) {
 			return $html;
 		}
 

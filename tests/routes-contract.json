@@ -1,0 +1,30 @@
+{
+  "version": "6.17.10",
+  "base": "http://localhost:8090",
+  "root": {
+    "path": "/",
+    "expected_status": 200,
+    "expected_redirects": 0,
+    "expected_final_path": "/",
+    "expected_lang": "fr",
+    "expected_dir": "ltr",
+    "contract_note": "La racine répond directement en 200 dans cette instance; Polylang conserve la page d’accueil publique sans redirection."
+  },
+  "routes": [
+    {"name":"fr-accueil","path":"/fr/","expected_status":200,"expected_redirects":0,"expected_lang":"fr","expected_dir":"ltr"},
+    {"name":"en-accueil","path":"/en/","expected_status":200,"expected_redirects":0,"expected_lang":"en","expected_dir":"ltr"},
+    {"name":"ar-accueil","path":"/ar/","expected_status":200,"expected_redirects":0,"expected_lang":"ar","expected_dir":"rtl"},
+    {"name":"fr-annonces","path":"/fr/annonces/","expected_status":200,"expected_redirects":0,"expected_lang":"fr","expected_dir":"ltr"},
+    {"name":"en-annonces","path":"/en/annonces/","expected_status":200,"expected_redirects":0,"expected_lang":"en","expected_dir":"ltr"},
+    {"name":"ar-annonces","path":"/ar/annonces/","expected_status":200,"expected_redirects":0,"expected_lang":"ar","expected_dir":"rtl"},
+    {"name":"fr-deposer","path":"/fr/deposer/","expected_status":200,"expected_redirects":0,"expected_lang":"fr","expected_dir":"ltr"},
+    {"name":"en-deposer","path":"/en/deposer-en/","expected_status":200,"expected_redirects":0,"expected_lang":"en","expected_dir":"ltr"},
+    {"name":"ar-deposer","path":"/ar/deposer-ar/","expected_status":200,"expected_redirects":0,"expected_lang":"ar","expected_dir":"rtl"},
+    {"name":"fr-mes-annonces","path":"/fr/mes-annonces/","expected_status":302,"expected_location_prefix":"/wp-login.php","expected_redirects":1,"expected_lang":null,"expected_dir":null},
+    {"name":"en-mes-annonces","path":"/en/mes-annonces-en/","expected_status":302,"expected_location_prefix":"/wp-login.php","expected_redirects":1,"expected_lang":null,"expected_dir":null},
+    {"name":"ar-mes-annonces","path":"/ar/mes-annonces-ar/","expected_status":302,"expected_location_prefix":"/wp-login.php","expected_redirects":1,"expected_lang":null,"expected_dir":null},
+    {"name":"fr-favoris","path":"/fr/favoris/","expected_status":200,"expected_redirects":0,"expected_lang":"fr","expected_dir":"ltr"},
+    {"name":"en-favoris","path":"/en/favoris-en/","expected_status":200,"expected_redirects":0,"expected_lang":"en","expected_dir":"ltr"},
+    {"name":"ar-favoris","path":"/ar/favoris-ar/","expected_status":200,"expected_redirects":0,"expected_lang":"ar","expected_dir":"rtl"}
+  ]
+}
