@@ -176,13 +176,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: cdc-v1.7.1-cold-${{ github.sha }}
-          path: "$RUNNER_TEMP/cold"
+          path: cold-download
 
       - name: Prepare evidence sidecar
         run: |
           mkdir -p "$RUNNER_TEMP/evidence"
-          find "$RUNNER_TEMP/cold" -maxdepth 4 -type f -print
-          cold_archive="$(find "$RUNNER_TEMP/cold" -type f -name 'cold-acceptance-v1.7.1.tar.gz' -print -quit)"
+          find "$GITHUB_WORKSPACE/cold-download" -maxdepth 4 -type f -print
+          cold_archive="$(find "$GITHUB_WORKSPACE/cold-download" -type f -name 'cold-acceptance-v1.7.1.tar.gz' -print -quit)"
           [ -n "$cold_archive" ] || { echo 'cold-acceptance-v1.7.1.tar.gz absent de l’artifact téléchargé' >&2; exit 1; }
           tar -xzf "$cold_archive" -C "$RUNNER_TEMP/evidence"
 
