@@ -43,6 +43,12 @@ jobs:
       - name: Dependency hashes
         run: bash scripts/verify-dependencies.sh documentation/dependency-manifest-v1.7.1.json
 
+      - name: Install pinned Semgrep
+        run: |
+          python3 -m pip install --user semgrep==1.132.0
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          "$HOME/.local/bin/semgrep" --version
+
       - name: Secret scan
         run: bash scripts/scan-secrets.sh documentation/secrets-scan-v1.7.1.json
 
