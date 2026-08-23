@@ -64,10 +64,10 @@ done
 q1="$(jq -er '.queries_total' "$ROOT/documentation/sql-trace-v${VERSION}-run1.json")"
 q2="$(jq -er '.queries_total' "$ROOT/documentation/sql-trace-v${VERSION}-run2.json")"
 q3="$(jq -er '.queries_total' "$ROOT/documentation/sql-trace-v${VERSION}-run3.json")"
-jq -n --arg version "$VERSION" --argjson q1 "$q1" --argjson q2 "$q2" --argjson q3 "$q3" \
-  '{version:$version,scope:"mesure du template d’archive sous SAVEQUERIES",runs:[$q1,$q2,$q3],threshold:56,all_below_threshold:([$q1,$q2,$q3]|all(. <= 56)),trace_files:["documentation/sql-trace-v"+$version+"-run1.json","documentation/sql-trace-v"+$version+"-run2.json","documentation/sql-trace-v"+$version+"-run3.json"]}' > "$ROOT/documentation/sql-v${VERSION}-summary.json"
+jq -n --arg version "$VERSION" --arg commit "$CI_COMMIT" --arg source_ref "${GITHUB_REF:-local}" --arg run_id "${GITHUB_RUN_ID:-local}" --argjson q1 "$q1" --argjson q2 "$q2" --argjson q3 "$q3" \
+  '{version:$version,scope:"mesure du template d’archive sous SAVEQUERIES",runs:[$q1,$q2,$q3],threshold:56,all_below_threshold:([$q1,$q2,$q3]|all(. <= 56)),commit:$commit,source_ref:$source_ref,run_id:$run_id,trace_files:["documentation/sql-trace-v"+$version+"-run1.json","documentation/sql-trace-v"+$version+"-run2.json","documentation/sql-trace-v"+$version+"-run3.json"]}' > "$ROOT/documentation/sql-v${VERSION}-summary.json"
 
-bash "$ROOT/scripts/run-semgrep-v${VERSION}.sh" "$ROOT/documentation/semgrep-v${VERSION}.json" > "$ROOT/documentation/semgrep-v${VERSION}.log"
+bash "$ROOT/scripts/run-semgrep-v1.7.1.sh" "$ROOT/documentation/semgrep-v${VERSION}.json" > "$ROOT/documentation/semgrep-v${VERSION}.log"
 semgrep --version > "$ROOT/documentation/semgrep-version-v${VERSION}.txt"
 bash "$ROOT/scripts/check.sh" > "$ROOT/documentation/check-v${VERSION}.log"
 bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/documentation/provenance-v${VERSION}.log"

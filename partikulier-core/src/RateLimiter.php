@@ -8,12 +8,18 @@ use WP_REST_Request;
 
 final class RateLimiter
 {
+    /** @var array<string, true> Requests already charged during this PHP request. */
+    private array $seen = [];
+
     public function guard(WP_REST_Request $request, string $bucket, bool $authorized, int $limit, int $window = 60): bool|WP_Error
     {
         if (!$authorized) {
             return false;
         }
         $identity = is_user_logged_in() ? 'user:' . (string) get_current_user_id() : 'ip:' . $this->clientIp();
+        $requestMarker = spl_object_id($request) . '|' . $bucket . '|' . $identity;
+        if (isset($this->seen[$requestMarker])) return true;
+        $this->seen[$requestMarker] = true;
         $route = preg_replace('/[^a-z0-9_-]/i', '_', $request->get_route()) ?: 'route';
         $key = 'pk_rl_' . md5($bucket . '|' . $route . '|' . $identity);
         $state = get_transient($key);

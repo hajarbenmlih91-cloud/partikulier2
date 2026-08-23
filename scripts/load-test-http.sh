@@ -15,6 +15,9 @@ STARTED="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 [ -n "$WP_DIR" ] && [ -f "$WP_DIR/wp-load.php" ] || { echo 'PK_WP_DIR absent' >&2; exit 2; }
 count=$(wp --path="$WP_DIR" post list --post_type=properties --post_status=publish --format=count --allow-root)
 [ "$count" -ge "$MIN_FIXTURE" ] || { echo "NOT_RUN: fixture=$count < $MIN_FIXTURE" >&2; exit 3; }
+# The runtime is disposable; clear only this test's rate-limit transients so
+# earlier functional requests cannot consume the declared public-read budget.
+wp --path="$WP_DIR" eval 'global $wpdb; $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE \"_transient_pk_rl_%\" OR option_name LIKE \"_transient_timeout_pk_rl_%\"");' --allow-root >/dev/null
 mkdir -p "$(dirname "$REPORT")"
 export VERSION COMMIT RUN_ID WARMUP MEASURED MIN_FIXTURE CONCURRENCY REPORT STARTED
 for i in $(seq 1 "$WARMUP"); do curl -fsS -o /dev/null "$BASE/wp-json/partikulier/v1/listings?locale=fr&per_page=24"; done

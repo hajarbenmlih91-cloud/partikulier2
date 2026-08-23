@@ -37,7 +37,7 @@
       {"method": "POST", "path": "/listings", "permission": "edit_posts or publish_posts", "response": "created_listing", "rate_limit": "30 requests / 60 seconds / identity"},
       {"method": "POST", "path": "/leads", "permission": "public", "response": "created_lead", "rate_limit": "10 requests / 60 seconds / identity"},
       {"method": "POST", "path": "/favorites", "permission": "authenticated", "response": "favorite_state", "rate_limit": "60 requests / 60 seconds / user"},
-      {"method": "GET", "path": "/health", "permission": "public", "response": "health", "rate_limit": "120 requests / 60 seconds / identity"}
+      {"method": "GET", "path": "/health", "permission": "public", "response": "health", "rate_limit": "180 requests / 60 seconds / identity"}
     ]
   },
   "security_controls": {

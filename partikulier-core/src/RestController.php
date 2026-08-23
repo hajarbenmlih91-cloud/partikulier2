@@ -82,7 +82,7 @@ final class RestController
 
     public function guardPublic(WP_REST_Request $request): bool|WP_Error
     {
-        return $this->rateLimiter->guard($request, 'public', $this->policy->canReadPublic(), 120, 60);
+        return $this->rateLimiter->guard($request, 'public', $this->policy->canReadPublic(), 180, 60);
     }
 
     public function guardWrite(WP_REST_Request $request): bool|WP_Error
