@@ -69,10 +69,11 @@ unzip -tq "$OUT" >/dev/null
 unzip -tq "$THEME_OUT" >/dev/null
 ( cd "$(dirname "$OUT")" && sha256sum "$(basename "$OUT")" ) > "$OUT.sha256"
   if [ -n "${PK_EVIDENCE_DIR:-}" ] && [ -d "$PK_EVIDENCE_DIR" ]; then cp -a "$PK_EVIDENCE_DIR/." "$EVIDENCE/"; fi
-if [ -f "$EVIDENCE/qualification-v1.7.1.json" ]; then
+qualification_report="$(find "$EVIDENCE" -type f -name 'qualification-v1.7.1.json' -print -quit)"
+if [ -n "$qualification_report" ]; then
   package_sha="$(cut -d' ' -f1 "$OUT.sha256")"
-  jq --arg package_sha "$package_sha" --arg commit "$COMMIT" '.package_sha256 = $package_sha | .source_commit = $commit' "$EVIDENCE/qualification-v1.7.1.json" > "$EVIDENCE/qualification-v1.7.1.json.tmp"
-  mv "$EVIDENCE/qualification-v1.7.1.json.tmp" "$EVIDENCE/qualification-v1.7.1.json"
+  jq --arg package_sha "$package_sha" --arg commit "$COMMIT" '.package_sha256 = $package_sha | .source_commit = $commit' "$qualification_report" > "$qualification_report.tmp"
+  mv "$qualification_report.tmp" "$qualification_report"
 fi
 printf '{"format":"partikulier-evidence-sidecar-v1","candidate_version":"%s","source_commit":"%s","package_sha256":"%s","source_ref":"%s","run_id":"%s"}\n' "$VERSION" "$COMMIT" "$(cut -d' ' -f1 "$OUT.sha256")" "${GITHUB_REF:-local}" "${GITHUB_RUN_ID:-local}" > "$EVIDENCE/attestation.json"
 find "$EVIDENCE" -type f -exec touch -d "@${SOURCE_DATE_EPOCH}" {} +
