@@ -72,11 +72,7 @@ bash scripts/install.sh
 PK_WP_DIR="$PWD/.runtime/wp-6.17.10" PK_PORT=8090 bash scripts/start.sh
 ```
 
-Le package final est construit par `bash scripts/package.sh 6.17.10`. La vérification locale a produit deux archives byte-identiques. L’empreinte SHA-256 du bundle est :
-
-```text
-9173c97b2b3e20ae3afa11ffc966d66dfd03f090a2cec64e599f748f20369b7d  partikulier-6.17.10.zip
-```
+Le package final est construit par `bash scripts/package.sh 6.17.10`. La vérification locale a produit deux archives byte-identiques. L’empreinte SHA-256 du bundle est générée après chaque build dans le fichier externe `documentation/partikulier-6.17.10.zip.sha256`. Elle ne doit pas être incluse dans l’archive elle-même, car cela créerait une dépendance circulaire.
 
 ## Limites et transparence
 

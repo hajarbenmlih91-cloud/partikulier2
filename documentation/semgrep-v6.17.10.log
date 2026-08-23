@@ -11,12 +11,12 @@
   },
   "time": {
     "rules": [],
-    "rules_parse_time": 0.002655029296875,
+    "rules_parse_time": 0.0031709671020507812,
     "profiling_times": {
-      "config_time": 0.14163804054260254,
-      "core_time": 0.31195712089538574,
-      "ignores_time": 0.0000667572021484375,
-      "total_time": 0.4539604187011719
+      "config_time": 0.15394330024719238,
+      "core_time": 0.32507848739624023,
+      "ignores_time": 0.00005984306335449219,
+      "total_time": 0.4794275760650635
     },
     "parsing_time": {
       "total_time": 0.0,
@@ -31,10 +31,10 @@
       "very_slow_files": []
     },
     "scanning_time": {
-      "total_time": 0.0022668838500976562,
+      "total_time": 0.0029070377349853516,
       "per_file_time": {
-        "mean": 0.0007556279500325521,
-        "std_dev": 1.5883731268533868E-8
+        "mean": 0.0009690125783284506,
+        "std_dev": 1.7755331151016029E-7
       },
       "very_slow_stats": {
         "time_ratio": 0.0,
@@ -74,7 +74,7 @@
   "engine_requested": "OSS",
   "skipped_rules": [],
   "acceptance": {
-    "commit": "6153debac8f84da46b1da95af1c810320dc7e5bf",
+    "commit": "c448496bc023c50b43d3b8ab012cde6bd83977ce",
     "command": "semgrep --config .semgrep/partikulier.yml --json --output documentation/semgrep-v6.17.10.json theme",
     "rules_used": [
       "partikulier-no-direct-automation-route-in-business-module"
@@ -148,7 +148,7 @@
       "theme/tests/reparer-taxonomies.php",
       "theme/tests/traduire-annonces.php"
     ],
-    "bytes_analyzed": 700994,
+    "bytes_analyzed": 701966,
     "blocking_findings": 0,
     "errors_count": 0
   }

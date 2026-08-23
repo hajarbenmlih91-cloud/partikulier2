@@ -22,8 +22,7 @@ Scanner R6 : OK (0 texte en dur détecté)
 ════════ Tout est conforme ════════
 
 Bundle : /home/ubuntu/work/partikulier2/partikulier-6.17.10.zip
-Taille  : 723K
-SHA-256 : 9173c97b2b3e20ae3afa11ffc966d66dfd03f090a2cec64e599f748f20369b7d
-Thème  : /home/ubuntu/work/partikulier2/partikulier-6.17.10-theme.zip
-
-Pensez à ajouter l'entrée de changelog dans theme/readme.txt.
+Taille  : 14M
+SHA-256 : edc324b1542b9a4289e616382b625fc24b4bb9bd5d213b7a493b167db5d5fd47
+Thème   : /home/ubuntu/work/partikulier2/partikulier-6.17.10-theme.zip
+Baselines dans bundle : 30

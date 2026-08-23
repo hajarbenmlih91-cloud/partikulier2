@@ -48,11 +48,15 @@ class Partikulier_Search_Filters {
 		if ( is_admin() || ! $query->is_main_query() || ! self::is_property_query( $query ) ) {
 			return $orderby;
 		}
+		// Les tris explicites du formulaire sont déjà traduits dans WP_Query.
+		$requested_order = isset( $_GET['pk_order'] ) ? sanitize_key( wp_unslash( $_GET['pk_order'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( in_array( $requested_order, array( 'price-asc', 'price-desc', 'surface-desc' ), true ) ) {
+			return $orderby;
+		}
 		global $wpdb;
 		$posts = $wpdb->posts;
 		// Estatik peut remplacer ORDER BY plus tôt dans la chaîne de hooks.
-		// Pour les archives de propriétés, le contrat reste date DESC avec ID DESC
-		// comme départage déterministe, quelle que soit la clause précédente.
+		// Sans tri explicite, date puis ID fournissent un ordre déterministe.
 		return $posts . '.post_date DESC, ' . $posts . '.ID DESC';
 	}
 
@@ -70,10 +74,27 @@ class Partikulier_Search_Filters {
 			return;
 		}
 
-		// Les fixtures et les annonces créées à la même seconde doivent rester
-		// dans un ordre stable ; l’ID ne remplace pas le tri par date, il le départage.
-		if ( ! $query->get( 'orderby' ) || 'date' === $query->get( 'orderby' ) ) {
-			$query->set( 'orderby', array( 'date' => 'DESC', 'ID' => 'DESC' ) );
+		// Les tris explicites du formulaire sont traduits en meta_key/orderby
+		// afin d’être réellement appliqués par WP_Query.
+		$order = isset( $_GET['pk_order'] ) ? sanitize_key( wp_unslash( $_GET['pk_order'] ) ) : 'recent'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		switch ( $order ) {
+			case 'price-asc':
+				$query->set( 'meta_key', 'es_property_price' );
+				$query->set( 'orderby', array( 'meta_value_num' => 'ASC', 'ID' => 'DESC' ) );
+				break;
+			case 'price-desc':
+				$query->set( 'meta_key', 'es_property_price' );
+				$query->set( 'orderby', array( 'meta_value_num' => 'DESC', 'ID' => 'DESC' ) );
+				break;
+			case 'surface-desc':
+				$query->set( 'meta_key', 'es_property_area' );
+				$query->set( 'orderby', array( 'meta_value_num' => 'DESC', 'ID' => 'DESC' ) );
+				break;
+			default:
+				if ( ! $query->get( 'orderby' ) || 'date' === $query->get( 'orderby' ) ) {
+					$query->set( 'orderby', array( 'date' => 'DESC', 'ID' => 'DESC' ) );
+				}
+				break;
 		}
 
 		// --- Filtres de taxonomie (achat/location, type de bien, ville) ---

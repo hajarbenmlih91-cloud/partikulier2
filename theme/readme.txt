@@ -3,8 +3,8 @@
 Contributors: partikulier
 Tags: real-estate, property, listings, immobilier, performance, avif
 Requires at least: 6.0
-Tested up to: 7.0
-Requires PHP: 7.4
+Tested up to: 7.1
+Requires PHP: 8.0
 Stable tag: 6.17.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -35,7 +35,7 @@ Caracteristiques :
 2. Uploadez le theme dans `wp-content/themes/partikulier/` ou via Apparence > Themes > Ajouter.
 3. Activez le theme Partikulier.
 4. Reglages > Permaliens : choisissez "Nom de la publication" puis Sauvegarder.
-5. Creez la page **Deposer une annonce** (slug `deposer-une-annonce`) avec le template "Deposer une annonce".
+5. Creez la page **Deposer une annonce** (slug `deposer`) avec le template "Deposer une annonce".
 6. Reglages > Lecture : page d'accueil = "Vos dernieres annonces" (laissez la page d'accueil a vide pour que le theme utilise front-page.php).
 7. Apparence > Menus : creez le menu "Menu principal" (Accueil, Annonces, Deposer une annonce, Mentions legales).
 
@@ -46,6 +46,12 @@ Caracteristiques :
 * Le theme surcharge automatiquement les templates d'Estatik via le dossier `estatik4/front/`.
 
 == Changelog ==
+
+= 6.17.10 =
+* Livraison CDC fermée autosuffisante : scripts, contrat de routes, 30 baselines visuelles versionnées, preuves HMAC/SQL/Semgrep et recette froide.
+* Polylang FR/EN/AR : routes préfixées, famille de traductions publiée, détection navigateur et direction RTL vérifiées.
+* Cache : les réponses HTML vides ne sont plus persistées comme pages publiques.
+* Compatibilité déclarée : PHP 8.0+ et WordPress 7.1 testé.
 
 = 6.17.7 =
 * Fix: Senior CDC v1.5 compliance (N+1, RTL, slugs, pagination, HMAC proofs)

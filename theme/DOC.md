@@ -1,6 +1,6 @@
 # Partikulier — documentation du thème
 
-**Version 6.13.0 · août 2026**
+**Version 6.17.10 · août 2026**
 
 > Ce fichier remplace une documentation qui décrivait la version 1.2.0 d'origine et était devenue trompeuse (palette orange, 11 modules, envoi d'e-mail de confirmation — plus rien de tout cela n'est exact).
 
@@ -24,7 +24,7 @@ Le thème dépend d'**un seul plugin : Estatik**. Tout le reste est intégré : 
 
 ## Installation
 
-1. Uploader le zip dans *Apparence › Thèmes › Ajouter*, puis activer. Les pages obligatoires (`deposer-une-annonce`, `mes-annonces`, `favoris`) sont créées automatiquement.
+1. Uploader le zip dans *Apparence › Thèmes › Ajouter*, puis activer. Les pages obligatoires (`deposer`, `mes-annonces`, `favoris`) sont créées automatiquement.
 2. Installer et activer **Estatik**.
 3. *Réglages › Permaliens › Enregistrer*, sans rien modifier. **Étape obligatoire** : sans elle, les URL d'annonces peuvent renvoyer des 404.
 4. *Apparence › Personnaliser › Validation WhatsApp* : renseigner le numéro. **Sans numéro, le formulaire refuse tous les dépôts.**
