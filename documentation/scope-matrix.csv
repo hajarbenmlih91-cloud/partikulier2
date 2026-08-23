@@ -24,6 +24,12 @@ Visual design system independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Reviewer m
 UX independent review,M1,NOT_IMPLEMENTED,NOT_RUN,ux,Three independent reviewers required
 Load test 1000 listings,M1,IMPLEMENTED,PASS,performance,1000 local listings with 30 warmups and 100 measured requests
 HTTP p95 p99 gate,M1,IMPLEMENTED,PASS,performance,Local fixed envelope p95 0.739s p99 0.751s; production-equivalent environment still separate
+Capacity sustained reads,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires 10 req/s for 900 seconds with 50 concurrent sessions and resource telemetry
+Capacity burst reads,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires 25 req/s for 60 seconds with error, latency and resource telemetry
+Capacity write API,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires authenticated write API at 2 req/s for 900 seconds with cleanup and no secret disclosure
+Capacity concurrent sessions,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires 50 concurrent client sessions
+Capacity CPU RSS saturation,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires cgroup CPU/RSS peaks and a controlled saturation point
+Upgrade v6.17.16 to v6.17.17,M1,IMPLEMENTED,NOT_RUN,operations,Fresh install does not prove upgrade preservation; old-tag runtime, data/settings invariants and idempotent migration must pass
 partikulier-pro,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly OUT_OF_FIRST_RELEASE_SCOPE; optional module and never implied delivered
 Payments and orders,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly OUT_OF_FIRST_RELEASE_SCOPE and outside current technical release until implemented
 Commercial approval,M2,NOT_IMPLEMENTED,NOT_RUN,product,Required product decision; OUT_OF_FIRST_TECHNICAL_RELEASE until approved
