@@ -2,7 +2,8 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 const base = process.env.PK_BASE || 'http://localhost:8090';
 const browser = await chromium.launch({ headless: true });
-const result = { version: '6.17.10', base, passed: true, checks: [] };
+const VERSION = process.env.PK_VERSION || '6.17.11';
+const result = { version: VERSION, base, passed: true, checks: [] };
 for (const item of [
   { lang: 'ar', path: '/ar/', expectedFont: true, expectedDir: 'rtl' },
   { lang: 'fr', path: '/fr/', expectedFont: null, expectedDir: 'ltr' },
@@ -39,7 +40,7 @@ for (const item of [
   } finally { await context.close(); }
 }
 await browser.close();
-const report = process.env.PK_REPORT || 'documentation/i18n-fonts-v6.17.10.json';
+const report = process.env.PK_REPORT || `documentation/i18n-fonts-v${VERSION}.json`;
 fs.writeFileSync(report, `${JSON.stringify(result, null, 2)}\n`);
 console.log(JSON.stringify(result, null, 2));
 process.exit(result.passed ? 0 : 1);

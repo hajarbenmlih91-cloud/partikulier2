@@ -2,7 +2,8 @@
 set -u
 
 BASE_URL="${PK_URL:-http://localhost:8090}"
-REPORT="${PK_REPORT:-/tmp/partikulier-6.17-browser-detection.json}"
+VERSION="${PK_VERSION:-6.17.11}"
+REPORT="${PK_REPORT:-/tmp/partikulier-${VERSION}-browser-detection.json}"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -40,7 +41,7 @@ for ua in "Googlebot/2.1" "bingbot/2.0" "YandexBot/3.0" "DuckDuckBot/1.0" "Apple
   run_case "robot_$slug" "$ua" "ar" "" 200 ""
 done
 
-printf '{"passed":%s,"failures":[' "$([ "${#failures[@]}" -eq 0 ] && echo true || echo false)" > "$REPORT"
+printf '{"version":"%s","passed":%s,"failures":[' "$VERSION" "$([ "${#failures[@]}" -eq 0 ] && echo true || echo false)" > "$REPORT"
 if [ "${#failures[@]}" -gt 0 ]; then
   printf '%s' "$(printf '"%s",' "${failures[@]}" | sed 's/,$//')" >> "$REPORT"
 fi

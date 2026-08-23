@@ -4,7 +4,7 @@
 #
 # Vérifie : syntaxe PHP, syntaxe JS, cohérence des numéros de version,
 # et absence de régressions connues.
-set -u
+set -Eeuo pipefail
 ROOT="${PK_CHECK_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 T="$ROOT/theme"
 FAIL=0
@@ -29,10 +29,13 @@ fi
 echo "── Syntaxe JavaScript"
 if command -v node >/dev/null 2>&1; then
   bad=0
-  for f in "$T"/assets/js/*.js; do
+  js_count=0
+  for f in "$T"/assets/js/*.js "$ROOT"/scripts/*.mjs; do
+    [ -f "$f" ] || continue
+    js_count=$((js_count + 1))
     node --check "$f" >/dev/null 2>&1 || { echo "   ERREUR  $f"; bad=1; }
   done
-  [ $bad -eq 0 ] && echo "   $(ls "$T"/assets/js/*.js | wc -l) fichiers, aucune erreur" || FAIL=1
+  [ $bad -eq 0 ] && echo "   $js_count fichiers, aucune erreur" || FAIL=1
 else
   echo "   node absent : contrôle ignoré"
 fi
@@ -85,8 +88,14 @@ else
 fi
 
 # Un seul gestionnaire de clic sur le cœur (deux s'annulent).
-h=$(grep -c 'b\.addEventListener("click"' "$T/assets/js/main.js" 2>/dev/null || echo 0)
+h=$(grep -c 'b\.addEventListener("click"' "$T/assets/js/main.js" 2>/dev/null || true)
+h=${h:-0}
 echo "   gestionnaires favoris : $h gestionnaire(s) addEventListener détecté(s)"
+if [ "$h" -eq 1 ]; then
+  echo "   cardinalité du gestionnaire favoris         OK"
+else
+  echo "   cardinalité invalide : attendu 1, trouvé $h"; FAIL=1
+fi
 
 # main.js doit se neutraliser sur la page de dépôt.
 if grep -q "pk-steps" "$T/assets/js/main.js"; then

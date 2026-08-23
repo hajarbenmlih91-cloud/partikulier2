@@ -34,7 +34,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="pk-container pk-topbar-inner">
 		<span class="pk-topbar-promo"><?php echo esc_html( Partikulier_Settings::get( 'topbar_text' ) ); ?></span>
 		<div class="pk-topbar-contact">
-			<a href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?></a>
+			<a href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>"><?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?></a>
 			<a href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php esc_html_e( 'Toutes les annonces', 'partikulier' ); ?></a>
 			<?php if ( is_user_logged_in() ) : ?>
 				<a href="<?php echo esc_url( pk_page_url( 'mes-annonces', '/mes-annonces/' ) ); ?>"><?php esc_html_e( 'Mon espace', 'partikulier' ); ?></a>
@@ -142,7 +142,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php esc_html_e( 'Mon espace', 'partikulier' ); ?>
 				</a>
 			<?php else : ?>
-				<a class="pk-header-icon pk-header-cta pk-btn pk-btn-primary pk-btn-sm" href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>">
+				<a class="pk-header-icon pk-header-cta pk-btn pk-btn-primary pk-btn-sm" href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>">
 					<?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?>
 				</a>
 			<?php endif; ?>

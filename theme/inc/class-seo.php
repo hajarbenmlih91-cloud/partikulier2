@@ -289,7 +289,7 @@ class Partikulier_SEO {
 				155
 			);
 		}
-		if ( is_page( 'deposer-une-annonce' ) ) {
+		if ( is_page( array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce' ) ) ) {
 			return self::limit(
 				__( 'Déposez gratuitement votre annonce immobilière entre particuliers en quelques étapes simples et vérifiées.', 'partikulier' ),
 				155
@@ -350,7 +350,7 @@ class Partikulier_SEO {
 		 * Directive robots : index,follow sauf pages inutiles.
 		 */
 	public static function robots_directive() {
-		if ( is_search() || is_404() || is_attachment() || is_page( array( 'deposer-une-annonce', 'mes-annonces' ) ) ) {
+		if ( is_search() || is_404() || is_attachment() || is_page( array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce', 'mes-annonces', 'mes-annonces-en', 'mes-annonces-ar' ) ) ) {
 			return 'noindex,follow';
 		}
 		if ( is_paged() ) {

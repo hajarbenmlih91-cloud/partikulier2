@@ -1,0 +1,73 @@
+=== Sun Aug 23 14:07:04 UTC 2026 ===
+>>> 1/7 paquets système
+>>> 2/7 base de données
+>>> 3/7 WP-CLI
+>>> 4/7 WordPress
+Downloading WordPress 7.1 (fr_FR)...
+Using cached file '/home/ubuntu/.wp-cli/cache/core/wordpress-7.1-fr_FR.tar.gz'...
+Success: WordPress downloaded.
+Success: Generated 'wp-config.php' file.
+Success: Updated the constant 'WP_DEBUG' in the 'wp-config.php' file with the raw value 'true'.
+Success: Added the constant 'WP_DEBUG_LOG' to the 'wp-config.php' file with the raw value 'true'.
+Success: Added the constant 'WP_DEBUG_DISPLAY' to the 'wp-config.php' file with the raw value 'false'.
+Success: WordPress installed successfully.
+Language 'fr_FR' already installed.
+Success: Installed 0 of 1 languages (1 skipped).
+Warning: Language 'fr_FR' already active.
+Success: Rewrite structure set.
+Warning: Regenerating a .htaccess file requires special configuration. See usage docs.
+Warning: Regenerating a .htaccess file requires special configuration. See usage docs.
+Success: Rewrite rules flushed.
+>>> 5/7 thème et plugin
+Téléchargement du paquet d’installation depuis https://downloads.wordpress.org/plugin/estatik.zip…
+Décompression de l’archive de l’extension...
+Installation de l’extension...
+Retrait de l’ancienne version de l’extension...
+L’extension a bien été mise à jour.
+Success: Installed 1 of 1 plugins.
+Warning: Some code is trying to do a URL redirect. Backtrace:
+#0 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-includes/class-wp-hook.php(355): WP_CLI\Utils\wp_redirect_handler('...')
+#1 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-includes/plugin.php(206): WP_Hook->apply_filters('...', Array)
+#2 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-includes/pluggable.php(1500): apply_filters('...', '...', 302)
+#3 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-content/plugins/estatik/includes/hooks.php(946): wp_redirect('...')
+#4 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-includes/class-wp-hook.php(355): es_demo_content_redirect('...')
+#5 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-includes/class-wp-hook.php(377): WP_Hook->apply_filters('', Array)
+#6 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-includes/plugin.php(523): WP_Hook->do_action(Array)
+#7 /home/ubuntu/work/partikulier2/.runtime/v611-cold-wp/wp-admin/includes/plugin.php(730): do_action('...', '...', false)
+#8 phar:///usr/local/bin/wp/vendor/wp-cli/extension-command/src/Plugin_Command.php(386): activate_plugin('...', '', false)
+#9 [internal function]: Plugin_Command->activate(Array, Array)
+#10 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Dispatcher/CommandFactory.php(100): call_user_func(Array, Array, Array)
+#11 [internal function]: WP_CLI\Dispatcher\CommandFactory::WP_CLI\Dispatcher\{closure}(Array, Array)
+#12 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Dispatcher/Subcommand.php(497): call_user_func(Object(Closure), Array, Array)
+#13 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Runner.php(470): WP_CLI\Dispatcher\Subcommand->invoke(Array, Array, Array)
+#14 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Runner.php(493): WP_CLI\Runner->run_command(Array, Array)
+#15 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Runner.php(1295): WP_CLI\Runner->run_command_and_exit()
+#16 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/WP_CLI/Bootstrap/LaunchRunner.php(28): WP_CLI\Runner->start()
+#17 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/bootstrap.php(84): WP_CLI\Bootstrap\LaunchRunner->process(Object(WP_CLI\Bootstrap\BootstrapState))
+#18 phar:///usr/local/bin/wp/vendor/wp-cli/wp-cli/php/wp-cli.php(35): WP_CLI\bootstrap()
+#19 phar:///usr/local/bin/wp/php/boot-phar.php(20): include('...')
+#20 /usr/local/bin/wp(4): include('...')
+1Téléchargement du paquet d’installation depuis https://downloads.wordpress.org/plugin/polylang.3.8.7.zip…
+Décompression de l’archive de l’extension...
+Installation de l’extension...
+Retrait de l’ancienne version de l’extension...
+L’extension a bien été mise à jour.
+Success: Installed 1 of 1 plugins.
+Plugin 'polylang' activated.
+Success: Activated 1 of 1 plugins.
+Téléchargement du paquet d’installation depuis https://downloads.wordpress.org/plugin/query-monitor.4.0.7.zip…
+Décompression de l’archive de l’extension...
+Installation de l’extension...
+Retrait de l’ancienne version de l’extension...
+L’extension a bien été mise à jour.
+Success: Installed 1 of 1 plugins.
+Plugin 'query-monitor' activated.
+Success: Activated 1 of 1 plugins.
+Success: Switched to 'Partikulier' theme.
+>>> 6/7 données de démonstration
+PROVISIONING_DONE
+PROVISIONING_DONE
+  Polylang options : {"force_lang":1,"domains":[],"hide_default":0,"rewrite":1,"redirect_lang":false,"browser":1,"media_support":false,"post_types":["page","properties"],"taxonomies":["es_type","es_category","es_location"],"sync":[],"default_lang":"fr","nav_menus":[],"first_activation":1787494058,"previous_version":"","version":"3.8.7"}
+Warning: Regenerating a .htaccess file requires special configuration. See usage docs.
+Success: Rewrite rules flushed.
+>>> 7/7 terminé

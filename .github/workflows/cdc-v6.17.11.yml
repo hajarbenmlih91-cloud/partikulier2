@@ -1,8 +1,8 @@
-name: CDC fermé Partikulier 6.17.10
+name: CDC fermé Partikulier 6.17.11
 
 on:
   push:
-    branches: ["main", "fix/cdc-v6.17.10"]
+    branches: ["main", "fix/cdc-v6.17.10", "fix/cdc-v6.17.11"]
   pull_request:
 
 jobs:
@@ -19,8 +19,9 @@ jobs:
       - run: node --check scripts/routes-contract.mjs
       - run: node --check scripts/parcours.mjs
       - run: node --check scripts/visual.mjs
-      - run: test "$(find tests/baselines-6.17.10 -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 30
-      - run: test -s tests/baselines-6.17.10/SHA256SUMS
+      - run: test "$(find tests/baselines-6.17.11 -maxdepth 1 -type f -name '*.png' | wc -l)" -eq 30
+      - run: test -s tests/baselines-6.17.11/SHA256SUMS
+      - run: node -e "JSON.parse(require('fs').readFileSync('tests/routes-contract.json','utf8')); JSON.parse(require('fs').readFileSync('documentation/e2e-v6.17.11.json','utf8'))"
       - run: semgrep --config .semgrep/partikulier.yml --error theme
 
   package:
@@ -32,12 +33,12 @@ jobs:
         with:
           node-version: 22
       - run: npm ci
-      - run: bash scripts/package.sh 6.17.10
-      - run: unzip -tq partikulier-6.17.10.zip
-      - run: unzip -l partikulier-6.17.10.zip | grep -q 'tests/baselines-6.17.10/SHA256SUMS'
+      - run: bash scripts/package.sh 6.17.11
+      - run: unzip -tq partikulier-6.17.11.zip
+      - run: unzip -l partikulier-6.17.11.zip | grep -q 'tests/baselines-6.17.11/SHA256SUMS'
       - uses: actions/upload-artifact@v4
         with:
-          name: partikulier-6.17.10-bundle
+          name: partikulier-6.17.11-bundle
           path: |
-            partikulier-6.17.10.zip
-            partikulier-6.17.10-theme.zip
+            partikulier-6.17.11.zip
+            partikulier-6.17.11-theme.zip

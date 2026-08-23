@@ -3,9 +3,8 @@
  * Module : creation automatique des pages indispensables du theme.
  *
  * Probleme resolu : le theme propose des gabarits (« Deposer une annonce »,
- * « Mes annonces ») et pointe vers /deposer-une-annonce/ dans le menu, mais
- * ne creait jamais les pages correspondantes. Resultat : le visiteur cliquait
- * sur « Deposer une annonce » et tombait sur une page vide ou une 404.
+ * « Mes annonces ») et crée désormais la page canonique /deposer/ avant le
+ * provisioning Polylang. Les pages correspondantes ne tombent plus sur une 404.
  *
  * Ce module :
  *  - cree les pages manquantes a l'activation du theme ;
@@ -34,7 +33,7 @@ class Partikulier_Required_Pages {
 	 */
 	public static function pages() {
 		return array(
-			'deposer-une-annonce' => array(
+			'deposer' => array(
 				'title'    => __( 'Déposer une annonce', 'partikulier' ),
 				'template' => 'templates/page-deposer-annonce.php',
 				'content'  => '',
@@ -53,6 +52,7 @@ class Partikulier_Required_Pages {
 	}
 
 	public static function init() {
+		add_action( 'init', array( __CLASS__, 'maybe_migrate_legacy_slugs' ), 1 );
 		add_action( 'after_switch_theme', array( __CLASS__, 'create_missing' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'notice' ) );
 		add_action( 'admin_post_' . self::ACTION, array( __CLASS__, 'handle_repair' ) );
@@ -65,9 +65,23 @@ class Partikulier_Required_Pages {
 	 * @return WP_Post|null
 	 */
 	public static function find( $slug ) {
+		$slug = sanitize_title( $slug );
 		$page = get_page_by_path( $slug, OBJECT, 'page' );
 		if ( $page instanceof WP_Post && 'trash' !== $page->post_status ) {
 			return $page;
+		}
+
+		// Compatibilité d’upgrade : reconnaître l’ancien slug avant sa migration.
+		foreach ( self::legacy_slugs( $slug ) as $legacy_slug ) {
+			$legacy_page = get_page_by_path( $legacy_slug, OBJECT, 'page' );
+			if ( $legacy_page instanceof WP_Post && 'trash' !== $legacy_page->post_status ) {
+				return $legacy_page;
+			}
+		}
+
+		$pages = self::pages();
+		if ( ! isset( $pages[ $slug ]['template'] ) ) {
+			return null;
 		}
 
 		// Rattrapage : une page peut exister avec un slug traduit ou suffixe (-2).
@@ -76,12 +90,58 @@ class Partikulier_Required_Pages {
 			'post_status'      => array( 'publish', 'draft', 'pending', 'private' ),
 			'posts_per_page'   => 1,
 			'meta_key'         => '_wp_page_template',
-			'meta_value'       => self::pages()[ $slug ]['template'],
+			'meta_value'       => $pages[ $slug ]['template'],
 			'suppress_filters' => true,
 			'lang'             => '',
 		) );
 
 		return $found ? $found[0] : null;
+	}
+
+	/**
+	 * Retourne les anciens slugs connus pour une page canonique.
+	 *
+	 * @param string $canonical_slug Slug canonique.
+	 * @return array
+	 */
+	private static function legacy_slugs( $canonical_slug ) {
+		$aliases = array(
+			'deposer' => array( 'deposer-une-annonce' ),
+		);
+		return isset( $aliases[ $canonical_slug ] ) ? $aliases[ $canonical_slug ] : array();
+	}
+
+	/**
+	 * Migre les pages historiques vers les slugs canoniques sans doublon.
+	 *
+	 * @return void
+	 */
+	public static function maybe_migrate_legacy_slugs() {
+		if ( '1.1.0' === get_option( 'pk_required_pages_migration', '' ) ) {
+			return;
+		}
+		self::migrate_legacy_slugs();
+		update_option( 'pk_required_pages_migration', '1.1.0', false );
+	}
+
+	private static function migrate_legacy_slugs() {
+		foreach ( self::pages() as $canonical_slug => $definition ) {
+			if ( get_page_by_path( $canonical_slug, OBJECT, 'page' ) ) {
+				continue;
+			}
+			foreach ( self::legacy_slugs( $canonical_slug ) as $legacy_slug ) {
+				$legacy_page = get_page_by_path( $legacy_slug, OBJECT, 'page' );
+				if ( ! $legacy_page instanceof WP_Post || 'trash' === $legacy_page->post_status ) {
+					continue;
+				}
+				$template = get_post_meta( $legacy_page->ID, '_wp_page_template', true );
+				if ( $definition['template'] !== $template ) {
+					continue;
+				}
+				wp_update_post( array( 'ID' => $legacy_page->ID, 'post_name' => $canonical_slug ) );
+				break;
+			}
+		}
 	}
 
 	/**
@@ -106,6 +166,7 @@ class Partikulier_Required_Pages {
 	 * @return array Slugs reellement crees.
 	 */
 	public static function create_missing() {
+		self::maybe_migrate_legacy_slugs();
 		$created = array();
 
 		foreach ( self::missing() as $slug => $definition ) {

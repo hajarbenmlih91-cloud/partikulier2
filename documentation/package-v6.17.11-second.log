@@ -1,0 +1,29 @@
+── Alignement des versions sur 6.17.11
+── Contrôle qualité
+════════ Contrôle qualité Partikulier ════════
+
+── Syntaxe PHP
+   66 fichiers, aucune erreur
+── Syntaxe JavaScript
+   15 fichiers, aucune erreur
+── Cohérence des versions
+   style.css 6.17.11 · functions.php 6.17.11 · package.json 6.17.11 · readme.txt 6.17.11
+   Les 4 fichiers concordent
+── Garde-fou routes automation
+   modules automation via wrapper central       OK
+── Garde-fou R6 chaînes publiques
+Scanner R6 : OK (0 texte en dur détecté)
+── Régressions connues
+   .pk-wish-active stylée               OK
+   gestionnaires favoris : 1 gestionnaire(s) addEventListener détecté(s)
+   cardinalité du gestionnaire favoris         OK
+   garde .pk-steps dans main.js          OK
+   vocabulaire (pas de « mandataire » affiché)  OK
+
+════════ Tout est conforme ════════
+
+Bundle : /home/ubuntu/work/partikulier2/partikulier-6.17.11.zip
+Taille  : 14M
+SHA-256 : recorded externally in documentation/partikulier-6.17.11.zip.sha256
+Thème   : /home/ubuntu/work/partikulier2/partikulier-6.17.11-theme.zip
+Baselines dans bundle : 30

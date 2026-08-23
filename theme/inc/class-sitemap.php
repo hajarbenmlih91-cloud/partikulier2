@@ -100,7 +100,7 @@ class Partikulier_Sitemap {
 			'numberposts'    => -1,
 			'no_found_rows'  => true,
 		) );
-		$excluded_pages = array( 'deposer-une-annonce', 'mes-annonces', 'annonces', 'catalogue' );
+		$excluded_pages = array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce', 'mes-annonces', 'mes-annonces-en', 'mes-annonces-ar', 'favoris', 'favoris-en', 'favoris-ar', 'annonces', 'catalogue' );
 		$seen_pages = array();
 		foreach ( $pages as $p ) {
 			if ( in_array( $p->post_name, $excluded_pages, true ) ) {

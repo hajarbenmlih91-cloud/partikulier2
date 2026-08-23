@@ -79,7 +79,7 @@ $status_labels = array(
 			<p class="pk-dashboard-subtitle"><?php esc_html_e( 'Suivez les vues, modifiez les informations essentielles et gardez la main sur vos contacts directs.', 'partikulier' ); ?></p>
 			<div class="pk-dashboard-actions">
 				<a class="pk-btn pk-btn-outline" href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php esc_html_e( 'Rechercher un bien', 'partikulier' ); ?></a>
-				<a class="pk-btn pk-btn-primary" href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>">
+				<a class="pk-btn pk-btn-primary" href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>">
 					<span aria-hidden="true">+</span> <?php esc_html_e( 'Nouvelle annonce', 'partikulier' ); ?>
 				</a>
 			</div>
@@ -125,7 +125,7 @@ $status_labels = array(
 		<?php if ( ! $my_listings ) : ?>
 			<div class="pk-dashboard-empty">
 				<p><?php esc_html_e( 'Vous n’avez pas encore d’annonce. C’est gratuit et ça prend 2 minutes !', 'partikulier' ); ?></p>
-				<a class="pk-btn pk-btn-primary" href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php esc_html_e( 'Déposer ma première annonce', 'partikulier' ); ?></a>
+				<a class="pk-btn pk-btn-primary" href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>"><?php esc_html_e( 'Déposer ma première annonce', 'partikulier' ); ?></a>
 			</div>
 		<?php else : ?>
 			<div class="pk-listing-table-wrap">
@@ -182,10 +182,10 @@ $status_labels = array(
 									<button type="button" class="pk-btn pk-btn-dark pk-btn-sm pk-manage-btn" data-post-id="<?php echo (int) $listing->ID; ?>" data-action="mark_sold"><?php esc_html_e( 'Marquer vendu', 'partikulier' ); ?></button>
 									<button type="button" class="pk-btn pk-btn-outline pk-btn-sm pk-manage-btn" data-post-id="<?php echo (int) $listing->ID; ?>" data-action="mark_rented"><?php esc_html_e( 'Marquer loué', 'partikulier' ); ?></button>
 									<button type="button" class="pk-btn pk-btn-outline pk-btn-sm pk-manage-btn" data-post-id="<?php echo (int) $listing->ID; ?>" data-action="pause"><?php esc_html_e( 'Mettre en pause', 'partikulier' ); ?></button>
-									<a class="pk-btn pk-btn-outline pk-btn-sm" href="<?php echo esc_url( add_query_arg( array( 'edit' => $listing->ID ), pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ) ); ?>"><?php esc_html_e( 'Modifier', 'partikulier' ); ?></a>
+									<a class="pk-btn pk-btn-outline pk-btn-sm" href="<?php echo esc_url( add_query_arg( array( 'edit' => $listing->ID ), pk_page_url( 'deposer', '/deposer/' ) ) ); ?>"><?php esc_html_e( 'Modifier', 'partikulier' ); ?></a>
 									<button type="button" class="pk-btn-text pk-manage-btn" data-post-id="<?php echo (int) $listing->ID; ?>" data-action="archive" data-confirm="<?php esc_attr_e( 'Retirer cette annonce des résultats tout en conservant sa page publique ?', 'partikulier' ); ?>"><?php esc_html_e( 'Retirer (garder la page SEO)', 'partikulier' ); ?></button>
 								<?php elseif ( class_exists( 'Partikulier_WhatsApp_Verification' ) && Partikulier_WhatsApp_Verification::STATUS_PENDING === $status ) : ?>
-									<a class="pk-btn pk-btn-outline pk-btn-sm" href="<?php echo esc_url( add_query_arg( array( 'edit' => $listing->ID ), pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ) ); ?>"><?php esc_html_e( 'Modifier', 'partikulier' ); ?></a>
+									<a class="pk-btn pk-btn-outline pk-btn-sm" href="<?php echo esc_url( add_query_arg( array( 'edit' => $listing->ID ), pk_page_url( 'deposer', '/deposer/' ) ) ); ?>"><?php esc_html_e( 'Modifier', 'partikulier' ); ?></a>
 									<button type="button" class="pk-btn-text pk-manage-btn" data-post-id="<?php echo (int) $listing->ID; ?>" data-action="archive" data-confirm="<?php esc_attr_e( 'Retirer cette annonce des résultats tout en conservant sa page publique ?', 'partikulier' ); ?>"><?php esc_html_e( 'Retirer (garder la page SEO)', 'partikulier' ); ?></button>
 								<?php elseif ( $closed ) : ?>
 									<button type="button" class="pk-btn pk-btn-primary pk-btn-sm pk-manage-btn" data-post-id="<?php echo (int) $listing->ID; ?>" data-action="reactivate"><?php esc_html_e( 'Remettre en ligne', 'partikulier' ); ?></button>

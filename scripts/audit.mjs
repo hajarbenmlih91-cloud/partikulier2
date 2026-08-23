@@ -7,13 +7,15 @@
  * Core Web Vitals approximes). Les seuils d'acceptation se decident ensuite.
  */
 import { chromium } from 'playwright';
+import fs from 'node:fs';
 
 const BASE = process.env.PK_BASE || 'http://localhost:8090';
-
+const contract = JSON.parse(fs.readFileSync(new URL('../tests/routes-contract.json', import.meta.url), 'utf8'));
+const route = (name, fallback) => contract.routes.find((item) => item.name === name)?.path || fallback;
 const PAGES = [
-  ['accueil', '/'],
-  ['annonces', '/property/'],
-  ['deposer', '/deposer-une-annonce/'],
+  ['accueil', contract.root.path],
+  ['annonces', route('fr-annonces', '/fr/annonces/')],
+  ['deposer', route('fr-deposer', '/fr/deposer/')],
 ];
 
 const nav = await chromium.launch();

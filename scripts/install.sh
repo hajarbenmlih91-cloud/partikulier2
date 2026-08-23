@@ -11,15 +11,23 @@
 #
 # Testé sur Debian/Ubuntu. Sur une autre distribution, adapter l'étape 1.
 # ==============================================================================
-set -u
+set -Eeuo pipefail
 
 WP_VERSION="${PK_WP_VERSION:-7.1}"
+WPCLI_VERSION="${PK_WPCLI_VERSION:-2.12.0}"
 ESTATIK_VERSION="${PK_ESTATIK_VERSION:-4.3.4}"
 POLYLANG_VERSION="${PK_POLYLANG_VERSION:-3.8.7}"
 QUERY_MONITOR_VERSION="${PK_QUERY_MONITOR_VERSION:-4.0.7}"
 DB_NAME="${PK_DB_NAME:-wp}"
 DB_USER="${PK_DB_USER:-wp}"
 DB_PASS="${PK_DB_PASS:-wp}"
+ADMIN_USER="${PK_ADMIN_USER:-admin}"
+ADMIN_PASS="${PK_ADMIN_PASS:-local-admin-change-me}"
+ADMIN_EMAIL="${PK_ADMIN_EMAIL:-admin@example.test}"
+
+case "$DB_NAME" in ''|*[!A-Za-z0-9_]*) echo "DB_NAME invalide : utiliser seulement A-Z, a-z, 0-9 et _" >&2; exit 2;; esac
+case "$DB_USER" in ''|*[!A-Za-z0-9_]*) echo "DB_USER invalide : utiliser seulement A-Z, a-z, 0-9 et _" >&2; exit 2;; esac
+DB_PASS_SQL="$(printf '%s' "$DB_PASS" | sed "s/'/''/g")"
 
 # Racine du paquet (le dossier qui contient ce script/..)
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -57,20 +65,26 @@ sudo mkdir -p /run/mysqld /var/lib/mysql
 sudo chown -R mysql:mysql /run/mysqld /var/lib/mysql 2>/dev/null
 [ -d /var/lib/mysql/mysql ] || sudo mariadb-install-db --user=mysql --datadir=/var/lib/mysql >>"$LOG" 2>&1
 pgrep -x mariadbd >/dev/null || (sudo mariadbd-safe --datadir=/var/lib/mysql --user=mysql >>"$LOG" 2>&1 &)
-for i in $(seq 1 30); do sudo mariadb -e "SELECT 1" >/dev/null 2>&1 && break; sleep 1; done
+ready=0
+for i in $(seq 1 30); do
+  if sudo mariadb -e "SELECT 1" >/dev/null 2>&1; then ready=1; break; fi
+  sleep 1
+done
+[ "$ready" -eq 1 ] || { echo "MariaDB indisponible après 30 secondes" | tee -a "$LOG" >&2; exit 1; }
 
 sudo mariadb -e "CREATE DATABASE IF NOT EXISTS \`$DB_NAME\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
-CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS';
+CREATE USER IF NOT EXISTS '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS_SQL';
+CREATE USER IF NOT EXISTS '$DB_USER'@'127.0.0.1' IDENTIFIED BY '$DB_PASS_SQL';
 GRANT ALL ON \`$DB_NAME\`.* TO '$DB_USER'@'localhost'; GRANT ALL ON \`$DB_NAME\`.* TO '$DB_USER'@'127.0.0.1';
 FLUSH PRIVILEGES;" >>"$LOG" 2>&1
 
 # ------------------------------------------------------------------ 3. wp-cli
 step "3/7 WP-CLI"
-if ! have wp; then
-  curl -sL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /tmp/wpcli
+if ! have wp || ! wp --version 2>/dev/null | grep -q "WP-CLI $WPCLI_VERSION"; then
+  curl -fsSL "https://github.com/wp-cli/wp-cli/releases/download/v$WPCLI_VERSION/wp-cli-$WPCLI_VERSION.phar" -o /tmp/wpcli
   chmod +x /tmp/wpcli && sudo mv /tmp/wpcli /usr/local/bin/wp
 fi
+[ "$(wp --version 2>/dev/null | sed -n 's/^WP-CLI \([^ ]*\).*/\1/p')" = "$WPCLI_VERSION" ] || { echo "WP-CLI version incorrecte" | tee -a "$LOG" >&2; exit 1; }
 
 # ------------------------------------------------------------------ 4. coeur WP
 step "4/7 WordPress"
@@ -86,7 +100,7 @@ if [ ! -f wp-config.php ]; then
 fi
 if ! wp core is-installed >/dev/null 2>&1; then
   wp core install --url="$URL" --title="Partikulier" \
-    --admin_user=admin --admin_password=admin --admin_email=a@b.co --skip-email >>"$LOG" 2>&1
+    --admin_user="$ADMIN_USER" --admin_password="$ADMIN_PASS" --admin_email="$ADMIN_EMAIL" --skip-email >>"$LOG" 2>&1
   wp language core install fr_FR >>"$LOG" 2>&1
   wp site switch-language fr_FR >>"$LOG" 2>&1
   wp rewrite structure '/%postname%/' --hard >>"$LOG" 2>&1
@@ -126,10 +140,11 @@ install_pinned_plugin query-monitor "$QUERY_MONITOR_VERSION" "https://downloads.
 wp theme activate partikulier >>"$LOG" 2>&1
 
 # Réglages sans lesquels le formulaire refuse tous les dépôts.
-wp eval '
+DEV_HMAC_SECRET="${PARTIKULIER_N8N_SECRET:-$(head -c 32 /dev/urandom | base64 -w0)}"
+PK_INSTALL_HMAC_SECRET="$DEV_HMAC_SECRET" wp eval '
 $o = get_option("pk_theme_options", array());
 if (empty($o["whatsapp_validation_number"])) $o["whatsapp_validation_number"] = "212612345678";
-if (empty($o["automation_api_secret"]))      $o["automation_api_secret"]      = "secret-dev-local";
+if (empty($o["automation_api_secret"]))      $o["automation_api_secret"]      = getenv("PK_INSTALL_HMAC_SECRET");
 update_option("pk_theme_options", $o);
 do_action("after_switch_theme");
 if (class_exists("Partikulier_Listing_URLs")) Partikulier_Listing_URLs::flush();
@@ -219,5 +234,5 @@ echo "  Journal          : $LOG"
 echo
 echo "  Démarrer le site :  bash scripts/start.sh"
 echo "  Adresse          :  $URL"
-echo "  Administration   :  $URL/wp-admin  (admin / admin)"
+  echo "  Administration   :  $URL/wp-admin  (identifiants fournis par PK_ADMIN_USER/PK_ADMIN_PASS)"
 echo

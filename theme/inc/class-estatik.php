@@ -147,7 +147,7 @@ add_action( 'wp_enqueue_scripts', function() { remove_action( 'wp_enqueue_script
 			// pour ne pas casser galerie, filtres, sélection ou upload.
 			$property_context = is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE )
 				|| is_singular( PARTIKULIER_ESTATIK_POST_TYPE )
-				|| is_page( array( 'deposer-une-annonce', 'mes-annonces', 'favoris' ) );
+				|| is_page( array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce', 'mes-annonces', 'mes-annonces-en', 'mes-annonces-ar', 'favoris', 'favoris-en', 'favoris-ar' ) );
 			if ( $property_context ) {
 				return;
 			}

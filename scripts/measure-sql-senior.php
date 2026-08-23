@@ -17,8 +17,9 @@ $queries = array();
 foreach ( (array) $wpdb->queries as $query ) {
     $queries[] = array( 'sql' => (string) ( $query[0] ?? '' ), 'time' => (float) ( $query[1] ?? 0 ), 'caller' => (string) ( $query[2] ?? '' ) );
 }
+$version = getenv( 'PK_VERSION' ) ?: '6.17.11';
 $payload = array(
-    'version' => '6.17.10',
+    'version' => $version,
     'scope' => 'mesure du template d’archive sous SAVEQUERIES',
     'url_or_template' => '/fr/annonces/ -> theme/templates/archive.php',
     'fixture' => array( 'post_type' => 'properties', 'annonces' => (int) $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type='properties' AND post_status='publish'" ) ),
@@ -32,7 +33,7 @@ $payload = array(
     'output_bytes' => strlen( $output ),
     'measured_at_utc' => gmdate( 'c' ),
 );
-$report = getenv( 'PK_SQL_REPORT' ) ?: 'documentation/sql-trace-v6.17.10.json';
+$report = getenv( 'PK_SQL_REPORT' ) ?: 'documentation/sql-trace-v' . $version . '.json';
 file_put_contents( $report, json_encode( $payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES ) . "\n" );
 echo json_encode( array( 'version' => $payload['version'], 'scope' => $payload['scope'], 'queries_total' => $payload['queries_total'], 'report' => $report ), JSON_UNESCAPED_UNICODE ) . "\n";
 exit( $payload['queries_total'] <= 56 ? 0 : 1 );

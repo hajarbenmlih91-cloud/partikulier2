@@ -5,7 +5,7 @@ Tags: real-estate, property, listings, immobilier, performance, avif
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 8.0
-Stable tag: 6.17.10
+Stable tag: 6.17.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -46,6 +46,10 @@ Caracteristiques :
 * Le theme surcharge automatiquement les templates d'Estatik via le dossier `estatik4/front/`.
 
 == Changelog ==
+
+= 6.17.11 =
+* Revue senior : migration idempotente de l’ancien slug `deposer-une-annonce` vers `/deposer/` et exclusion des espaces privés du cache public.
+* Reproductibilité renforcée : sorties JSON strictes, suivi des chaînes de redirection, WP-CLI vérifié par SHA-512, `npm ci` et contrôle Node 22.
 
 = 6.17.10 =
 * Livraison CDC fermée autosuffisante : scripts, contrat de routes, 30 baselines visuelles versionnées, preuves HMAC/SQL/Semgrep et recette froide.

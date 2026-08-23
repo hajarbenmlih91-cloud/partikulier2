@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fabrique le bundle autosuffisant du CDC fermé et l’archive thème historique.
-# Usage : bash scripts/package.sh 6.17.10
+# Usage : bash scripts/package.sh 6.17.11
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME="$ROOT/theme"
@@ -45,6 +45,8 @@ if [ -d "$ROOT/assets-demo" ]; then cp -a "$ROOT/assets-demo" "$STAGE/assets-dem
 # les archives historiques restent dans Git mais ne polluent pas le livrable de recette.
 for proof in \
   documentation/validation-v$VERSION.md \
+  documentation/senior-code-review-v$VERSION.md \
+  documentation/release-notes-v$VERSION.md \
   documentation/environment-v$VERSION.json \
   documentation/routes-contract-v$VERSION.json \
   documentation/e2e-v$VERSION.json \
@@ -53,6 +55,7 @@ for proof in \
   documentation/browser-detection-v$VERSION.json \
   documentation/i18n-fonts-v$VERSION.json \
   documentation/discover-i18n-family-v$VERSION.json \
+  documentation/search-sorting-v$VERSION.json \
   documentation/hmac-http-v$VERSION.json \
   documentation/sql-v$VERSION-summary.json \
   documentation/sql-trace-v$VERSION-run1.json \
@@ -108,8 +111,9 @@ bash scripts/check.sh
 PK_BASE=http://localhost:8090 node scripts/routes-contract.mjs
 PK_BASE=http://localhost:8090 node scripts/parcours.mjs
 PK_BASE=http://localhost:8090 node scripts/visual.mjs
-bash scripts/test-i18n-browser-detection.sh
-PK_BASE=http://localhost:8090 node scripts/test-i18n-fonts.mjs
+PK_VERSION=$VERSION bash scripts/test-i18n-browser-detection.sh
+PK_BASE=http://localhost:8090 PK_VERSION=$VERSION node scripts/test-i18n-fonts.mjs
+PK_WP_DIR="\$PWD/.runtime/wp-$VERSION" PK_VERSION=$VERSION php scripts/test-search-sorting.php
 bash scripts/test-hmac-http.sh
 PK_WP_DIR="\$PWD/.runtime/wp-$VERSION" php scripts/measure-sql-senior.php
 bash scripts/run-semgrep-v$VERSION.sh documentation/semgrep-v$VERSION.json
@@ -144,10 +148,10 @@ unzip -tq "$OUT" >/dev/null
 unzip -tq "$THEME_OUT" >/dev/null
 required=(
   INSTALL.md scripts/check.sh scripts/package.sh scripts/install.sh scripts/routes-contract.mjs scripts/parcours.mjs scripts/visual.mjs
-  scripts/test-hmac-http.sh scripts/measure-sql-senior.php tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS
+  scripts/test-hmac-http.sh scripts/measure-sql-senior.php scripts/test-search-sorting.php tests/routes-contract.json tests/baselines-$VERSION/SHA256SUMS
   documentation/candidate-$VERSION.json documentation/routes-contract-v$VERSION.json documentation/e2e-v$VERSION.json
-  documentation/visual-v$VERSION.json documentation/hmac-http-v$VERSION.json documentation/sql-v$VERSION-summary.json
-  documentation/semgrep-v$VERSION.json documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
+  documentation/visual-v$VERSION.json documentation/search-sorting-v$VERSION.json documentation/hmac-http-v$VERSION.json documentation/sql-v$VERSION-summary.json
+  documentation/semgrep-v$VERSION.json documentation/senior-code-review-v$VERSION.md documentation/release-notes-v$VERSION.md documentation/bundle-inventory-v$VERSION.txt documentation/bundle-files-v$VERSION.sha256 .semgrep/partikulier.yml .github/workflows/cdc-v$VERSION.yml
 )
 for entry in "${required[@]}"; do
   unzip -l "$OUT" | grep -E "[[:space:]]${entry//./\\.}$" >/dev/null || { echo "Bundle incomplet : $entry" >&2; exit 1; }

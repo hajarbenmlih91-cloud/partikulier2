@@ -7,7 +7,8 @@ URL="${PK_HMAC_URL:-$BASE/wp-json/partikulier/v1/automation-event}"
 ROUTE="/partikulier/v1/automation-event"
 KEY_ID="${PK_HMAC_KEY_ID:-env}"
 SECRET_B64="${PARTIKULIER_N8N_SECRET:-}"
-LOG="${PK_HMAC_LOG:-$ROOT/documentation/hmac-http-v6.17.10.json}"
+VERSION="${PK_VERSION:-6.17.11}"
+LOG="${PK_HMAC_LOG:-$ROOT/documentation/hmac-http-v${VERSION}.json}"
 ROUNDS=5
 [ -n "$SECRET_B64" ] || { echo 'PARTIKULIER_N8N_SECRET absent (valeur Base64 exigée)' >&2; exit 2; }
 command -v curl >/dev/null || { echo 'curl absent' >&2; exit 2; }
@@ -38,7 +39,7 @@ round_results=()
 false_count=0
 true_count=0
 for round in $(seq 1 "$ROUNDS"); do
-  event_id="n8n-cdc-6-17-10-$round-$(date +%s%N)"
+  event_id="n8n-cdc-${VERSION//./-}-$round-$(date +%s%N)"
   body=$(jq -cn --arg id "$event_id" '{event_id:$id,event_type:"whatsapp_inbound",source:"n8n",payload:{msg:"cdc-http"}}')
   ts=$(date +%s)
   sig=$(sign "$ts" "$body")
@@ -83,7 +84,7 @@ missing_header=$(curl --silent --show-error --max-time 30 --output "$TMP/negativ
   -X POST "$URL" -H 'Content-Type: application/json' -H "X-Partikulier-Timestamp: $now" -H "X-Partikulier-Key-Id: $KEY_ID" -H "X-Partikulier-Signature: $valid_sig" --data-binary "$valid_body")
 [ "$invalid_secret" = 401 ] && [ "$invalid_signature" = 401 ] && [ "$expired" = 401 ] && [ "$missing_header" = 401 ] || { echo "NEGATIVE_FAIL $invalid_secret/$invalid_signature/$expired/$missing_header"; exit 1; }
 
-jq -n --arg version '6.17.10' --arg base "$BASE" --arg url "$URL" --arg protocol 'POST\\nREST_ROUTE\\nTIMESTAMP\\nBODY; HMAC-SHA256 over Base64-decoded secret' \
+jq -n --arg version "$VERSION" --arg base "$BASE" --arg url "$URL" --arg protocol 'POST\\nREST_ROUTE\\nTIMESTAMP\\nBODY; HMAC-SHA256 over Base64-decoded secret' \
   --argjson rounds "$ROUNDS" --argjson false_count "$false_count" --argjson true_count "$true_count" \
   --arg invalid_secret "$invalid_secret" --arg invalid_signature "$invalid_signature" --arg expired "$expired" --arg missing_header "$missing_header" \
   '{version:$version,base:$base,url:$url,canonicalization:$protocol,rounds:$rounds,concurrent:{http_200_each_round:true,duplicate_false:$false_count,duplicate_true:$true_count},negative:{invalid_secret:$invalid_secret,invalid_signature:$invalid_signature,expired_timestamp:$expired,missing_shared_header:$missing_header},secret_included:false}' | tee "$LOG"

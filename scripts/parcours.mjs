@@ -52,5 +52,5 @@ await browser.close();
 const passed = results.filter((r) => r.result === 'PASS').length;
 const failed = results.length - passed;
 console.log(JSON.stringify({ version: contract.version, commit, base, total: results.length, passed, failed, results }, null, 2));
-console.log(`E2E_SUMMARY version=${contract.version} commit=${commit} total=${results.length} pass=${passed} fail=${failed}`);
+console.error(`E2E_SUMMARY version=${contract.version} commit=${commit} total=${results.length} pass=${passed} fail=${failed}`);
 process.exit(failed === 0 ? 0 : 1);

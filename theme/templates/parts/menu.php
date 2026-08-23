@@ -19,7 +19,7 @@ class Partikulier_Header {
 		$items = array(
 			home_url( '/' )                                 => __( 'Accueil', 'partikulier' ),
 			pk_properties_archive_url()                     => __( 'Annonces', 'partikulier' ),
-				pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) => __( 'Déposer une annonce', 'partikulier' ),
+				pk_page_url( 'deposer', '/deposer/' ) => __( 'Déposer une annonce', 'partikulier' ),
 		);
 		$items = array_filter( $items );
 		echo '<ul class="' . esc_attr( $args['menu_class'] ) . '">';

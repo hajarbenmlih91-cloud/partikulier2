@@ -162,7 +162,12 @@ class Partikulier_Cache {
 	private static function is_private_path() {
 		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
 		$path = trim( (string) $path, '/' );
-		if ( in_array( $path, array( 'deposer-une-annonce', 'mes-annonces', 'sitemap.xml', 'robots.txt', 'xmlrpc.php' ), true ) ) {
+		if ( in_array( $path, array( 'sitemap.xml', 'robots.txt', 'xmlrpc.php' ), true ) ) {
+			return true;
+		}
+		// Les pages de dépôt et d’espace personnel peuvent être préfixées par
+		// Polylang (`fr/`, `en/`, `ar/`) et ne doivent jamais devenir publiques.
+		if ( preg_match( '#(?:^|/)(?:deposer(?:-une-annonce|-annonce|-en|-ar)?|mes-annonces(?:-en|-ar)?)(?:/|$)#', $path ) ) {
 			return true;
 		}
 		return 0 === strpos( $path, 'wp-admin/' ) || 0 === strpos( $path, 'wp-json/' );
@@ -207,7 +212,7 @@ class Partikulier_Cache {
 			if ( is_user_logged_in() || ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) ) {
 				return false;
 			}
-			if ( self::is_private_path() || is_page( array( 'deposer-une-annonce', 'mes-annonces' ) ) ) {
+			if ( self::is_private_path() || is_page( array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce', 'mes-annonces', 'mes-annonces-en', 'mes-annonces-ar' ) ) ) {
 				return false;
 			}
 		$cookie_header = isset( $_SERVER['HTTP_COOKIE'] ) ? (string) $_SERVER['HTTP_COOKIE'] : '';

@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="pk-footer-col">
 				<h3 class="pk-footer-title"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Aide', 'Aide', 'partikulier' ) : __( 'Aide', 'partikulier' ) ); ?></h3>
 			<ul class="pk-footer-links">
-<li><a href="<?php echo esc_url( pk_page_url( 'deposer-une-annonce', '/deposer-une-annonce/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Déposer une annonce', 'Déposer une annonce', 'partikulier' ) ); ?></a></li>
+<li><a href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Déposer une annonce', 'Déposer une annonce', 'partikulier' ) ); ?></a></li>
 					<li><a href="<?php echo esc_url( pk_properties_archive_url() ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Toutes les annonces', 'Toutes les annonces', 'partikulier' ) ); ?></a></li>
 					<li><a href="<?php echo esc_url( pk_page_url( 'faq', '/faq/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Questions fréquentes', 'Questions fréquentes', 'partikulier' ) ); ?></a></li>
 					<li><a href="<?php echo esc_url( pk_page_url( 'contact', '/contact/' ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contactez-nous', 'Contactez-nous', 'partikulier' ) ); ?></a></li>

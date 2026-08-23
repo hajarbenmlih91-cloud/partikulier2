@@ -5,7 +5,7 @@ import { chromium, request } from 'playwright';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 
-const VERSION = '6.17.10';
+const VERSION = process.env.PK_VERSION || '6.17.11';
 const BASE_URL = process.env.PK_BASE || 'http://localhost:8090';
 const ROOT = process.cwd();
 const BASELINE_DIR = path.join(ROOT, 'tests', `baselines-${VERSION}`);
@@ -88,7 +88,9 @@ try {
         const rawLang = (await page.locator('html').getAttribute('lang') || '').toLowerCase() || null;
         const htmlLang = rawLang ? rawLang.split(/[-_]/)[0] : null;
         const htmlDir = (await page.locator('html').getAttribute('dir') || '').toLowerCase() || null;
+        const navigatedFinalPath = new URL(page.url()).pathname;
         const errors = [...directErrors];
+        if (scenario.finalPrefix && !navigatedFinalPath.startsWith(scenario.finalPrefix)) errors.push(`navigation_final=${navigatedFinalPath}, préfixe=${scenario.finalPrefix}`);
         if (scenario.status === 200) {
           if (htmlLang !== scenario.lang) errors.push(`lang=${htmlLang}, attendu=${scenario.lang}`);
           if (htmlDir !== scenario.dir) errors.push(`dir=${htmlDir}, attendu=${scenario.dir}`);
@@ -110,7 +112,7 @@ try {
         await page.waitForTimeout(250);
         await page.screenshot({ path: output, fullPage: true });
         if (generate) {
-          results.push({ name: testName, http: directStatus, status: errors.length ? 'FAIL' : 'GENERATED', lang: htmlLang, dir: htmlDir, errors });
+          results.push({ name: testName, http: directStatus, final_path: navigatedFinalPath, status: errors.length ? 'FAIL' : 'GENERATED', lang: htmlLang, dir: htmlDir, errors });
         } else {
           const baseline = PNG.sync.read(fs.readFileSync(path.join(BASELINE_DIR, `${testName}.png`)));
           const current = PNG.sync.read(fs.readFileSync(output));
@@ -122,7 +124,7 @@ try {
             diffPercent = (pixels / (baseline.width * baseline.height)) * 100;
             if (diffPercent > SEUIL) { fs.writeFileSync(path.join(DIFF_DIR, `${testName}.png`), PNG.sync.write(diff)); errors.push(`diff=${diffPercent.toFixed(2)}%, seuil=${SEUIL}%`); }
           }
-          results.push({ name: testName, http: directStatus, status: errors.length ? 'FAIL' : 'OK', lang: htmlLang, dir: htmlDir, diff: `${diffPercent.toFixed(2)}%`, errors });
+          results.push({ name: testName, http: directStatus, final_path: navigatedFinalPath, status: errors.length ? 'FAIL' : 'OK', lang: htmlLang, dir: htmlDir, diff: `${diffPercent.toFixed(2)}%`, errors });
         }
       } catch (error) { results.push({ name: testName, status: 'ERROR', errors: [error.message] }); }
       finally { await page.close(); }
@@ -133,5 +135,5 @@ if (generate) writeManifest();
 const passed = results.filter((r) => r.status === (generate ? 'GENERATED' : 'OK')).length;
 const failed = results.length - passed;
 console.log(JSON.stringify({ version: VERSION, commit, base: BASE_URL, mode: generate ? 'GENERATE' : 'CHECK', total: results.length, passed, failed, results }, null, 2));
-console.log(`VISUAL_SUMMARY version=${VERSION} commit=${commit} total=${results.length} pass=${passed} fail=${failed}`);
+console.error(`VISUAL_SUMMARY version=${VERSION} commit=${commit} total=${results.length} pass=${passed} fail=${failed}`);
 process.exit(failed === 0 && passed === expectedFiles.length ? 0 : 1);
