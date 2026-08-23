@@ -50,6 +50,14 @@ def validate_record(data: dict[str, Any], expected_commit: str, expected_package
         records = list(records.values()) if isinstance(records, dict) else []
     if not records:
         raise Blocked(f"{label} has no approval records")
+    minimums = {"ux_content": 3, "native_language": 3, "visual_design": 1}
+    if len(records) < minimums.get(label, 1):
+        raise Blocked(f"{label} has {len(records)} records; minimum is {minimums[label]}")
+    if label == "native_language":
+        languages = {str(record.get("language", "")).lower() for record in records if isinstance(record, dict)}
+        missing_languages = {"fr", "en", "ar"} - languages
+        if missing_languages:
+            raise Blocked(f"native_language is missing languages: {sorted(missing_languages)}")
 
     for index, record in enumerate(records, 1):
         prefix = f"{label}[{index}]"
