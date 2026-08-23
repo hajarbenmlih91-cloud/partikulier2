@@ -5,7 +5,7 @@ set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LOG="${PK_TOOLING_LOG:-$ROOT/documentation/install-tooling.log}"
-SEMgrep_VERSION="1.132.0"
+SEMGREP_VERSION="1.132.0"
 WPCLI_VERSION="2.12.0"
 WPCLI_SHA512="be928f6b8ca1e8dfb9d2f4b75a13aa4aee0896f8a9a0a1c45cd5d2c98605e6172e6d014dda2e27f88c98befc16c040cbb2bd1bfa121510ea5cdf5f6a30fe8832"
 NODE_MAJOR="22"
@@ -27,8 +27,13 @@ if ! command -v wp >/dev/null 2>&1 || ! wp --version 2>/dev/null | grep -q "WP-C
   sudo mv /tmp/wpcli.phar /usr/local/bin/wp
 fi
 
-if ! command -v semgrep >/dev/null 2>&1 || ! semgrep --version 2>/dev/null | grep -q "^$SEMgrep_VERSION$"; then
-  sudo uv pip install --system "semgrep==$SEMgrep_VERSION"
+if ! command -v semgrep >/dev/null 2>&1 || ! semgrep --version 2>/dev/null | grep -q "^$SEMGREP_VERSION$"; then
+  if command -v uv >/dev/null 2>&1; then
+    sudo uv pip install --system "semgrep==$SEMGREP_VERSION"
+  else
+    python3 -m pip install --user --break-system-packages "semgrep==$SEMGREP_VERSION"
+    export PATH="$HOME/.local/bin:$PATH"
+  fi
 fi
 
 cd "$ROOT"

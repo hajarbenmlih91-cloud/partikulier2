@@ -5,7 +5,7 @@ import { chromium, request } from 'playwright';
 import { PNG } from 'pngjs';
 import pixelmatch from 'pixelmatch';
 
-const VERSION = process.env.PK_VERSION || '6.17.13';
+const VERSION = process.env.PK_VERSION || '6.17.14';
 const BASE_URL = process.env.PK_BASE || 'http://localhost:8090';
 const ROOT = process.cwd();
 const BASELINE_DIR = path.join(ROOT, 'tests', `baselines-${VERSION}`);

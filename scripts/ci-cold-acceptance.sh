@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-VERSION="${PK_VERSION:-6.17.13}"
+VERSION="${PK_VERSION:-6.17.14}"
 PORT="${PK_PORT:-8090}"
 BASE="${PK_BASE:-http://localhost:${PORT}}"
 RUNTIME="${PK_WP_DIR:-$ROOT/.runtime/ci-wp-${VERSION}}"

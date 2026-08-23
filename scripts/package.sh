@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fabrique le bundle autosuffisant du CDC fermé et l’archive thème historique.
-# Usage : bash scripts/package.sh 6.17.13
+# Usage : bash scripts/package.sh 6.17.14
 set -Eeuo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 THEME="$ROOT/theme"

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	require_once rtrim( $wp_dir, '/' ) . '/wp-load.php';
 }
 
-$version = getenv( 'PK_VERSION' ) ?: '6.17.13';
+$version = getenv( 'PK_VERSION' ) ?: '6.17.14';
 $orders  = array( 'price-asc', 'price-desc', 'surface-desc' );
 $out     = array();
 $errors  = array();

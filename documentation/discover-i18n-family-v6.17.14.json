@@ -1,0 +1,12 @@
+{
+  "version": "6.17.14",
+  "ids": {"fr": 7, "en": 8, "ar": 9},
+  "urls": {
+    "fr": "/fr/annonce/casablanca/appartement-lumineux-3-pieces/",
+    "en": "/en/annonce/rabat/maison-contemporaine-avec-jardin/",
+    "ar": "/ar/annonce/marrakech/appartement-t2-vue-mer-avec-balcon/"
+  },
+  "family_size": 3,
+  "non_empty": true,
+  "source": "cold-acceptance-v6.17.14 on localhost:8094"
+}

@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import fs from 'node:fs';
 const base = process.env.PK_BASE || 'http://localhost:8090';
 const browser = await chromium.launch({ headless: true });
-const VERSION = process.env.PK_VERSION || '6.17.13';
+const VERSION = process.env.PK_VERSION || '6.17.14';
 const result = { version: VERSION, base, passed: true, checks: [] };
 for (const item of [
   { lang: 'ar', path: '/ar/', expectedFont: true, expectedDir: 'rtl' },
