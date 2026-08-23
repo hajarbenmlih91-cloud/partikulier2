@@ -213,6 +213,21 @@ jobs:
           cmp --silent "partikulier-${PK_VERSION}-deterministic.zip" "$tmp/partikulier-${PK_VERSION}-deterministic.zip"
           jq -n --arg commit "$GITHUB_SHA" --arg package "$(sha256sum "partikulier-${PK_VERSION}-deterministic.zip" | cut -d' ' -f1)" --arg version "$PK_VERSION" '{test_id:"PACKAGE-REPRO-001",candidate_version:$version,source_commit:$commit,status:"PASS",branch_sha256:$package,detached_sha256:$package,comparison:"cmp byte-identical",source_to_release_reproducible:"PENDING_UNTIL_RELEASE_ASSET_COMPARE"}' > reproducibility-v1.7.1.json
 
+      - name: Verify candidate artifact independently
+        env:
+          PK_COMMIT: ${{ github.sha }}
+          PK_RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/cdc-artifact-to-verify"
+          cp partikulier-${PK_VERSION}-deterministic.zip* "$RUNNER_TEMP/cdc-artifact-to-verify/"
+          cp partikulier-${PK_VERSION}-evidence.tar.gz* "$RUNNER_TEMP/cdc-artifact-to-verify/"
+          cp reproducibility-v1.7.1.json "$RUNNER_TEMP/cdc-artifact-to-verify/"
+          python3 scripts/verify-candidate-artifact-v1.7.1.py \
+            "$RUNNER_TEMP/cdc-artifact-to-verify" \
+            --commit "$PK_COMMIT" \
+            --run-id "$PK_RUN_ID" \
+            --output candidate-artifact-verification-v1.7.1.json
+
       - name: Upload product, checksums and sidecars
         uses: actions/upload-artifact@v4
         with:
@@ -224,6 +239,7 @@ jobs:
             partikulier-6.17.17-evidence.tar.gz
             partikulier-6.17.17-evidence.tar.gz.sha256
             reproducibility-v1.7.1.json
+            candidate-artifact-verification-v1.7.1.json
           if-no-files-found: error
 
   release:

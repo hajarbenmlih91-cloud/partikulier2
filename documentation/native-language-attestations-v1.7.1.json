@@ -1,0 +1,25 @@
+{
+  "record_type": "human-native-language-attestations",
+  "candidate_version": "6.17.17",
+  "source_commit": "",
+  "package_sha256": "",
+  "status": "PENDING_NOT_SIMULATED",
+  "languages": ["fr", "en", "ar"],
+  "attestations": [],
+  "required_record_fields": [
+    "reviewer_identity",
+    "reviewer_role",
+    "conflict_of_interest",
+    "language",
+    "reviewed_commit",
+    "reviewed_package_sha256",
+    "decision",
+    "reviewed_at_utc",
+    "signature_method",
+    "signature",
+    "evidence_refs"
+  ],
+  "coverage_policy": "One authentic native-language reviewer record is required for each of fr, en and ar.",
+  "decision_policy": "Each attestation must identify the exact candidate commit and package SHA and must be signed by the identified reviewer.",
+  "prohibition": "This template is not an approval and must not be changed to APPROVED without authentic native-language review records."
+}

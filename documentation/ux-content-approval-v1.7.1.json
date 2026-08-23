@@ -1,0 +1,29 @@
+{
+  "record_type": "human-ux-content-approval",
+  "candidate_version": "6.17.17",
+  "source_commit": "",
+  "package_sha256": "",
+  "status": "PENDING_NOT_SIMULATED",
+  "required_scope": [
+    "UX independent review",
+    "FR EN AR visible content",
+    "keyboard and focus review",
+    "screen reader or equivalent review"
+  ],
+  "minimum_approvals": 3,
+  "approvals": [],
+  "required_record_fields": [
+    "reviewer_identity",
+    "reviewer_role",
+    "conflict_of_interest",
+    "reviewed_commit",
+    "reviewed_package_sha256",
+    "decision",
+    "reviewed_at_utc",
+    "signature_method",
+    "signature",
+    "evidence_refs"
+  ],
+  "decision_policy": "No approval is valid unless it names the exact commit and package SHA and is signed by the identified reviewer.",
+  "prohibition": "This template is not an approval and must not be changed to APPROVED without an authentic independent review record."
+}
