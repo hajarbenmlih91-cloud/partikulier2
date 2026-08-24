@@ -33,7 +33,11 @@ pid = $RUN_DIR/php-fpm.pid
 error_log = $RUN_DIR/php-fpm-error.log
 
 [www]
+user = www-data
+group = www-data
 listen = $SOCKET
+listen.owner = www-data
+listen.group = www-data
 pm = static
 pm.max_children = $WORKERS
 clear_env = no
