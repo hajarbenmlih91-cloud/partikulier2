@@ -208,10 +208,20 @@ def create_credentials(wp_dir: str, run_id: str, count: int = 50) -> tuple[list[
 
 
 def cleanup(wp_dir: str, ids: list[int], user_ids: list[int]) -> None:
-    for post_id in sorted(set(ids)):
-        subprocess.run(["wp", f"--path={wp_dir}", "post", "delete", str(post_id), "--force", "--allow-root"], cwd=ROOT, text=True, capture_output=True)
+    unique_ids = sorted(set(int(post_id) for post_id in ids if int(post_id) > 0))
+    if unique_ids:
+        ids_json = json.dumps(unique_ids, separators=(",", ":"))
+        php = (
+            f'$ids = {ids_json}; global $wpdb; '
+            'if ($ids) { '
+            '$in = implode(",", array_map("intval", $ids)); '
+            '$wpdb->query("DELETE FROM {$wpdb->prefix}pk_audit_log WHERE object_id IN ($in)"); '
+            '$wpdb->query("DELETE FROM {$wpdb->prefix}pk_listings WHERE id IN ($in)"); '
+            '}'
+        )
+        subprocess.run(["wp", f"--path={wp_dir}", "eval", php, "--allow-root"], cwd=ROOT, text=True, capture_output=True, check=False)
     for user_id in sorted(set(user_ids)):
-        subprocess.run(["wp", f"--path={wp_dir}", "user", "delete", str(user_id), "--yes", "--reassign=1", "--allow-root"], cwd=ROOT, text=True, capture_output=True)
+        subprocess.run(["wp", f"--path={wp_dir}", "user", "delete", str(user_id), "--yes", "--reassign=1", "--allow-root"], cwd=ROOT, text=True, capture_output=True, check=False)
 
 
 def main() -> int:
