@@ -17,6 +17,9 @@ CREATE TABLE {prefix}pk_listings (
   PRIMARY KEY (id),
   UNIQUE KEY external_id (external_id),
   KEY status_locale (status, locale),
+  KEY status_locale_created (status, locale, created_at, id),
+  KEY status_locale_price (status, locale, price, id),
+  KEY status_locale_area (status, locale, area, id),
   KEY owner_status (owner_user_id, status),
   KEY search_order (status, price, area)
 );

@@ -41,14 +41,12 @@ add_action('plugins_loaded', static function (): void {
     $GLOBALS['partikulier_core_jobs'] = new \Partikulier\Core\JobRunner();
     $GLOBALS['partikulier_core_jobs']->register();
     $GLOBALS['partikulier_core_rest'] = new RestController();
-    add_action('wp_loaded', static function (): void {
-        $repository = new \Partikulier\Core\ListingRepository();
-        $repository->syncEstatikProperties();
-    }, 5);
 });
 
 register_activation_hook(__FILE__, static function (): void {
     (new Migrator())->migrate();
+    // Synchronisation initiale bornée à l’activation, jamais exécutée sur chaque requête publique.
+    (new \Partikulier\Core\ListingRepository())->syncEstatikProperties();
 });
 
 register_deactivation_hook(__FILE__, static function (): void {
