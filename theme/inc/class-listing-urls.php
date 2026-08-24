@@ -267,7 +267,20 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 		/** Résout le slug géographique en ID après le parsing WordPress. */
 		public static function resolve_geo_request( $wp ) {
 			$raw_slug = isset( $wp->query_vars['pk_listing_slug'] ) ? rawurldecode( (string) $wp->query_vars['pk_listing_slug'] ) : '';
-			$slug     = $raw_slug ? sanitize_title( $raw_slug ) : '';
+			$path_lang = '';
+
+			// Fallback explicite pour les environnements dont le parseur/rewrite
+			// ne transmet pas la variable interne. Le chemin public reste la
+			// source de vérité : /[lang]/annonce/[ville]/[slug]/ (ou quartier).
+			if ( ! $raw_slug ) {
+				$request_path = trim( (string) wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' ), PHP_URL_PATH ), '/' );
+				if ( preg_match( '#^(?:(fr|en|ar)/)?annonce/(?:[^/]+/){1,2}([^/]+)/?$#', $request_path, $fallback ) ) {
+					$path_lang = isset( $fallback[1] ) ? sanitize_key( (string) $fallback[1] ) : '';
+					$raw_slug  = rawurldecode( (string) $fallback[2] );
+				}
+			}
+
+			$slug = $raw_slug ? sanitize_title( $raw_slug ) : '';
 			if ( ! $slug || ! empty( $wp->query_vars['p'] ) ) {
 				return;
 			}
@@ -283,7 +296,7 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 				return;
 			}
 
-			$lang = isset( $wp->query_vars['lang'] ) ? sanitize_key( $wp->query_vars['lang'] ) : '';
+			$lang = isset( $wp->query_vars['lang'] ) ? sanitize_key( $wp->query_vars['lang'] ) : $path_lang;
 			if ( $lang && function_exists( 'pll_get_post' ) ) {
 				$translated_id = pll_get_post( $post->ID, $lang );
 				if ( $translated_id ) {
