@@ -45,6 +45,18 @@ function pk_properties_archive_url() {
 		$parsed_host = wp_parse_url( $url, PHP_URL_HOST );
 		$invalid_host = in_array( $parsed_host, array( '0', '0.0.0.0', 'localhost' ), true );
 		if ( ! $invalid_host ) {
+			// Estatik/WordPress ne localise pas toujours le lien d’archive CPT.
+			// Avec Polylang en réécriture par répertoire, il faut conserver la langue
+			// de la page courante au lieu de renvoyer vers /annonces/ non localisé.
+			if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
+				$language = (string) pll_current_language( 'slug' );
+				if ( preg_match( '#^/' . preg_quote( $language, '#' ) . '/#', (string) wp_parse_url( $url, PHP_URL_PATH ) ) ) {
+					return $url;
+				}
+				if ( $language ) {
+					return trailingslashit( pll_home_url( $language ) ) . 'annonces/';
+				}
+			}
 			return $url;
 		}
 	}
