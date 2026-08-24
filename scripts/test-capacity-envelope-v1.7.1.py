@@ -126,22 +126,35 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     sampler = ResourceSampler()
     results: list[dict[str, Any]] = []
     created_ids: list[int] = []
+    results_lock = threading.Lock()
     started = now()
+    phase_started = time.monotonic()
+    deadline = phase_started + duration
     sampler.start()
-    workers = max(50, rps)
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        for second in range(duration):
-            futures = []
-            for index in range(rps):
-                auth = credentials[index % len(credentials)] if credentials else None
-                futures.append(pool.submit(request, base, name, second * rps + index, auth, write))
-            for future in as_completed(futures):
-                result = future.result()
+
+    def worker(worker_id: int) -> None:
+        sequence = 0
+        next_at = phase_started + (worker_id / max(rps, 1))
+        while next_at < deadline:
+            delay = next_at - time.monotonic()
+            if delay > 0:
+                time.sleep(delay)
+            if time.monotonic() >= deadline:
+                break
+            auth = credentials[worker_id % len(credentials)] if credentials else None
+            result = request(base, name, worker_id * 100000 + sequence, auth, write)
+            sequence += 1
+            with results_lock:
                 results.append(result)
                 if result.get("created_id"):
                     created_ids.append(int(result["created_id"]))
-            if second + 1 < duration:
-                time.sleep(max(0, 1.0 - (time.monotonic() % 1)))
+            next_at += 1.0
+
+    workers = max(1, rps)
+    with ThreadPoolExecutor(max_workers=workers) as pool:
+        futures = [pool.submit(worker, worker_id) for worker_id in range(workers)]
+        for future in futures:
+            future.result()
     resources = sampler.stop()
     times = sorted(float(row["seconds"]) for row in results if int(row.get("status_code", 0)) in range(200, 300))
     errors = sum(1 for row in results if int(row.get("status_code", 0)) not in range(200, 300))
@@ -155,7 +168,7 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     error_rate = errors / len(results) if results else 1.0
     rss = resources.get("cgroup_peak_rss_bytes")
     status = "PASS" if results and error_rate <= 0.001 and p95 is not None and p95 <= P95_LIMIT and p99 <= P99_LIMIT and (rss is None or rss <= MAX_RSS) and (resources.get("cpu_average_percent") is None or resources["cpu_average_percent"] <= 80) else "FAIL"
-    return {"name": name, "status": status, "started_at_utc": started, "finished_at_utc": now(), "target_rps": rps, "duration_seconds": duration, "requests": len(results), "errors": errors, "error_rate": error_rate, "p50_seconds": p50, "p95_seconds": p95, "p99_seconds": p99, "resources": resources, "created_ids": created_ids, "concurrency_clients": min(max(50, rps), 200)}
+    return {"name": name, "status": status, "started_at_utc": started, "finished_at_utc": now(), "target_rps": rps, "duration_seconds": duration, "requests": len(results), "errors": errors, "error_rate": error_rate, "p50_seconds": p50, "p95_seconds": p95, "p99_seconds": p99, "resources": resources, "created_ids": created_ids, "concurrency_clients": max(1, rps)}
 
 
 def create_credentials(wp_dir: str, run_id: str, count: int = 50) -> tuple[list[tuple[str, str]], list[int]]:

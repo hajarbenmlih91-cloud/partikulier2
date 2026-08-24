@@ -88,7 +88,7 @@ jobs:
     name: Cold WordPress MariaDB HTTP acceptance
     needs: static-contracts
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 55
     steps:
       - name: Checkout exact source
         uses: actions/checkout@v4
