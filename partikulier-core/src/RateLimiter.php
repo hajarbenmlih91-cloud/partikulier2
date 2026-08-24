@@ -22,13 +22,34 @@ final class RateLimiter
         $this->seen[$requestMarker] = true;
         $route = preg_replace('/[^a-z0-9_-]/i', '_', $request->get_route()) ?: 'route';
         $key = 'pk_rl_' . md5($bucket . '|' . $route . '|' . $identity);
-        $state = get_transient($key);
         $now = time();
-        if (!is_array($state) || !isset($state['started'], $state['count']) || ($now - (int) $state['started']) >= $window) {
-            $state = ['started' => $now, 'count' => 0];
+        if (function_exists('apcu_enabled') && apcu_enabled() && function_exists('apcu_fetch') && function_exists('apcu_store') && function_exists('apcu_inc')) {
+            $startedKey = $key . '_started';
+            $countKey = $key . '_count';
+            $started = apcu_fetch($startedKey, $startedFound);
+            if (!$startedFound || ($now - (int) $started) >= $window) {
+                if (function_exists('apcu_delete')) {
+                    apcu_delete($startedKey);
+                    apcu_delete($countKey);
+                }
+                apcu_add($startedKey, $now, $window);
+                apcu_store($countKey, 0, $window);
+                $started = $now;
+            }
+            $count = apcu_inc($countKey, 1, $countFound, $window);
+            if (!$countFound) {
+                $count = 1;
+                apcu_store($countKey, $count, $window);
+            }
+            $state = ['started' => (int) $started, 'count' => (int) $count];
+        } else {
+            $state = get_transient($key);
+            if (!is_array($state) || !isset($state['started'], $state['count']) || ($now - (int) $state['started']) >= $window) {
+                $state = ['started' => $now, 'count' => 0];
+            }
+            $state['count']++;
+            set_transient($key, $state, $window);
         }
-        $state['count']++;
-        set_transient($key, $state, $window);
         if ((int) $state['count'] > $limit) {
             $retryAfter = max(1, $window - ($now - (int) $state['started']));
             return new WP_Error(
