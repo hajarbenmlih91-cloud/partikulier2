@@ -37,7 +37,7 @@ final class ListingRepository
         // worker, il évite de refaire la même lecture publique pendant une
         // courte fenêtre. Sans l’extension, le chemin SQL reste inchangé.
         $cacheKey = $this->searchCacheKey($locale, $order, $page, $perPage);
-        if (function_exists('apcu_fetch')) {
+        if (self::apcuAvailable()) {
             $found = false;
             $cached = apcu_fetch($cacheKey, $found);
             if ($found && is_array($cached)) {
@@ -47,7 +47,7 @@ final class ListingRepository
 
         $sql = 'SELECT id, owner_user_id, external_id, status, locale, title, description, price, area, created_at, updated_at FROM ' . $wpdb->prefix . 'pk_listings WHERE status = %s AND locale = %s ORDER BY ' . $orderBy . ' LIMIT %d OFFSET %d';
         $rows = $wpdb->get_results($wpdb->prepare($sql, 'published', sanitize_key($locale), $perPage, $offset), ARRAY_A) ?: [];
-        if (function_exists('apcu_store')) {
+        if (self::apcuAvailable()) {
             apcu_store($cacheKey, $rows, 2);
         }
         return $rows;
@@ -55,13 +55,18 @@ final class ListingRepository
 
     private function searchCacheKey(string $locale, string $order, int $page, int $perPage): string
     {
-        $version = function_exists('apcu_fetch') ? (int) (apcu_fetch('pk_listing_search_version') ?: 1) : 1;
+        $version = self::apcuAvailable() ? (int) (apcu_fetch('pk_listing_search_version') ?: 1) : 1;
         return 'pk_listing_search_' . $version . '_' . md5(sanitize_key($locale) . '|' . $order . '|' . $page . '|' . $perPage);
+    }
+
+    private static function apcuAvailable(): bool
+    {
+        return function_exists('apcu_enabled') && apcu_enabled() && function_exists('apcu_fetch') && function_exists('apcu_store');
     }
 
     private function invalidateSearchCache(): void
     {
-        if (!function_exists('apcu_store') || !function_exists('apcu_inc')) {
+        if (!self::apcuAvailable() || !function_exists('apcu_inc')) {
             return;
         }
         if (false === apcu_inc('pk_listing_search_version')) {
