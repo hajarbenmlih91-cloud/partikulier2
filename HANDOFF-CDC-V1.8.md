@@ -15,7 +15,7 @@
 | Branche candidate | `automation/release-approval-gate-v1.7.1` |
 | Branche de base | `implementation/cdc-v1.7.1` |
 | Head d’implémentation avant ce document | `151cc3e21d7301c846f27d859894872fde5eb561` |
-| Head de branche après le commit de passation | à relever après le push ; le commit documentaire est non fonctionnel |
+| Head de branche de passation | à relever avec `git rev-parse HEAD` ; les commits documentaires connus sont `050fe11…` puis `00fe79e…` |
 | Dernier correctif source | `fix: preserve locale in property archive URLs` |
 | État PR observé | ouverte, non draft, `REVIEW_REQUIRED` |
 | Tag/release v6.17.17 | absents ; aucune publication autorisée |
@@ -143,7 +143,7 @@ L’historique de `v6.17.16` doit rester intact. Ne pas squasher, réécrire ou 
 
 ### A. Rejouer la candidate sur le nouveau head
 
-Le run `32787562048` ne couvre pas `151cc3e…`, et ne couvre pas non plus le commit documentaire qui suit. Après le push de ce document, relever le nouveau `HEAD` — attendu `050fe11a0a42854a0be18747fa35e7453f8bace9` si aucun autre commit n’est ajouté — puis attendre un nouveau run candidate. Ne jamais présenter le run 699 comme une validation du nouveau head.
+Le run `32787562048` ne couvre pas `151cc3e…`, `050fe11…` ni `00fe79e…`. Après tout changement ultérieur, relever le nouveau `HEAD` avec Git et attendre le run candidate correspondant. Ne jamais présenter le run 699 comme une validation du nouveau head.
 
 Commandes de départ :
 
