@@ -12,6 +12,12 @@ const BASE_URL = process.env.PK_BASE || 'http://localhost:8090';
 const VERSION = process.env.PK_VERSION || '6.17.17';
 const COMMIT = process.env.PK_COMMIT || '';
 const RUN_ID = process.env.PK_RUN_ID || 'local';
+const cacheBust = process.env.PK_CACHE_BUST || '';
+function requestUrl(raw) {
+  const url = new URL(raw, BASE_URL);
+  if (cacheBust) url.searchParams.set('pkqa', cacheBust);
+  return url.toString();
+}
 const generate = process.argv.includes('--generate');
 const threshold = Number(process.env.PK_VISUAL_THRESHOLD || '0.5');
 const baselineDir = path.join(ROOT, contract.baseline_policy.directory);
@@ -64,14 +70,14 @@ const results = [];
 try {
   for (const scenario of scenarios) {
     const viewport = viewports[scenario.viewport];
-    const direct = await api.get(scenario.url);
+    const direct = await api.get(requestUrl(scenario.url));
     const directStatus = direct.status();
     const errors = [];
     if (directStatus !== scenario.expected_http) errors.push(`http=${directStatus}, attendu=${scenario.expected_http}`);
     const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
     const output = path.join(generate ? baselineDir : currentDir, scenario.baseline.replace(`${contract.baseline_policy.directory}/`, ''));
     try {
-      const navigated = await page.goto(new URL(scenario.url, BASE_URL).toString(), { waitUntil: 'domcontentloaded', timeout: 30000 });
+      const navigated = await page.goto(requestUrl(scenario.url), { waitUntil: 'domcontentloaded', timeout: 30000 });
       await page.waitForTimeout(500);
       const htmlLang = ((await page.locator('html').getAttribute('lang')) || '').toLowerCase().split(/[-_]/)[0];
       const htmlDir = ((await page.locator('html').getAttribute('dir')) || '').toLowerCase();
