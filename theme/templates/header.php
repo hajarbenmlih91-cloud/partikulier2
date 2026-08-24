@@ -186,13 +186,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contacter le propriétaire', 'Contacter le propriétaire', 'partikulier' ) ); ?>
 			</a>
 		</nav>
-	<?php elseif ( ! is_page_template( 'templates/page-deposer-annonce.php' ) ) : ?>
-		<nav class="pk-mobile-action-bar" aria-label="<?php esc_attr_e( 'Action principale', 'partikulier' ); ?>">
-			<a class="pk-btn pk-btn-primary" href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>">
-				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Déposer une annonce', 'Déposer une annonce', 'partikulier' ) ); ?>
-			</a>
-		</nav>
-	<?php endif; ?>
+		<?php endif; ?>
 </header>
 
 <main id="main-content" class="pk-main">
