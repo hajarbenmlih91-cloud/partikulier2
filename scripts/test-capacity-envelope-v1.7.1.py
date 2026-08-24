@@ -103,13 +103,13 @@ def client_ip(index: int) -> str:
     return f"127.0.0.{2 + (index % 200)}"
 
 
-def request(base: str, phase: str, index: int, auth: tuple[str, str] | None = None, write: bool = False) -> dict[str, Any]:
+def request(base: str, phase: str, index: int, auth: tuple[str, str, str] | None = None, write: bool = False) -> dict[str, Any]:
     url = f"{base}/wp-json/partikulier/v1/{'listings' if write else 'listings?locale=fr&per_page=24'}"
     cmd = ["curl", "-sS", "--max-time", "30", "--interface", client_ip(index), "-H", "Accept: application/json"]
     if write:
         cmd += ["-H", "Content-Type: application/json", "-d", json.dumps({"title": f"CDC capacity {phase} {index}", "description": "Disposable CDC capacity fixture", "locale": "fr", "price": 100, "area": 10})]
     if auth:
-        cmd += ["--user", f"{auth[0]}:{auth[1]}"]
+        cmd += ["--cookie", f"{auth[0]}={auth[1]}", "-H", f"X-WP-Nonce: {auth[2]}"]
     cmd += ["-o", "-", "-w", "\n__META__ %{http_code} %{time_total}", url]
     proc = subprocess.run(cmd, text=True, capture_output=True)
     marker = "\n__META__ "
@@ -128,7 +128,7 @@ def request(base: str, phase: str, index: int, auth: tuple[str, str] | None = No
     return item
 
 
-def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple[str, str]] | None = None, write: bool = False) -> dict[str, Any]:
+def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple[str, str, str]] | None = None, write: bool = False) -> dict[str, Any]:
     sampler = ResourceSampler()
     results: list[dict[str, Any]] = []
     created_ids: list[int] = []
@@ -182,16 +182,20 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     return {"name": name, "status": status, "started_at_utc": started, "finished_at_utc": now(), "target_rps": rps, "duration_seconds": duration, "requests": len(results), "effective_rps": round(effective_rps, 3), "status_counts": status_counts, "error_samples": error_samples, "errors": errors, "error_rate": error_rate, "p50_seconds": p50, "p95_seconds": p95, "p99_seconds": p99, "resources": resources, "created_ids": created_ids, "concurrency_clients": workers}
 
 
-def create_credentials(wp_dir: str, run_id: str, count: int = 50) -> tuple[list[tuple[str, str]], list[int]]:
-    credentials: list[tuple[str, str]] = []
+def create_credentials(wp_dir: str, run_id: str, count: int = 50) -> tuple[list[tuple[str, str, str]], list[int]]:
+    credentials: list[tuple[str, str, str]] = []
+    cookie_name = run_checked(["wp", f"--path={wp_dir}", "eval", "echo LOGGED_IN_COOKIE;", "--allow-root"])
+    if not cookie_name:
+        raise RuntimeError("WordPress logged-in cookie name is unavailable")
     user_ids: list[int] = []
     suffix = re.sub(r"[^a-z0-9]", "", run_id.lower())[-12:] or "run"
     for index in range(count):
         username = f"pkload{suffix}{index:02d}"[:60]
         email = f"{username}@example.test"
         user_id = int(run_checked(["wp", f"--path={wp_dir}", "user", "create", username, email, "--role=author", "--user_pass=capacity-only-password", "--porcelain", "--allow-root"]))
-        password = run_checked(["wp", f"--path={wp_dir}", "user", "application-password", "create", str(user_id), f"capacity-{suffix}", "--porcelain", "--allow-root"])
-        credentials.append((username, password))
+        cookie = run_checked(["wp", f"--path={wp_dir}", "eval", f'echo wp_generate_auth_cookie({user_id}, time() + 3600, "logged_in");', "--allow-root"])
+        nonce = run_checked(["wp", f"--path={wp_dir}", "eval", f'wp_set_current_user({user_id}); echo wp_create_nonce("wp_rest");', "--allow-root"])
+        credentials.append((cookie_name, cookie, nonce))
         user_ids.append(user_id)
     return credentials, user_ids
 

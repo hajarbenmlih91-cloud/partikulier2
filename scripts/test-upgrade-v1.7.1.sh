@@ -83,19 +83,13 @@ snapshot "$work/before-candidate.json"
 
 # Materialize the exact historical source from Git, then activate it in the same runtime.
 mkdir -p "$work/old"
-git -C "$ROOT" archive --format=tar "$OLD_TAG" theme partikulier-core mu-plugins | tar -xf - -C "$work/old"
+git -C "$ROOT" archive --format=tar "$OLD_TAG" theme mu-plugins | tar -xf - -C "$work/old"
 cp -a "$WP_DIR/wp-content/themes/partikulier" "$work/current-theme"
-cp -a "$WP_DIR/wp-content/plugins/partikulier-core" "$work/current-core"
-if [ -d "$WP_DIR/wp-content/mu-plugins" ]; then cp -a "$WP_DIR/wp-content/mu-plugins" "$work/current-mu"; fi
-
 wpq theme deactivate >/dev/null 2>&1 || true
 wpq plugin deactivate partikulier-core >/dev/null 2>&1 || true
 rm -rf "$WP_DIR/wp-content/themes/partikulier" "$WP_DIR/wp-content/plugins/partikulier-core"
 cp -a "$work/old/theme" "$WP_DIR/wp-content/themes/partikulier"
-mkdir -p "$WP_DIR/wp-content/plugins/partikulier-core"
-cp -a "$work/old/partikulier-core/." "$WP_DIR/wp-content/plugins/partikulier-core/"
 if [ -d "$work/old/mu-plugins" ]; then rm -rf "$WP_DIR/wp-content/mu-plugins"; cp -a "$work/old/mu-plugins" "$WP_DIR/wp-content/mu-plugins"; fi
-wpq plugin activate partikulier-core >/dev/null
 wpq theme activate partikulier >/dev/null
 wpq eval 'do_action("after_switch_theme"); do_action("init");' >/dev/null
 wpq cache flush >/dev/null 2>&1 || true
