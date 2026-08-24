@@ -133,6 +133,8 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     results: list[dict[str, Any]] = []
     created_ids: list[int] = []
     results_lock = threading.Lock()
+    dispatch_lock = threading.Lock()
+    dispatch_number = 0
     started = now()
     phase_started = time.monotonic()
     deadline = phase_started + duration
@@ -141,6 +143,7 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     workers = min(max(1, rps), 200)
     interval = workers / rps
     def timed_worker(worker_id: int) -> None:
+        nonlocal dispatch_number
         sequence = 0
         next_at = phase_started + (worker_id / rps)
         while next_at < deadline:
@@ -149,8 +152,11 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
                 time.sleep(delay)
             if time.monotonic() >= deadline:
                 break
-            auth = credentials[worker_id % len(credentials)] if credentials else None
-            result = request(base, name, worker_id * 100000 + sequence, auth, write)
+            with dispatch_lock:
+                request_number = dispatch_number
+                dispatch_number += 1
+            auth = credentials[request_number % len(credentials)] if credentials else None
+            result = request(base, name, request_number, auth, write)
             sequence += 1
             with results_lock:
                 results.append(result)
