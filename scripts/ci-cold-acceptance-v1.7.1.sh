@@ -44,6 +44,9 @@ wait_for_http() {
   exit 1
 }
 wait_for_http
+# Le provisioning Estatik intervient après l’activation du core : synchroniser une
+# fois explicitement avant les assertions, jamais depuis chaque requête HTTP.
+wp --path="$RUNTIME" eval '$repository = new \Partikulier\Core\ListingRepository(); echo "SYNCED=" . $repository->syncEstatikProperties() . PHP_EOL;' --allow-root > "$ROOT/documentation/estatik-sync-v${VERSION}.log"
 
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/core-contract.php" > "$ROOT/documentation/core-contract-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/services-contract.php" > "$ROOT/documentation/core-services-contract-v${VERSION}.json"
