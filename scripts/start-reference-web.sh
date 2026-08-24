@@ -30,6 +30,9 @@ clear_env = no
 catch_workers_output = yes
 php_admin_value[error_log] = $RUN_DIR/php-error.log
 php_admin_flag[log_errors] = on
+php_admin_value[opcache.enable] = 1
+php_admin_value[opcache.memory_consumption] = 128
+php_admin_value[opcache.validate_timestamps] = 0
 EOF
 
 cat > "$RUN_DIR/nginx.conf" <<EOF
@@ -57,6 +60,7 @@ http {
     location ~ \.php$ {
       include /etc/nginx/fastcgi_params;
       fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+      fastcgi_param HTTP_AUTHORIZATION \$http_authorization;
       fastcgi_param HTTP_PROXY '';
       fastcgi_pass unix:$SOCKET;
     }

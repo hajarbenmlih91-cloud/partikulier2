@@ -78,8 +78,10 @@ bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/docume
 
 PK_WP_DIR="$RUNTIME" PK_MIN_LISTINGS=1000 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/scripts/provision-load-fixture.php" > "$ROOT/documentation/load-fixture-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_LOAD_REPORT="$ROOT/documentation/load-test-v${VERSION}.json" bash "$ROOT/scripts/load-test-http.sh" > "$ROOT/documentation/load-test-v${VERSION}.log"
-PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_CAPACITY_REPORT="$ROOT/documentation/capacity-envelope-v${VERSION}.json" python3 "$ROOT/scripts/test-capacity-envelope-v1.7.1.py" > "$ROOT/documentation/capacity-envelope-v${VERSION}.log"
-PK_WP_DIR="$RUNTIME" PK_DB_NAME="$DB_NAME" PK_DB_USER="$DB_USER" PK_DB_PASS="$DB_PASS" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UPGRADE_REPORT="$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" bash "$ROOT/scripts/test-upgrade-v1.7.1.sh" > "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.log"
+capacity_exit=0
+PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_CAPACITY_REPORT="$ROOT/documentation/capacity-envelope-v${VERSION}.json" python3 "$ROOT/scripts/test-capacity-envelope-v1.7.1.py" > "$ROOT/documentation/capacity-envelope-v${VERSION}.log" || capacity_exit=$?
+upgrade_exit=0
+PK_WP_DIR="$RUNTIME" PK_DB_NAME="$DB_NAME" PK_DB_USER="$DB_USER" PK_DB_PASS="$DB_PASS" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UPGRADE_REPORT="$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" bash "$ROOT/scripts/test-upgrade-v1.7.1.sh" > "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.log" || upgrade_exit=$?
 # These reports are created after the first stamp; stamp them again so every
 # candidate JSON carries the same exact commit field before gate evaluation.
 bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/documentation/provenance-v${VERSION}-final.log"
@@ -100,5 +102,9 @@ jq -e '.status == "PASS" and .after >= 1000' "$ROOT/documentation/load-fixture-v
 jq -e '.status == "PASS" and .metrics.errors == 0 and .metrics.p95_seconds <= 1.5 and .metrics.p99_seconds <= 3.0' "$ROOT/documentation/load-test-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .scale == 1 and ([.phases[] | select(.name == "sustained_read_10rps") | .target_rps == 10 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "burst_read_25rps") | .target_rps == 25 and .duration_seconds == 60] | any) and ([.phases[] | select(.name == "write_api_2rps") | .target_rps == 2 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "concurrent_sessions_50") | .target_concurrency == 50 and .status == "PASS"] | any)' "$ROOT/documentation/capacity-envelope-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .from_tag == "v6.17.16" and .to_version == "6.17.17" and ([.checks[] | select(.test_id == "UPGRADE-DATA-001" or .test_id == "UPGRADE-SETTINGS-001" or .test_id == "UPGRADE-IDEMPOTENT-001") | .status == "PASS"] | all)' "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" >/dev/null
+if [ "$capacity_exit" -ne 0 ] || [ "$upgrade_exit" -ne 0 ]; then
+  printf 'CAPACITY_EXIT=%s\nUPGRADE_EXIT=%s\n' "$capacity_exit" "$upgrade_exit" >&2
+  exit 1
+fi
 for report in "$ROOT"/documentation/*"v${VERSION}".json; do jq -e '(.commit|type) == "string" and (.commit|test("^[0-9a-f]{40}$"))' "$report" >/dev/null; done
 printf 'COLD_ACCEPTANCE=PASS\nVERSION=%s\nBASE=%s\n' "$VERSION" "$BASE"

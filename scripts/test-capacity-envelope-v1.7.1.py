@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from collections import Counter
 import os
 import re
 import subprocess
@@ -37,7 +38,12 @@ def run_checked(command: list[str], *, capture: bool = True) -> str:
 
 
 def cgroup_memory_peak() -> int | None:
-    for path in (Path("/sys/fs/cgroup/memory.peak"), Path("/sys/fs/cgroup/memory.max_usage_in_bytes")):
+    paths = [
+        Path("/sys/fs/cgroup/memory.peak"),
+        Path("/sys/fs/cgroup/memory/memory.max_usage_in_bytes"),
+        Path("/sys/fs/cgroup/memory.max_usage_in_bytes"),
+    ]
+    for path in paths:
         try:
             value = path.read_text().strip()
             if value.isdigit():
@@ -167,11 +173,13 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     else:
         p50 = p95 = p99 = None
     error_rate = errors / len(results) if results else 1.0
+    status_counts = {str(code): count for code, count in sorted(Counter(int(row.get("status_code", 0)) for row in results).items())}
+    error_samples = [{"status_code": int(row.get("status_code", 0)), "error": str(row.get("error", ""))[:240], "body": str(row.get("body", ""))[:240]} for row in results if int(row.get("status_code", 0)) not in range(200, 300)][:5]
     effective_rps = len(results) / max(duration, 1)
     rss = resources.get("cgroup_peak_rss_bytes")
     required_delivery = rps * 0.99 if name in {"sustained_read_10rps", "burst_read_25rps", "write_api_2rps"} else 0
-    status = "PASS" if results and effective_rps >= required_delivery and error_rate <= 0.001 and p95 is not None and p95 <= P95_LIMIT and p99 <= P99_LIMIT and (rss is None or rss <= MAX_RSS) and (resources.get("cpu_average_percent") is None or resources["cpu_average_percent"] <= 80) else "FAIL"
-    return {"name": name, "status": status, "started_at_utc": started, "finished_at_utc": now(), "target_rps": rps, "duration_seconds": duration, "requests": len(results), "effective_rps": round(effective_rps, 3), "errors": errors, "error_rate": error_rate, "p50_seconds": p50, "p95_seconds": p95, "p99_seconds": p99, "resources": resources, "created_ids": created_ids, "concurrency_clients": workers}
+    status = "PASS" if results and effective_rps >= required_delivery and error_rate <= 0.001 and p95 is not None and p95 <= P95_LIMIT and p99 <= P99_LIMIT and rss is not None and rss <= MAX_RSS and (resources.get("cpu_average_percent") is None or resources["cpu_average_percent"] <= 80) else "FAIL"
+    return {"name": name, "status": status, "started_at_utc": started, "finished_at_utc": now(), "target_rps": rps, "duration_seconds": duration, "requests": len(results), "effective_rps": round(effective_rps, 3), "status_counts": status_counts, "error_samples": error_samples, "errors": errors, "error_rate": error_rate, "p50_seconds": p50, "p95_seconds": p95, "p99_seconds": p99, "resources": resources, "created_ids": created_ids, "concurrency_clients": workers}
 
 
 def create_credentials(wp_dir: str, run_id: str, count: int = 50) -> tuple[list[tuple[str, str]], list[int]]:
@@ -239,7 +247,7 @@ def main() -> int:
                 break
         failed_probe = next((row for row in payload["saturation_probe"] if row["status"] != "PASS"), None)
         payload["saturation_point"] = {"observed": failed_probe is not None, "rps": failed_probe.get("target_rps") if failed_probe else None, "reason": "first non-passing probe" if failed_probe else "not reached before maximum probe"}
-        all_pass = args.scale == 1 and all(row.get("status") == "PASS" for row in payload["phases"]) and failed_probe is not None and all(int(row.get("resources", {}).get("cgroup_peak_rss_bytes") or 0) <= MAX_RSS for row in payload["phases"])
+        all_pass = args.scale == 1 and all(row.get("status") == "PASS" for row in payload["phases"]) and failed_probe is not None and all(row.get("resources", {}).get("cgroup_peak_rss_bytes") is not None and int(row["resources"]["cgroup_peak_rss_bytes"]) <= MAX_RSS for row in payload["phases"])
         payload["status"] = "PASS" if all_pass else "FAIL"
     except Exception as exc:
         payload["error"] = str(exc)
