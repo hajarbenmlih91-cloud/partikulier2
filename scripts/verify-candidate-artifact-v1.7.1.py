@@ -220,7 +220,10 @@ def main() -> int:
             assert_equal(str(qualification.get("run_id")), str(args.run_id), "qualification.run_id")
             assert_equal(qualification.get("package_sha256"), package_sha, "qualification.package_sha256")
             labels = qualification.get("labels") or {}
-            assert_equal(labels.get("TECHNICAL_STATUS"), "PASS", "qualification.TECHNICAL_STATUS")
+            technical_status = labels.get("TECHNICAL_CANDIDATE_STATUS", labels.get("TECHNICAL_STATUS"))
+            assert_equal(technical_status, "PASS", "qualification.TECHNICAL_CANDIDATE_STATUS")
+            if "TECHNICAL_STATUS" in labels:
+                assert_equal(labels.get("TECHNICAL_STATUS"), "PASS", "qualification.TECHNICAL_STATUS")
             assert_equal(labels.get("RELEASE_STATUS"), "CANDIDATE", "qualification.RELEASE_STATUS")
             assert_equal(labels.get("TECHNICAL_RELEASE_CANDIDATE"), "PASS", "qualification.TECHNICAL_RELEASE_CANDIDATE")
             assert_equal(qualification.get("human_validation"), "PENDING_NOT_SIMULATED", "qualification.human_validation")
