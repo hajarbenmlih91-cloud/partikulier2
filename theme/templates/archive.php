@@ -127,7 +127,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 			</button>
 			<div class="pk-archive-layout">
 					<aside class="pk-filters" aria-label="<?php echo esc_attr( $pk_filters_label ); ?>">
-						<div class="pk-filters-panel<?php echo $pk_active_filters ? ' is-open' : ''; ?>" id="pk-filters-panel">
+						<div class="pk-filters-panel<?php echo $pk_active_filters ? ' ' . 'is-open' : ''; ?>" id="pk-filters-panel">
 						<h2 class="screen-reader-text"><?php echo esc_html( $pk_filters_label ); ?></h2>
 
 				<div class="pk-filter">
