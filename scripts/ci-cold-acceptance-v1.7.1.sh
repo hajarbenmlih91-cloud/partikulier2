@@ -68,7 +68,13 @@ PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${G
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/scripts/theme-contract.php" > "$ROOT/documentation/theme-contract-v${VERSION}.json"
 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/routes-contract.mjs" > "$ROOT/documentation/routes-contract-v${VERSION}.json" 2> "$ROOT/documentation/routes-contract-v${VERSION}.summary.log"
 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/parcours.mjs" > "$ROOT/documentation/e2e-v${VERSION}.json" 2> "$ROOT/documentation/e2e-v${VERSION}.summary.log"
-PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" node "$ROOT/scripts/visual-contract-v1.7.1.mjs" > "$ROOT/documentation/visual-contract-v${VERSION}.json" 2> "$ROOT/documentation/visual-contract-v${VERSION}.summary.log"
+# Exécuter les contrôles UI v1.8 avant le comparateur historique pour conserver
+# les preuves DOM/crawl/responsive même si le gate pixel immuable échoue.
+ui_exit=0
+rm -rf "$ROOT/documentation/ui-v1.8"
+PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UI_OUT="$ROOT/documentation/ui-v1.8" node "$ROOT/scripts/test-ui-v1.8.mjs" > "$ROOT/documentation/ui-v1.8.log" 2>&1 || ui_exit=$?
+visual_exit=0
+PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" node "$ROOT/scripts/visual-contract-v1.7.1.mjs" > "$ROOT/documentation/visual-contract-v${VERSION}.json" 2> "$ROOT/documentation/visual-contract-v${VERSION}.summary.log" || visual_exit=$?
 # Les baselines sont versionnées dans Git : la CI ne les régénère jamais et
 # produit seulement une fiche de contrôle non ambiguë.
 jq -n --arg version "$VERSION" --arg commit "$CI_COMMIT" --arg manifest "tests/baselines-$VERSION/SHA256SUMS" --argjson count 30 '{version:$version,candidate_version:$version,commit:$commit,mode:"committed-baselines-validation",baseline_count:$count,manifest:$manifest,regenerated:false}' > "$ROOT/documentation/visual-generate-v${VERSION}.json"
@@ -76,9 +82,6 @@ printf 'VISUAL_BASELINES_MODE=committed\nVERSION=%s\nCOMMIT=%s\nCOUNT=30\n' "$VE
 PK_URL="$BASE" PK_REPORT="$ROOT/documentation/browser-detection-v${VERSION}.json" bash "$ROOT/scripts/test-i18n-browser-detection.sh" > "$ROOT/documentation/browser-detection-v${VERSION}.log"
 PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_A11Y_REPORT="$ROOT/documentation/accessibility-v${VERSION}.json" node "$ROOT/scripts/test-accessibility.mjs" > "$ROOT/documentation/accessibility-v${VERSION}.log"
 PK_BASE="$BASE" PK_REPORT="$ROOT/documentation/i18n-fonts-v${VERSION}.json" node "$ROOT/scripts/test-i18n-fonts.mjs" > "$ROOT/documentation/i18n-fonts-v${VERSION}.log"
-ui_exit=0
-rm -rf "$ROOT/documentation/ui-v1.8"
-PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UI_OUT="$ROOT/documentation/ui-v1.8" node "$ROOT/scripts/test-ui-v1.8.mjs" > "$ROOT/documentation/ui-v1.8.log" 2>&1 || ui_exit=$?
 PK_SORT_REPORT="$ROOT/documentation/search-sorting-v${VERSION}.json" php "$ROOT/scripts/test-search-sorting.php" > "$ROOT/documentation/search-sorting-v${VERSION}.log"
 
 SECRET_B64="$(openssl rand -base64 32)"
@@ -116,7 +119,7 @@ jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/core-services-co
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/theme-contract-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/routes-contract-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/e2e-v${VERSION}.json" >/dev/null
-jq -e '.failed == 0 and .passed == .total and .total == 30' "$ROOT/documentation/visual-contract-v${VERSION}.json" >/dev/null
+jq -e '.failed == 0 and .passed == .total and .total == 30' "$ROOT/documentation/visual-contract-v${VERSION}.json" >/dev/null || visual_exit=1
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/accessibility-v${VERSION}.json" >/dev/null
 jq -e '.negative.invalid_secret == "401" and .negative.invalid_signature == "401" and .negative.expired_timestamp == "401" and .negative.missing_shared_header == "401" and (.rounds_detail|length) == 5 and (.negative.details|length) == 4 and .secret_included == false and (.commit|test("^[0-9a-f]{40}$"))' "$ROOT/documentation/hmac-http-v${VERSION}.json" >/dev/null
 jq -e '.all_below_threshold == true and (.commit|test("^[0-9a-f]{40}$"))' "$ROOT/documentation/sql-v${VERSION}-summary.json" >/dev/null
@@ -129,8 +132,8 @@ jq -e '.link_crawl_passed == .link_crawl_total and .link_crawl_total == .scenari
 jq -e '.responsive_passed == .responsive_total and .responsive_total > 0' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
 jq -e '.status == "PASS" and .scale == 1 and ([.phases[] | select(.name == "sustained_read_10rps") | .target_rps == 10 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "burst_read_25rps") | .target_rps == 25 and .duration_seconds == 60] | any) and ([.phases[] | select(.name == "write_api_2rps") | .target_rps == 2 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "concurrent_sessions_50") | .target_concurrency == 50 and .status == "PASS"] | any)' "$ROOT/documentation/capacity-envelope-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .from_tag == "v6.17.16" and .to_version == "6.17.17" and ([.checks[] | select(.test_id == "UPGRADE-DATA-001" or .test_id == "UPGRADE-SETTINGS-001" or .test_id == "UPGRADE-IDEMPOTENT-001") | .status == "PASS"] | all)' "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" >/dev/null
-if [ "$capacity_exit" -ne 0 ] || [ "$upgrade_exit" -ne 0 ] || [ "$ui_exit" -ne 0 ]; then
-  printf 'CAPACITY_EXIT=%s\nUPGRADE_EXIT=%s\nUI_V18_EXIT=%s\n' "$capacity_exit" "$upgrade_exit" "$ui_exit" >&2
+if [ "$visual_exit" -ne 0 ] || [ "$capacity_exit" -ne 0 ] || [ "$upgrade_exit" -ne 0 ] || [ "$ui_exit" -ne 0 ]; then
+  printf 'VISUAL_EXIT=%s\nCAPACITY_EXIT=%s\nUPGRADE_EXIT=%s\nUI_V18_EXIT=%s\n' "$visual_exit" "$capacity_exit" "$upgrade_exit" "$ui_exit" >&2
   exit 1
 fi
 for report in "$ROOT"/documentation/*"v${VERSION}".json; do jq -e '(.commit|type) == "string" and (.commit|test("^[0-9a-f]{40}$"))' "$report" >/dev/null; done
