@@ -3,6 +3,13 @@
 set -Eeuo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Toute sortie non attendue doit identifier la ligne et la commande fautive dans le log brut.
+cold_acceptance_err() {
+  local rc=$?
+  printf 'COLD_ACCEPTANCE_ERROR status=%s line=%s command=%q\n' "$rc" "${BASH_LINENO[0]:-unknown}" "$BASH_COMMAND" >&2
+  exit "$rc"
+}
+trap cold_acceptance_err ERR
 VERSION="${PK_VERSION:-6.17.17}"
 PORT="${PK_PORT:-8090}"
 BASE="${PK_BASE:-http://localhost:${PORT}}"
@@ -34,13 +41,20 @@ else
 fi
 
 wait_for_http() {
+  local response_file="$RUNTIME/health-response.html"
+  local status="000"
   for _ in $(seq 1 30); do
-    if curl --fail --silent --show-error --connect-timeout 2 --max-time 5 "$BASE/fr/" >/dev/null; then return 0; fi
+    status="$(curl --silent --show-error --connect-timeout 2 --max-time 5 -o "$response_file" -w '%{http_code}' "$BASE/fr/" || true)"
+    if [[ "$status" =~ ^2[0-9][0-9]$ ]]; then
+      printf 'REFERENCE_HEALTH_HTTP=%s\n' "$status"
+      return 0
+    fi
     sleep 1
   done
-  echo "WordPress non disponible sur $BASE" >&2
+  printf 'WordPress non disponible sur %s (last_http_status=%s)\n' "$BASE" "$status" >&2
+  if [ -f "$response_file" ]; then tail -c 2000 "$response_file" >&2 || true; fi
   ss -ltnp || true
-  pgrep -af 'php -S' || true
+  pgrep -af 'php -S|php-fpm|nginx' || true
   if [ -f "$PK_WP_DIR/partikulier-server.log" ]; then tail -100 "$PK_WP_DIR/partikulier-server.log" >&2; fi
   exit 1
 }
