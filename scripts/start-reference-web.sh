@@ -50,6 +50,7 @@ php_admin_value[opcache.validate_timestamps] = 0
 EOF
 
 cat > "$RUN_DIR/nginx.conf" <<EOF
+user www-data;
 pid $RUN_DIR/nginx.pid;
 error_log $NGINX_LOG warn;
 worker_processes 1;
