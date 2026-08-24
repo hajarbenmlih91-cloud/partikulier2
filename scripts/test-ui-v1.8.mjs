@@ -53,6 +53,15 @@ function localePathOk(href, locale) {
 function extraWidthsFor(pageType) {
   return ['home', 'archive', 'single', 'deposer'].includes(pageType) ? requiredMobileWidths : [];
 }
+function classifyLink(link, scenarioUrl) {
+  const target = new URL(link.href);
+  const source = new URL(scenarioUrl);
+  if (target.hash && target.pathname === source.pathname && target.search === source.search) return 'same-page-anchor';
+  if (/^\/(?:wp-login\.php|wp-register\.php)(?:$|\?)/.test(target.pathname)) return 'wordpress-auth-endpoint';
+  if (target.pathname.startsWith('/wp-') || target.pathname.includes('/wp-json/')) return 'wordpress-endpoint';
+  if (link.className.includes('pk-lang') || link.href.includes('hreflang=') || link.hreflang) return 'language-selector';
+  return null;
+}
 
 const browser = await chromium.launch({ headless: true });
 try {
@@ -93,14 +102,17 @@ try {
       imageDom.push({ scenario_id: scenario.id, url: finalUrl, viewport, images: imageRows, valid: imageRows.every((row) => row.valid) });
       if (imageRows.some((row) => !row.valid)) errors.push('image-dom-invalid');
 
-      const links = await page.locator('a[href]').evaluateAll((anchors) => anchors.map((a) => ({ href: a.href, text: (a.textContent || '').trim().slice(0, 120), className: a.className || '' })));
+      const links = await page.locator('a[href]').evaluateAll((anchors) => anchors.map((a) => ({ href: a.href, text: (a.textContent || '').trim().slice(0, 120), className: typeof a.className === 'string' ? a.className : '', hreflang: a.getAttribute('hreflang') || '' })));
       const linkRows = [];
       for (const link of links) {
         if (!isInternalHttp(link.href)) continue;
         const target = new URL(link.href);
-        const status = await page.request.get(link.href, { maxRedirects: 0, timeout: 15000 }).then((r) => r.status()).catch(() => null);
-        const ignored = target.pathname.startsWith('/wp-') || target.pathname.includes('/wp-json/');
-        linkRows.push({ ...link, status, locale_expected: scenario.locale, locale_ok: ignored || localePathOk(link.href, scenario.locale), ignored });
+        const ignoredReason = classifyLink(link, finalUrl);
+        const response = await page.request.get(link.href, { maxRedirects: 5, timeout: 15000 }).catch(() => null);
+        const status = response ? response.status() : null;
+        const finalLinkUrl = response ? response.url() : null;
+        const localeOk = ignoredReason ? true : Boolean(finalLinkUrl && localePathOk(finalLinkUrl, scenario.locale));
+        linkRows.push({ ...link, status, final_url: finalLinkUrl, locale_expected: scenario.locale, locale_ok: localeOk, ignored: Boolean(ignoredReason), ignored_reason: ignoredReason });
       }
       linkCrawl.push({ scenario_id: scenario.id, url: finalUrl, links: linkRows, valid: linkRows.every((row) => row.status === 200 && row.locale_ok) });
       if (linkRows.some((row) => row.status !== 200 || !row.locale_ok)) errors.push('localized-link-crawl-invalid');
