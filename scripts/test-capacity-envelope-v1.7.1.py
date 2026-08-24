@@ -194,7 +194,8 @@ def create_credentials(wp_dir: str, run_id: str, count: int = 50) -> tuple[list[
         email = f"{username}@example.test"
         user_id = int(run_checked(["wp", f"--path={wp_dir}", "user", "create", username, email, "--role=author", "--user_pass=capacity-only-password", "--porcelain", "--allow-root"]))
         cookie = run_checked(["wp", f"--path={wp_dir}", "eval", f'echo wp_generate_auth_cookie({user_id}, time() + 3600, "logged_in");', "--allow-root"])
-        nonce = run_checked(["wp", f"--path={wp_dir}", "eval", f'wp_set_current_user({user_id}); echo wp_create_nonce("wp_rest");', "--allow-root"])
+        nonce_eval = f'$_COOKIE[LOGGED_IN_COOKIE] = {json.dumps(cookie)}; wp_set_current_user({user_id}); echo wp_create_nonce("wp_rest");'
+        nonce = run_checked(["wp", f"--path={wp_dir}", "eval", nonce_eval, "--allow-root"])
         credentials.append((cookie_name, cookie, nonce))
         user_ids.append(user_id)
     return credentials, user_ids
