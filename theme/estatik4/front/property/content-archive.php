@@ -12,7 +12,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $post      = isset( $property ) ? $property : get_post();
-	$price     = get_post_meta( $post->ID, 'es_property_price', true ) ?: get_post_meta( $post->ID, 'es_price', true );
+if ( ! $post instanceof WP_Post ) {
+	return;
+}
+$pk_property_url = get_permalink( $post );
+if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post' ) ) {
+	$pk_language = pll_current_language( 'slug' );
+	$pk_translated_id = $pk_language ? (int) pll_get_post( $post->ID, $pk_language ) : 0;
+	if ( $pk_translated_id ) {
+		$pk_property_url = get_permalink( $pk_translated_id );
+	}
+}
+		$price     = get_post_meta( $post->ID, 'es_property_price', true ) ?: get_post_meta( $post->ID, 'es_price', true );
 	$surface   = get_post_meta( $post->ID, 'es_property_area', true ) ?: get_post_meta( $post->ID, 'es_size', true );
 	$bedrooms  = get_post_meta( $post->ID, '_pk_bedrooms_label', true );
 	$living_rooms = get_post_meta( $post->ID, '_pk_living_rooms_label', true );
@@ -73,12 +84,12 @@ if ( ! $img_id ) {
 	$img_id = get_post_thumbnail_id( $post );
 }
 
-$jpg  = $img_id ? wp_get_attachment_image_url( $img_id, 'pk-card' ) : '';
-$avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
+	$jpg  = $img_id ? Partikulier_AVIF::valid_image_url( $img_id, 'pk-card' ) : false;
+	$avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
 ?>
 
 <article class="pk-card pk-card-property pk-card-estatik">
-	<a class="pk-card-media" href="<?php echo esc_url( get_permalink( $post ) ); ?>" tabindex="-1" aria-hidden="true">
+	<a class="pk-card-media" href="<?php echo esc_url( $pk_property_url ); ?>" tabindex="-1" aria-hidden="true">
 		<?php if ( $jpg ) : ?>
 			<picture>
 				<?php if ( $avif ) : ?>
@@ -87,7 +98,7 @@ $avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
 				<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( get_the_title( $post ) ); ?>" loading="lazy" decoding="async">
 			</picture>
 		<?php else : ?>
-			<div class="pk-card-placeholder" aria-hidden="true"><span>🏠</span></div>
+			<div class="pk-card-placeholder" aria-hidden="true"><span><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.6V21h14V9.6"/><path d="M9.5 21v-6h5v6"/></svg></span></div>
 		<?php endif; ?>
 		<?php if ( $action ) : ?>
 			<span class="pk-card-badge pk-badge-<?php echo esc_attr( sanitize_title( $action ) ); ?>"><?php echo esc_html( $action ); ?></span>
@@ -97,7 +108,7 @@ $avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
 	<div class="pk-card-body">
 		<div class="pk-card-price"><?php echo $price ? esc_html( is_numeric( $price ) ? number_format_i18n( (float) $price ) : $price ) : esc_html__( 'Prix sur demande', 'partikulier' ); ?></div>
 		<h3 class="pk-card-title">
-			<a href="<?php echo esc_url( get_permalink( $post ) ); ?>">
+			<a href="<?php echo esc_url( $pk_property_url ); ?>">
 				<?php echo esc_html( get_the_title( $post ) ); ?>
 			</a>
 		</h3>
@@ -118,5 +129,6 @@ $avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
 					<div class="pk-card-meta-item"><dd><?php echo esc_html( $terrace_label ); ?></dd></div>
 				<?php endif; ?>
 		</dl>
+		<div class="pk-card-foot"><span class="pk-card-direct"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact direct', 'Contact direct', 'partikulier' ) ); ?></span><a class="pk-card-cta" href="<?php echo esc_url( $pk_property_url ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Voir l\'annonce', 'Voir l\'annonce', 'partikulier' ) ); ?> <span aria-hidden="true">↗</span></a></div>
 	</div>
 </article>

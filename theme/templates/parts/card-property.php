@@ -19,7 +19,21 @@ if ( ! $property ) {
 	return;
 }
 
-		$price    = get_post_meta( $property->ID, 'es_property_price', true );
+// Les cartes liées peuvent être construites hors de la requête de langue active.
+// Revenir à la traduction Polylang évite les liens génériques /annonces/.
+if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post' ) ) {
+	$pk_language = pll_current_language( 'slug' );
+	$pk_translated_id = $pk_language ? (int) pll_get_post( $property->ID, $pk_language ) : 0;
+	if ( $pk_translated_id && $pk_translated_id !== (int) $property->ID ) {
+		$pk_translated = get_post( $pk_translated_id );
+		if ( $pk_translated instanceof WP_Post && PARTIKULIER_ESTATIK_POST_TYPE === $pk_translated->post_type ) {
+			$property = $pk_translated;
+		}
+	}
+}
+$pk_property_url = get_permalink( $property );
+
+			$price    = get_post_meta( $property->ID, 'es_property_price', true );
 		$surface  = get_post_meta( $property->ID, 'es_property_area', true );
 	$bedrooms = get_post_meta( $property->ID, '_pk_bedrooms_label', true );
 	$living_rooms = get_post_meta( $property->ID, '_pk_living_rooms_label', true );
@@ -64,10 +78,13 @@ $location = Partikulier_Geo::location_string( $property->ID );
 
 $thumb_id   = get_post_thumbnail_id( $property );
 $gallery    = get_post_meta( $property->ID, 'es_property_gallery', true );
-$gallery    = is_array( $gallery ) ? array_slice( array_unique( $gallery ), 0, 8 ) : array();
-if ( $thumb_id && ! in_array( $thumb_id, $gallery, true ) ) {
-	array_unshift( $gallery, $thumb_id );
+$gallery    = is_array( $gallery ) ? array_slice( array_unique( array_map( 'absint', $gallery ) ), 0, 8 ) : array();
+if ( $thumb_id && ! in_array( (int) $thumb_id, $gallery, true ) ) {
+	array_unshift( $gallery, (int) $thumb_id );
 }
+$gallery = array_values( array_filter( $gallery, static function ( $attachment_id ) {
+	return (bool) Partikulier_AVIF::valid_image_url( $attachment_id, 'pk-card' );
+} ) );
 
 /** Texte de prix avec unite mensuelle pour la location. */
 $price_html = '';
@@ -83,11 +100,11 @@ $price_html = '';
 }
 ?>
 <article class="pk-card pk-card-property" itemscope itemtype="https://schema.org/RealEstateListing">
-	<a class="pk-card-media" href="<?php echo esc_url( get_permalink( $property ) ); ?>" tabindex="-1" aria-hidden="true">
+	<a class="pk-card-media" href="<?php echo esc_url( $pk_property_url ); ?>" tabindex="-1" aria-hidden="true">
 		<?php
 		if ( $gallery ) {
-			$avif = Partikulier_AVIF::avif_path_for_url( wp_get_attachment_image_url( (int) $gallery[0], 'pk-card' ) );
-			$jpg  = wp_get_attachment_image_url( (int) $gallery[0], 'pk-card' );
+$jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
+				$avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
 			if ( $jpg ) {
 				?>
 				<picture>
@@ -114,18 +131,18 @@ $price_html = '';
 		<?php endif; ?>
 	</a>
 
-	<span class="pk-card-actions">
-		<a class="pk-card-action pk-card-peek" href="<?php echo esc_url( get_permalink( $property ) ); ?>" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Aperçu rapide', 'Aperçu rapide', 'partikulier' ) ); ?>">
+	<div class="pk-card-actions">
+		<a class="pk-card-action pk-card-peek" href="<?php echo esc_url( $pk_property_url ); ?>" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Aperçu rapide', 'Aperçu rapide', 'partikulier' ) ); ?>">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
 		</a>
 		<button type="button" class="pk-card-action pk-card-wishlist" data-post-id="<?php echo esc_attr( $property->ID ); ?>" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Ajouter aux favoris', 'Ajouter aux favoris', 'partikulier' ) ); ?>">
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
 		</button>
-	</span>
+	</div>
 
 	<div class="pk-card-body">
 		<h3 class="pk-card-title">
-			<a href="<?php echo esc_url( get_permalink( $property ) ); ?>" itemprop="url">
+			<a href="<?php echo esc_url( $pk_property_url ); ?>" itemprop="url">
 				<span itemprop="name"><?php echo esc_html( get_the_title( $property ) ); ?></span>
 			</a>
 		</h3>
@@ -172,6 +189,6 @@ $price_html = '';
 				<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16"/></svg><span><?php echo esc_html( $type ); ?></span></dd>
 			</div>
 		</dl>
-		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact direct', 'Contact direct', 'partikulier' ) ); ?></span><a class="pk-card-cta" href="<?php echo esc_url( get_permalink( $property ) ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Voir l\'annonce', 'Voir l\'annonce', 'partikulier' ) ); ?><span aria-hidden="true"> ↗</span></a></div>
+		<div class="pk-card-foot"><span class="pk-card-direct"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact direct', 'Contact direct', 'partikulier' ) ); ?></span><a class="pk-card-cta" href="<?php echo esc_url( $pk_property_url ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Voir l\'annonce', 'Voir l\'annonce', 'partikulier' ) ); ?><span aria-hidden="true"> ↗</span></a></div>
 	</div>
 </article>

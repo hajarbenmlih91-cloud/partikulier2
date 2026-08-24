@@ -192,7 +192,7 @@ while ( have_posts() ) :
 				</div>
 
 				<aside class="pk-single-sidebar">
-					<div class="pk-contact-card pk-contact-card--dark">
+					<div class="pk-contact-card pk-contact-card--dark" id="pk-contact-card">
 <p class="pk-contact-kicker"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact sécurisé', 'Contact sécurisé', 'partikulier' ) ); ?></p>
 							<h2 class="pk-contact-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Intéressé par ce bien ?', 'Intéressé par ce bien ?', 'partikulier' ) ); ?></h2>
 							<p class="pk-contact-note"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ) ); ?></p>

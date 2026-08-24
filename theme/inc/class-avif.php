@@ -100,7 +100,11 @@ class Partikulier_AVIF {
 			return true;
 		}
 
-		return self::convert_with_vips( $file, $avif );
+		$converted = self::convert_with_vips( $file, $avif );
+		if ( ! $converted && file_exists( $avif ) && 0 === filesize( $avif ) ) {
+			@unlink( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+		}
+		return $converted;
 	}
 
 	/**
@@ -256,6 +260,31 @@ class Partikulier_AVIF {
 			return false;
 		}
 
+		/**
+		 * Retourne une URL d’image uniquement si la ressource locale est non vide
+		 * et décodable. Les URLs externes restent soumises au contrôle navigateur.
+		 *
+		 * @param int    $attachment_id Identifiant media.
+		 * @param string $size Taille WordPress.
+		 * @return string|false
+		 */
+		public static function valid_image_url( $attachment_id, $size = 'thumbnail' ) {
+			$image = wp_get_attachment_image_src( (int) $attachment_id, $size );
+			if ( ! is_array( $image ) || empty( $image[0] ) ) {
+				return false;
+			}
+
+			$upload = wp_get_upload_dir();
+			if ( ! empty( $upload['baseurl'] ) && 0 === strpos( $image[0], $upload['baseurl'] ) ) {
+				$path = str_replace( $upload['baseurl'], $upload['basedir'], $image[0] );
+				if ( ! is_file( $path ) || filesize( $path ) <= 0 || ( function_exists( 'getimagesize' ) && false === @getimagesize( $path ) ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					return false;
+				}
+			}
+
+			return $image[0];
+		}
+
 		public static function avif_path_for_url( $url ) {
 		$avif_url = $url . '.avif';
 		// Verifier l'existence physique (upload dir local).
@@ -263,7 +292,7 @@ class Partikulier_AVIF {
 		$base   = $upload['baseurl'];
 		if ( 0 === strpos( $avif_url, $base ) ) {
 			$path = str_replace( $base, $upload['basedir'], $avif_url );
-			if ( file_exists( $path ) ) {
+			if ( file_exists( $path ) && filesize( $path ) > 0 ) {
 				return $avif_url;
 			}
 		}

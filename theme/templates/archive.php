@@ -111,9 +111,24 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 		</div>
 
 
-		<div class="pk-archive-layout">
-				<aside class="pk-filters" aria-label="<?php echo esc_attr( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Filtres', 'Filtres', 'partikulier' ) : __( 'Filtres', 'partikulier' ) ); ?>">
-					<h2 class="screen-reader-text"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Filtres', 'Filtres', 'partikulier' ) : __( 'Filtres', 'partikulier' ) ); ?></h2>
+			<?php
+			$pk_active_filters = 0;
+			foreach ( array( 'pk_price_max', 'es_type', 'es_category', 'pk_city' ) as $pk_filter_key ) {
+				if ( isset( $_GET[ $pk_filter_key ] ) && '' !== trim( (string) wp_unslash( $_GET[ $pk_filter_key ] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$pk_active_filters++;
+				}
+			}
+			$pk_filters_label = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'Filtres', 'Filtres', 'partikulier' ) : __( 'Filtres', 'partikulier' );
+			?>
+			<button type="button" class="pk-filter-toggle" aria-expanded="<?php echo $pk_active_filters ? 'true' : 'false'; ?>" aria-controls="pk-filters-panel">
+				<span><?php echo esc_html( $pk_filters_label ); ?></span>
+				<span class="pk-filter-toggle-meta"><span class="pk-filter-count"><?php echo esc_html( $pk_active_filters ); ?></span> <?php esc_html_e( 'actifs', 'partikulier' ); ?></span>
+				<span class="pk-filter-toggle-icon" aria-hidden="true">+</span>
+			</button>
+			<div class="pk-archive-layout">
+					<aside class="pk-filters" aria-label="<?php echo esc_attr( $pk_filters_label ); ?>">
+						<div class="pk-filters-panel<?php echo $pk_active_filters ? ' is-open' : ''; ?>" id="pk-filters-panel">
+						<h2 class="screen-reader-text"><?php echo esc_html( $pk_filters_label ); ?></h2>
 
 				<div class="pk-filter">
 					<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Action', 'Action', 'partikulier' ) ); ?></h3>
@@ -185,9 +200,10 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 					}
 					?>
 				</div>
-			</aside>
+						</div>
+				</aside>
 
-			<div class="pk-archive-content">
+				<div class="pk-archive-content">
 				<?php if ( have_posts() ) : ?>
 					<div class="pk-grid pk-grid-cards">
 						<?php

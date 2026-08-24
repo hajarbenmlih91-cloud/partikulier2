@@ -156,6 +156,8 @@ jobs:
           ((${#candidate_files[@]} > 0)) || { echo 'Aucune preuve candidate à archiver' >&2; exit 1; }
           cp -a "${candidate_files[@]}" "$RUNNER_TEMP/cdc-evidence/documentation/"
           cp -a tests/current-* tests/diff-* "$RUNNER_TEMP/cdc-evidence/" 2>/dev/null || true
+          [ -d documentation/ui-v1.8 ] && cp -a documentation/ui-v1.8 "$RUNNER_TEMP/cdc-evidence/documentation/" || true
+          [ -f documentation/ui-v1.8.log ] && cp -a documentation/ui-v1.8.log "$RUNNER_TEMP/cdc-evidence/documentation/" || true
           tar --sort=name --mtime="@${SOURCE_DATE_EPOCH}" --owner=0 --group=0 --numeric-owner -czf "cold-acceptance-v1.7.1.tar.gz" -C "$RUNNER_TEMP/cdc-evidence" .
 
       - name: Upload cold acceptance evidence

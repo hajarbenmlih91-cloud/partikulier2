@@ -37,19 +37,73 @@ def run_checked(command: list[str], *, capture: bool = True) -> str:
     return (proc.stdout or "").strip()
 
 
-def cgroup_memory_peak() -> int | None:
-    paths = [
-        Path("/sys/fs/cgroup/memory.peak"),
-        Path("/sys/fs/cgroup/memory/memory.max_usage_in_bytes"),
-        Path("/sys/fs/cgroup/memory.max_usage_in_bytes"),
-    ]
-    for path in paths:
+def _cgroup_dirs() -> list[Path]:
+    """Retourne uniquement les cgroups auxquels appartient ce processus."""
+    dirs: list[Path] = []
+    configured = os.environ.get("PK_CAPACITY_CGROUP_PATH", "").strip()
+    if configured:
+        dirs.append(Path(configured))
+    try:
+        cgroup_lines = Path("/proc/self/cgroup").read_text().splitlines()
+    except OSError:
+        cgroup_lines = []
+    unified = next((line.split(":", 2)[2] for line in cgroup_lines if line.startswith("0::")), "")
+    if unified:
+        dirs.append(Path("/sys/fs/cgroup") / unified.lstrip("/"))
+    for line in cgroup_lines:
+        parts = line.split(":", 2)
+        if len(parts) != 3 or not parts[1]:
+            continue
+        relative = parts[2].lstrip("/")
+        for mount in (Path("/sys/fs/cgroup") / parts[1], Path("/sys/fs/cgroup")):
+            dirs.append(mount / relative)
+    # Certains runners exposent un sous-mount cgroup2 différent de /sys/fs/cgroup.
+    try:
+        for line in Path("/proc/self/mountinfo").read_text().splitlines():
+            if " - cgroup2 " in line:
+                mount_point = line.split(" - ", 1)[0].split()[4]
+                dirs.append(Path(mount_point) / unified.lstrip("/"))
+    except OSError:
+        pass
+    unique: list[Path] = []
+    for directory in dirs:
+        if directory.is_dir() and directory not in unique:
+            unique.append(directory)
+    return unique
+
+
+def cgroup_memory_info() -> dict[str, Any]:
+    """Lit memory.peak du cgroup courant; None signifie métrique non exposée."""
+    candidates: list[tuple[Path, str]] = []
+    for directory in _cgroup_dirs():
+        candidates.extend(((directory / "memory.peak", "cgroup-v2 memory.peak"), (directory / "memory.max_usage_in_bytes", "cgroup-v1 memory.max_usage_in_bytes")))
+    for path, source in candidates:
         try:
             value = path.read_text().strip()
             if value.isdigit():
-                return int(value)
+                return {"peak_bytes": int(value), "source": source, "path": str(path)}
         except OSError:
-            pass
+            continue
+    return {"peak_bytes": None, "source": None, "path": None}
+
+
+def cgroup_memory_peak() -> int | None:
+    return cgroup_memory_info()["peak_bytes"]
+
+
+def cgroup_cpu_usage_usec() -> int | None:
+    for directory in _cgroup_dirs():
+        try:
+            values = {}
+            for line in (directory / "cpu.stat").read_text().splitlines():
+                key, value = line.split()[:2]
+                values[key] = int(value)
+            if "usage_usec" in values:
+                return values["usage_usec"]
+            if "usage_nsec" in values:
+                return values["usage_nsec"] // 1000
+        except (OSError, ValueError, IndexError):
+            continue
     return None
 
 
@@ -83,19 +137,26 @@ class ResourceSampler:
         self.stop_event.set()
         if self.thread:
             self.thread.join(timeout=5)
+        memory = cgroup_memory_info()
         if not self.samples:
-            return {"cpu_average_percent": None, "cgroup_peak_rss_bytes": cgroup_memory_peak(), "samples": 0}
+            return {"cpu_average_percent": None, "cgroup_peak_rss_bytes": memory["peak_bytes"], "cgroup_memory_source": memory["source"], "cgroup_path": memory["path"], "samples": 0}
         elapsed = max(float(self.samples[-1]["monotonic"]) - float(self.samples[0]["monotonic"]), 0.001)
-        delta = int(self.samples[-1]["jiffies"]) - int(self.samples[0]["jiffies"])
-        hz = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
         cpus = os.cpu_count() or 1
-        cpu = (delta / hz) / elapsed / cpus * 100
-        peak = cgroup_memory_peak()
-        return {"cpu_average_percent": round(cpu, 3), "cgroup_peak_rss_bytes": peak, "samples": len(self.samples), "cpu_cores": cpus}
+        cgroup_start = self.samples[0].get("cgroup_cpu_usec")
+        cgroup_end = self.samples[-1].get("cgroup_cpu_usec")
+        if isinstance(cgroup_start, int) and isinstance(cgroup_end, int) and cgroup_end >= cgroup_start:
+            cpu = ((cgroup_end - cgroup_start) / 1_000_000) / elapsed / cpus * 100
+            cpu_source = "cgroup-v2 cpu.stat usage_usec"
+        else:
+            delta = int(self.samples[-1]["jiffies"]) - int(self.samples[0]["jiffies"])
+            hz = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
+            cpu = (delta / hz) / elapsed / cpus * 100
+            cpu_source = "process jiffies fallback"
+        return {"cpu_average_percent": round(cpu, 3), "cpu_source": cpu_source, "cgroup_peak_rss_bytes": memory["peak_bytes"], "cgroup_memory_source": memory["source"], "cgroup_path": memory["path"], "samples": len(self.samples), "cpu_cores": cpus}
 
     def _run(self) -> None:
         while not self.stop_event.is_set():
-            self.samples.append({"monotonic": time.monotonic(), "jiffies": process_jiffies(), "cgroup_peak_rss_bytes": cgroup_memory_peak() or 0})
+            self.samples.append({"monotonic": time.monotonic(), "jiffies": process_jiffies(), "cgroup_cpu_usec": cgroup_cpu_usage_usec() or -1, "cgroup_peak_rss_bytes": cgroup_memory_peak() or 0})
             self.stop_event.wait(1)
 
 
@@ -233,7 +294,7 @@ def main() -> int:
     args = parser.parse_args()
     commit = os.environ.get("PK_COMMIT", "")
     run_id = os.environ.get("PK_RUN_ID", os.environ.get("GITHUB_RUN_ID", "local"))
-    payload: dict[str, Any] = {"test_id": "CAPACITY-ENVELOPE-001", "candidate_version": "6.17.17", "source_commit": commit, "source_ref": os.environ.get("GITHUB_REF", "local"), "run_id": run_id, "started_at_utc": now(), "status": "FAIL", "scale": args.scale, "scale_is_contractual": args.scale == 1, "phases": [], "saturation_probe": [], "cleanup": {}, "limitations": ["CPU is normalized over available CPUs and cgroup memory is used when exposed by the runner."]}
+    payload: dict[str, Any] = {"test_id": "CAPACITY-ENVELOPE-001", "candidate_version": "6.17.17", "source_commit": commit, "source_ref": os.environ.get("GITHUB_REF", "local"), "run_id": run_id, "started_at_utc": now(), "status": "FAIL", "scale": args.scale, "scale_is_contractual": args.scale == 1, "cgroup_target": os.environ.get("PK_CAPACITY_CGROUP_PATH") or None, "cgroup_required": os.environ.get("PK_CAPACITY_CGROUP_REQUIRED") == "1", "phases": [], "saturation_probe": [], "cleanup": {}, "limitations": ["CPU is normalized over the reference host CPU count; service RSS is measured from the declared cgroup memory.peak and is FAIL when unavailable."]}
     all_created: list[int] = []
     user_ids: list[int] = []
     try:
@@ -241,6 +302,9 @@ def main() -> int:
             raise RuntimeError("PK_COMMIT must be an exact 40-character lowercase SHA")
         if not args.wp_dir or not Path(args.wp_dir, "wp-load.php").is_file():
             raise RuntimeError("--wp-dir must point to a WordPress runtime")
+        configured_cgroup = os.environ.get("PK_CAPACITY_CGROUP_PATH", "").strip()
+        if os.environ.get("PK_CAPACITY_CGROUP_REQUIRED") == "1" and (not configured_cgroup or not Path(configured_cgroup).is_dir()):
+            raise RuntimeError("PK_CAPACITY_CGROUP_PATH must point to an existing dedicated cgroup")
         if args.scale <= 0:
             raise RuntimeError("scale must be positive")
         read_base = f"{args.base.rstrip('/') }"

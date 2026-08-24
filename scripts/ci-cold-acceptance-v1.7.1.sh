@@ -15,7 +15,8 @@ DB_PASS="${PK_DB_PASS:-ci-only-password}"
 ADMIN_USER="${PK_ADMIN_USER:-ciadmin}"
 ADMIN_PASS="${PK_ADMIN_PASS:-ci-only-admin-password}"
 ADMIN_EMAIL="${PK_ADMIN_EMAIL:-ci@example.test}"
-export PK_VERSION="$VERSION" PK_PORT="$PORT" PK_BASE="$BASE" PK_WP_DIR="$RUNTIME" PK_DB_NAME="$DB_NAME" PK_DB_USER="$DB_USER" PK_DB_PASS="$DB_PASS" PK_ADMIN_USER="$ADMIN_USER" PK_ADMIN_PASS="$ADMIN_PASS" PK_ADMIN_EMAIL="$ADMIN_EMAIL"
+REFERENCE_RUN_DIR="${PK_REFERENCE_RUN_DIR:-$RUNTIME/reference-$PORT}"
+export PK_VERSION="$VERSION" PK_PORT="$PORT" PK_BASE="$BASE" PK_WP_DIR="$RUNTIME" PK_DB_NAME="$DB_NAME" PK_DB_USER="$DB_USER" PK_DB_PASS="$DB_PASS" PK_ADMIN_USER="$ADMIN_USER" PK_ADMIN_PASS="$ADMIN_PASS" PK_ADMIN_EMAIL="$ADMIN_EMAIL" PK_REFERENCE_RUN_DIR="$REFERENCE_RUN_DIR"
 
 mkdir -p "$ROOT/documentation" "$ROOT/.runtime"
 rm -rf "$RUNTIME"
@@ -61,6 +62,9 @@ printf 'VISUAL_BASELINES_MODE=committed\nVERSION=%s\nCOMMIT=%s\nCOUNT=30\n' "$VE
 PK_URL="$BASE" PK_REPORT="$ROOT/documentation/browser-detection-v${VERSION}.json" bash "$ROOT/scripts/test-i18n-browser-detection.sh" > "$ROOT/documentation/browser-detection-v${VERSION}.log"
 PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_A11Y_REPORT="$ROOT/documentation/accessibility-v${VERSION}.json" node "$ROOT/scripts/test-accessibility.mjs" > "$ROOT/documentation/accessibility-v${VERSION}.log"
 PK_BASE="$BASE" PK_REPORT="$ROOT/documentation/i18n-fonts-v${VERSION}.json" node "$ROOT/scripts/test-i18n-fonts.mjs" > "$ROOT/documentation/i18n-fonts-v${VERSION}.log"
+ui_exit=0
+rm -rf "$ROOT/documentation/ui-v1.8"
+PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UI_OUT="$ROOT/documentation/ui-v1.8" node "$ROOT/scripts/test-ui-v1.8.mjs" > "$ROOT/documentation/ui-v1.8.log" 2>&1 || ui_exit=$?
 PK_SORT_REPORT="$ROOT/documentation/search-sorting-v${VERSION}.json" php "$ROOT/scripts/test-search-sorting.php" > "$ROOT/documentation/search-sorting-v${VERSION}.log"
 
 SECRET_B64="$(openssl rand -base64 32)"
@@ -82,7 +86,9 @@ bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/docume
 PK_WP_DIR="$RUNTIME" PK_MIN_LISTINGS=1000 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/scripts/provision-load-fixture.php" > "$ROOT/documentation/load-fixture-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_LOAD_REPORT="$ROOT/documentation/load-test-v${VERSION}.json" bash "$ROOT/scripts/load-test-http.sh" > "$ROOT/documentation/load-test-v${VERSION}.log"
 capacity_exit=0
-PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_CAPACITY_REPORT="$ROOT/documentation/capacity-envelope-v${VERSION}.json" python3 "$ROOT/scripts/test-capacity-envelope-v1.7.1.py" > "$ROOT/documentation/capacity-envelope-v${VERSION}.log" || capacity_exit=$?
+capacity_cgroup_path=""
+if [ -f "$REFERENCE_RUN_DIR/cgroup.path" ]; then capacity_cgroup_path="$(cat "$REFERENCE_RUN_DIR/cgroup.path")"; fi
+PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_CAPACITY_CGROUP_PATH="$capacity_cgroup_path" PK_CAPACITY_CGROUP_REQUIRED="1" PK_CAPACITY_REPORT="$ROOT/documentation/capacity-envelope-v${VERSION}.json" python3 "$ROOT/scripts/test-capacity-envelope-v1.7.1.py" > "$ROOT/documentation/capacity-envelope-v${VERSION}.log" || capacity_exit=$?
 upgrade_exit=0
 PK_WP_DIR="$RUNTIME" PK_DB_NAME="$DB_NAME" PK_DB_USER="$DB_USER" PK_DB_PASS="$DB_PASS" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UPGRADE_REPORT="$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" bash "$ROOT/scripts/test-upgrade-v1.7.1.sh" > "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.log" || upgrade_exit=$?
 # These reports are created after the first stamp; stamp them again so every
@@ -103,10 +109,14 @@ jq -e '.all_below_threshold == true and (.commit|test("^[0-9a-f]{40}$"))' "$ROOT
 jq -e '.acceptance.targets_scanned == 66 and .acceptance.raw_targets_scanned == 66 and .acceptance.blocking_findings == 0 and .acceptance.errors_count == 0 and (.acceptance.commit|test("^[0-9a-f]{40}$"))' "$ROOT/documentation/semgrep-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .after >= 1000' "$ROOT/documentation/load-fixture-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .metrics.errors == 0 and .metrics.p95_seconds <= 1.5 and .metrics.p99_seconds <= 3.0' "$ROOT/documentation/load-test-v${VERSION}.json" >/dev/null
+jq -e '.failed == 0 and .passed == .scenario_count' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
+jq -e '.image_dom_passed == .image_dom_total and .image_dom_total == .scenario_count' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
+jq -e '.link_crawl_passed == .link_crawl_total and .link_crawl_total == .scenario_count' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
+jq -e '.responsive_passed == .responsive_total and .responsive_total > 0' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
 jq -e '.status == "PASS" and .scale == 1 and ([.phases[] | select(.name == "sustained_read_10rps") | .target_rps == 10 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "burst_read_25rps") | .target_rps == 25 and .duration_seconds == 60] | any) and ([.phases[] | select(.name == "write_api_2rps") | .target_rps == 2 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "concurrent_sessions_50") | .target_concurrency == 50 and .status == "PASS"] | any)' "$ROOT/documentation/capacity-envelope-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .from_tag == "v6.17.16" and .to_version == "6.17.17" and ([.checks[] | select(.test_id == "UPGRADE-DATA-001" or .test_id == "UPGRADE-SETTINGS-001" or .test_id == "UPGRADE-IDEMPOTENT-001") | .status == "PASS"] | all)' "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" >/dev/null
-if [ "$capacity_exit" -ne 0 ] || [ "$upgrade_exit" -ne 0 ]; then
-  printf 'CAPACITY_EXIT=%s\nUPGRADE_EXIT=%s\n' "$capacity_exit" "$upgrade_exit" >&2
+if [ "$capacity_exit" -ne 0 ] || [ "$upgrade_exit" -ne 0 ] || [ "$ui_exit" -ne 0 ]; then
+  printf 'CAPACITY_EXIT=%s\nUPGRADE_EXIT=%s\nUI_V18_EXIT=%s\n' "$capacity_exit" "$upgrade_exit" "$ui_exit" >&2
   exit 1
 fi
 for report in "$ROOT"/documentation/*"v${VERSION}".json; do jq -e '(.commit|type) == "string" and (.commit|test("^[0-9a-f]{40}$"))' "$report" >/dev/null; done

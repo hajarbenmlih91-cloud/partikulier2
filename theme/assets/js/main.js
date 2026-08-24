@@ -37,8 +37,8 @@
 	var toggle = document.querySelector(".pk-nav-toggle");
 	var mobileMenu = document.getElementById("pk-mobile-menu");
 	if (toggle && mobileMenu) {
-		toggle.addEventListener("click", function () {
-			var open = !toggle.classList.toggle("pk-open");
+			toggle.addEventListener("click", function () {
+				var open = toggle.classList.toggle("pk-open");
 			if (open) {
 				mobileMenu.removeAttribute("hidden");
 			} else {
@@ -601,4 +601,42 @@
 			if (window.pkBindWishlist) window.pkBindWishlist();
 		})
 		.catch(showEmpty);
+}());
+
+
+/* Ultra-Premium v1.8 : filtres mobiles et sticky contextuel. */
+(function () {
+	"use strict";
+	var filterToggle = document.querySelector(".pk-filter-toggle");
+	var filterPanel = document.getElementById("pk-filters-panel");
+	if (filterToggle && filterPanel) {
+		function setFilters(open) {
+			filterPanel.classList.toggle("is-open", open);
+			filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+		}
+		setFilters(false);
+		filterToggle.addEventListener("click", function () {
+			setFilters(!filterPanel.classList.contains("is-open"));
+		});
+		document.addEventListener("keydown", function (event) {
+			if (event.key === "Escape") setFilters(false);
+		});
+	}
+
+	var actionBar = document.querySelector(".pk-mobile-action-bar");
+	if (!actionBar) return;
+	function updateKeyboardState() {
+		if (!window.visualViewport) return;
+		var viewport = window.visualViewport;
+		var keyboardLikelyOpen = window.innerHeight - viewport.height > 140;
+		actionBar.classList.toggle("is-keyboard-open", keyboardLikelyOpen);
+	}
+	if (window.visualViewport) {
+		window.visualViewport.addEventListener("resize", updateKeyboardState);
+		window.visualViewport.addEventListener("scroll", updateKeyboardState);
+	}
+	document.addEventListener("focusin", function (event) {
+		if (/^(INPUT|SELECT|TEXTAREA)$/.test(event.target.tagName)) updateKeyboardState();
+	});
+	updateKeyboardState();
 }());
