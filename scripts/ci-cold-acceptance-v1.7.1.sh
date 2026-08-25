@@ -13,7 +13,7 @@ trap cold_acceptance_err ERR
 VERSION="${PK_VERSION:-6.17.17}"
 PORT="${PK_PORT:-8090}"
 BASE="${PK_BASE:-http://localhost:${PORT}}"
-CI_COMMIT="${GITHUB_SHA:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}"
+CI_COMMIT="${PK_COMMIT:-${GITHUB_SHA:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}}"
 [[ "$CI_COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo "Commit CI invalide ou absent: $CI_COMMIT" >&2; exit 2; }
 RUNTIME="${PK_WP_DIR:-/tmp/partikulier-ci-wp-${VERSION}-${GITHUB_RUN_ID:-local}}"
 DB_NAME="${PK_DB_NAME:-partikulier_ci_${VERSION//./_}}"
