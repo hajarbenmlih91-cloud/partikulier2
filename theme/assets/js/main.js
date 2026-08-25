@@ -607,14 +607,18 @@
 /* Ultra-Premium v1.8 : filtres mobiles et sticky contextuel. */
 (function () {
 	"use strict";
-	var filterToggle = document.querySelector(".pk-filter-toggle");
-	var filterPanel = document.getElementById("pk-filters-panel");
-	if (filterToggle && filterPanel) {
-		function setFilters(open) {
-			filterPanel.classList.toggle("is-open", open);
-			filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-		}
-		setFilters(false);
+		var filterToggle = document.querySelector(".pk-filter-toggle");
+		var filterPanel = document.getElementById("pk-filters-panel");
+		var archiveSearch = document.querySelector(".pk-archive-search .pk-search-archive");
+		var archiveTrust = document.querySelector(".pk-archive-search .pk-archive-trust");
+		if (filterToggle && filterPanel) {
+			function setFilters(open) {
+				filterPanel.classList.toggle("is-open", open);
+				if (archiveSearch) archiveSearch.classList.toggle("is-mobile-filter-open", open);
+				if (archiveTrust) archiveTrust.classList.toggle("is-mobile-filter-open", open);
+				filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+			}
+			setFilters(filterToggle.getAttribute("aria-expanded") === "true");
 		filterToggle.addEventListener("click", function () {
 			setFilters(!filterPanel.classList.contains("is-open"));
 		});
