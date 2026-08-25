@@ -32,6 +32,9 @@ if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post
 	}
 }
 $pk_property_url = get_permalink( $property );
+if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
+	$pk_property_url = Partikulier_Listing_URLs::filter_link( $pk_property_url, $property );
+}
 
 			$price    = get_post_meta( $property->ID, 'es_property_price', true );
 		$surface  = get_post_meta( $property->ID, 'es_property_area', true );

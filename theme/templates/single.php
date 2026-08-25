@@ -107,7 +107,7 @@ while ( have_posts() ) :
 								<?php if ( $avif ) : ?>
 									<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" width="1600" height="900" loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
+								<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" width="1600" height="900" loading="eager" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
 							</picture>
 						<?php endif; ?>
 					<?php endforeach; ?>

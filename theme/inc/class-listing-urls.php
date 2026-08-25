@@ -286,6 +286,14 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 					$path_lang = isset( $fallback[1] ) ? sanitize_key( (string) $fallback[1] ) : '';
 					$raw_slug  = rawurldecode( (string) $fallback[2] );
 				}
+				if ( preg_match( '#^(?:(fr|en|ar)/)?location/([^/]+)/?$#', $request_path, $location_fallback ) ) {
+					$wp->query_vars['taxonomy'] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
+					$wp->query_vars['term']     = sanitize_title( rawurldecode( (string) $location_fallback[2] ) );
+					if ( ! empty( $location_fallback[1] ) ) {
+						$wp->query_vars['lang'] = sanitize_key( (string) $location_fallback[1] );
+					}
+					return;
+				}
 			}
 
 			$slug = $raw_slug ? sanitize_title( $raw_slug ) : '';
