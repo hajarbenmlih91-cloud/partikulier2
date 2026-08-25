@@ -212,8 +212,8 @@ class Partikulier_JSONLD {
 
 		return self::itemlist_from_posts(
 			sprintf( 'Annonces immobilières à %s', $term->name ),
-			get_term_link( $term ),
-			$posts
+				function_exists( 'pk_term_url' ) ? pk_term_url( $term ) : get_term_link( $term ),
+				$posts
 		);
 	}
 
@@ -330,14 +330,14 @@ class Partikulier_JSONLD {
 			$locations = wp_get_object_terms( $post->ID, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY, array( 'number' => 1 ) );
 			if ( $locations && ! is_wp_error( $locations ) ) {
 				$location = $locations[0];
-				$crumbs[] = array( 'name' => $location->name, 'url' => get_term_link( $location ) );
+					$crumbs[] = array( 'name' => $location->name, 'url' => function_exists( 'pk_term_url' ) ? pk_term_url( $location ) : get_term_link( $location ) );
 			}
 			$crumbs[] = array( 'name' => get_the_title( $post ), 'url' => get_permalink( $post ) );
 		} elseif ( is_tax() ) {
 			$term = get_queried_object();
 			$crumbs[] = array( 'name' => __( 'Annonces', 'partikulier' ), 'url' => pk_properties_archive_url() );
 			if ( $term instanceof WP_Term ) {
-				$crumbs[] = array( 'name' => $term->name, 'url' => get_term_link( $term ) );
+					$crumbs[] = array( 'name' => $term->name, 'url' => function_exists( 'pk_term_url' ) ? pk_term_url( $term ) : get_term_link( $term ) );
 			}
 		} elseif ( is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
 			$crumbs[] = array( 'name' => __( 'Annonces immobilières', 'partikulier' ), 'url' => pk_properties_archive_url() );

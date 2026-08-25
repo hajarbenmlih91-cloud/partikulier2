@@ -81,6 +81,15 @@ try {
         if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, new Promise((resolve) => setTimeout(resolve, 5000))]);
       });
       await page.waitForTimeout(250);
+      // Les fiches utilisent le lazy-loading ; faire défiler chaque image permet
+      // de vérifier aussi les médias hors écran, sans désactiver les contrôles
+      // `complete`, dimensions naturelles, ressource observée et statut HTTP.
+      const imageLocator = page.locator('img');
+      for (let imageIndex = 0; imageIndex < await imageLocator.count(); imageIndex += 1) {
+        await imageLocator.nth(imageIndex).scrollIntoViewIfNeeded().catch(() => {});
+      }
+      await page.evaluate(() => window.scrollTo(0, 0));
+      await page.waitForTimeout(300);
       finalUrl = page.url();
       const langDir = await page.locator('html').evaluate((html) => ({ lang: html.lang || '', dir: html.dir || '' }));
       const lang = langDir.lang.toLowerCase().split(/[-_]/)[0];
@@ -129,8 +138,11 @@ try {
           const root = document.documentElement;
           const cta = Array.from(document.querySelectorAll('.pk-card-cta, .pk-step-actions .pk-btn, .pk-mobile-action-bar .pk-btn')).map((el) => {
             const rect = el.getBoundingClientRect();
-            return { text: (el.textContent || '').trim(), left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height };
-          });
+            const style = window.getComputedStyle(el);
+            return { el, rect, style };
+          }).filter(({ rect, style }) => style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0).map(({ el, rect }) => ({
+            text: (el.textContent || '').trim(), left: rect.left, right: rect.right, top: rect.top, bottom: rect.bottom, width: rect.width, height: rect.height,
+          }));
           return { scroll_width: root.scrollWidth, client_width: root.clientWidth, horizontal_overflow: root.scrollWidth > root.clientWidth, cta };
         });
         responsive.push({ scenario_id: scenario.id, width, height: width === 320 ? 568 : width === 360 ? 740 : width === 375 ? 667 : 844, layout, valid: !layout.horizontal_overflow && layout.cta.every((item) => item.left >= -1 && item.right <= width + 1 && item.height >= 44) });

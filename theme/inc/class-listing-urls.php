@@ -214,7 +214,15 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 		}
 
 		$slug = self::clean_slug( $post->post_name );
-			return home_url( user_trailingslashit( $path . '/' . $slug ) );
+		$prefix = '';
+		if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
+			$language = sanitize_key( (string) pll_current_language( 'slug' ) );
+			if ( $language ) {
+				$prefix = trim( wp_parse_url( pll_home_url( $language ), PHP_URL_PATH ), '/' );
+				$prefix = $prefix ? $prefix . '/' : '';
+			}
+		}
+		return home_url( user_trailingslashit( $prefix . $path . '/' . $slug ) );
 	}
 
 	/**
@@ -326,6 +334,16 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 			// L’archive publique est francisée ; les anciennes URLs restent récupérables.
 			add_rewrite_rule( '^property/page/([0-9]+)/?$', 'index.php?post_type=' . $cpt . '&paged=$matches[1]', 'top' );
 			add_rewrite_rule( '^property/?$', 'index.php?post_type=' . $cpt, 'top' );
+
+			// Les archives et taxonomies doivent aussi être explicites : selon la
+			// version d’Estatik/Polylang, leurs règles natives ne sont pas toujours
+			// préfixées ou persistées dans une installation froide.
+			add_rewrite_rule( '^(fr|en|ar)/annonces/page/([0-9]+)/?$', 'index.php?post_type=' . $cpt . '&paged=$matches[2]&lang=$matches[1]', 'top' );
+			add_rewrite_rule( '^(fr|en|ar)/annonces/?$', 'index.php?post_type=' . $cpt . '&lang=$matches[1]', 'top' );
+			add_rewrite_rule( '^annonces/page/([0-9]+)/?$', 'index.php?post_type=' . $cpt . '&paged=$matches[1]', 'top' );
+			add_rewrite_rule( '^annonces/?$', 'index.php?post_type=' . $cpt, 'top' );
+			add_rewrite_rule( '^(fr|en|ar)/location/([^/]+)/?$', 'index.php?taxonomy=' . PARTIKULIER_ESTATIK_LOCATION_TAXONOMY . '&term=$matches[2]&lang=$matches[1]', 'top' );
+			add_rewrite_rule( '^location/([^/]+)/?$', 'index.php?taxonomy=' . PARTIKULIER_ESTATIK_LOCATION_TAXONOMY . '&term=$matches[1]', 'top' );
 
 			// Polylang ajoute le slug de langue devant les fiches non par defaut.
 			// Ces regles doivent preceder les regles sans prefixe : sans elles,

@@ -124,7 +124,7 @@ class Partikulier_Geo {
 		public static function city_link( $post_id ) {
 			$terms = get_the_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
 			if ( $terms && ! is_wp_error( $terms ) ) {
-				return get_term_link( $terms[0] );
+				return function_exists( 'pk_term_url' ) ? pk_term_url( $terms[0] ) : get_term_link( $terms[0] );
 			}
 			return pk_properties_archive_url();
 		}

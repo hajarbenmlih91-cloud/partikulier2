@@ -40,30 +40,16 @@ define( 'PARTIKULIER_ESTATIK_LOCATION_TAXONOMY', 'es_location' );
  * @return string
  */
 function pk_properties_archive_url() {
-	$url = get_post_type_archive_link( PARTIKULIER_ESTATIK_POST_TYPE );
-	if ( $url ) {
-		$parsed_host = wp_parse_url( $url, PHP_URL_HOST );
-		$invalid_host = in_array( $parsed_host, array( '0', '0.0.0.0', 'localhost' ), true );
-		if ( ! $invalid_host ) {
-			// Estatik/WordPress ne localise pas toujours le lien d’archive CPT.
-			// Avec Polylang en réécriture par répertoire, il faut conserver la langue
-			// de la page courante au lieu de renvoyer vers /annonces/ non localisé.
-			if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
-				$language = (string) pll_current_language( 'slug' );
-				if ( preg_match( '#^/' . preg_quote( $language, '#' ) . '/#', (string) wp_parse_url( $url, PHP_URL_PATH ) ) ) {
-					return $url;
-				}
-				if ( $language ) {
-					return trailingslashit( pll_home_url( $language ) ) . 'annonces/';
-				}
-			}
-			return $url;
+	// L’archive publique est un contrat du portail, pas un détail du slug
+	// retourné par Estatik. Construire cette URL explicitement évite les 404
+	// lorsque le plugin expose encore son ancien `/property/`.
+	if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
+		$language = sanitize_key( (string) pll_current_language( 'slug' ) );
+		if ( $language ) {
+			return trailingslashit( pll_home_url( $language ) ) . 'annonces/';
 		}
 	}
-
-	// Estatik peut exposer une archive invalide avant sa configuration publique.
-	// La page WordPress /annonces/ reste le repli SEO et Polylang la traduira si liée.
-	return pk_page_url( 'annonces', '/annonces/' );
+	return home_url( '/annonces/' );
 }
 
 /**
