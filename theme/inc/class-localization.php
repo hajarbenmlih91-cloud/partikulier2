@@ -300,17 +300,40 @@ class Partikulier_Localization {
 	 */
 			public static function translate_taxonomy_label( $label ) {
 			$map = array(
-				'A louer' => array( 'fr' => 'A louer', 'en' => 'For rent', 'ar' => 'للإيجار' ),
-				'A vendre' => array( 'fr' => 'A vendre', 'en' => 'For sale', 'ar' => 'للبيع' ),
-				'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
-				'Appartements' => array( 'fr' => 'Appartements', 'en' => 'Apartments', 'ar' => 'شقق' ),
-				'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
-				'Maisons' => array( 'fr' => 'Maisons', 'en' => 'Houses', 'ar' => 'منازل' ),
-				'Rabat' => array( 'fr' => 'Rabat', 'en' => 'Rabat', 'ar' => 'الرباط' ),
-				'Casablanca' => array( 'fr' => 'Casablanca', 'en' => 'Casablanca', 'ar' => 'الدار البيضاء' ),
+					'A louer' => array( 'fr' => 'A louer', 'en' => 'For rent', 'ar' => 'للإيجار' ),
+					'A vendre' => array( 'fr' => 'A vendre', 'en' => 'For sale', 'ar' => 'للبيع' ),
+					'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
+					'Appartements' => array( 'fr' => 'Appartements', 'en' => 'Apartments', 'ar' => 'شقق' ),
+					'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
+					'Maisons' => array( 'fr' => 'Maisons', 'en' => 'Houses', 'ar' => 'منازل' ),
+					'Villa' => array( 'fr' => 'Villa', 'en' => 'Villa', 'ar' => 'فيلا' ),
+					'Terrain' => array( 'fr' => 'Terrain', 'en' => 'Land', 'ar' => 'أرض' ),
+					'Parking' => array( 'fr' => 'Parking', 'en' => 'Parking', 'ar' => 'موقف سيارات' ),
+					'Immeuble' => array( 'fr' => 'Immeuble', 'en' => 'Building', 'ar' => 'عمارة' ),
+					'Local' => array( 'fr' => 'Local', 'en' => 'Commercial space', 'ar' => 'محل تجاري' ),
+					'Bureau' => array( 'fr' => 'Bureau', 'en' => 'Office', 'ar' => 'مكتب' ),
+					'Rabat' => array( 'fr' => 'Rabat', 'en' => 'Rabat', 'ar' => 'الرباط' ),
+					'Casablanca' => array( 'fr' => 'Casablanca', 'en' => 'Casablanca', 'ar' => 'الدار البيضاء' ),
+					'Marrakech' => array( 'fr' => 'Marrakech', 'en' => 'Marrakech', 'ar' => 'مراكش' ),
+					'Tanger' => array( 'fr' => 'Tanger', 'en' => 'Tangier', 'ar' => 'طنجة' ),
+					'Fès' => array( 'fr' => 'Fès', 'en' => 'Fez', 'ar' => 'فاس' ),
+					'Agadir' => array( 'fr' => 'Agadir', 'en' => 'Agadir', 'ar' => 'أكادير' ),
 			);
 			$language = self::current_language();
-			return isset( $map[ $label ][ $language ] ) ? $map[ $label ][ $language ] : $label;
+			if ( isset( $map[ $label ][ $language ] ) ) {
+				return $map[ $label ][ $language ];
+			}
+			if ( 'fr' !== $language && class_exists( 'Partikulier_Listing_I18n' ) ) {
+				$type_label = Partikulier_Listing_I18n::localized_type( $label, $language );
+				if ( $type_label !== $label ) {
+					return $type_label;
+				}
+				$place_label = Partikulier_Listing_I18n::localized_place( $label, $language );
+				if ( $place_label !== $label ) {
+					return $place_label;
+				}
+			}
+			return $label;
 		}
 
 		public static function translate_public_string( $string ) {

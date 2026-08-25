@@ -122,6 +122,10 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 			?>
 				<div class="pk-archive-layout">
 						<aside class="pk-filters" aria-label="<?php echo esc_attr( $pk_filters_label ); ?>">
+							<div class="pk-filters-heading">
+								<h2><?php echo esc_html( $pk_filters_label ); ?></h2>
+								<span><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Affiner la recherche', 'Affiner la recherche', 'partikulier' ) ); ?></span>
+							</div>
 						<button type="button" class="pk-filter-toggle" aria-expanded="<?php echo $pk_active_filters ? 'true' : 'false'; ?>" aria-controls="pk-filters-panel">
 							<span><?php echo esc_html( $pk_filters_label ); ?></span>
 							<span class="pk-filter-toggle-meta"><span class="pk-filter-count"><?php echo esc_html( $pk_active_filters ); ?></span> <?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Filtres actifs', 'Filtres actifs', 'partikulier' ) ); ?></span>
@@ -141,7 +145,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 							printf(
 								'<li><a href="%1$s"%3$s>%2$s <span class="pk-filter-count">(%4$s)</span></a></li>',
 								esc_url( pk_term_url( $term ) ),
-								esc_html( $term->name ),
+								esc_html( Partikulier_Localization::translate_taxonomy_label( $term->name ) ),
 								$active,
 								esc_html( number_format_i18n( $term->count ) )
 							);
@@ -162,7 +166,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 							printf(
 								'<li><a href="%1$s"%3$s>%2$s <span class="pk-filter-count">(%4$s)</span></a></li>',
 								esc_url( pk_term_url( $term ) ),
-								esc_html( $term->name ),
+								esc_html( Partikulier_Localization::translate_taxonomy_label( $term->name ) ),
 								$active,
 								esc_html( number_format_i18n( $term->count ) )
 							);
@@ -192,7 +196,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 							printf(
 								'<li><a href="%1$s">%2$s <span class="pk-filter-count">(%3$s)</span></a></li>',
 								esc_url( pk_term_url( $city ) ),
-								esc_html( $city->name ),
+								esc_html( class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::localized_place( $city->name ) : $city->name ),
 								esc_html( number_format_i18n( $city->count ) )
 							);
 						}

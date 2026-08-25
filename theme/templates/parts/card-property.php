@@ -31,6 +31,8 @@ if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post
 		}
 	}
 }
+$pk_language = function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : 'fr';
+$pk_display_title = class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::title_from_post( $property, $pk_language ) : get_the_title( $property );
 $pk_property_url = get_permalink( $property );
 if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
 	$pk_property_url = Partikulier_Listing_URLs::filter_link( $pk_property_url, $property );
@@ -38,9 +40,15 @@ if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
 
 			$price    = get_post_meta( $property->ID, 'es_property_price', true );
 		$surface  = get_post_meta( $property->ID, 'es_property_area', true );
-	$bedrooms = get_post_meta( $property->ID, '_pk_bedrooms_label', true );
-	$living_rooms = get_post_meta( $property->ID, '_pk_living_rooms_label', true );
-	$bathrooms = get_post_meta( $property->ID, '_pk_bathrooms_label', true );
+		$bedrooms = get_post_meta( $property->ID, '_pk_bedrooms_label', true );
+		if ( '' === $bedrooms ) {
+			$bedrooms = get_post_meta( $property->ID, 'es_property_bedrooms', true ) ?: get_post_meta( $property->ID, 'es_bedrooms', true );
+		}
+		$living_rooms = get_post_meta( $property->ID, '_pk_living_rooms_label', true );
+		$bathrooms = get_post_meta( $property->ID, '_pk_bathrooms_label', true );
+		if ( '' === $bathrooms ) {
+			$bathrooms = get_post_meta( $property->ID, 'es_property_bathrooms', true ) ?: get_post_meta( $property->ID, 'es_bathrooms', true );
+		}
 	$terrace = get_post_meta( $property->ID, '_pk_terrace', true );
 	$terrace_surface = get_post_meta( $property->ID, '_pk_terrace_surface', true );
 			if ( '' !== $bedrooms ) {
@@ -69,14 +77,21 @@ if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
 				$label = ( 1 === (int) $bathrooms ) ? Partikulier_Localization::translate_polylang_string( '1 salle de bains', '1 salle de bains', 'partikulier' ) : Partikulier_Localization::translate_polylang_string( '2 salles de bains', '2 salles de bains', 'partikulier' );
 				$bathrooms = class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( $label, $label, 'partikulier' ) : esc_html__( $label, 'partikulier' );
 			}
-		$composition = implode( ' · ', array_filter( array( $bedrooms, $living_rooms ) ) );
-		$terrace_label = 'Oui' === $terrace ? Partikulier_Localization::translate_polylang_string( 'Terrasse', 'Terrasse', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' ' . Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) : '' ) : '';
-$location = Partikulier_Geo::location_string( $property->ID );
+					$composition = implode( ' · ', array_filter( array( $bedrooms, $living_rooms ) ) );
+			if ( class_exists( 'Partikulier_Listing_I18n' ) ) {
+				$pk_rooms_label = Partikulier_Listing_I18n::rooms_label_from_post( $property, $pk_language );
+				if ( $pk_rooms_label ) {
+					$composition = $pk_rooms_label;
+				}
+			}
+			$terrace_label = 'Oui' === $terrace ? Partikulier_Localization::translate_polylang_string( 'Terrasse', 'Terrasse', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' ' . Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) : '' ) : '';
+	$location = Partikulier_Geo::location_string( $property->ID, $pk_language );
 
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query amorce par update_post_term_cache.
 	$types   = get_the_terms( $property->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
 	$actions = get_the_terms( $property->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
 	$type    = ( ! is_wp_error( $types ) && $types ) ? $types[0]->name : __( 'Bien', 'partikulier' );
+	$type    = class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::localized_type( $type, $pk_language ) : $type;
 	$action  = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
 
 $thumb_id   = get_post_thumbnail_id( $property );
@@ -114,7 +129,7 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 					<?php if ( $avif ) : ?>
 						<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 					<?php endif; ?>
-					<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( get_the_title( $property ) ); ?>" loading="eager" decoding="async" fetchpriority="<?php echo $property === get_queried_object() ? 'high' : 'low'; ?>">
+					<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( $pk_display_title ); ?>" loading="eager" decoding="async" fetchpriority="<?php echo $property === get_queried_object() ? 'high' : 'low'; ?>">
 				</picture>
 				<?php
 			}
@@ -146,7 +161,7 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 	<div class="pk-card-body">
 		<h3 class="pk-card-title">
 			<a href="<?php echo esc_url( $pk_property_url ); ?>" itemprop="url">
-				<span itemprop="name"><?php echo esc_html( get_the_title( $property ) ); ?></span>
+				<span itemprop="name"><?php echo esc_html( $pk_display_title ); ?></span>
 			</a>
 		</h3>
 		<?php
@@ -170,8 +185,8 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 				</div>
 			<?php endif; ?>
 			<?php if ( $composition ) : ?>
-				<div class="pk-card-meta-item">
-					<dt class="screen-reader-text"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Composition', 'Composition', 'partikulier' ) ); ?></dt>
+					<div class="pk-card-meta-item pk-card-meta-item--rooms">
+						<dt class="screen-reader-text"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Composition', 'Composition', 'partikulier' ) ); ?></dt>
 					<dd><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6"/><path d="M3 18h18"/><path d="M7 10V7a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v3"/></svg><span><?php echo esc_html( $composition ); ?></span></dd>
 				</div>
 			<?php endif; ?>

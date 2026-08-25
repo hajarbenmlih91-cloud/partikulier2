@@ -108,15 +108,29 @@ class Partikulier_Geo {
 	/**
 	 * Localisation lisible d'une annonce : "Rue X, Quartier Y, Ville, Region".
 	 */
-		public static function location_string( $post_id ) {
-			$parts = array();
-			// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
-			$terms = get_the_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
-			if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
-				$parts = wp_list_pluck( $terms, 'name' );
+	public static function location_string( $post_id, $lang = '' ) {
+		$parts = array();
+		$lang  = $lang ? $lang : ( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' );
+		// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
+		$terms = get_the_terms( $post_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+		if ( ! is_wp_error( $terms ) && ! empty( $terms ) ) {
+			foreach ( $terms as $term ) {
+				$name = $term->name;
+				if ( 'fr' !== $lang && function_exists( 'pll_get_term' ) ) {
+					$translated_id = (int) pll_get_term( $term->term_id, $lang );
+					$translated    = $translated_id ? get_term( $translated_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) : false;
+					if ( $translated && ! is_wp_error( $translated ) ) {
+						$name = $translated->name;
+					}
+				}
+				if ( class_exists( 'Partikulier_Listing_I18n' ) ) {
+					$name = Partikulier_Listing_I18n::localized_place( $name, $lang );
+				}
+				$parts[] = $name;
 			}
-			return implode( ', ', array_unique( $parts ) );
 		}
+		return implode( 'ar' === $lang ? '، ' : ', ', array_unique( array_filter( $parts ) ) );
+	}
 
 	/**
 	 * URL de la ville d'une annonce (pour le bouton "Voir les annonces de cette ville").

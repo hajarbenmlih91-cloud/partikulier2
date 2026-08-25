@@ -32,7 +32,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 	<div class="pk-search-field pk-search-type">
 		<label class="pk-search-label" for="pk-s-action"><?php esc_html_e( 'Achat ou location', 'partikulier' ); ?></label>
 		<select name="es_action" id="pk-s-action">
-			<option value=""><?php esc_html_e( 'Tout', 'partikulier' ); ?></option>
+			<option value=""><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Tout', 'Tout', 'partikulier' ) ); ?></option>
 				<?php foreach ( (array) $actions as $term ) : ?>
 					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
 					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
@@ -43,7 +43,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 	<div class="pk-search-field pk-search-type">
 		<label class="pk-search-label" for="pk-s-type"><?php esc_html_e( 'Type de bien', 'partikulier' ); ?></label>
 		<select name="es_type" id="pk-s-type">
-			<option value=""><?php esc_html_e( 'Tous', 'partikulier' ); ?></option>
+			<option value=""><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Tous', 'Tous', 'partikulier' ) ); ?></option>
 				<?php foreach ( (array) $types as $term ) : ?>
 					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
 					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
@@ -54,7 +54,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 	<div class="pk-search-field pk-search-city">
 		<label class="pk-search-label" for="pk-s-city"><?php esc_html_e( 'Ville', 'partikulier' ); ?></label>
 		<select name="es_city" id="pk-s-city">
-			<option value=""><?php esc_html_e( 'Toutes les villes', 'partikulier' ); ?></option>
+			<option value=""><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Toutes les villes', 'Toutes les villes', 'partikulier' ) ); ?></option>
 				<?php foreach ( (array) $cities as $term ) : ?>
 					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
 					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
@@ -65,7 +65,7 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 	<div class="pk-search-field pk-search-budget">
 		<label class="pk-search-label" for="pk-s-budget"><?php esc_html_e( 'Budget max', 'partikulier' ); ?></label>
 		<select name="es_price_max" id="pk-s-budget">
-			<option value=""><?php esc_html_e( 'Illimité', 'partikulier' ); ?></option>
+			<option value=""><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Illimité', 'Illimité', 'partikulier' ) ); ?></option>
 				<?php foreach ( array( 100000, 200000, 300000, 400000, 500000, 750000, 1000000, 1500000 ) as $b ) : ?>
 					<option value="<?php echo esc_attr( $b ); ?>"><?php echo esc_html( number_format_i18n( $b ) ) . ' MAD'; ?></option>
 				<?php endforeach; ?>
