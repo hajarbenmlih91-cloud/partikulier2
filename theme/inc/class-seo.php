@@ -132,7 +132,7 @@ class Partikulier_SEO {
 				if ( count( $existing ) > 1 ) {
 					$default = function_exists( 'pll_default_language' ) ? pll_default_language() : 'fr';
 					if ( ! empty( $existing[ $default ] ) && 'publish' === get_post_status( $existing[ $default ] ) ) {
-						printf( '<link rel="alternate" hreflang="x-default" href="%s">%s', esc_url( get_permalink( $existing[ $default ] ) ), "\\n" );
+						printf( '<link rel="alternate" hreflang="x-default" href="%s">%s', esc_url( get_permalink( $existing[ $default ] ) ), "\n" );
 					}
 					return;
 				}

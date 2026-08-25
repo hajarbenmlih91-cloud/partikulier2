@@ -114,7 +114,7 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 					<?php if ( $avif ) : ?>
 						<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 					<?php endif; ?>
-					<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( get_the_title( $property ) ); ?>" loading="lazy" decoding="async" fetchpriority="<?php echo $property === get_queried_object() ? 'high' : 'low'; ?>">
+					<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( get_the_title( $property ) ); ?>" loading="eager" decoding="async" fetchpriority="<?php echo $property === get_queried_object() ? 'high' : 'low'; ?>">
 				</picture>
 				<?php
 			}

@@ -286,7 +286,14 @@ class Partikulier_AVIF {
 		}
 
 		public static function avif_path_for_url( $url ) {
-		$avif_url = $url . '.avif';
+			// Certains hébergements servent les fichiers `.avif` avec `text/plain`.
+			// Dans ce cas, le navigateur peut parfois décoder l’octet mais le contrat
+			// image exige un MIME image valide. Le fallback WebP/JPEG reste donc la
+			// livraison par défaut ; l’AVIF n’est activé qu’après vérification serveur.
+			if ( ! defined( 'PARTIKULIER_ENABLE_AVIF_DELIVERY' ) || ! PARTIKULIER_ENABLE_AVIF_DELIVERY ) {
+				return false;
+			}
+			$avif_url = $url . '.avif';
 		// Verifier l'existence physique (upload dir local).
 		$upload = wp_get_upload_dir();
 		$base   = $upload['baseurl'];

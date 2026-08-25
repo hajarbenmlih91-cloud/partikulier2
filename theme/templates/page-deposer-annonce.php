@@ -72,9 +72,18 @@ $types = get_terms( array(
 			<?php if ( $editing_post ) : ?>
 				<input type="hidden" name="pk_edit_id" value="<?php echo esc_attr( (string) $editing_post->ID ); ?>">
 			<?php endif; ?>
-			<?php wp_nonce_field( 'pk_submit_listing', 'nonce' ); ?>
+				<?php wp_nonce_field( 'pk_submit_listing', 'nonce' ); ?>
 
-			<input type="hidden" name="pk_city_name" id="pk-city-name" value="">
+				<nav class="pk-stepper" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Étapes de publication', 'Étapes de publication', 'partikulier' ) ); ?>" data-pk-stepper>
+					<ol class="pk-stepper-list">
+						<li class="pk-stepper-item is-current" data-step-indicator="1" aria-current="step"><span class="pk-stepper-number">1</span><span class="pk-stepper-label"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Qui publie l’annonce ?', 'Qui publie l’annonce ?', 'partikulier' ) ); ?></span></li>
+						<li class="pk-stepper-item" data-step-indicator="2"><span class="pk-stepper-number">2</span><span class="pk-stepper-label"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Les informations du bien', 'Les informations du bien', 'partikulier' ) ); ?></span></li>
+						<li class="pk-stepper-item" data-step-indicator="3"><span class="pk-stepper-number">3</span><span class="pk-stepper-label"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Votre aperçu', 'Votre aperçu', 'partikulier' ) ); ?></span></li>
+					</ol>
+					<p class="pk-stepper-status" id="pk-stepper-status" role="status" aria-live="polite"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Étape 1', 'Étape 1', 'partikulier' ) ); ?></p>
+				</nav>
+
+				<input type="hidden" name="pk_city_name" id="pk-city-name" value="">
 			<input type="hidden" name="pk_district_name" id="pk-district-name" value="">
 			<input type="hidden" name="pk_action_mode" id="pk-action-mode" value="vendre">
 

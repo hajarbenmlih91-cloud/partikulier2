@@ -122,7 +122,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 			?>
 			<button type="button" class="pk-filter-toggle" aria-expanded="<?php echo $pk_active_filters ? 'true' : 'false'; ?>" aria-controls="pk-filters-panel">
 				<span><?php echo esc_html( $pk_filters_label ); ?></span>
-				<span class="pk-filter-toggle-meta"><span class="pk-filter-count"><?php echo esc_html( $pk_active_filters ); ?></span> <?php esc_html_e( 'actifs', 'partikulier' ); ?></span>
+				<span class="pk-filter-toggle-meta"><span class="pk-filter-count"><?php echo esc_html( $pk_active_filters ); ?></span> <?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Filtres actifs', 'Filtres actifs', 'partikulier' ) ); ?></span>
 				<span class="pk-filter-toggle-icon" aria-hidden="true">+</span>
 			</button>
 			<div class="pk-archive-layout">
