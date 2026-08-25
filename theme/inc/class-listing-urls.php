@@ -41,8 +41,9 @@ class Partikulier_Listing_URLs {
 add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 			add_action( 'parse_request', array( __CLASS__, 'resolve_geo_request' ), 2 );
 				add_filter( 'query_vars', array( __CLASS__, 'query_vars' ) );
-				add_action( 'pre_get_posts', array( __CLASS__, 'filter_city_query' ) );
-			add_action( 'template_redirect', array( __CLASS__, 'redirect_legacy' ), 1 );
+					add_action( 'pre_get_posts', array( __CLASS__, 'filter_city_query' ) );
+					add_filter( 'posts_clauses', array( __CLASS__, 'filter_city_clauses' ), 999, 2 );
+				add_action( 'template_redirect', array( __CLASS__, 'redirect_legacy' ), 1 );
 
 		// La geographie est figee a l'enregistrement : une URL ne doit pas
 		// changer parce qu'un terme a ete renomme trois mois plus tard.
@@ -289,7 +290,15 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 				if ( ! $term || is_wp_error( $term ) ) {
 					return;
 				}
-				$tax_query = (array) $query->get( 'tax_query' );
+				$existing_tax_query = $query->get( 'tax_query' );
+				if ( $existing_tax_query instanceof WP_Tax_Query ) {
+					$tax_query = $existing_tax_query->queries;
+					if ( ! empty( $existing_tax_query->relation ) ) {
+						$tax_query['relation'] = $existing_tax_query->relation;
+					}
+				} else {
+					$tax_query = (array) $existing_tax_query;
+				}
 				$tax_query[] = array(
 					'taxonomy' => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
 					'field'    => 'term_id',
@@ -298,7 +307,46 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 				$query->set( 'tax_query', $tax_query );
 			}
 
-		/** Résout le slug géographique en ID après le parsing WordPress. */
+			/**
+			 * Applique le filtre ville au niveau SQL après les extensions qui
+			 * reconstruisent la tax_query dans pre_get_posts.
+			 *
+			 * @param array    $clauses Clauses SQL WordPress.
+			 * @param WP_Query $query   Requête courante.
+			 * @return array
+			 */
+			public static function filter_city_clauses( $clauses, $query ) {
+				if ( is_admin() || ! $query->is_main_query() || $query->is_singular() ) {
+					return $clauses;
+				}
+				$post_type = $query->get( 'post_type' );
+				if ( PARTIKULIER_ESTATIK_POST_TYPE !== $post_type && ( ! is_array( $post_type ) || ! in_array( PARTIKULIER_ESTATIK_POST_TYPE, $post_type, true ) ) && ! $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
+					return $clauses;
+				}
+				$city_slug = sanitize_title( (string) ( $query->get( 'pk_city_slug' ) ?: $query->get( 'location' ) ) );
+				if ( '' === $city_slug && ! empty( $_GET['location'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					$city_slug = sanitize_title( wp_unslash( $_GET['location'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				}
+				if ( '' === $city_slug ) {
+					return $clauses;
+				}
+				global $wpdb;
+				$term = $wpdb->get_row( $wpdb->prepare(
+					'SELECT t.term_id, tt.term_taxonomy_id FROM ' . $wpdb->terms . ' AS t INNER JOIN ' . $wpdb->term_taxonomy . ' AS tt ON tt.term_id = t.term_id WHERE t.slug = %s AND tt.taxonomy = %s LIMIT 1',
+					$city_slug,
+					PARTIKULIER_ESTATIK_LOCATION_TAXONOMY
+				) );
+				if ( ! $term ) {
+					return $clauses;
+				}
+				if ( false === strpos( $clauses['join'], 'pk_city_filter_rel' ) ) {
+					$clauses['join'] .= ' INNER JOIN ' . $wpdb->term_relationships . ' AS pk_city_filter_rel ON (' . $wpdb->posts . '.ID = pk_city_filter_rel.object_id)';
+				}
+				$clauses['where'] .= $wpdb->prepare( ' AND pk_city_filter_rel.term_taxonomy_id = %d', (int) $term->term_taxonomy_id );
+				return $clauses;
+			}
+
+			/** Résout le slug géographique en ID après le parsing WordPress. */
 		public static function resolve_geo_request( $wp ) {
 			$raw_slug = isset( $wp->query_vars['pk_listing_slug'] ) ? rawurldecode( (string) $wp->query_vars['pk_listing_slug'] ) : '';
 			$path_lang = '';
