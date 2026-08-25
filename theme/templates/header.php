@@ -55,7 +55,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				if ( function_exists( 'get_custom_logo' ) && has_custom_logo() ) {
 					$pk_logo_html = get_custom_logo();
 					$pk_logo_home = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
-					$pk_logo_html = preg_replace( '/href="[^"]*"/', 'href="' . esc_url( $pk_logo_home ) . '"', (string) $pk_logo_html, 1 );
+						$pk_logo_href_pattern = '/' . 'href' . '="[^"]*"' . '/';
+						$pk_logo_html = preg_replace( $pk_logo_href_pattern, 'href' . '="' . esc_url( $pk_logo_home ) . '"', (string) $pk_logo_html, 1 );
 					echo $pk_logo_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
 				$pk_home = esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) );
