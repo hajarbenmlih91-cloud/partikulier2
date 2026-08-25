@@ -2790,3 +2790,31 @@ html[dir='rtl'] .pk-editorial-hero__intro {
 
 /* Language dropdown must remain above the contextual navigation bar. */
 .pk-lang-menu { z-index: 1200; }
+
+
+/* Archive filter hierarchy: desktop keeps all filters in editorial order;
+   mobile puts listings first and leaves only budget + popular cities. */
+@media (min-width: 768px) {
+	.pk-filters-panel {
+		display: flex !important;
+		flex-direction: column;
+	}
+	.pk-filters-panel > .screen-reader-text { order: 0; }
+	.pk-filters-panel > .pk-filter-actions { order: 1; }
+	.pk-filters-panel > .pk-filter-types { order: 2; }
+	.pk-filters-panel > .pk-filter-budget { order: 3; }
+	.pk-filters-panel > .pk-filter-popular-cities { order: 4; }
+}
+
+@media (max-width: 767px) {
+	.pk-archive-layout {
+		display: flex;
+		flex-direction: column;
+	}
+	.pk-archive-content { order: 1; }
+	.pk-filters { order: 2; }
+	.pk-filters-panel > .pk-filter-actions,
+	.pk-filters-panel > .pk-filter-types { display: none !important; }
+	.pk-filters-panel > .pk-filter-budget { order: 1; }
+	.pk-filters-panel > .pk-filter-popular-cities { order: 2; }
+}
