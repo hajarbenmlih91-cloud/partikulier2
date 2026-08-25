@@ -40,7 +40,8 @@ class Partikulier_Listing_URLs {
 		add_filter( 'post_type_link', array( __CLASS__, 'filter_link' ), 10, 2 );
 add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 			add_action( 'parse_request', array( __CLASS__, 'resolve_geo_request' ), 2 );
-			add_filter( 'query_vars', array( __CLASS__, 'query_vars' ) );
+				add_filter( 'query_vars', array( __CLASS__, 'query_vars' ) );
+				add_action( 'pre_get_posts', array( __CLASS__, 'filter_city_query' ) );
 			add_action( 'template_redirect', array( __CLASS__, 'redirect_legacy' ), 1 );
 
 		// La geographie est figee a l'enregistrement : une URL ne doit pas
@@ -268,9 +269,33 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 		 * localisées contenant directement `name=`.
 		 */
 		public static function query_vars( $vars ) {
-			$vars[] = 'pk_listing_slug';
-			return $vars;
-		}
+					$vars[] = 'pk_listing_slug';
+					$vars[] = 'pk_city_slug';
+					$vars[] = 'location';
+				return $vars;
+			}
+
+			/** Filtre l’archive publique sur la ville demandée par sa taxonomie. */
+			public static function filter_city_query( $query ) {
+				if ( is_admin() || ! $query->is_main_query() ) {
+					return;
+				}
+				$city_slug = sanitize_title( (string) ( $query->get( 'pk_city_slug' ) ?: $query->get( 'location' ) ) );
+				if ( ! $city_slug || PARTIKULIER_ESTATIK_POST_TYPE !== $query->get( 'post_type' ) ) {
+					return;
+				}
+				$term = get_term_by( 'slug', $city_slug, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+				if ( ! $term || is_wp_error( $term ) ) {
+					return;
+				}
+				$tax_query = (array) $query->get( 'tax_query' );
+				$tax_query[] = array(
+					'taxonomy' => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
+					'field'    => 'term_id',
+					'terms'    => array( (int) $term->term_id ),
+				);
+				$query->set( 'tax_query', $tax_query );
+			}
 
 		/** Résout le slug géographique en ID après le parsing WordPress. */
 		public static function resolve_geo_request( $wp ) {
@@ -287,8 +312,7 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 					$raw_slug  = rawurldecode( (string) $fallback[2] );
 				}
 				if ( preg_match( '#^(?:(fr|en|ar)/)?location/([^/]+)/?$#', $request_path, $location_fallback ) ) {
-					$wp->query_vars['taxonomy'] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
-					$wp->query_vars['term']     = sanitize_title( rawurldecode( (string) $location_fallback[2] ) );
+					$wp->query_vars['pk_city_slug'] = sanitize_title( rawurldecode( (string) $location_fallback[2] ) );
 					if ( ! empty( $location_fallback[1] ) ) {
 						$wp->query_vars['lang'] = sanitize_key( (string) $location_fallback[1] );
 					}
@@ -350,8 +374,8 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 			add_rewrite_rule( '^(fr|en|ar)/annonces/?$', 'index.php?post_type=' . $cpt . '&lang=$matches[1]', 'top' );
 			add_rewrite_rule( '^annonces/page/([0-9]+)/?$', 'index.php?post_type=' . $cpt . '&paged=$matches[1]', 'top' );
 			add_rewrite_rule( '^annonces/?$', 'index.php?post_type=' . $cpt, 'top' );
-			add_rewrite_rule( '^(fr|en|ar)/location/([^/]+)/?$', 'index.php?taxonomy=' . PARTIKULIER_ESTATIK_LOCATION_TAXONOMY . '&term=$matches[2]&lang=$matches[1]', 'top' );
-			add_rewrite_rule( '^location/([^/]+)/?$', 'index.php?taxonomy=' . PARTIKULIER_ESTATIK_LOCATION_TAXONOMY . '&term=$matches[1]', 'top' );
+			add_rewrite_rule( '^(fr|en|ar)/location/([^/]+)/?$', 'index.php?post_type=' . $cpt . '&pk_city_slug=$matches[2]&lang=$matches[1]', 'top' );
+				add_rewrite_rule( '^location/([^/]+)/?$', 'index.php?post_type=' . $cpt . '&pk_city_slug=$matches[1]', 'top' );
 
 			// Polylang ajoute le slug de langue devant les fiches non par defaut.
 			// Ces regles doivent preceder les regles sans prefixe : sans elles,
@@ -462,8 +486,9 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 			return;
 		}
 
-		$current = wp_parse_url( home_url( add_query_arg( array() ) ), PHP_URL_PATH );
-		$wanted  = wp_parse_url( $target, PHP_URL_PATH );
+			$current = wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' ), PHP_URL_PATH );
+			$target  = self::filter_link( $target, get_post( $post_id ) );
+			$wanted  = wp_parse_url( $target, PHP_URL_PATH );
 
 		if ( ! $current || ! $wanted ) {
 			return;

@@ -91,8 +91,12 @@ function pk_get_template( $slug ) {
  * fatale sous PHP 8 : ltrim() n'accepte pas un WP_Error.
  */
 if ( ! function_exists( 'pk_term_url' ) ) {
-		function pk_term_url( $term, $fallback = '' ) {
-			$link = get_term_link( $term );
+			function pk_term_url( $term, $fallback = '' ) {
+				if ( is_object( $term ) && isset( $term->taxonomy ) && PARTIKULIER_ESTATIK_LOCATION_TAXONOMY === $term->taxonomy ) {
+					$archive = function_exists( 'pk_properties_archive_url' ) ? pk_properties_archive_url() : home_url( '/' );
+					return add_query_arg( 'location', sanitize_title( (string) $term->slug ), $archive );
+				}
+				$link = get_term_link( $term );
 			if ( is_wp_error( $link ) || ! is_string( $link ) ) {
 				return $fallback ? $fallback : home_url( '/' );
 			}
