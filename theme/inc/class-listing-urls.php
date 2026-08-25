@@ -281,7 +281,8 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 					return;
 				}
 				$city_slug = sanitize_title( (string) ( $query->get( 'pk_city_slug' ) ?: $query->get( 'location' ) ) );
-				if ( ! $city_slug || PARTIKULIER_ESTATIK_POST_TYPE !== $query->get( 'post_type' ) ) {
+				$post_types = (array) $query->get( 'post_type' );
+				if ( ! $city_slug || ! in_array( PARTIKULIER_ESTATIK_POST_TYPE, $post_types, true ) ) {
 					return;
 				}
 				$term = get_term_by( 'slug', $city_slug, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
