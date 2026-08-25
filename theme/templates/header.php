@@ -158,34 +158,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-			<nav class="pk-mobile-primary-nav" aria-label="<?php esc_attr_e( 'Navigation mobile', 'partikulier' ); ?>">
-			<a href="<?php echo esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) ); ?>">
-				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Accueil', 'Home', 'partikulier' ) ); ?>
-			</a>
-			<a href="<?php echo esc_url( pk_properties_archive_url() ); ?>">
-				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Annonces', 'Listings', 'partikulier' ) ); ?>
-			</a>
-			<a href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>">
-				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Déposer une annonce', 'Post a listing', 'partikulier' ) ); ?>
-			</a>
-		</nav>
 
 
-
-	<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
-		<div class="pk-container">
-			<?php
-			wp_nav_menu( array(
-				'theme_location' => 'main',
-				'container'      => false,
-				'menu_class'     => 'pk-menu',
-				'depth'          => 2,
-				'fallback_cb'    => array( 'Partikulier_Header', 'fallback_menu' ),
-				'walker'         => new Partikulier_Menu_Walker(),
-			) );
-			?>
-			</div>
-		</nav>
 
 		<div class="pk-mobile-menu" id="pk-mobile-menu" hidden>
 		<?php
@@ -200,5 +174,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</div>
 
 	</header>
+
+<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
+	<div class="pk-container">
+		<?php
+		wp_nav_menu( array(
+			'theme_location' => 'main',
+			'container'      => false,
+			'menu_class'     => 'pk-menu',
+			'depth'          => 2,
+			'fallback_cb'    => array( 'Partikulier_Header', 'fallback_menu' ),
+			'walker'         => new Partikulier_Menu_Walker(),
+		) );
+		?>
+	</div>
+</nav>
 
 <main id="main-content" class="pk-main">
