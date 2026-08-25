@@ -123,8 +123,27 @@ class Partikulier_Search_Filters {
 				continue;
 			}
 
-			// Le formulaire envoie un slug ; Estatik peut envoyer un term ID.
-			$is_id = ctype_digit( $raw );
+				// Le formulaire utilise des slugs stables pour les actions. Si Estatik a un
+				// libelle different, retrouver son vrai terme avant de construire la tax_query.
+				if ( 'es_action' === $param && in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
+					$needles = 'a-louer' === $raw ? array( 'louer', 'location', 'rent' ) : array( 'vend', 'vente', 'sale' );
+					$action_terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
+					if ( ! is_wp_error( $action_terms ) ) {
+						foreach ( $action_terms as $action_term ) {
+							$action_name = function_exists( 'remove_accents' ) ? remove_accents( $action_term->name ) : $action_term->name;
+							$action_name = function_exists( 'mb_strtolower' ) ? mb_strtolower( $action_name ) : strtolower( $action_name );
+							foreach ( $needles as $needle ) {
+								if ( false !== strpos( $action_name, $needle ) ) {
+									$raw = $action_term->slug;
+									break 2;
+								}
+							}
+						}
+					}
+				}
+
+				// Le formulaire envoie un slug ; Estatik peut envoyer un term ID.
+				$is_id = ctype_digit( $raw );
 			$term  = $is_id
 				? get_term( (int) $raw, $taxonomy )
 				: get_term_by( 'slug', $raw, $taxonomy );
