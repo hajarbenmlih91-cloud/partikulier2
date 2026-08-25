@@ -2668,3 +2668,71 @@ html[dir="rtl"] .pk-card-price {
 	.pk-grid.pk-grid-cards,
 	.pk-grid.pk-grid-cards.pk-grid-list { grid-template-columns: minmax(0, 1fr); }
 }
+
+
+/* CDC v1.8 — arabe : hero mobile lisible et non encombré.
+   La typographie latine du hero (tracking négatif + accent Georgia italique)
+   est inadaptée aux glyphes arabes et provoquait un bloc trop dense. */
+html[dir='rtl'] .pk-editorial-hero .pk-editorial-kicker {
+	max-width: 100%;
+	font-size: .78rem;
+	line-height: 1.55;
+	letter-spacing: 0;
+	text-transform: none;
+	text-align: right;
+}
+html[dir='rtl'] .pk-editorial-hero h1 {
+	letter-spacing: 0;
+	line-height: 1.18;
+	text-align: right;
+}
+html[dir='rtl'] .pk-editorial-hero h1 .pk-hero-accent {
+	font-family: 'Noto Sans Arabic', system-ui, sans-serif;
+	font-style: normal;
+	font-weight: 600;
+	letter-spacing: 0;
+	line-height: 1.18;
+}
+html[dir='rtl'] .pk-editorial-hero__intro {
+	line-height: 1.75;
+	text-align: right;
+}
+@media (max-width: 640px) {
+	html[dir='rtl'] .pk-editorial-hero,
+	html[dir='rtl'] .pk-editorial-hero__inner {
+		min-height: 680px;
+	}
+	html[dir='rtl'] .pk-editorial-hero__inner {
+		gap: 1.35rem;
+		padding-top: 3.5rem;
+		padding-bottom: 3rem;
+	}
+	html[dir='rtl'] .pk-editorial-hero__copy {
+		max-width: 100%;
+	}
+	html[dir='rtl'] .pk-editorial-hero h1 {
+		font-size: clamp(2rem, 9.5vw, 3rem);
+		margin-bottom: .8rem;
+	}
+	html[dir='rtl'] .pk-editorial-hero__intro {
+		max-width: 100%;
+		margin-bottom: 1.15rem;
+		font-size: 1rem;
+		line-height: 1.75;
+	}
+	html[dir='rtl'] .pk-editorial-actions {
+		gap: .6rem;
+	}
+	html[dir='rtl'] .pk-editorial-actions .pk-btn {
+		min-height: 48px;
+		padding-inline: 1rem;
+	}
+	html[dir='rtl'] .pk-hero-trust {
+		gap: .65rem 1rem;
+		margin-top: .75rem;
+	}
+	html[dir='rtl'] .pk-hero-trust li {
+		font-size: .75rem;
+		line-height: 1.5;
+	}
+}
