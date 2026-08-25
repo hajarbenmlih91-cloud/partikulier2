@@ -97,10 +97,20 @@ class Partikulier_Search_Filters {
 				break;
 		}
 
-		// --- Filtres de taxonomie (achat/location, type de bien, ville) ---
-		$tax_query = (array) $query->get( 'tax_query' );
+			// --- Filtres de taxonomie (achat/location, type de bien, ville) ---
+			$existing_tax_query = $query->get( 'tax_query' );
+			if ( $existing_tax_query instanceof WP_Tax_Query ) {
+				$tax_query = $existing_tax_query->queries;
+				if ( ! empty( $existing_tax_query->relation ) ) {
+					$tax_query['relation'] = $existing_tax_query->relation;
+				}
+			} else {
+				$tax_query = (array) $existing_tax_query;
+			}
 
-		foreach ( self::taxonomy_map() as $param => $taxonomy ) {
+			$taxonomy_map = self::taxonomy_map();
+			$taxonomy_map['location'] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
+			foreach ( $taxonomy_map as $param => $taxonomy ) {
 			if ( empty( $_GET[ $param ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				continue;
 			}
@@ -131,12 +141,30 @@ class Partikulier_Search_Filters {
 			);
 		}
 
-		if ( count( $tax_query ) > 1 ) {
-			$tax_query['relation'] = 'AND';
-		}
-		if ( ! empty( $tax_query ) ) {
-			$query->set( 'tax_query', $tax_query );
-		}
+			// Les routes /[lang]/location/{slug}/ transmettent une query var interne,
+			// tandis que les liens de l’interface utilisent ?location={slug}.
+			$city_slug = sanitize_title( (string) $query->get( 'pk_city_slug' ) );
+			if ( '' === $city_slug && ! empty( $_GET['location'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$city_slug = sanitize_title( wp_unslash( $_GET['location'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+			if ( '' !== $city_slug && taxonomy_exists( PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) {
+				$city_term = get_term_by( 'slug', $city_slug, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+				if ( $city_term && ! is_wp_error( $city_term ) ) {
+					$tax_query[] = array(
+						'taxonomy'         => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
+						'field'            => 'term_id',
+						'terms'            => (int) $city_term->term_id,
+						'include_children' => true,
+					);
+				}
+			}
+
+			if ( count( $tax_query ) > 1 ) {
+				$tax_query['relation'] = 'AND';
+			}
+			if ( ! empty( $tax_query ) ) {
+				$query->set( 'tax_query', $tax_query );
+			}
 
 		// --- Budget maximum ---
 		$price_max = isset( $_GET['es_price_max'] ) ? (int) $_GET['es_price_max'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
