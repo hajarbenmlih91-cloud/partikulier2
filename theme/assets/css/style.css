@@ -2660,3 +2660,11 @@ html[dir="rtl"] .pk-card-price {
 	html,
 	body { overflow-x: clip; }
 }
+
+
+/* Catalogue mobile: override the more-specific generic grid rule so every
+   listing card uses the full available width instead of three narrow columns. */
+@media (max-width: 767px) {
+	.pk-grid.pk-grid-cards,
+	.pk-grid.pk-grid-cards.pk-grid-list { grid-template-columns: minmax(0, 1fr); }
+}
