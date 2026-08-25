@@ -21,8 +21,12 @@ class Partikulier_Header {
 
 	public static function localize_archive_items( $items, $args ) {
 		foreach ( $items as $item ) {
-			$path = (string) wp_parse_url( $item->url, PHP_URL_PATH );
-			if ( preg_match( '#/(?:property|annonces)(?:/page/([0-9]+))?/?$#', $path, $match ) ) {
+				$path = (string) wp_parse_url( $item->url, PHP_URL_PATH );
+				if ( '/' === untrailingslashit( $path ) && function_exists( 'pk_localized_home_url' ) ) {
+					$item->url = pk_localized_home_url();
+					continue;
+				}
+				if ( preg_match( '#/(?:property|annonces)(?:/page/([0-9]+))?/?$#', $path, $match ) ) {
 				$item->url = pk_properties_archive_url();
 				if ( ! empty( $match[1] ) ) {
 					$item->url = trailingslashit( $item->url ) . 'page/' . absint( $match[1] ) . '/';
