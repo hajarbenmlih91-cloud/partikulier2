@@ -22,6 +22,9 @@ if ( ! $post || empty( $post->ID ) ) {
 }
 
 $pk_property_url = get_permalink( $post );
+if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
+	$pk_property_url = Partikulier_Listing_URLs::filter_link( $pk_property_url, $post );
+}
 if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post' ) ) {
 	$pk_language = pll_current_language( 'slug' );
 	$pk_translated_id = $pk_language ? (int) pll_get_post( $post->ID, $pk_language ) : 0;
@@ -191,7 +194,7 @@ $gallery_ids = array();
 										<?php if ( $avif ) : ?>
 											<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 										<?php endif; ?>
-										<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
+										<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="eager" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
 									</picture>
 									<?php if ( $is_closed ) : ?>
 										<span class="pk-photo-watermark" aria-hidden="true"><?php echo esc_html( $closed_label ); ?></span>
