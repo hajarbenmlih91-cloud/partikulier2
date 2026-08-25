@@ -30,7 +30,7 @@ class Partikulier_Listing_URLs {
 	/**
 	 * Version des regles : incrementer force une regeneration unique.
 	 */
-	const RULES_VERSION = '3';
+	const RULES_VERSION = '4';
 
 	const META_CITY     = '_pk_url_city';
 	const META_DISTRICT = '_pk_url_district';
