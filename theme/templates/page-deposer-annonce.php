@@ -74,7 +74,7 @@ $types = get_terms( array(
 			<?php endif; ?>
 				<?php wp_nonce_field( 'pk_submit_listing', 'nonce' ); ?>
 
-				<nav class="pk-stepper" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Étapes de publication', 'Étapes de publication', 'partikulier' ) ); ?>" data-pk-stepper>
+				<nav class="pk-stepper" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Étapes de publication', 'Étapes de publication', 'partikulier' ) ); ?>">
 					<ol class="pk-stepper-list">
 						<li class="pk-stepper-item is-current" data-step-indicator="1" aria-current="step"><span class="pk-stepper-number">1</span><span class="pk-stepper-label"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Qui publie l’annonce ?', 'Qui publie l’annonce ?', 'partikulier' ) ); ?></span></li>
 						<li class="pk-stepper-item" data-step-indicator="2"><span class="pk-stepper-number">2</span><span class="pk-stepper-label"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Les informations du bien', 'Les informations du bien', 'partikulier' ) ); ?></span></li>
