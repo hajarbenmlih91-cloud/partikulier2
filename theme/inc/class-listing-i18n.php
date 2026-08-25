@@ -226,8 +226,10 @@ class Partikulier_Listing_I18n {
 					'bureau'      => 'مكتب',
 					'local commercial' => 'محل تجاري',
 					'riad'        => 'رياض',
-					'ferme'       => 'ضيعة',
-				),
+						'ferme'       => 'ضيعة',
+						'bien'        => 'عقار',
+						'property'    => 'عقار',
+					),
 			),
 		);
 
@@ -768,9 +770,9 @@ class Partikulier_Listing_I18n {
 			}
 		}
 		$candidate = trim( (string) get_the_title( $display_post ) );
-		if ( 'ar' === $lang && preg_match( '/\p{Arabic}/u', $candidate ) ) {
-			return $candidate;
-		}
+			if ( 'ar' === $lang && preg_match( '/\p{Arabic}/u', $candidate ) && ! preg_match( '/[A-Za-zÀ-ÿ]/u', $candidate ) ) {
+				return $candidate;
+			}
 
 		$source_id = (int) get_post_meta( $display_post->ID, '_pk_translation_source', true );
 		$source    = $source_id ? get_post( $source_id ) : $post;
