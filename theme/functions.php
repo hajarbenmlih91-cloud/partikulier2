@@ -46,10 +46,33 @@ function pk_properties_archive_url() {
 	if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
 		$language = sanitize_key( (string) pll_current_language( 'slug' ) );
 		if ( $language ) {
-			return trailingslashit( pll_home_url( $language ) ) . 'annonces/';
+			return pk_localized_home_url( $language ) . 'annonces/';
 		}
 	}
 	return home_url( '/annonces/' );
+}
+
+/**
+ * Accueil localisé avec repli explicite si Polylang renvoie la racine.
+ *
+ * @param string $language Code de langue.
+ * @return string
+ */
+function pk_localized_home_url( $language = '' ) {
+	$language = sanitize_key( (string) $language );
+	if ( ! $language && function_exists( 'pll_current_language' ) ) {
+		$language = sanitize_key( (string) pll_current_language( 'slug' ) );
+	}
+	if ( ! $language ) {
+		return trailingslashit( home_url( '/' ) );
+	}
+
+	$url  = function_exists( 'pll_home_url' ) ? pll_home_url( $language ) : home_url( '/' . $language . '/' );
+	$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+	if ( ! preg_match( '#(?:^|/)' . preg_quote( $language, '#' ) . '/?$#', untrailingslashit( $path ) ) ) {
+		$url = home_url( '/' . $language . '/' );
+	}
+	return trailingslashit( $url );
 }
 
 /**

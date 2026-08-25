@@ -115,7 +115,7 @@ if ( ! function_exists( 'pk_term_url' ) ) {
 					}
 					$path = (string) wp_parse_url( $link, PHP_URL_PATH );
 					if ( ! preg_match( '#^/' . preg_quote( $language, '#' ) . '(?:/|$)#', $path ) ) {
-						$link = trailingslashit( pll_home_url( $language ) ) . ltrim( $path, '/' );
+						$link = pk_localized_home_url( $language ) . ltrim( $path, '/' );
 					}
 				}
 			}

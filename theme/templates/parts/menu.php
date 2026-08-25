@@ -15,6 +15,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Partikulier_Header {
 
+	public static function init() {
+		add_filter( 'wp_nav_menu_objects', array( __CLASS__, 'localize_archive_items' ), 20, 2 );
+	}
+
+	public static function localize_archive_items( $items, $args ) {
+		foreach ( $items as $item ) {
+			$path = (string) wp_parse_url( $item->url, PHP_URL_PATH );
+			if ( preg_match( '#/(?:property|annonces)(?:/page/([0-9]+))?/?$#', $path, $match ) ) {
+				$item->url = pk_properties_archive_url();
+				if ( ! empty( $match[1] ) ) {
+					$item->url = trailingslashit( $item->url ) . 'page/' . absint( $match[1] ) . '/';
+				}
+			}
+		}
+		return $items;
+	}
+
 	public static function fallback_menu( $args ) {
 		$items = array(
 			home_url( '/' )                                 => __( 'Accueil', 'partikulier' ),
@@ -35,6 +52,8 @@ class Partikulier_Header {
 		echo '</ul>';
 	}
 }
+
+Partikulier_Header::init();
 
 /**
  * Walker de menu legere : classes BEM, pas de JS requis (dropdowns en CSS).

@@ -218,7 +218,7 @@ add_action( 'parse_request', array( __CLASS__, 'redirect_legacy_early' ), 1 );
 		if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
 			$language = sanitize_key( (string) pll_current_language( 'slug' ) );
 			if ( $language ) {
-				$prefix = trim( wp_parse_url( pll_home_url( $language ), PHP_URL_PATH ), '/' );
+				$prefix = trim( wp_parse_url( pk_localized_home_url( $language ), PHP_URL_PATH ), '/' );
 				$prefix = $prefix ? $prefix . '/' : '';
 			}
 		}
