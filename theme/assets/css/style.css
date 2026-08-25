@@ -2541,3 +2541,64 @@ html[dir="rtl"] .pk-card-price {
 	.pk-mobile-quick-actions .pk-container { padding-inline: 12px; }
 	.pk-mobile-quick-actions a { font-size: .72rem; padding-inline: .55rem; }
 }
+
+
+/* v1.8 mobile primary navigation: one sticky navigation, not action buttons. */
+.pk-mobile-primary-nav { display: none; }
+
+@media (max-width: 767px) {
+	.pk-mobile-quick-actions,
+	.pk-mobile-action-bar { display: none !important; }
+
+	.pk-mobile-primary-nav {
+		position: fixed;
+		inset-inline: 0;
+		bottom: 0;
+		z-index: 1100;
+		display: flex;
+		align-items: stretch;
+		justify-content: space-around;
+		min-height: 64px;
+		padding: 0 8px env(safe-area-inset-bottom);
+		background: rgba(255,254,250,.98);
+		border-top: 1px solid var(--pk-line);
+		box-shadow: 0 -10px 26px rgba(22,23,21,.12);
+	}
+
+	.pk-mobile-primary-nav a {
+		position: relative;
+		display: flex;
+		flex: 1 1 0;
+		align-items: center;
+		justify-content: center;
+		min-width: 0;
+		min-height: 64px;
+		padding: .55rem .35rem;
+		color: var(--pk-ink);
+		font-size: .72rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-align: center;
+		text-decoration: none;
+		white-space: normal;
+	}
+
+	.pk-mobile-primary-nav a + a { border-inline-start: 1px solid var(--pk-line); }
+	.pk-mobile-primary-nav a[aria-current="page"] { color: var(--pk-primary); }
+	.pk-mobile-primary-nav a[aria-current="page"]::before {
+		position: absolute;
+		inset-inline: 22%;
+		top: 0;
+		height: 3px;
+		background: var(--pk-primary);
+		content: "";
+	}
+
+	.pk-main { padding-bottom: 5.5rem; }
+	.pk-site-footer { padding-bottom: 5.5rem; }
+}
+
+@media (max-width: 390px) {
+	.pk-mobile-primary-nav { padding-inline: 4px; }
+	.pk-mobile-primary-nav a { font-size: .68rem; padding-inline: .2rem; }
+}
