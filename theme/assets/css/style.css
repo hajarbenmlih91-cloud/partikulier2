@@ -1830,6 +1830,78 @@ html[dir="rtl"] .pk-card-price {
 
 .pk-submit-body { max-width: 760px; margin-top: -1.6rem; }
 
+/* --- Stepper accessible du dépôt --- */
+.pk-stepper {
+	max-width: 760px;
+	margin: 0 auto 1.35rem;
+	padding: .9rem 0 0;
+}
+.pk-stepper-list {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: .75rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.pk-stepper-item {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: .55rem;
+	min-width: 0;
+	color: var(--pk-muted);
+	font-size: .78rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+.pk-stepper-item:not(:last-child)::after {
+	content: "";
+	position: absolute;
+	inset-inline-end: -.45rem;
+	inset-block-start: 50%;
+	width: .35rem;
+	height: 1px;
+	background: var(--pk-line);
+}
+.pk-stepper-number {
+	flex: 0 0 2rem;
+	display: inline-grid;
+	place-items: center;
+	width: 2rem;
+	height: 2rem;
+	border: 1px solid var(--pk-line);
+	border-radius: 50%;
+	background: #fff;
+	color: var(--pk-muted);
+}
+.pk-stepper-item.is-current { color: var(--pk-ink); }
+.pk-stepper-item.is-current .pk-stepper-number {
+	border-color: var(--pk-ink);
+	background: var(--pk-ink);
+	color: #fff;
+}
+.pk-stepper-item.is-complete { color: var(--pk-primary); }
+.pk-stepper-item.is-complete .pk-stepper-number {
+	border-color: var(--pk-primary);
+	background: var(--pk-primary);
+	color: #fff;
+}
+.pk-stepper-label { min-width: 0; overflow-wrap: anywhere; }
+.pk-stepper-status {
+	margin: .65rem 0 0;
+	color: var(--pk-muted);
+	font-size: .76rem;
+	font-weight: 600;
+}
+@media (max-width: 560px) {
+	.pk-stepper { padding-inline: 0; }
+	.pk-stepper-list { gap: .35rem; }
+	.pk-stepper-item { align-items: flex-start; flex-direction: column; gap: .3rem; font-size: .7rem; }
+	.pk-stepper-item:not(:last-child)::after { inset-inline-end: -.28rem; inset-block-start: 1rem; width: .2rem; }
+	.pk-stepper-number { flex-basis: 2rem; }
+}
+
 /* --- carte d'etape --- */
 .pk-card {
 	background: #fff;
@@ -2265,6 +2337,11 @@ html[dir="rtl"] .pk-card-price {
 	.pk-archive { padding-bottom: 6.5rem; }
 	.pk-archive-layout { display: block; }
 	.pk-filter-toggle { display: flex; }
+	/* Sur mobile, la recherche et les filtres secondaires partagent le tiroir. */
+	.pk-archive-search .pk-search-archive { display: none; }
+	.pk-archive-search .pk-search-archive.is-mobile-filter-open { display: grid; }
+	.pk-archive-search .pk-archive-trust { display: none; }
+	.pk-archive-search .pk-archive-trust.is-mobile-filter-open { display: flex; }
 	.pk-filters { position: static; padding: 0; border: 0; background: transparent; }
 	.pk-filters-panel {
 		display: none;
