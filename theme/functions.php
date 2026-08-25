@@ -99,7 +99,14 @@ add_filter( 'register_post_type_args', 'pk_properties_post_type_args', 20, 2 );
  * @return string
  */
 function pk_page_url( $slug, $fallback = '/' ) {
-	$page = get_page_by_path( trim( (string) $slug, '/' ), OBJECT, 'page' );
+	$slug = trim( (string) $slug, '/' );
+	$page = get_page_by_path( $slug, OBJECT, 'page' );
+	// Le provisioning du thème connaît les slugs canoniques et leurs alias
+	// historiques (par exemple deposer-une-annonce). Utiliser ce résolveur
+	// évite qu’un lien public retombe silencieusement sur une route obsolète.
+	if ( ! $page && class_exists( 'Partikulier_Required_Pages' ) ) {
+		$page = Partikulier_Required_Pages::find( $slug );
+	}
 	if ( $page && function_exists( 'pll_get_post' ) ) {
 		$translated_id = pll_get_post( $page->ID );
 		if ( $translated_id ) {
