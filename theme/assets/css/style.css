@@ -2652,3 +2652,11 @@ html[dir="rtl"] .pk-card-price {
 @media (max-width: 390px) {
 	.pk-main-nav .pk-menu-item > a { font-size: .64rem; padding-inline: .15rem; }
 }
+
+
+/* Keep horizontal clipping without creating an overflow scroll container that
+   would prevent the primary navigation from sticking to the viewport top. */
+@media (max-width: 767px) {
+	html,
+	body { overflow-x: clip; }
+}
