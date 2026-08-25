@@ -74,8 +74,12 @@ class Partikulier_Geo {
 		if ( $with_all ) {
 			$out .= '<option value="">' . esc_html__( 'Tous les biens', 'partikulier' ) . '</option>';
 		}
+		$lang = function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr';
 		foreach ( $types as $t ) {
-			$out .= '<option value="' . esc_attr( $t->slug ) . '">' . esc_html( $t->name ) . '</option>';
+			$label = ( 'ar' === $lang && class_exists( 'Partikulier_Listing_I18n' ) )
+				? Partikulier_Listing_I18n::localized_type( $t->name, $lang )
+				: $t->name;
+			$out .= '<option value="' . esc_attr( $t->slug ) . '">' . esc_html( $label ) . '</option>';
 		}
 		return $out;
 	}
