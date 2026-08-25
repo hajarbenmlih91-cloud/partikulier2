@@ -55,7 +55,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
 				the_custom_logo();
 			} else {
-				$pk_home = esc_url( home_url( '/' ) );
+				$pk_home = esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) );
 				$pk_name = get_bloginfo( 'name' );
 				?>
 			<a class="pk-logo-text" href="<?php echo $pk_home; // phpcs:ignore ?>" rel="home" aria-label="<?php echo esc_attr( sprintf( __( '%s, retour a l accueil', 'partikulier' ), $pk_name ) ); ?>">

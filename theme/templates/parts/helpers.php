@@ -98,7 +98,7 @@ if ( ! function_exists( 'pk_term_url' ) ) {
 				}
 				$link = get_term_link( $term );
 			if ( is_wp_error( $link ) || ! is_string( $link ) ) {
-				return $fallback ? $fallback : home_url( '/' );
+				return $fallback ? $fallback : ( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) );
 			}
 
 			// Estatik renvoie parfois une taxonomie sans le préfixe Polylang.

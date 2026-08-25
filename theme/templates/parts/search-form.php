@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $variant  = isset( $variant ) ? $variant : 'hero';
 $archive  = pk_properties_archive_url();
 if ( ! $archive ) {
-	$archive = home_url( '/' );
+	$archive = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
 }
 
 // Options pour les selects.

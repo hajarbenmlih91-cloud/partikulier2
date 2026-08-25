@@ -34,14 +34,15 @@ class Partikulier_Header {
 
 	public static function fallback_menu( $args ) {
 		$items = array(
-			home_url( '/' )                                 => __( 'Accueil', 'partikulier' ),
+			( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) ) => __( 'Accueil', 'partikulier' ),
 			pk_properties_archive_url()                     => __( 'Annonces', 'partikulier' ),
 				pk_page_url( 'deposer', '/deposer/' ) => __( 'Déposer une annonce', 'partikulier' ),
 		);
 		$items = array_filter( $items );
 		echo '<ul class="' . esc_attr( $args['menu_class'] ) . '">';
 		foreach ( $items as $url => $label ) {
-				$is_current = ( untrailingslashit( $url ) === untrailingslashit( home_url( add_query_arg( array() ) ) ) );
+				$current_home = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
+				$is_current = ( untrailingslashit( $url ) === untrailingslashit( $current_home ) );
 			printf(
 				'<li class="pk-menu-item%s"><a href="%s">%s</a></li>',
 				$is_current ? ' pk-current' : '',
