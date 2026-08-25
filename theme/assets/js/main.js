@@ -611,21 +611,34 @@
 		var filterPanel = document.getElementById("pk-filters-panel");
 		var archiveSearch = document.querySelector(".pk-archive-search .pk-search-archive");
 		var archiveTrust = document.querySelector(".pk-archive-search .pk-archive-trust");
+		var filterBackdrop = document.querySelector(".pk-filters-backdrop");
+		var filterClose = document.querySelector(".pk-filter-close");
 		if (filterToggle && filterPanel) {
 			function setFilters(open) {
 				filterPanel.classList.toggle("is-open", open);
+				filterPanel.setAttribute("aria-hidden", open ? "false" : "true");
+				document.body.classList.toggle("pk-filters-open", open);
+				if (filterBackdrop) {
+					filterBackdrop.hidden = !open;
+					filterBackdrop.classList.toggle("is-open", open);
+				}
 				if (archiveSearch) archiveSearch.classList.toggle("is-mobile-filter-open", open);
 				if (archiveTrust) archiveTrust.classList.toggle("is-mobile-filter-open", open);
 				filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
+				if (open && filterClose) filterClose.focus();
+				if (!open) filterToggle.focus();
 			}
-			setFilters(filterToggle.getAttribute("aria-expanded") === "true");
-		filterToggle.addEventListener("click", function () {
-			setFilters(!filterPanel.classList.contains("is-open"));
-		});
-		document.addEventListener("keydown", function (event) {
-			if (event.key === "Escape") setFilters(false);
-		});
-	}
+			setFilters(false);
+			filterToggle.addEventListener("click", function () {
+				setFilters(!filterPanel.classList.contains("is-open"));
+			});
+			document.querySelectorAll("[data-pk-filter-close]").forEach(function (closeButton) {
+				closeButton.addEventListener("click", function () { setFilters(false); });
+			});
+			document.addEventListener("keydown", function (event) {
+				if (event.key === "Escape" && filterPanel.classList.contains("is-open")) setFilters(false);
+			});
+		}
 
 	var actionBar = document.querySelector(".pk-mobile-action-bar");
 	if (!actionBar) return;
@@ -643,4 +656,88 @@
 		if (/^(INPUT|SELECT|TEXTAREA)$/.test(event.target.tagName)) updateKeyboardState();
 	});
 	updateKeyboardState();
+}());
+
+
+/* ---------- Autocompletion publique des villes et quartiers ---------- */
+(function () {
+	"use strict";
+	if (typeof pkConfig === "undefined" || !pkConfig.ajaxUrl || !pkConfig.placesNonce) return;
+	var inputs = Array.prototype.slice.call(document.querySelectorAll("[data-pk-place-input='true']"));
+	if (!inputs.length) return;
+
+	function debounce(fn, wait) {
+		var timer;
+		return function () {
+			var args = arguments;
+			clearTimeout(timer);
+			timer = setTimeout(function () { fn.apply(null, args); }, wait);
+		};
+	}
+
+	function fetchPlaces(query) {
+		var language = pkConfig.language || document.documentElement.lang || "fr";
+		var url = pkConfig.ajaxUrl + "?action=pk_places_search&nonce=" + encodeURIComponent(pkConfig.placesNonce) +
+			"&scope=city&q=" + encodeURIComponent(query) + "&lang=" + encodeURIComponent(language);
+		return fetch(url, { credentials: "same-origin" })
+			.then(function (response) { return response.json(); })
+			.then(function (data) { return data && data.success && data.data && data.data.results ? data.data.results : []; })
+			.catch(function () { return []; });
+	}
+
+	inputs.forEach(function (input) {
+		var wrapper = input.closest(".pk-place-autocomplete");
+		var list = wrapper ? wrapper.querySelector(".pk-place-suggestions") : null;
+		var valueId = input.getAttribute("data-pk-place-value");
+		var hidden = valueId ? document.getElementById(valueId) : (wrapper ? wrapper.querySelector("input[type='hidden'][name='es_city']") : null);
+		if (!list || !hidden) return;
+
+		function close() { list.hidden = true; list.innerHTML = ""; }
+		function choose(item) {
+			var label = item.label || item.city || "";
+			input.value = item.district ? label + ", " + (item.meta || item.city || "") : label;
+			hidden.value = item.value || "";
+			input.setAttribute("aria-activedescendant", "");
+			close();
+		}
+		function render(results) {
+			list.innerHTML = "";
+			if (!results.length) { close(); return; }
+			results.forEach(function (item, index) {
+				var option = document.createElement("li");
+				option.className = "pk-suggest-item";
+				option.setAttribute("role", "option");
+				option.id = input.id + "-suggestion-" + index;
+				option.tabIndex = 0;
+				var label = document.createElement("span");
+				label.className = "pk-suggest-label";
+				label.textContent = item.label || item.city || "";
+				var meta = document.createElement("span");
+				meta.className = "pk-suggest-meta";
+				meta.textContent = item.meta || "";
+				option.appendChild(label);
+				option.appendChild(meta);
+				option.addEventListener("mousedown", function (event) { event.preventDefault(); choose(item); });
+				option.addEventListener("keydown", function (event) {
+					if (event.key === "Enter" || event.key === " ") { event.preventDefault(); choose(item); }
+				});
+				list.appendChild(option);
+			});
+			list.hidden = false;
+		}
+		var suggest = debounce(function () {
+			hidden.value = "";
+			var query = input.value.trim();
+			if (!query) { close(); return; }
+			fetchPlaces(query).then(render);
+		}, 120);
+		input.addEventListener("input", suggest);
+		input.addEventListener("focus", function () {
+			if (input.value.trim()) suggest();
+		});
+		input.addEventListener("keydown", function (event) {
+			if (event.key === "Escape") close();
+		});
+		input.addEventListener("blur", function () { setTimeout(close, 180); });
+	});
 }());

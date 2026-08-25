@@ -113,7 +113,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 
 			<?php
 			$pk_active_filters = 0;
-			foreach ( array( 'pk_price_max', 'es_type', 'es_category', 'pk_city' ) as $pk_filter_key ) {
+			foreach ( array( 'es_action', 'es_type', 'es_city', 'es_price_max' ) as $pk_filter_key ) {
 				if ( isset( $_GET[ $pk_filter_key ] ) && '' !== trim( (string) wp_unslash( $_GET[ $pk_filter_key ] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 					$pk_active_filters++;
 				}
@@ -126,34 +126,33 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 								<h2><?php echo esc_html( $pk_filters_label ); ?></h2>
 								<span><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Affiner la recherche', 'Affiner la recherche', 'partikulier' ) ); ?></span>
 							</div>
-						<button type="button" class="pk-filter-toggle" aria-expanded="<?php echo $pk_active_filters ? 'true' : 'false'; ?>" aria-controls="pk-filters-panel">
-							<span><?php echo esc_html( $pk_filters_label ); ?></span>
-							<span class="pk-filter-toggle-meta"><span class="pk-filter-count"><?php echo esc_html( $pk_active_filters ); ?></span> <?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Filtres actifs', 'Filtres actifs', 'partikulier' ) ); ?></span>
-							<span class="pk-filter-toggle-icon" aria-hidden="true">+</span>
-						</button>
-							<div class="pk-filters-panel<?php echo $pk_active_filters ? ' ' . 'is-open' : ''; ?>" id="pk-filters-panel">
-						<h2 class="screen-reader-text"><?php echo esc_html( $pk_filters_label ); ?></h2>
+					<button type="button" class="pk-filter-toggle" aria-expanded="<?php echo $pk_active_filters ? 'true' : 'false'; ?>" aria-controls="pk-filters-panel">
+						<span class="pk-filter-toggle-label"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Affiner la recherche', 'Affiner la recherche', 'partikulier' ) ); ?></span>
+						<span class="pk-filter-toggle-meta"><span class="pk-filter-count"><?php echo esc_html( $pk_active_filters ); ?></span> <?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Filtres actifs', 'Filtres actifs', 'partikulier' ) ); ?></span>
+						<span class="pk-filter-toggle-icon" aria-hidden="true">+</span>
+					</button>
+						<div class="pk-filters-backdrop" data-pk-filter-close="true" hidden></div>
+						<div class="pk-filters-panel<?php echo $pk_active_filters ? ' ' . 'is-open' : ''; ?>" id="pk-filters-panel" aria-hidden="<?php echo $pk_active_filters ? 'false' : 'true'; ?>">
+						<button type="button" class="pk-filter-close" data-pk-filter-close="true" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Fermer', 'Fermer', 'partikulier' ) ); ?>"><span aria-hidden="true">×</span><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Fermer', 'Fermer', 'partikulier' ) ); ?></button>
+					<h2 class="screen-reader-text"><?php echo esc_html( $pk_filters_label ); ?></h2>
 
-					<div class="pk-filter pk-filter-actions">
-						<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Action', 'Action', 'partikulier' ) ); ?></h3>
-					<?php
-					$actions = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, 'hide_empty' => true ) );
-					if ( $actions && ! is_wp_error( $actions ) ) {
-						echo '<ul class="pk-filter-list">';
-						foreach ( $actions as $term ) {
-							$active = $queried instanceof WP_Term && $queried->term_id === $term->term_id ? ' aria-current="true"' : '';
-							printf(
-								'<li><a href="%1$s"%3$s>%2$s <span class="pk-filter-count">(%4$s)</span></a></li>',
-								esc_url( pk_term_url( $term ) ),
-								esc_html( Partikulier_Localization::translate_taxonomy_label( $term->name ) ),
-								$active,
-								esc_html( number_format_i18n( $term->count ) )
-							);
-						}
-						echo '</ul>';
-					}
-					?>
-				</div>
+						<div class="pk-filter pk-filter-actions">
+							<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Transaction', 'Transaction', 'partikulier' ) ); ?></h3>
+							<ul class="pk-filter-list pk-filter-action-list">
+								<?php
+								$action_items = array(
+									array( 'value' => '', 'label' => 'Tout' ),
+									array( 'value' => 'a-vendre', 'label' => 'Vendre' ),
+									array( 'value' => 'a-louer', 'label' => 'Louer' ),
+								);
+								foreach ( $action_items as $action_item ) :
+									$action_url = $action_item['value'] ? add_query_arg( 'es_action', $action_item['value'], pk_properties_archive_url() ) : pk_properties_archive_url();
+									$action_label = Partikulier_Localization::translate_polylang_string( $action_item['label'], $action_item['label'], 'partikulier' );
+									?>
+									<li><a href="<?php echo esc_url( $action_url ); ?>"><?php echo esc_html( $action_label ); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+					</div>
 
 					<div class="pk-filter pk-filter-types">
 						<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Types de biens', 'Types de biens', 'partikulier' ) ); ?></h3>
@@ -176,34 +175,20 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 					?>
 				</div>
 
-					<div class="pk-filter pk-filter-budget">
-						<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Budget maximum', 'Budget maximum', 'partikulier' ) ); ?></h3>
-						<form action="<?php echo esc_url( pk_properties_archive_url() ); ?>" method="get">
-						<div class="pk-filter-price">
-								<input type="number" name="pk_price_max" placeholder="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'MAD max', 'MAD max', 'partikulier' ) ); ?>" min="0" aria-label="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Budget maximum en MAD', 'Budget maximum en MAD', 'partikulier' ) ); ?>">
+						<div class="pk-filter pk-filter-city">
+							<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Ville', 'Ville', 'partikulier' ) ); ?></h3>
+							<form action="<?php echo esc_url( pk_properties_archive_url() ); ?>" method="get" class="pk-filter-city-form pk-place-autocomplete">
+								<label class="screen-reader-text" for="pk-filter-city-input"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Toutes les villes', 'Toutes les villes', 'partikulier' ) ); ?></label>
+								<div class="pk-place-autocomplete-wrap">
+									<input id="pk-filter-city-input" class="pk-place-input" type="search" data-pk-place-input="true" data-pk-place-value="pk-filter-city-value" autocomplete="off" aria-controls="pk-filter-city-suggestions" aria-autocomplete="list" placeholder="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Toutes les villes', 'Toutes les villes', 'partikulier' ) ); ?>" value="">
+									<input type="hidden" name="es_city" id="pk-filter-city-value" value="<?php echo isset( $_GET['es_city'] ) ? esc_attr( sanitize_title( wp_unslash( $_GET['es_city'] ) ) ) : ''; ?>">
+									<ul id="pk-filter-city-suggestions" class="pk-suggest pk-place-suggestions" role="listbox" hidden></ul>
+								</div>
+								<button type="submit" class="pk-filter-apply"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Appliquer', 'Appliquer', 'partikulier' ) ); ?></button>
+							</form>
 						</div>
-							<button type="submit" class="pk-filter-apply"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_polylang_string( 'APPLIQUER', 'APPLIQUER', 'partikulier' ) : __( 'APPLIQUER', 'partikulier' ) ); ?></button>
-					</form>
-				</div>
-
-					<div class="pk-filter pk-filter-popular-cities">
-						<h3 class="pk-filter-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Villes populaires', 'Villes populaires', 'partikulier' ) ); ?></h3>
-					<?php
-					$cities = Partikulier_Geo::top_cities( 6 );
-					if ( $cities ) {
-						echo '<ul class="pk-filter-list">';
-						foreach ( $cities as $city ) {
-							printf(
-								'<li><a href="%1$s">%2$s <span class="pk-filter-count">(%3$s)</span></a></li>',
-								esc_url( pk_term_url( $city ) ),
-								esc_html( class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::localized_place( $city->name ) : $city->name ),
-								esc_html( number_format_i18n( $city->count ) )
-							);
-						}
-						echo '</ul>';
-					}
-					?>
-				</div>
+						<?php $pk_reset_url = pk_properties_archive_url(); ?>
+						<a class="pk-filter-reset" href="<?php echo esc_url( $pk_reset_url ); ?>"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Réinitialiser', 'Réinitialiser', 'partikulier' ) ); ?></a>
 						</div>
 				</aside>
 

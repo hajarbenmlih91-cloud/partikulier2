@@ -27,6 +27,9 @@ $cities  = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY
 $types   = is_wp_error( $types ) ? array() : $types;
 $actions = is_wp_error( $actions ) ? array() : $actions;
 $cities  = is_wp_error( $cities ) ? array() : $cities;
+$selected_city_slug  = isset( $_GET['es_city'] ) ? sanitize_title( wp_unslash( $_GET['es_city'] ) ) : '';
+$selected_city_term  = $selected_city_slug ? get_term_by( 'slug', $selected_city_slug, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) : false;
+$selected_city_label = ( $selected_city_term && ! is_wp_error( $selected_city_term ) ) ? $selected_city_term->name : '';
 ?>
 <form class="pk-search pk-search-<?php echo esc_attr( $variant ); ?>" action="<?php echo esc_url( $archive ); ?>" method="get" role="search" aria-label="<?php esc_attr_e( 'Rechercher un bien immobilier', 'partikulier' ); ?>">
 	<div class="pk-search-field pk-search-type">
@@ -51,16 +54,14 @@ $cities  = is_wp_error( $cities ) ? array() : $cities;
 		</select>
 	</div>
 
-	<div class="pk-search-field pk-search-city">
-		<label class="pk-search-label" for="pk-s-city"><?php esc_html_e( 'Ville', 'partikulier' ); ?></label>
-		<select name="es_city" id="pk-s-city">
-			<option value=""><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Toutes les villes', 'Toutes les villes', 'partikulier' ) ); ?></option>
-				<?php foreach ( (array) $cities as $term ) : ?>
-					<?php if ( ! $term instanceof WP_Term ) { continue; } ?>
-					<option value="<?php echo esc_attr( $term->slug ); ?>"><?php echo esc_html( class_exists( 'Partikulier_Localization' ) ? Partikulier_Localization::translate_taxonomy_label( $term->name ) : $term->name ); ?></option>
-			<?php endforeach; ?>
-		</select>
-	</div>
+		<div class="pk-search-field pk-search-city pk-place-autocomplete">
+			<label class="pk-search-label" for="pk-s-city-input"><?php esc_html_e( 'Ville', 'partikulier' ); ?></label>
+			<div class="pk-place-autocomplete-wrap">
+				<input type="search" id="pk-s-city-input" class="pk-place-input" value="<?php echo esc_attr( $selected_city_label ); ?>" placeholder="<?php echo esc_attr( Partikulier_Localization::translate_polylang_string( 'Toutes les villes', 'Toutes les villes', 'partikulier' ) ); ?>" autocomplete="off" data-pk-place-input="true" aria-controls="pk-s-city-suggestions" aria-autocomplete="list">
+				<input type="hidden" name="es_city" id="pk-s-city-value" value="<?php echo esc_attr( $selected_city_slug ); ?>">
+				<ul id="pk-s-city-suggestions" class="pk-suggest pk-place-suggestions" role="listbox" hidden></ul>
+			</div>
+		</div>
 
 	<div class="pk-search-field pk-search-budget">
 		<label class="pk-search-label" for="pk-s-budget"><?php esc_html_e( 'Budget max', 'partikulier' ); ?></label>

@@ -260,6 +260,7 @@ class Partikulier_Morocco_Places {
 		$query = isset( $_GET['q'] ) ? sanitize_text_field( wp_unslash( $_GET['q'] ) ) : '';
 		$city  = isset( $_GET['city'] ) ? sanitize_text_field( wp_unslash( $_GET['city'] ) ) : '';
 		$scope = isset( $_GET['scope'] ) ? sanitize_key( wp_unslash( $_GET['scope'] ) ) : 'city';
+		$lang  = isset( $_GET['lang'] ) ? sanitize_key( wp_unslash( $_GET['lang'] ) ) : ( function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr' );
 
 		if ( 'district' === $scope ) {
 			$results = self::districts_of( $city, $query );
@@ -271,7 +272,26 @@ class Partikulier_Morocco_Places {
 			);
 		}
 
-		wp_send_json_success( array( 'results' => array_values( $results ) ) );
+		$results = array_map(
+			static function ( $item ) use ( $lang ) {
+				$city     = isset( $item['city'] ) ? (string) $item['city'] : '';
+				$district = isset( $item['district'] ) ? (string) $item['district'] : '';
+				$term_id  = $city ? self::find_existing_term( $city, $district ) : 0;
+				if ( $term_id && function_exists( 'pll_get_term' ) ) {
+					$translated_id = (int) pll_get_term( $term_id, $lang );
+					$term_id       = $translated_id ?: $term_id;
+				}
+				$term = $term_id ? get_term( $term_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) : false;
+				$item['value'] = ( $term && ! is_wp_error( $term ) ) ? $term->slug : sanitize_title( $district ?: $city );
+				if ( 'ar' === $lang && class_exists( 'Partikulier_Listing_I18n' ) ) {
+					$item['label'] = Partikulier_Listing_I18n::localized_place( $district ?: $city, $lang );
+					$item['meta']  = $district ? Partikulier_Listing_I18n::localized_place( $city, $lang ) : __( 'Ville', 'partikulier' );
+				}
+				return $item;
+			},
+			array_values( $results )
+		);
+		wp_send_json_success( array( 'results' => $results ) );
 	}
 
 	/**
