@@ -2413,3 +2413,131 @@ html[dir="rtl"] .pk-card-price {
 	.pk-card:hover { transform: none; }
 	.pk-card:hover .pk-card-media img { transform: none; }
 }
+
+
+/* ============================================================
+   Correctif visuel mobile — cartes, navigation, auth et sticky.
+   Les cartes liées sont éditoriales (.pk-editorial-cards), donc
+   elles ne suivent pas la règle .pk-grid-cards précédente.
+   Estatik imprime aussi son popup auth après le footer : sans sa
+   feuille native, mfp-hide doit être rétabli explicitement.
+   ============================================================ */
+
+/* Le popup Estatik reste fonctionnel quand son JS retire mfp-hide,
+   mais ne doit jamais occuper le flux de la page à l’état initial. */
+#es-authentication-popup.mfp-hide { display: none !important; }
+#es-authentication-popup .es-auth__item--hidden { display: none !important; }
+#es-authentication-popup:not(.mfp-hide) {
+	display: block;
+	position: fixed;
+	inset: 50% auto auto 50%;
+	z-index: 100001;
+	width: min(92vw, 30rem);
+	max-height: min(88vh, 40rem);
+	overflow: auto;
+	transform: translate(-50%, -50%);
+	background: var(--pk-white);
+	border: 1px solid var(--pk-line);
+	box-shadow: var(--pk-shadow-lg);
+}
+#es-authentication-popup:not(.mfp-hide) .es-auth {
+	padding: clamp(1.25rem, 4vw, 2rem);
+	color: var(--pk-text);
+}
+#es-authentication-popup:not(.mfp-hide) .es-auth__item:not(.es-auth__item--hidden) { display: block; }
+#es-authentication-popup:not(.mfp-hide) h3 { color: var(--pk-ink); margin: 0 0 .55rem; }
+#es-authentication-popup:not(.mfp-hide) p { line-height: 1.55; }
+#es-authentication-popup:not(.mfp-hide) form { display: grid; gap: .8rem; }
+#es-authentication-popup:not(.mfp-hide) input,
+#es-authentication-popup:not(.mfp-hide) button,
+#es-authentication-popup:not(.mfp-hide) .es-btn {
+	width: 100%;
+	min-height: 44px;
+	padding: .7rem .85rem;
+	border: 1px solid var(--pk-line);
+	background: #fff;
+}
+#es-authentication-popup:not(.mfp-hide) .es-btn,
+#es-authentication-popup:not(.mfp-hide) button[type="submit"] {
+	border-color: var(--pk-primary);
+	background: var(--pk-primary);
+	color: #fff;
+	font-weight: 700;
+	cursor: pointer;
+}
+.mfp-bg { position: fixed; inset: 0; z-index: 100000; background: rgba(15,16,14,.62); }
+.mfp-wrap { position: fixed; inset: 0; z-index: 100001; overflow: auto; }
+
+.pk-mobile-quick-actions { display: none; }
+
+@media (max-width: 767px) {
+	/* Le topbar promotionnel desktop ne doit pas devenir une barre noire
+	   parasite au-dessus du header mobile. */
+	.pk-topbar { display: none; }
+	.pk-mobile-quick-actions {
+		display: block;
+		background: var(--pk-white);
+		border-top: 1px solid var(--pk-line);
+		border-bottom: 1px solid var(--pk-line);
+	}
+	.pk-mobile-quick-actions .pk-container {
+		display: flex;
+		align-items: center;
+		gap: .55rem;
+		min-height: 52px;
+		padding-block: .45rem;
+	}
+	.pk-mobile-quick-actions a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 40px;
+		padding: .55rem .75rem;
+		font-size: .78rem;
+		font-weight: 700;
+		line-height: 1.2;
+		text-align: center;
+	}
+	.pk-mobile-quick-actions a:first-child {
+		flex: 1 1 auto;
+		background: var(--pk-primary);
+		color: #fff;
+	}
+	.pk-mobile-quick-actions a:last-child {
+		flex: 0 0 auto;
+		border: 1px solid var(--pk-line);
+		color: var(--pk-ink);
+		background: #fff;
+	}
+	.pk-mobile-quick-actions a:hover { color: var(--pk-ink); }
+	.pk-mobile-quick-actions a:first-child:hover { color: #fff; background: var(--pk-primary-dark); }
+
+	/* Une carte liée par ligne : le contenu textuel n’est plus comprimé
+	   dans deux colonnes de 160 px. */
+	.pk-editorial-cards { grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+	.pk-editorial-cards .pk-card-media { aspect-ratio: 16 / 10; }
+	.pk-editorial-cards .pk-card-body { padding: 1.15rem; }
+	.pk-editorial-cards .pk-card-title { font-size: 1.2rem; min-height: 0; -webkit-line-clamp: 3; }
+	.pk-editorial-cards .pk-card-meta { gap: .45rem .9rem; }
+	.pk-editorial-cards .pk-card-foot { align-items: center; }
+
+	/* Le header blanc reste la barre sticky principale sur mobile. */
+	.pk-site-header { top: 0; }
+	.pk-single { padding-bottom: 6.25rem; }
+	.pk-mobile-action-bar {
+		background: rgba(255,254,250,.98);
+		border-top: 1px solid var(--pk-line);
+		box-shadow: 0 -10px 26px rgba(22,23,21,.12);
+		padding-block: .65rem;
+	}
+	.pk-mobile-action-bar .pk-btn {
+		background: var(--pk-primary);
+		border-color: var(--pk-primary);
+		color: #fff;
+	}
+}
+
+@media (max-width: 390px) {
+	.pk-mobile-quick-actions .pk-container { padding-inline: 12px; }
+	.pk-mobile-quick-actions a { font-size: .72rem; padding-inline: .55rem; }
+}
