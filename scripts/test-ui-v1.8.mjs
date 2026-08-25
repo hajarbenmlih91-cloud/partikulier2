@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { chromium } from 'playwright';
+import { chromium, firefox, webkit } from 'playwright';
 
 const ROOT = process.cwd();
 const BASE_URL = process.env.PK_BASE || 'http://localhost:8090';
@@ -14,6 +14,9 @@ const OUT = path.resolve(process.env.PK_UI_OUT || path.join(ROOT, 'tests', `ui-v
 const BEFORE_DIR = process.env.PK_BEFORE_DIR ? path.resolve(process.env.PK_BEFORE_DIR) : '';
 const cacheBust = process.env.PK_CACHE_BUST || '';
 const sourceCommit = process.env.PK_COMMIT || execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const browserName = process.env.PK_BROWSER || 'chromium';
+const browserType = { chromium, firefox, webkit }[browserName];
+if (!browserType) throw new Error(`Navigateur Playwright inconnu : ${browserName}`);
 
 if (!/^[0-9a-f]{40}$/.test(sourceCommit)) throw new Error('source_commit doit être un SHA Git de 40 caractères');
 if (!Array.isArray(contract.scenarios) || contract.scenarios.length !== 30) throw new Error('Le contrat visuel doit contenir exactement 30 scénarios');
@@ -63,7 +66,7 @@ function classifyLink(link, scenarioUrl) {
   return null;
 }
 
-const browser = await chromium.launch({ headless: true });
+const browser = await browserType.launch({ headless: true });
 try {
   for (const scenario of contract.scenarios) {
     const viewport = viewportMap[scenario.viewport];
@@ -158,7 +161,7 @@ try {
 }
 
 const summary = {
-  test_id: 'UI-UX-V1.8-001', candidate_version: VERSION, source_commit: sourceCommit, run_id: RUN_ID,
+  test_id: 'UI-UX-V1.8-001', browser: browserName, candidate_version: VERSION, source_commit: sourceCommit, run_id: RUN_ID,
   base_url: BASE_URL, cache_bust: cacheBust || null, scenario_count: scenarios.length,
   passed: scenarios.filter((row) => row.status === 'PASS').length,
   failed: scenarios.filter((row) => row.status !== 'PASS').length,

@@ -72,7 +72,12 @@ PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/parcours.mjs" >
 # les preuves DOM/crawl/responsive même si le gate pixel immuable échoue.
 ui_exit=0
 rm -rf "$ROOT/documentation/ui-v1.8"
-PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UI_OUT="$ROOT/documentation/ui-v1.8" node "$ROOT/scripts/test-ui-v1.8.mjs" > "$ROOT/documentation/ui-v1.8.log" 2>&1 || ui_exit=$?
+for browser in chromium firefox webkit; do
+  ui_out="$ROOT/documentation/ui-v1.8"
+  if [ "$browser" != chromium ]; then ui_out="$ROOT/documentation/ui-v1.8/$browser"; fi
+  mkdir -p "$ui_out"
+  PK_BROWSER="$browser" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_UI_OUT="$ui_out" node "$ROOT/scripts/test-ui-v1.8.mjs" > "$ROOT/documentation/ui-v1.8-${browser}.log" 2>&1 || ui_exit=1
+done
 visual_exit=0
 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" node "$ROOT/scripts/visual-contract-v1.7.1.mjs" > "$ROOT/documentation/visual-contract-v${VERSION}.json" 2> "$ROOT/documentation/visual-contract-v${VERSION}.summary.log" || visual_exit=$?
 # Les baselines sont versionnées dans Git : la CI ne les régénère jamais et
@@ -129,7 +134,11 @@ jq -e '.status == "PASS" and .metrics.errors == 0 and .metrics.p95_seconds <= 1.
 jq -e '.failed == 0 and .passed == .scenario_count' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
 jq -e '.image_dom_passed == .image_dom_total and .image_dom_total == .scenario_count' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
 jq -e '.link_crawl_passed == .link_crawl_total and .link_crawl_total == .scenario_count' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
-jq -e '.responsive_passed == .responsive_total and .responsive_total > 0' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
+jq -e '.responsive_passed == .responsive_total and .responsive_total > 0 and .browser == "chromium"' "$ROOT/documentation/ui-v1.8/ui-summary.json" >/dev/null || ui_exit=1
+for browser in firefox webkit; do
+  report="$ROOT/documentation/ui-v1.8/$browser/ui-summary.json"
+  jq -e --arg browser "$browser" '.failed == 0 and .passed == .scenario_count and .image_dom_passed == .image_dom_total and .link_crawl_passed == .link_crawl_total and .responsive_passed == .responsive_total and .browser == $browser' "$report" >/dev/null || ui_exit=1
+done
 jq -e '.status == "PASS" and .scale == 1 and ([.phases[] | select(.name == "sustained_read_10rps") | .target_rps == 10 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "burst_read_25rps") | .target_rps == 25 and .duration_seconds == 60] | any) and ([.phases[] | select(.name == "write_api_2rps") | .target_rps == 2 and .duration_seconds == 900] | any) and ([.phases[] | select(.name == "concurrent_sessions_50") | .target_concurrency == 50 and .status == "PASS"] | any)' "$ROOT/documentation/capacity-envelope-v${VERSION}.json" >/dev/null
 jq -e '.status == "PASS" and .from_tag == "v6.17.16" and .to_version == "6.17.17" and ([.checks[] | select(.test_id == "UPGRADE-DATA-001" or .test_id == "UPGRADE-SETTINGS-001" or .test_id == "UPGRADE-IDEMPOTENT-001") | .status == "PASS"] | all)' "$ROOT/documentation/upgrade-v6.17.16-to-v${VERSION}.json" >/dev/null
 if [ "$visual_exit" -ne 0 ] || [ "$capacity_exit" -ne 0 ] || [ "$upgrade_exit" -ne 0 ] || [ "$ui_exit" -ne 0 ]; then
