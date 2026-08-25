@@ -90,7 +90,7 @@ PK_BASE="$BASE" PK_REPORT="$ROOT/documentation/i18n-fonts-v${VERSION}.json" node
 PK_SORT_REPORT="$ROOT/documentation/search-sorting-v${VERSION}.json" php "$ROOT/scripts/test-search-sorting.php" > "$ROOT/documentation/search-sorting-v${VERSION}.log"
 
 SECRET_B64="$(openssl rand -base64 32)"
-PARTIKULIER_N8N_SECRET="$SECRET_B64" PK_HMAC_LOG="$ROOT/documentation/hmac-http-v${VERSION}.json" bash "$ROOT/scripts/test-hmac-http.sh" > "$ROOT/documentation/hmac-http-v${VERSION}.log"
+PK_BASE="$BASE" PK_COMMIT="$CI_COMMIT" PARTIKULIER_N8N_SECRET="$SECRET_B64" PK_HMAC_LOG="$ROOT/documentation/hmac-http-v${VERSION}.json" bash "$ROOT/scripts/test-hmac-http.sh" > "$ROOT/documentation/hmac-http-v${VERSION}.log"
 for run in 1 2 3; do
   PK_SQL_REPORT="$ROOT/documentation/sql-trace-v${VERSION}-run${run}.json" php "$ROOT/scripts/measure-sql-senior.php" > "$ROOT/documentation/sql-v${VERSION}-run${run}.log"
 done
