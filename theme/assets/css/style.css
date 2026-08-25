@@ -2602,3 +2602,61 @@ html[dir="rtl"] .pk-card-price {
 	.pk-mobile-primary-nav { padding-inline: 4px; }
 	.pk-mobile-primary-nav a { font-size: .68rem; padding-inline: .2rem; }
 }
+
+
+/* v1.8 contextual sticky primary navigation: normal in flow, sticky at the viewport top. */
+.pk-site-header {
+	position: relative;
+	top: auto;
+	z-index: auto;
+}
+
+.pk-main-nav {
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+	background: var(--pk-white);
+	box-shadow: 0 4px 16px rgba(22,23,21,.06);
+}
+
+.pk-mobile-primary-nav { display: none !important; }
+
+@media (max-width: 767px) {
+	.pk-main-nav { display: block; }
+	.pk-main-nav .pk-container { padding-inline: 12px; }
+	.pk-main-nav .pk-menu {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 0;
+		width: 100%;
+	}
+	.pk-main-nav .pk-menu-item { min-width: 0; }
+	.pk-main-nav .pk-menu-item > a {
+		justify-content: center;
+		min-height: 58px;
+		margin-right: 0;
+		padding: .55rem .25rem;
+		font-size: .68rem;
+		letter-spacing: .02em;
+		line-height: 1.2;
+		text-align: center;
+		text-transform: none;
+	}
+	.pk-main-nav .pk-menu-item + .pk-menu-item > a { border-inline-start: 1px solid var(--pk-line); }
+	.pk-main-nav .pk-menu-item.pk-current > a::after { left: 22%; right: 22%; }
+	.pk-main-nav .pk-submenu { display: none; }
+	.pk-main { padding-bottom: 1rem; }
+	.pk-site-footer { padding-bottom: 1rem; }
+}
+
+@media (max-width: 390px) {
+	.pk-main-nav .pk-menu-item > a { font-size: .64rem; padding-inline: .15rem; }
+}
+
+
+/* Keep horizontal clipping without creating an overflow scroll container that
+   would prevent the primary navigation from sticking to the viewport top. */
+@media (max-width: 767px) {
+	html,
+	body { overflow-x: clip; }
+}
