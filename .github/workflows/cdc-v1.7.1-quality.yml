@@ -1,10 +1,8 @@
 name: cdc-v1.7.1-quality
 
 on:
-  push:
-    branches: ["implementation/cdc-v1.7.1", "docs/cdc-ultra-premium-v1.7"]
-  pull_request:
-    branches: ["main", "implementation/cdc-v1.7.1"]
+  # Workflow historique conservé pour rejouer la recette à la demande.
+  workflow_dispatch:
 
 permissions:
   contents: read

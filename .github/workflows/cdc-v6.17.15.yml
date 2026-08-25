@@ -1,10 +1,8 @@
 name: CDC fermé Partikulier 6.17.15
 
 on:
-  push:
-    branches: ["main", "fix/cdc-v6.17.15"]
-    tags: ["v6.17.15"]
-  pull_request:
+  # Workflow historique conservé pour rejouer la recette à la demande.
+  workflow_dispatch:
 
 permissions:
   contents: read
