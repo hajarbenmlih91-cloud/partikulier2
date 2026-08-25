@@ -52,8 +52,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// Marque en texte : pas d'image, donc nette a toutes les resolutions,
 			// traduisible, selectionnable, et sans requete HTTP supplementaire.
 			// Un logo televerse dans Personnaliser reste prioritaire s'il y en a un.
-			if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
-				the_custom_logo();
+				if ( function_exists( 'get_custom_logo' ) && has_custom_logo() ) {
+					$pk_logo_html = get_custom_logo();
+					$pk_logo_home = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
+					$pk_logo_html = preg_replace( '/href=("|\\\').*?\\1/', 'href="' . esc_url( $pk_logo_home ) . '"', (string) $pk_logo_html, 1 );
+					echo $pk_logo_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
 				$pk_home = esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) );
 				$pk_name = get_bloginfo( 'name' );

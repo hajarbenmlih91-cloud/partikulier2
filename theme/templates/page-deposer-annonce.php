@@ -46,7 +46,7 @@ $types = get_terms( array(
 
 	<div class="pk-submit-hero">
 		<div class="pk-container">
-			<a class="pk-submit-back" href="<?php echo esc_url( home_url( '/' ) ); ?>">
+			<a class="pk-submit-back" href="<?php echo esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) ); ?>">
 				<span aria-hidden="true">&larr;</span> <?php esc_html_e( 'Retour à l’accueil', 'partikulier' ); ?>
 			</a>
 			<p class="pk-editorial-kicker"><?php esc_html_e( 'Publication directe', 'partikulier' ); ?></p>
