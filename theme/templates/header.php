@@ -158,6 +158,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
+	<nav class="pk-mobile-quick-actions" aria-label="<?php esc_attr_e( 'Actions rapides', 'partikulier' ); ?>">
+		<div class="pk-container">
+			<a href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>">
+				<?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?>
+			</a>
+			<a href="<?php echo esc_url( is_user_logged_in() ? pk_page_url( 'mes-annonces', '/mes-annonces/' ) : wp_login_url( pk_page_url( 'mes-annonces', '/mes-annonces/' ) ) ); ?>">
+				<?php echo esc_html( is_user_logged_in() ? __( 'Mon espace', 'partikulier' ) : __( 'Se connecter', 'partikulier' ) ); ?>
+			</a>
+		</div>
+	</nav>
+
 	<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
 		<div class="pk-container">
 			<?php
