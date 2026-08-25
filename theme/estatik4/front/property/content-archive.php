@@ -95,7 +95,7 @@ if ( ! $img_id ) {
 				<?php if ( $avif ) : ?>
 					<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 				<?php endif; ?>
-				<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( get_the_title( $post ) ); ?>" loading="lazy" decoding="async">
+				<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( get_the_title( $post ) ); ?>" loading="eager" decoding="async">
 			</picture>
 		<?php else : ?>
 			<div class="pk-card-placeholder" aria-hidden="true"><span><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.6V21h14V9.6"/><path d="M9.5 21v-6h5v6"/></svg></span></div>
