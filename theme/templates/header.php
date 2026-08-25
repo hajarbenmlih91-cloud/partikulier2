@@ -158,16 +158,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-	<nav class="pk-mobile-quick-actions" aria-label="<?php esc_attr_e( 'Actions rapides', 'partikulier' ); ?>">
-		<div class="pk-container">
+			<nav class="pk-mobile-primary-nav" aria-label="<?php esc_attr_e( 'Navigation mobile', 'partikulier' ); ?>">
+			<a href="<?php echo esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) ); ?>">
+				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Accueil', 'Home', 'partikulier' ) ); ?>
+			</a>
+			<a href="<?php echo esc_url( pk_properties_archive_url() ); ?>">
+				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Annonces', 'Listings', 'partikulier' ) ); ?>
+			</a>
 			<a href="<?php echo esc_url( pk_page_url( 'deposer', '/deposer/' ) ); ?>">
-				<?php esc_html_e( 'Déposer une annonce', 'partikulier' ); ?>
+				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Déposer une annonce', 'Post a listing', 'partikulier' ) ); ?>
 			</a>
-			<a href="<?php echo esc_url( is_user_logged_in() ? pk_page_url( 'mes-annonces', '/mes-annonces/' ) : wp_login_url( pk_page_url( 'mes-annonces', '/mes-annonces/' ) ) ); ?>">
-				<?php echo esc_html( is_user_logged_in() ? __( 'Mon espace', 'partikulier' ) : __( 'Se connecter', 'partikulier' ) ); ?>
-			</a>
-		</div>
-	</nav>
+		</nav>
+
+
 
 	<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
 		<div class="pk-container">
@@ -195,13 +198,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		) );
 		?>
 	</div>
-	<?php if ( is_singular( PARTIKULIER_ESTATIK_POST_TYPE ) ) : ?>
-		<nav class="pk-mobile-action-bar pk-mobile-action-bar--single" aria-label="<?php esc_attr_e( 'Action principale', 'partikulier' ); ?>">
-			<a class="pk-btn pk-btn-primary" href="#pk-contact-card">
-				<?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contacter le propriétaire', 'Contacter le propriétaire', 'partikulier' ) ); ?>
-			</a>
-		</nav>
-		<?php endif; ?>
-</header>
+
+	</header>
 
 <main id="main-content" class="pk-main">
