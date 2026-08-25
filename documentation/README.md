@@ -15,7 +15,7 @@ Ce dossier contient plusieurs générations de preuves et de rapports. Pour évi
 
 ## Code et CI actifs
 
-Le code produit se trouve dans `theme/`, `mu-plugins/` et `partikulier-core/`. Le workflow de référence de la candidate est `.github/workflows/cdc-v1.7.1-candidate.yml`. Les workflows historiques v6.17.15, v6.17.16 et le workflow quality v1.7.1 sont conservés pour traçabilité, mais ne doivent pas s’exécuter automatiquement ; leur déclenchement est manuel uniquement.
+Le code produit se trouve dans `theme/`, `mu-plugins/` et `partikulier-core/`. Le workflow de référence de la candidate est `.github/workflows/cdc-v1.7.1-candidate.yml`. Les workflows historiques v6.17.10 à v6.17.16 ainsi que le workflow quality v1.7.1 sont conservés dans l’historique pour traçabilité, mais sont **désactivés dans GitHub Actions**. Seule la candidate v1.7.1 reste active ; toute réactivation d’un historique doit être décidée explicitement.
 
 ## Preuves et rapports
 
