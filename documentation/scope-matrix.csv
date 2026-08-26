@@ -29,7 +29,7 @@ Capacity burst reads,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires 25
 Capacity write API,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires authenticated write API at 2 req/s for 900 seconds with cleanup and no secret disclosure
 Capacity concurrent sessions,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires 50 concurrent client sessions
 Capacity CPU RSS saturation,M1,IMPLEMENTED,NOT_RUN,performance,CDC envelope requires cgroup CPU/RSS peaks and a controlled saturation point
-Upgrade v6.17.16 to v6.17.17,M1,IMPLEMENTED,NOT_RUN,operations,Fresh install does not prove upgrade preservation; old-tag runtime, data/settings invariants and idempotent migration must pass
+Upgrade v6.17.16 to v6.17.22,M1,IMPLEMENTED,NOT_RUN,operations,Fresh install does not prove upgrade preservation; old-tag runtime, data/settings invariants and idempotent migration must pass
 partikulier-pro,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly OUT_OF_FIRST_RELEASE_SCOPE; optional module and never implied delivered
 Payments and orders,M2,NOT_IMPLEMENTED,NOT_RUN,commercial,Explicitly OUT_OF_FIRST_RELEASE_SCOPE and outside current technical release until implemented
 Commercial approval,M2,NOT_IMPLEMENTED,NOT_RUN,product,Required product decision; OUT_OF_FIRST_TECHNICAL_RELEASE until approved
