@@ -1,0 +1,48 @@
+=== /fr/annonces/ request=1 ===
+HTTP/2 200
+vary: Accept-Encoding
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: HIT
+time_starttransfer=3.282651 time_total=4.725720 http=200
+=== /fr/annonces/ request=2 ===
+HTTP/2 200
+vary: Accept-Encoding
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: HIT
+time_starttransfer=3.183402 time_total=4.704018 http=200
+=== /en/annonces/ request=1 ===
+HTTP/2 200
+vary: Accept-Encoding
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: MISS
+time_starttransfer=3.556551 time_total=4.825105 http=200
+=== /en/annonces/ request=2 ===
+HTTP/2 200
+vary: Accept-Encoding
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: MISS
+time_starttransfer=3.577045 time_total=5.108358 http=200
+=== /ar/annonces/ request=1 ===
+HTTP/2 200
+vary: Accept-Encoding
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: HIT
+time_starttransfer=3.267957 time_total=4.826590 http=200
+=== /ar/annonces/ request=2 ===
+HTTP/2 200
+vary: Accept-Encoding
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: HIT
+time_starttransfer=2.809553 time_total=4.351488 http=200

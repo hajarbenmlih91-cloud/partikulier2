@@ -166,6 +166,17 @@ $partikulier_modules = array(
 	'/templates/parts/helpers.php',
 );
 
+// La collection REST du core ne rend aucun HTML et n’utilise aucun module du
+// thème. Éviter leur bootstrap sur cette route réduit le coût CPU sans
+// modifier les réponses, les routes front ou les contrats de présentation.
+$partikulier_rest_route = isset( $_GET['rest_route'] ) ? sanitize_text_field( (string) wp_unslash( $_GET['rest_route'] ) ) : '';
+$partikulier_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+$partikulier_core_listing_rest = str_contains( $partikulier_request_uri, '/wp-json/partikulier/v1/listings' )
+	|| str_starts_with( $partikulier_rest_route, '/partikulier/v1/listings' );
+if ( $partikulier_core_listing_rest ) {
+	$partikulier_modules = array();
+}
+
 foreach ( $partikulier_modules as $module ) {
 	$file = PARTIKULIER_DIR . $module;
 	if ( file_exists( $file ) ) {

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Partikulier\Core;
@@ -9,27 +10,66 @@ use WP_REST_Response;
 
 final class RestController
 {
-    private ListingRepository $repository;
-    private ListingPolicy $policy;
-    private SearchService $search;
-    private ListingService $service;
-    private HealthCheck $health;
-    private LeadService $leads;
-    private FavoriteService $favorites;
-    private RateLimiter $rateLimiter;
+    private ?ListingRepository $repository = null;
+    private ?ListingPolicy $policy = null;
+    private ?SearchService $search = null;
+    private ?ListingService $service = null;
+    private ?AuditLogger $audit = null;
+    private ?LeadService $leads = null;
+    private ?FavoriteService $favorites = null;
+    private ?RateLimiter $rateLimiter = null;
+    private ?HealthCheck $health = null;
 
     public function __construct()
     {
-        $audit = new AuditLogger();
-        $this->repository = new ListingRepository();
-        $this->policy = new ListingPolicy();
-        $this->search = new SearchService($this->repository);
-        $this->service = new ListingService($this->repository, $audit);
-        $this->leads = new LeadService();
-        $this->favorites = new FavoriteService();
-        $this->rateLimiter = new RateLimiter();
-        $this->health = new HealthCheck();
+        // Les services sont construits à la demande : les lectures publiques ne
+        // initialisent ni leads, ni favoris, ni santé, ni écriture.
         add_action('rest_api_init', [$this, 'registerRoutes']);
+    }
+
+    private function repository(): ListingRepository
+    {
+        return $this->repository ??= new ListingRepository();
+    }
+
+    private function policy(): ListingPolicy
+    {
+        return $this->policy ??= new ListingPolicy();
+    }
+
+    private function search(): SearchService
+    {
+        return $this->search ??= new SearchService($this->repository());
+    }
+
+    private function service(): ListingService
+    {
+        return $this->service ??= new ListingService($this->repository(), $this->audit());
+    }
+
+    private function audit(): AuditLogger
+    {
+        return $this->audit ??= new AuditLogger();
+    }
+
+    private function leads(): LeadService
+    {
+        return $this->leads ??= new LeadService();
+    }
+
+    private function favorites(): FavoriteService
+    {
+        return $this->favorites ??= new FavoriteService();
+    }
+
+    private function rateLimiter(): RateLimiter
+    {
+        return $this->rateLimiter ??= new RateLimiter();
+    }
+
+    private function health(): HealthCheck
+    {
+        return $this->health ??= new HealthCheck();
     }
 
     public function registerRoutes(): void
@@ -75,29 +115,29 @@ final class RestController
         ]);
         register_rest_route('partikulier/v1', '/health', [
             'methods' => 'GET',
-            'callback' => fn(): WP_REST_Response => new WP_REST_Response($this->health->get(), 200),
+            'callback' => fn(): WP_REST_Response => new WP_REST_Response($this->health()->get(), 200),
             'permission_callback' => [$this, 'guardPublic'],
         ]);
     }
 
     public function guardPublic(WP_REST_Request $request): bool|WP_Error
     {
-        return $this->rateLimiter->guard($request, 'public', $this->policy->canReadPublic(), 180, 60);
+        return $this->rateLimiter()->guard($request, 'public', $this->policy()->canReadPublic(), 180, 60);
     }
 
     public function guardWrite(WP_REST_Request $request): bool|WP_Error
     {
-        return $this->rateLimiter->guard($request, 'write', $this->policy->canCreate(), 30, 60);
+        return $this->rateLimiter()->guard($request, 'write', $this->policy()->canCreate(), 30, 60);
     }
 
     public function guardLead(WP_REST_Request $request): bool|WP_Error
     {
-        return $this->rateLimiter->guard($request, 'lead', $this->policy->canReadPublic(), 10, 60);
+        return $this->rateLimiter()->guard($request, 'lead', $this->policy()->canReadPublic(), 10, 60);
     }
 
     public function guardPrivate(WP_REST_Request $request): bool|WP_Error
     {
-        return $this->rateLimiter->guard($request, 'private', $this->policy->canReadPrivate(), 60, 60);
+        return $this->rateLimiter()->guard($request, 'private', $this->policy()->canReadPrivate(), 60, 60);
     }
 
     private function listArgs(): array
@@ -112,30 +152,30 @@ final class RestController
 
     public function listings(WP_REST_Request $request): WP_REST_Response
     {
-        return new WP_REST_Response(['data' => $this->search->search($request->get_params()), 'page' => (int) $request['page']], 200);
+        return new WP_REST_Response(['data' => $this->search()->search($request->get_params()), 'page' => (int) $request['page']], 200);
     }
 
     public function listing(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $result = $this->repository->find((int) $request['id']);
+        $result = $this->repository()->find((int) $request['id']);
         return is_wp_error($result) ? $result : new WP_REST_Response(['data' => $result], 200);
     }
 
     public function createListing(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $id = $this->service->create($request->get_json_params() ?: $request->get_params(), get_current_user_id());
+        $id = $this->service()->create($request->get_json_params() ?: $request->get_params(), get_current_user_id());
         return is_wp_error($id) ? $id : new WP_REST_Response(['id' => $id, 'status' => 'draft'], 201);
     }
 
     public function createLead(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $result = $this->leads->create($request->get_json_params() ?: $request->get_params());
+        $result = $this->leads()->create($request->get_json_params() ?: $request->get_params());
         return is_wp_error($result) ? $result : new WP_REST_Response(['data' => $result], 201);
     }
 
     public function toggleFavorite(WP_REST_Request $request): WP_REST_Response|WP_Error
     {
-        $result = $this->favorites->toggle((int) $request['listing_id'], get_current_user_id());
+        $result = $this->favorites()->toggle((int) $request['listing_id'], get_current_user_id());
         return is_wp_error($result) ? $result : new WP_REST_Response(['data' => $result], 200);
     }
 }

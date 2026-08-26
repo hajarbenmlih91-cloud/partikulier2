@@ -17,30 +17,55 @@ const PARTIKULIER_CORE_FILE = __FILE__;
 
 require_once __DIR__ . '/src/Database/Schema.php';
 require_once __DIR__ . '/src/Database/Migrator.php';
-require_once __DIR__ . '/src/AuditLogger.php';
-require_once __DIR__ . '/src/ListingPolicy.php';
 require_once __DIR__ . '/src/ListingRepository.php';
-require_once __DIR__ . '/src/ListingService.php';
-require_once __DIR__ . '/src/SearchService.php';
-require_once __DIR__ . '/src/TranslationService.php';
 require_once __DIR__ . '/src/HealthCheck.php';
 require_once __DIR__ . '/src/Services.php';
-require_once __DIR__ . '/src/RateLimiter.php';
-require_once __DIR__ . '/src/RestController.php';
+
+/**
+ * Les classes REST et d’écriture ne sont pas nécessaires sur une page HTML
+ * publique. Elles restent chargées pour REST, WP-CLI et l’administration afin
+ * de préserver les contrats existants et les commandes de maintenance.
+ */
+function partikulier_core_should_load_rest(): bool
+{
+    if (defined('REST_REQUEST') && REST_REQUEST) {
+        return true;
+    }
+    if (defined('WP_CLI') && WP_CLI) {
+        return true;
+    }
+    if (is_admin()) {
+        return true;
+    }
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
+    return str_contains($request_uri, '/wp-json/') || isset($_GET['rest_route']);
+}
+
+if (partikulier_core_should_load_rest()) {
+    require_once __DIR__ . '/src/AuditLogger.php';
+    require_once __DIR__ . '/src/ListingPolicy.php';
+    require_once __DIR__ . '/src/ListingService.php';
+    require_once __DIR__ . '/src/SearchService.php';
+    require_once __DIR__ . '/src/TranslationService.php';
+    require_once __DIR__ . '/src/RateLimiter.php';
+    require_once __DIR__ . '/src/RestController.php';
+}
 
 use Partikulier\Core\Database\Migrator;
 use Partikulier\Core\HealthCheck;
 use Partikulier\Core\RestController;
 
 add_action('plugins_loaded', static function (): void {
-    if (!class_exists('\wpdb')) {
+    if (!class_exists('\\wpdb')) {
         return;
     }
     $GLOBALS['partikulier_core_migrator'] = new Migrator();
     $GLOBALS['partikulier_core_health'] = new HealthCheck();
     $GLOBALS['partikulier_core_jobs'] = new \Partikulier\Core\JobRunner();
     $GLOBALS['partikulier_core_jobs']->register();
-    $GLOBALS['partikulier_core_rest'] = new RestController();
+    if (partikulier_core_should_load_rest()) {
+        $GLOBALS['partikulier_core_rest'] = new RestController();
+    }
 });
 
 register_activation_hook(__FILE__, static function (): void {
