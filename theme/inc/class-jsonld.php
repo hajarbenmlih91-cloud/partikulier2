@@ -324,7 +324,7 @@ class Partikulier_JSONLD {
 	 * Fil d'Ariane logique (pas de HTML).
 	 */
 	public static function build_breadcrumbs() {
-		$home  = home_url( '/' );
+		$home  = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
 		$crumbs = array( array( 'name' => get_bloginfo( 'name' ), 'url' => $home ) );
 
 		if ( is_singular( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
