@@ -64,6 +64,18 @@ function pk_localized_home_url( $language = '' ) {
 	if ( ! $language && function_exists( 'pll_current_language' ) ) {
 		$language = sanitize_key( (string) pll_current_language( 'slug' ) );
 	}
+	// Polylang peut ne pas encore exposer la langue pendant certains rendus
+	// froids. La route publique reste alors la source de vérité fonctionnelle.
+	if ( ! $language && isset( $_SERVER['REQUEST_URI'] ) ) {
+		$request_path = sanitize_text_field( (string) wp_parse_url( wp_unslash( (string) $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- REQUEST_URI is unslashed and sanitized for route detection
+		$first_segment = sanitize_key( (string) strtok( trim( $request_path, '/' ), '/' ) );
+		if ( in_array( $first_segment, array( 'fr', 'en', 'ar' ), true ) ) {
+			$language = $first_segment;
+		}
+	}
+	if ( ! $language && function_exists( 'determine_locale' ) ) {
+		$language = sanitize_key( substr( (string) determine_locale(), 0, 2 ) );
+	}
 	if ( ! $language ) {
 		return trailingslashit( home_url( '/' ) );
 	}
@@ -169,8 +181,8 @@ $partikulier_modules = array(
 // La collection REST du core ne rend aucun HTML et n’utilise aucun module du
 // thème. Éviter leur bootstrap sur cette route réduit le coût CPU sans
 // modifier les réponses, les routes front ou les contrats de présentation.
-$partikulier_rest_route = isset( $_GET['rest_route'] ) ? sanitize_text_field( (string) wp_unslash( $_GET['rest_route'] ) ) : '';
-$partikulier_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+	$partikulier_rest_route = isset( $_GET['rest_route'] ) ? sanitize_text_field( (string) wp_unslash( $_GET['rest_route'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- route detection, not form processing
+	$partikulier_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( (string) wp_unslash( $_SERVER['REQUEST_URI'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- route detection, not form processing
 $partikulier_core_listing_rest = str_contains( $partikulier_request_uri, '/wp-json/partikulier/v1/listings' )
 	|| str_starts_with( $partikulier_rest_route, '/partikulier/v1/listings' );
 if ( $partikulier_core_listing_rest ) {
