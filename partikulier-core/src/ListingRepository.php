@@ -69,7 +69,8 @@ final class ListingRepository
         if (!self::apcuAvailable() || !function_exists('apcu_inc')) {
             return;
         }
-        if (false === apcu_inc('pk_listing_search_version')) {
+        $nextVersion = apcu_inc('pk_listing_search_version');
+        if (!is_int($nextVersion)) {
             apcu_store('pk_listing_search_version', 2, 0);
         }
     }

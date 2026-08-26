@@ -19,7 +19,6 @@ require_once __DIR__ . '/src/Database/Schema.php';
 require_once __DIR__ . '/src/Database/Migrator.php';
 require_once __DIR__ . '/src/ListingRepository.php';
 require_once __DIR__ . '/src/HealthCheck.php';
-require_once __DIR__ . '/src/Services.php';
 
 /**
  * Les classes REST et d’écriture ne sont pas nécessaires sur une page HTML
@@ -40,8 +39,22 @@ function partikulier_core_should_load_rest(): bool
     if (is_admin()) {
         return true;
     }
-    $request_uri = isset($_SERVER['REQUEST_URI']) ? (string) $_SERVER['REQUEST_URI'] : '';
-    return str_contains($request_uri, '/wp-json/') || isset($_GET['rest_route']);
+    $request_uri = isset($_SERVER['REQUEST_URI']) ? sanitize_text_field(wp_unslash((string) $_SERVER['REQUEST_URI'])) : '';
+    return str_contains($request_uri, '/wp-json/') || isset($_GET['rest_route']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- route detection, not form processing
+}
+
+function partikulier_core_should_load_jobs(): bool
+{
+    if (PHP_SAPI === 'cli') {
+        return true;
+    }
+    if (defined('WP_CLI') && WP_CLI) {
+        return true;
+    }
+    if (defined('DOING_CRON') && DOING_CRON) {
+        return true;
+    }
+    return is_admin();
 }
 
 function partikulier_core_load_rest_classes(): void
@@ -50,6 +63,7 @@ function partikulier_core_load_rest_classes(): void
     if ($loaded) {
         return;
     }
+    require_once __DIR__ . '/src/Services.php';
     require_once __DIR__ . '/src/AuditLogger.php';
     require_once __DIR__ . '/src/ListingPolicy.php';
     require_once __DIR__ . '/src/ListingService.php';
@@ -74,8 +88,11 @@ add_action('plugins_loaded', static function (): void {
     }
     $GLOBALS['partikulier_core_migrator'] = new Migrator();
     $GLOBALS['partikulier_core_health'] = new HealthCheck();
-    $GLOBALS['partikulier_core_jobs'] = new \Partikulier\Core\JobRunner();
-    $GLOBALS['partikulier_core_jobs']->register();
+    if (partikulier_core_should_load_jobs()) {
+        require_once __DIR__ . '/src/Services.php';
+        $GLOBALS['partikulier_core_jobs'] = new \Partikulier\Core\JobRunner();
+        $GLOBALS['partikulier_core_jobs']->register();
+    }
     if (partikulier_core_should_load_rest()) {
         partikulier_core_load_rest_classes();
         $GLOBALS['partikulier_core_rest'] = new RestController();

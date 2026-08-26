@@ -45,8 +45,19 @@ async function filterCase() {
   const saleOk = sale.response?.status() === 200 && saleData.cards > 0 && saleData.sale_badges > 0;
   results.push({ test: 'filter-sale', status: saleOk ? 'PASS' : 'FAIL', http_status: sale.response?.status() || 0, data: saleData });
   const rent = await load(page, '/fr/annonces/?es_action=a-louer');
-  const rentData = await page.evaluate(() => ({ cards: document.querySelectorAll('.pk-card.pk-card-property').length, selected: document.querySelector('#pk-s-action')?.value || '' }));
-  results.push({ test: 'filter-rent-dataset-observation', status: rent.response?.status() === 200 ? 'PASS' : 'FAIL', http_status: rent.response?.status() || 0, data: rentData, limitation: 'Un résultat nul est une observation du dataset live, pas une création de fixture.' });
+  const rentData = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('.pk-card.pk-card-property')];
+    return {
+      cards: cards.length,
+      selected: document.querySelector('#pk-s-action')?.value || '',
+      rent_badges: cards.filter((el) => /à louer|a louer|\/ mois|par mois|per month/i.test(el.innerText)).length,
+      sale_badges: cards.filter((el) => /à vendre|a vendre|for sale/i.test(el.innerText)).length,
+    };
+  });
+  const rentStatus = rent.response?.status() !== 200
+    ? 'FAIL'
+    : (rentData.selected === 'a-louer' && rentData.cards > 0 && rentData.rent_badges > 0 ? 'PASS' : 'BLOCKED');
+  results.push({ test: 'filter-rent-dataset-observation', status: rentStatus, http_status: rent.response?.status() || 0, data: rentData, limitation: 'Un résultat nul ou sans badge location est une observation du dataset live, pas une création de fixture.' });
   await page.close();
 }
 
@@ -118,7 +129,9 @@ try {
   await browser.close();
 }
 const failed = results.filter((row) => row.status === 'FAIL');
-const report = { test_id: 'LIVE-FINAL30-SMOKE', browser: browserName, base, status: failed.length ? 'FAIL' : 'PASS', passed: results.length - failed.length, failed: failed.length, results, limitations: ['Le smoke test ne remplace pas les signoffs humains, la capacité 10 RPS, ni la mesure contractuelle TTFB/LCP.'] };
+const blocked = results.filter((row) => row.status === 'BLOCKED');
+const passed = results.filter((row) => row.status === 'PASS');
+const report = { test_id: 'LIVE-FINAL30-SMOKE', browser: browserName, base, status: failed.length ? 'FAIL' : (blocked.length ? 'BLOCKED' : 'PASS'), passed: passed.length, failed: failed.length, blocked: blocked.length, total: results.length, results, limitations: ['Le smoke test ne remplace pas les signoffs humains, la capacité 10 RPS, ni la mesure contractuelle TTFB/LCP.'] };
 fs.mkdirSync(new URL('.', `file://${process.cwd()}/${out}`).pathname, { recursive: true });
 fs.writeFileSync(out, JSON.stringify(report, null, 2));
 console.log(JSON.stringify(report));

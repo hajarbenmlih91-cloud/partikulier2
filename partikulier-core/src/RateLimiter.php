@@ -37,7 +37,7 @@ final class RateLimiter
                 $started = $now;
             }
             $count = apcu_inc($countKey, 1, $countFound, $window);
-            if (!$countFound) {
+            if (!$countFound || !is_int($count)) {
                 $count = 1;
                 apcu_store($countKey, $count, $window);
             }
@@ -63,7 +63,7 @@ final class RateLimiter
 
     private function clientIp(): string
     {
-        $ip = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : 'unknown';
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash((string) $_SERVER['REMOTE_ADDR'])) : 'unknown';
         return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : 'unknown';
     }
 }

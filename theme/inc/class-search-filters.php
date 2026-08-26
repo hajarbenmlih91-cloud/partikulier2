@@ -110,6 +110,7 @@ class Partikulier_Search_Filters {
 
 			$taxonomy_map = self::taxonomy_map();
 			$taxonomy_map['location'] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
+			$unresolvable_action = false;
 			foreach ( $taxonomy_map as $param => $taxonomy ) {
 			if ( empty( $_GET[ $param ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				continue;
@@ -148,9 +149,14 @@ class Partikulier_Search_Filters {
 				? get_term( (int) $raw, $taxonomy )
 				: get_term_by( 'slug', $raw, $taxonomy );
 
-			if ( ! $term || is_wp_error( $term ) ) {
-				continue;
-			}
+				if ( ! $term || is_wp_error( $term ) ) {
+					// Ne jamais ignorer silencieusement un filtre transactionnel reconnu :
+					// sans terme resolu, retourner zero resultat plutot que les ventes completes.
+					if ( 'es_action' === $param && in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
+						$unresolvable_action = true;
+					}
+					continue;
+				}
 
 			$tax_query[] = array(
 				'taxonomy'         => $taxonomy,
@@ -168,7 +174,7 @@ class Partikulier_Search_Filters {
 			}
 			if ( '' !== $city_slug && taxonomy_exists( PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) {
 				$city_term = get_term_by( 'slug', $city_slug, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
-				if ( $city_term && ! is_wp_error( $city_term ) ) {
+				if ( $city_term ) {
 					$tax_query[] = array(
 						'taxonomy'         => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
 						'field'            => 'term_id',
@@ -178,6 +184,9 @@ class Partikulier_Search_Filters {
 				}
 			}
 
+			if ( $unresolvable_action ) {
+				$query->set( 'post__in', array( 0 ) );
+			}
 			if ( count( $tax_query ) > 1 ) {
 				$tax_query['relation'] = 'AND';
 			}
