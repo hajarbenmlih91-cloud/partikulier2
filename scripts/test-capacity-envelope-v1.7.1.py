@@ -201,7 +201,10 @@ def phase(base: str, name: str, rps: int, duration: int, credentials: list[tuple
     deadline = phase_started + duration
     sampler.start()
 
-    workers = min(max(1, rps), 200)
+    # Fournir assez de workers pour maintenir le taux cible même si une
+    # requête dépasse une seconde ; sinon 25 workers à 25 RPS plafonnent
+    # artificiellement le générateur autour de 25 / latence.
+    workers = min(max(1, rps * 4), 200)
     interval = workers / rps
     def timed_worker(worker_id: int) -> None:
         nonlocal dispatch_number
