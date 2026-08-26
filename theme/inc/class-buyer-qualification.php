@@ -454,7 +454,11 @@ class Partikulier_Buyer_Qualification {
 			return '';
 		}
 		$key = hash( 'sha256', wp_salt( 'secure_auth' ), true );
-		return (string) openssl_decrypt( substr( $payload, 16 ), 'AES-256-CBC', $key, OPENSSL_RAW_DATA, substr( $payload, 0, 16 ) );
+		$decrypted = openssl_decrypt( substr( $payload, 16 ), 'AES-256-CBC', $key, OPENSSL_RAW_DATA, substr( $payload, 0, 16 ) );
+		if ( false === $decrypted ) {
+			return '';
+		}
+		return (string) $decrypted;
 	}
 }
 
