@@ -84,12 +84,14 @@ class Partikulier_AVIF {
 			return true;
 		}
 		if ( file_exists( $avif ) && 0 === filesize( $avif ) ) {
-			@unlink( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+			wp_delete_file( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations
+
 		}
 		if ( wp_image_editor_supports( array( 'mime_type' => 'image/avif' ) ) ) {
 			$editor = wp_get_image_editor( $file );
 			if ( ! is_wp_error( $editor ) ) {
-				$result = $editor->save( $avif, 'image/avif', array( 'quality' => self::QUALITY ) );
+					$editor->set_quality( self::QUALITY );
+					$result = $editor->save( $avif, 'image/avif' );
 				if ( ! is_wp_error( $result ) && ! empty( $result['path'] ) && file_exists( $result['path'] ) && filesize( $result['path'] ) > 0 ) {
 					return true;
 				}
@@ -102,7 +104,8 @@ class Partikulier_AVIF {
 
 		$converted = self::convert_with_vips( $file, $avif );
 		if ( ! $converted && file_exists( $avif ) && 0 === filesize( $avif ) ) {
-			@unlink( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+			wp_delete_file( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations
+
 		}
 		return $converted;
 	}
@@ -119,7 +122,8 @@ class Partikulier_AVIF {
 		$command = escapeshellarg( $binary ) . ' --min 25 --max 25 ' . escapeshellarg( $file ) . ' ' . escapeshellarg( $avif ) . ' 2>&1';
 		$output = array();
 		$code   = 1;
-		@exec( $command, $output, $code ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+		@exec( $command, $output, $code ); // nosemgrep: php.lang.security.exec-use.exec-use -- binaire absolu, chemin média et cible protégés par escapeshellarg
+
 
 		return 0 === $code && file_exists( $avif ) && filesize( $avif ) > 0;
 	}
@@ -138,7 +142,8 @@ class Partikulier_AVIF {
 		$command = escapeshellarg( $binary ) . ' copy ' . escapeshellarg( $file ) . ' ' . escapeshellarg( $target ) . ' 2>&1';
 		$output = array();
 		$code   = 1;
-		@exec( $command, $output, $code ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+		@exec( $command, $output, $code ); // nosemgrep: php.lang.security.exec-use.exec-use -- binaire absolu, chemin média et cible protégés par escapeshellarg
+
 
 		return 0 === $code && file_exists( $avif ) && filesize( $avif ) > 0;
 	}

@@ -1,6 +1,6 @@
 {
   "name": "partikulier-dev",
-  "version": "6.17.18",
+  "version": "6.17.22",
   "private": true,
   "description": "Environnement de développement du thème Partikulier",
   "scripts": {

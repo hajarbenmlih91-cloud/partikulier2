@@ -56,6 +56,9 @@ if ( ! defined( 'WP_CLI' ) && ! current_user_can( 'manage_options' ) ) {
 }
 
 $appliquer = ! empty( $_GET['appliquer'] );
+if ( $appliquer && ! defined( 'WP_CLI' ) ) {
+	check_admin_referer( 'partikulier_reparer_taxonomies' );
+}
 if ( ! $appliquer && defined( 'WP_CLI' ) ) {
 	// en CLI : wp eval-file ... --appliquer  OU  PK_APPLIQUER=1 wp eval-file ...
 	$appliquer = ( getenv( 'PK_APPLIQUER' ) === '1' )
@@ -175,7 +178,7 @@ if ( $appliquer ) {
 	$cache = WP_CONTENT_DIR . '/uploads/partikulier-cache';
 	if ( is_dir( $cache ) ) {
 		foreach ( (array) glob( $cache . '/*.html' ) as $f ) {
-			@unlink( $f ); // phpcs:ignore
+			wp_delete_file( $f ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations
 		}
 		$out[] = '';
 		$out[] = 'Cache du theme vide.';

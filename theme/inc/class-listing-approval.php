@@ -384,7 +384,11 @@ class Partikulier_Listing_Approval {
 		}
 		$key = hash( 'sha256', wp_salt( 'auth' ), true );
 		$json = openssl_decrypt( base64_decode( $stored['cipher'] ), 'aes-256-gcm', $key, OPENSSL_RAW_DATA, base64_decode( $stored['iv'] ), base64_decode( $stored['tag'] ) );
-		$data = is_string( $json ) ? json_decode( $json, true ) : null;
+		if ( false === $json ) {
+			delete_transient( 'pk_last_credentials' );
+			return false;
+		}
+		$data = json_decode( $json, true );
 		return is_array( $data ) ? $data : false;
 	}
 

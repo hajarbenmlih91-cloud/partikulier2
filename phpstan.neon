@@ -1,0 +1,19 @@
+includes:
+  - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+  bootstrapFiles:
+    - phpstan-bootstrap.php
+  scanFiles:
+    - theme/functions.php
+    - theme/inc/class-settings.php
+    - theme/inc/class-automation-bridge.php
+  level: 5
+  paths:
+    - theme/inc/class-avif.php
+    - theme/inc/class-cache.php
+    - theme/inc/class-listing-approval.php
+    - scripts/reparer-taxonomies.php
+  memoryLimitFile: /tmp/partikulier-phpstan-memory-limit.txt
+  reportUnmatchedIgnoredErrors: true
+  treatPhpDocTypesAsCertain: false

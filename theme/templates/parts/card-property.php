@@ -122,8 +122,10 @@ $price_html = '';
 	<a class="pk-card-media" href="<?php echo esc_url( $pk_property_url ); ?>" tabindex="-1" aria-hidden="true">
 		<?php
 		if ( $gallery ) {
-$jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
-				$avif = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
+				$jpg       = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
+				$avif      = $jpg ? Partikulier_AVIF::avif_path_for_url( $jpg ) : false;
+				$pk_srcset = function_exists( 'wp_get_attachment_image_srcset' ) ? wp_get_attachment_image_srcset( (int) $gallery[0], 'pk-card' ) : false;
+				$pk_sizes  = '(max-width: 767px) 300px, (max-width: 1199px) 50vw, 640px';
 			if ( $jpg ) {
 				?>
 				<picture>
@@ -131,7 +133,7 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 						<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 					<?php endif; ?>
 						<?php $pk_is_first_archive_card = isset( $pk_card_index ) && 1 === (int) $pk_card_index; ?>
-						<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( $pk_display_title ); ?>" loading="<?php echo $pk_is_first_archive_card ? 'eager' : 'lazy'; ?>" decoding="async" fetchpriority="<?php echo $pk_is_first_archive_card ? 'high' : 'low'; ?>">
+						<img src="<?php echo esc_url( $jpg ); ?>"<?php echo $pk_srcset ? ' srcset="' . esc_attr( $pk_srcset ) . '" sizes="' . esc_attr( $pk_sizes ) . '"' : ''; ?> width="640" height="480" alt="<?php echo esc_attr( $pk_display_title ); ?>" loading="<?php echo $pk_is_first_archive_card ? 'eager' : 'lazy'; ?>" decoding="async" fetchpriority="<?php echo $pk_is_first_archive_card ? 'high' : 'low'; ?>">
 				</picture>
 				<?php
 			}
