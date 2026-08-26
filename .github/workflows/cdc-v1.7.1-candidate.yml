@@ -3,7 +3,7 @@ name: cdc-v1.7.1-candidate
 on:
   push:
     branches: ["implementation/cdc-v1.7.1", "automation/release-approval-gate-v1.7.1"]
-    tags: ["v6.17.17"]
+    tags: ["v6.17.18"]
   pull_request:
     branches: ["main", "implementation/cdc-v1.7.1", "automation/release-approval-gate-v1.7.1"]
   workflow_dispatch:
@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  PK_VERSION: "6.17.17"
+  PK_VERSION: "6.17.18"
   NODE_MAJOR: "22"
   SEMGREP_VERSION: "1.132.0"
   SOURCE_DATE_EPOCH: "1767225600"
@@ -122,7 +122,7 @@ jobs:
 
       - name: Run fresh environment and all candidate acceptance suites
         env:
-          PK_VERSION: "6.17.17"
+          PK_VERSION: "6.17.18"
           PK_PORT: "8090"
           PK_BASE: http://localhost:8090
           PK_DB_NAME: partikulier_ci_61717
@@ -148,7 +148,7 @@ jobs:
       - name: Collect volatile CI evidence sidecar
         if: always()
         env:
-          CANDIDATE_VERSION: "6.17.17"
+          CANDIDATE_VERSION: "6.17.18"
         run: |
           mkdir -p "$RUNNER_TEMP/cdc-evidence/documentation"
           shopt -s nullglob
@@ -235,11 +235,11 @@ jobs:
         with:
           name: cdc-v1.7.1-package-${{ github.sha }}
           path: |
-            partikulier-6.17.17-deterministic.zip
-            partikulier-6.17.17-theme.zip
-            partikulier-6.17.17-deterministic.zip.sha256
-            partikulier-6.17.17-evidence.tar.gz
-            partikulier-6.17.17-evidence.tar.gz.sha256
+            partikulier-6.17.18-deterministic.zip
+            partikulier-6.17.18-theme.zip
+            partikulier-6.17.18-deterministic.zip.sha256
+            partikulier-6.17.18-evidence.tar.gz
+            partikulier-6.17.18-evidence.tar.gz.sha256
             reproducibility-v1.7.1.json
             candidate-artifact-verification-v1.7.1.json
           if-no-files-found: error
@@ -247,7 +247,7 @@ jobs:
   release:
     name: Publish only from an explicitly approved immutable tag
     needs: deterministic-package
-    if: github.event_name == 'push' && github.ref == 'refs/tags/v6.17.17'
+    if: github.event_name == 'push' && github.ref == 'refs/tags/v6.17.18'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
@@ -267,14 +267,14 @@ jobs:
       - name: Verify package before publication
         working-directory: release-assets
         run: |
-          sha256sum -c partikulier-6.17.17-deterministic.zip.sha256
-          unzip -tq partikulier-6.17.17-deterministic.zip
+          sha256sum -c partikulier-6.17.18-deterministic.zip.sha256
+          unzip -tq partikulier-6.17.18-deterministic.zip
           test "$(git -C "$GITHUB_WORKSPACE" rev-parse HEAD)" = "$GITHUB_SHA"
 
       - name: Verify authentic human approvals before publication
         working-directory: release-assets
         run: |
-          package_sha="$(awk '{print $1}' partikulier-6.17.17-deterministic.zip.sha256)"
+          package_sha="$(awk '{print $1}' partikulier-6.17.18-deterministic.zip.sha256)"
           python3 "$GITHUB_WORKSPACE/scripts/verify-approvals-v1.7.1.py" \
             --commit "$GITHUB_SHA" \
             --package-sha256 "$package_sha" \
@@ -288,13 +288,13 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            "release-assets/partikulier-6.17.17-deterministic.zip" \
-            "release-assets/partikulier-6.17.17-theme.zip" \
-            "release-assets/partikulier-6.17.17-deterministic.zip.sha256" \
-            "release-assets/partikulier-6.17.17-evidence.tar.gz" \
-            "release-assets/partikulier-6.17.17-evidence.tar.gz.sha256" \
+            "release-assets/partikulier-6.17.18-deterministic.zip" \
+            "release-assets/partikulier-6.17.18-theme.zip" \
+            "release-assets/partikulier-6.17.18-deterministic.zip.sha256" \
+            "release-assets/partikulier-6.17.18-evidence.tar.gz" \
+            "release-assets/partikulier-6.17.18-evidence.tar.gz.sha256" \
             "release-approval-verification-v1.7.1.json" \
-            --title "Partikulier v6.17.17 — CDC v1.7.1 candidate" \
+            --title "Partikulier v6.17.18 — CDC v1.7.1 candidate" \
             --notes "Publication conditionnée au succès intégral des gates CI. Les validations humaines UX, langues natives et commerciales restent des décisions séparées."
 
       - name: Download published asset and compare bytes
@@ -302,7 +302,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           mkdir -p "$RUNNER_TEMP/release-download"
-          gh release download "$GITHUB_REF_NAME" --pattern 'partikulier-6.17.17-deterministic.zip' --dir "$RUNNER_TEMP/release-download" --clobber
-          cmp --silent release-assets/partikulier-6.17.17-deterministic.zip "$RUNNER_TEMP/release-download/partikulier-6.17.17-deterministic.zip"
-          jq -n --arg version "$PK_VERSION" --arg commit "$GITHUB_SHA" --arg sha "$(sha256sum release-assets/partikulier-6.17.17-deterministic.zip | cut -d' ' -f1)" --arg run "$GITHUB_RUN_ID" '{test_id:"SOURCE-RELEASE-001",candidate_version:$version,source_commit:$commit,run_id:$run,status:"PASS",package_sha256:$sha,release_asset_sha256:$sha,comparison:"cmp byte-identical",source_to_release_reproducible:"PASS"}' > release-attestation-v1.7.1.json
+          gh release download "$GITHUB_REF_NAME" --pattern 'partikulier-6.17.18-deterministic.zip' --dir "$RUNNER_TEMP/release-download" --clobber
+          cmp --silent release-assets/partikulier-6.17.18-deterministic.zip "$RUNNER_TEMP/release-download/partikulier-6.17.18-deterministic.zip"
+          jq -n --arg version "$PK_VERSION" --arg commit "$GITHUB_SHA" --arg sha "$(sha256sum release-assets/partikulier-6.17.18-deterministic.zip | cut -d' ' -f1)" --arg run "$GITHUB_RUN_ID" '{test_id:"SOURCE-RELEASE-001",candidate_version:$version,source_commit:$commit,run_id:$run,status:"PASS",package_sha256:$sha,release_asset_sha256:$sha,comparison:"cmp byte-identical",source_to_release_reproducible:"PASS"}' > release-attestation-v1.7.1.json
           gh release upload "$GITHUB_REF_NAME" release-attestation-v1.7.1.json --clobber
