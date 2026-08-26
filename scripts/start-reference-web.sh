@@ -54,7 +54,7 @@ user www-data;
 pid $RUN_DIR/nginx.pid;
 error_log $NGINX_LOG warn;
 worker_processes 1;
-events { worker_connections 256; }
+events { worker_connections 2048; }
 http {
   access_log $RUN_DIR/nginx-access.log;
   include /etc/nginx/mime.types;
