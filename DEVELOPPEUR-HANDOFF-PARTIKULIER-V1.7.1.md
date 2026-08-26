@@ -9,17 +9,29 @@
 
 ## 1. Point de départ officiel
 
-Le dépôt de référence est [partikulier2](https://github.com/hajarbenmlih91-cloud/partikulier2). La branche de travail est [`automation/release-approval-gate-v1.7.1`](https://github.com/hajarbenmlih91-cloud/partikulier2/tree/automation/release-approval-gate-v1.7.1). Le dernier candidat source publié est le commit [`2ff8e38`](https://github.com/hajarbenmlih91-cloud/partikulier2/tree/2ff8e387ac096c98283f1ff6eb5bc8e1ff859733).
+Le dépôt de référence est [partikulier2](https://github.com/hajarbenmlih91-cloud/partikulier2). La branche de travail est [`automation/release-approval-gate-v1.7.1`](https://github.com/hajarbenmlih91-cloud/partikulier2/tree/automation/release-approval-gate-v1.7.1).
+
+**Référence fonctionnelle à auditer :** le commit [`2ff8e38`](https://github.com/hajarbenmlih91-cloud/partikulier2/tree/2ff8e387ac096c98283f1ff6eb5bc8e1ff859733). Il contient le dernier état du code fonctionnel évalué : bootstrap public différé, durcissement du filtre location, corrections de typage/sécurité et harnais de test honnête.
+
+**Commit documentaire actuel de la branche :** [`d61d2b1`](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/d61d2b1a2a818a7c1141cebf79df229b7ba88994). Il ajoute uniquement ce fichier de passation et ne modifie aucun fichier PHP, CSS, JavaScript, template, asset ou contenu du site. Cette affirmation est vérifiable avec le diff suivant :
+
+```bash
+git diff --stat 2ff8e387ac096c98283f1ff6eb5bc8e1ff859733..d61d2b1a2a818a7c1141cebf79df229b7ba88994
+git diff --name-status 2ff8e387ac096c98283f1ff6eb5bc8e1ff859733..d61d2b1a2a818a7c1141cebf79df229b7ba88994
+```
+
+Le résultat attendu est une seule addition : `DEVELOPPEUR-HANDOFF-PARTIKULIER-V1.7.1.md`.
 
 | Référence | Rôle | Lien |
 |---|---|---|
-| `2ff8e38` | Candidat actuel : bootstrap public différé, durcissement filtre location, corrections type/sécurité, harnais honnête | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/2ff8e387ac096c98283f1ff6eb5bc8e1ff859733) |
+| `2ff8e38` | **Code fonctionnel de départ à auditer** : bootstrap public différé, filtre location, corrections type/sécurité, harnais honnête | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/2ff8e387ac096c98283f1ff6eb5bc8e1ff859733) |
+| `d61d2b1` | **Documentation uniquement** : ajout de ce guide de passation | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/d61d2b1a2a818a7c1141cebf79df229b7ba88994) |
 | `a8fd5ec` | Candidat précédent : compatibilité PHP CLI et lazy REST/theme | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/a8fd5ec715118f2a974e352c4299f62c428e6fb0) |
 | `04906d7` | Première optimisation lazy REST/theme | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/04906d7) |
 | `e675a91` | Initialisation REST programmatique | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/e675a91) |
 | `d33e988` | Rapport historique final30 NO-GO à conserver | [Voir le commit](https://github.com/hajarbenmlih91-cloud/partikulier2/commit/d33e988) |
 
-Pour commencer, cloner le dépôt puis vérifier la branche et le SHA avant toute modification :
+Pour commencer, cloner le dépôt puis vérifier la branche, le SHA documentaire et le diff fonctionnel avant toute modification :
 
 ```bash
 gh repo clone hajarbenmlih91-cloud/partikulier2
@@ -27,7 +39,12 @@ cd partikulier2
 git checkout automation/release-approval-gate-v1.7.1
 git rev-parse HEAD
 git status --short
+git branch --show-current
+git diff --stat 2ff8e387ac096c98283f1ff6eb5bc8e1ff859733..HEAD
+git diff --name-status 2ff8e387ac096c98283f1ff6eb5bc8e1ff859733..HEAD
 ```
+
+À la date de cette passation, `HEAD` doit être `d61d2b1` et le diff par rapport à `2ff8e38` doit contenir uniquement ce fichier Markdown. Le développeur doit auditer et modifier le code à partir de `2ff8e38`, tout en conservant le document de passation sur la branche.
 
 Le dépôt contient de nombreux anciens journaux et artefacts non suivis issus des audits précédents. **Ne jamais exécuter `git add .`**. Toujours sélectionner les fichiers à ajouter explicitement et vérifier `git diff --cached --check` avant chaque commit.
 
