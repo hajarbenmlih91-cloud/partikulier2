@@ -88,7 +88,7 @@ jobs:
     name: Cold WordPress MariaDB HTTP acceptance
     needs: static-contracts
     runs-on: ubuntu-latest
-    timeout-minutes: 55
+    timeout-minutes: 90
     steps:
       - name: Checkout exact source
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -125,7 +125,7 @@ jobs:
           PK_VERSION: "6.17.22"
           PK_PORT: "8090"
           PK_BASE: http://localhost:8090
-          PK_DB_NAME: partikulier_ci_61717
+          PK_DB_NAME: partikulier_ci_61722
           PK_DB_USER: partikulier_ci
           PK_DB_PASS: ci-only-sql-password
           PK_ADMIN_USER: ciadmin

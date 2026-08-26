@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 from pathlib import Path
 from typing import Any
 
-VERSION = "6.17.17"
+VERSION = os.environ.get("PK_VERSION", "6.17.22")
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 SHA64 = re.compile(r"^[0-9a-f]{64}$")
 UTC = re.compile(r"Z$")

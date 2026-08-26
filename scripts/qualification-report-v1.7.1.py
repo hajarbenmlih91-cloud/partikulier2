@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "documentation" / "scope-matrix.csv"
 BLOCKING_IMPL = {"NOT_IMPLEMENTED", "NOT_COVERED", "DEPRECATED"}
 BLOCKING_TEST = {"FAIL", "NOT_RUN", "SKIPPED", "NO_BASELINE", "NON_REPRODUCIBLE", "BLOCKED"}
+PRODUCT_VERSION = os.environ.get("PK_VERSION", "6.17.22")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--output", default="documentation/qualification-v1.7.1.json")
@@ -50,7 +51,7 @@ capacity_capabilities = {
     "Capacity write API", "Capacity concurrent sessions", "Capacity CPU RSS saturation",
 }
 capacity_blockers = [r for r in m1 if r.get("capability") in capacity_capabilities and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
-upgrade_blockers = [r for r in m1 if r.get("capability") == "Upgrade v6.17.16 to v6.17.17" and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
+upgrade_blockers = [r for r in m1 if r.get("capability") == f"Upgrade v6.17.16 to {PRODUCT_VERSION}" and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
 
 technical = "PASS" if not m0_blockers and not errors else "FAIL"
 ux_content = "PASS" if not m1_blockers and not errors else "FAIL"
@@ -67,7 +68,7 @@ else:
 payload = {
     "test_id": "QUALIFICATION-REPORT-001",
     "candidate_version": "1.7.1",
-    "product_version": "6.17.17",
+    "product_version": PRODUCT_VERSION,
     "source_commit": args.commit,
     "source_ref": os.environ.get("GITHUB_REF", "local"),
     "run_id": os.environ.get("GITHUB_RUN_ID", "local"),

@@ -10,7 +10,7 @@ cold_acceptance_err() {
   exit "$rc"
 }
 trap cold_acceptance_err ERR
-VERSION="${PK_VERSION:-6.17.17}"
+VERSION="${PK_VERSION:-6.17.22}"
 PORT="${PK_PORT:-8090}"
 BASE="${PK_BASE:-http://localhost:${PORT}}"
 CI_COMMIT="${PK_COMMIT:-${GITHUB_SHA:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}}"

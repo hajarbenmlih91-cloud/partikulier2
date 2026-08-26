@@ -294,7 +294,7 @@ def main() -> int:
     args = parser.parse_args()
     commit = os.environ.get("PK_COMMIT", "")
     run_id = os.environ.get("PK_RUN_ID", os.environ.get("GITHUB_RUN_ID", "local"))
-    payload: dict[str, Any] = {"test_id": "CAPACITY-ENVELOPE-001", "candidate_version": "6.17.17", "source_commit": commit, "source_ref": os.environ.get("GITHUB_REF", "local"), "run_id": run_id, "started_at_utc": now(), "status": "FAIL", "scale": args.scale, "scale_is_contractual": args.scale == 1, "cgroup_target": os.environ.get("PK_CAPACITY_CGROUP_PATH") or None, "cgroup_required": os.environ.get("PK_CAPACITY_CGROUP_REQUIRED") == "1", "phases": [], "saturation_probe": [], "cleanup": {}, "limitations": ["CPU is normalized over the reference host CPU count; service RSS is measured from the declared cgroup memory.peak and is FAIL when unavailable."]}
+    payload: dict[str, Any] = {"test_id": "CAPACITY-ENVELOPE-001", "candidate_version": os.environ.get("PK_VERSION", "6.17.22"), "source_commit": commit, "source_ref": os.environ.get("GITHUB_REF", "local"), "run_id": run_id, "started_at_utc": now(), "status": "FAIL", "scale": args.scale, "scale_is_contractual": args.scale == 1, "cgroup_target": os.environ.get("PK_CAPACITY_CGROUP_PATH") or None, "cgroup_required": os.environ.get("PK_CAPACITY_CGROUP_REQUIRED") == "1", "phases": [], "saturation_probe": [], "cleanup": {}, "limitations": ["CPU is normalized over the reference host CPU count; service RSS is measured from the declared cgroup memory.peak and is FAIL when unavailable."]}
     all_created: list[int] = []
     user_ids: list[int] = []
     try:

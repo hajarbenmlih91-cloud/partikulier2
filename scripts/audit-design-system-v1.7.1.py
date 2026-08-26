@@ -14,6 +14,7 @@ CSS = ROOT / "theme" / "assets" / "css" / "style.css"
 TEMPLATES = ROOT / "theme" / "templates"
 OUTPUT = ROOT / "documentation" / "design-system-audit-v1.7.1.json"
 commit = os.environ.get("PK_COMMIT", "")
+version = os.environ.get("PK_VERSION", "6.17.22")
 
 TOKEN_RE = re.compile(r"(--pk-[a-z0-9-]+)\s*:\s*([^;]+);")
 CLASS_ATTR_RE = re.compile(r"class=[\"']([^\"']+)[\"']")
@@ -58,7 +59,7 @@ checks = [
 ]
 payload = {
     "test_id": "DESIGN-SYSTEM-AUDIT-001",
-    "candidate_version": "6.17.17",
+    "candidate_version": version,
     "source_commit": commit,
     "source_ref": os.environ.get("GITHUB_REF", "local"),
     "run_id": os.environ.get("GITHUB_RUN_ID", "local"),

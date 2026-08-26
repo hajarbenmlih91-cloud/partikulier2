@@ -8,9 +8,9 @@ DB_USER="${PK_DB_USER:?PK_DB_USER is required}"
 DB_PASS="${PK_DB_PASS:?PK_DB_PASS is required}"
 COMMIT="${PK_COMMIT:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}"
 RUN_ID="${PK_RUN_ID:-local}"
-REPORT="${PK_UPGRADE_REPORT:-$ROOT/documentation/upgrade-v6.17.16-to-v6.17.17.json}"
+REPORT="${PK_UPGRADE_REPORT:-$ROOT/documentation/upgrade-v6.17.16-to-v${PK_VERSION:-6.17.22}.json}"
 OLD_TAG="v6.17.16"
-NEW_VERSION="6.17.17"
+NEW_VERSION="${PK_VERSION:-6.17.22}"
 
 [[ "$COMMIT" =~ ^[0-9a-f]{40}$ ]] || { echo 'PK_COMMIT must be an exact 40-character SHA' >&2; exit 2; }
 [ -f "$WP_DIR/wp-load.php" ] || { echo "WordPress runtime absent: $WP_DIR" >&2; exit 2; }
@@ -128,14 +128,14 @@ check('UPGRADE-VERSION-001', after.get('sentinel', {}).get('id') == int(sentinel
 failed = [c for c in checks if c['status'] != 'PASS']
 payload = {
     'test_id': 'UPGRADE-COMPATIBILITY-001',
-    'candidate_version': '6.17.17',
+    'candidate_version': __import__('os').environ.get('PK_VERSION', '6.17.22'),
     'source_commit': commit,
     'source_ref': __import__('os').environ.get('GITHUB_REF', 'local'),
     'run_id': run_id,
     'started_at_utc': None,
     'finished_at_utc': datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z'),
     'from_tag': 'v6.17.16',
-    'to_version': '6.17.17',
+    'to_version': __import__('os').environ.get('PK_VERSION', '6.17.22'),
     'status': 'FAIL' if failed else 'PASS',
     'exit_code': 1 if failed else 0,
     'checks': checks,
