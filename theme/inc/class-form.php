@@ -339,9 +339,9 @@ class Partikulier_Form {
 			wp_set_object_terms( $post_id, (int) $type, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
 		}
 		if ( $action ) {
-			$term = get_term_by( 'slug', $action, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+			$term = get_term_by( 'slug', $action, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 			if ( $term ) {
-				wp_set_object_terms( $post_id, (int) $term->term_id, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+				wp_set_object_terms( $post_id, (int) $term->term_id, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 			}
 		}
 		if ( $city ) {
@@ -494,7 +494,7 @@ class Partikulier_Form {
 	 * @return string
 	 */
 		/**
-	 * Traduit un mode « vendre » / « louer » en slug de terme es_category.
+	 * Traduit un mode « vendre » / « louer » en slug de terme es_status.
 	 * Le terme est cree s'il n'existe pas encore : le formulaire ne doit
 	 * jamais echouer parce que la taxonomie du site est incomplete.
 	 *
@@ -551,7 +551,7 @@ class Partikulier_Form {
 	private static function resolve_action_slug( $mode ) {
 		$is_rent  = 'louer' === $mode;
 		$needles  = $is_rent ? array( 'a louer', 'louer', 'location', 'for rent', 'rent' ) : array( 'a vendre', 'vendre', 'vente', 'for sale', 'sale' );
-		$taxonomy = PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY;
+		$taxonomy = PARTIKULIER_ESTATIK_STATUS_TAXONOMY;
 
 		$terms = get_terms( array(
 			'taxonomy'   => $taxonomy,
@@ -611,7 +611,7 @@ class Partikulier_Form {
 
 			$city_term = $city_id ? get_term( $city_id, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) : null;
 			$place     = $city_term && ! is_wp_error( $city_term ) ? $city_term->name : __( 'votre ville', 'partikulier' );
-			$action_term = $action_slug ? get_term_by( 'slug', $action_slug, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY ) : null;
+			$action_term = $action_slug ? get_term_by( 'slug', $action_slug, PARTIKULIER_ESTATIK_STATUS_TAXONOMY ) : null;
 			$transaction = $action_term && false !== mb_stripos( $action_term->name, 'lou' ) ? 'à louer' : 'à vendre';
 
 			return self::normalize_generated_title( $type . $layout . $size . $primary_advantage . $terrace_label . ' ' . $transaction . ' à ' . $place );

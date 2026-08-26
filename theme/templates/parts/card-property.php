@@ -31,8 +31,9 @@ if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post
 		}
 	}
 }
-$pk_language = function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : 'fr';
-$pk_display_title = class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::title_from_post( $property, $pk_language ) : get_the_title( $property );
+	$pk_language = function_exists( 'pll_current_language' ) ? sanitize_key( (string) pll_current_language( 'slug' ) ) : 'fr';
+	$pk_display_title = class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::title_from_post( $property, $pk_language ) : get_the_title( $property );
+	$pk_card_heading_tag = ( is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || is_tax() ) ? 'h2' : 'h3';
 $pk_property_url = get_permalink( $property );
 if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
 	$pk_property_url = Partikulier_Listing_URLs::filter_link( $pk_property_url, $property );
@@ -89,7 +90,7 @@ if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
 
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query amorce par update_post_term_cache.
 	$types   = get_the_terms( $property->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
-	$actions = get_the_terms( $property->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$actions = get_the_terms( $property->ID, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 	$type    = ( ! is_wp_error( $types ) && $types ) ? $types[0]->name : __( 'Bien', 'partikulier' );
 	$type    = class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Listing_I18n::localized_type( $type, $pk_language ) : $type;
 	$action  = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
@@ -129,7 +130,8 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 					<?php if ( $avif ) : ?>
 						<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 					<?php endif; ?>
-					<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( $pk_display_title ); ?>" loading="eager" decoding="async" fetchpriority="<?php echo $property === get_queried_object() ? 'high' : 'low'; ?>">
+						<?php $pk_is_first_archive_card = isset( $pk_card_index ) && 1 === (int) $pk_card_index; ?>
+						<img src="<?php echo esc_url( $jpg ); ?>" width="640" height="480" alt="<?php echo esc_attr( $pk_display_title ); ?>" loading="<?php echo $pk_is_first_archive_card ? 'eager' : 'lazy'; ?>" decoding="async" fetchpriority="<?php echo $pk_is_first_archive_card ? 'high' : 'low'; ?>">
 				</picture>
 				<?php
 			}
@@ -159,11 +161,11 @@ $jpg  = Partikulier_AVIF::valid_image_url( (int) $gallery[0], 'pk-card' );
 	</div>
 
 	<div class="pk-card-body">
-		<h3 class="pk-card-title">
+			<<?php echo esc_html( $pk_card_heading_tag ); ?> class="pk-card-title">
 			<a href="<?php echo esc_url( $pk_property_url ); ?>" itemprop="url">
 				<span itemprop="name"><?php echo esc_html( $pk_display_title ); ?></span>
 			</a>
-		</h3>
+			</<?php echo esc_html( $pk_card_heading_tag ); ?>>
 		<?php
 		$pk_role       = get_post_meta( $property->ID, '_pk_owner_role', true );
 		$pk_role_label = Partikulier_Localization::translate_polylang_string( 'Propriétaire', 'Propriétaire', 'partikulier' );

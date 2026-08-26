@@ -26,7 +26,7 @@ class Partikulier_Search_Filters {
 	 */
 	private static function taxonomy_map() {
 		return array(
-			'es_action' => PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY,
+			'es_action' => PARTIKULIER_ESTATIK_STATUS_TAXONOMY,
 			'es_type'   => PARTIKULIER_ESTATIK_TYPE_TAXONOMY,
 			'es_city'   => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
 		);

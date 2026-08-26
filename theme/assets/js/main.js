@@ -614,30 +614,41 @@
 		var filterBackdrop = document.querySelector(".pk-filters-backdrop");
 		var filterClose = document.querySelector(".pk-filter-close");
 		if (filterToggle && filterPanel) {
-			function setFilters(open) {
-				filterPanel.classList.toggle("is-open", open);
-				filterPanel.setAttribute("aria-hidden", open ? "false" : "true");
-				document.body.classList.toggle("pk-filters-open", open);
-				if (filterBackdrop) {
-					filterBackdrop.hidden = !open;
-					filterBackdrop.classList.toggle("is-open", open);
+				function isMobileFilter() {
+					return window.matchMedia && window.matchMedia("(max-width: 767px)").matches;
 				}
-				if (archiveSearch) archiveSearch.classList.toggle("is-mobile-filter-open", open);
-				if (archiveTrust) archiveTrust.classList.toggle("is-mobile-filter-open", open);
-				filterToggle.setAttribute("aria-expanded", open ? "true" : "false");
-				if (open && filterClose) filterClose.focus();
-				if (!open) filterToggle.focus();
-			}
-			setFilters(false);
-			filterToggle.addEventListener("click", function () {
-				setFilters(!filterPanel.classList.contains("is-open"));
-			});
-			document.querySelectorAll("[data-pk-filter-close]").forEach(function (closeButton) {
-				closeButton.addEventListener("click", function () { setFilters(false); });
-			});
-			document.addEventListener("keydown", function (event) {
-				if (event.key === "Escape" && filterPanel.classList.contains("is-open")) setFilters(false);
-			});
+				function setFilters(open) {
+					var mobile = isMobileFilter();
+					var visible = mobile ? !!open : true;
+					filterPanel.classList.toggle("is-open", mobile && visible);
+					filterPanel.setAttribute("aria-hidden", visible ? "false" : "true");
+					if ("inert" in filterPanel) filterPanel.inert = mobile && !visible;
+					else if (mobile && !visible) filterPanel.setAttribute("inert", "");
+					else filterPanel.removeAttribute("inert");
+					document.body.classList.toggle("pk-filters-open", mobile && visible);
+					if (filterBackdrop) {
+						filterBackdrop.hidden = !(mobile && visible);
+						filterBackdrop.classList.toggle("is-open", mobile && visible);
+					}
+					if (archiveSearch) archiveSearch.classList.toggle("is-mobile-filter-open", mobile && visible);
+					if (archiveTrust) archiveTrust.classList.toggle("is-mobile-filter-open", mobile && visible);
+					filterToggle.setAttribute("aria-expanded", mobile && visible ? "true" : "false");
+					if (mobile && visible && filterClose) filterClose.focus();
+					if (mobile && !visible) filterToggle.focus();
+				}
+				var earlyOpen = filterPanel.classList.contains("is-open") && filterPanel.getAttribute("aria-hidden") === "false";
+				if (window.pkEarlyFilterClick) document.removeEventListener("click", window.pkEarlyFilterClick, true);
+				if (window.pkEarlyFilterKeydown) document.removeEventListener("keydown", window.pkEarlyFilterKeydown, true);
+				setFilters(earlyOpen);
+				filterToggle.addEventListener("click", function () {
+					setFilters(!filterPanel.classList.contains("is-open"));
+				});
+				document.querySelectorAll("[data-pk-filter-close]").forEach(function (closeButton) {
+					closeButton.addEventListener("click", function () { setFilters(false); });
+				});
+				document.addEventListener("keydown", function (event) {
+					if (event.key === "Escape" && filterPanel.classList.contains("is-open")) setFilters(false);
+				});
 		}
 
 	var actionBar = document.querySelector(".pk-mobile-action-bar");

@@ -50,7 +50,7 @@ class Partikulier_SEO {
 	 */
 	public static function geo_chain( $post ) {
 		$location = self::term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
-		$category = self::term_name( $post, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+		$category = self::term_name( $post, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 		$type     = self::term_name( $post, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
 		$context  = trim( implode( ' ', array_filter( array( $category, $type ) ) ) );
 

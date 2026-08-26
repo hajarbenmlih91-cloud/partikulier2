@@ -16,7 +16,7 @@ if (file_exists(__DIR__ . '/i18n-exceptions.txt')) {
 
 // Mots techniques à ignorer
 $technical_words = [
-	    'partikulier', 'com', 'mad', 'avif', 'jpg', 'png', 'svg', 'http', 'https', 'itemscope', 'itemtype', 'itemprop', 'role', 'aria-hidden', 'multiple', 'novalidate', 'fetchpriority', 'loading', 'decoding', 'tabindex', 'onclick', 'onchange', 'method', 'action', 'name', 'value', 'type', 'placeholder', 'multiple', 'enctype', 'novalidate', 'min', 'max', 'step', 'checked', 'selected', 'readonly', 'disabled', 'required', 'bearer', 'sha256', 'nonce', 'fetch', 'credentials', 'same-origin', 'ariaselected', 'datapkslide'
+	    'partikulier', 'com', 'mad', 'avif', 'jpg', 'png', 'svg', 'http', 'https', 'itemscope', 'itemtype', 'itemprop', 'role', 'aria-hidden', 'multiple', 'novalidate', 'fetchpriority', 'loading', 'decoding', 'tabindex', 'onclick', 'onchange', 'method', 'action', 'name', 'value', 'type', 'placeholder', 'multiple', 'enctype', 'novalidate', 'min', 'max', 'step', 'checked', 'selected', 'readonly', 'disabled', 'required', 'bearer', 'sha256', 'nonce', 'fetch', 'credentials', 'same-origin', 'ariaselected', 'ariahidden', 'ariaexpanded', 'ariacontrols', 'datapkslide'
 	];
 
 foreach ($files as $file_arr) {

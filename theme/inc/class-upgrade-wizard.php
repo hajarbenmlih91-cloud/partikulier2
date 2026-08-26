@@ -97,7 +97,7 @@ class Partikulier_Upgrade_Wizard {
 			if ( get_post_meta( $id, '_pk_auto_translation', true ) ) {
 				continue;
 			}
-			$terms = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, array( 'fields' => 'ids' ) );
+			$terms = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_STATUS_TAXONOMY, array( 'fields' => 'ids' ) );
 			if ( is_wp_error( $terms ) || ! $terms ) {
 				$count++;
 			}
@@ -471,7 +471,7 @@ class Partikulier_Upgrade_Wizard {
 		$type_label = ( $type_terms && ! is_wp_error( $type_terms ) ) ? $type_terms[0]->name : 'Bien';
 
 		$action = 'vendre';
-		$cat    = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+		$cat    = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 		if ( $cat && ! is_wp_error( $cat ) ) {
 			$name = remove_accents( $cat[0]->name );
 			$name = function_exists( 'mb_strtolower' ) ? mb_strtolower( $name ) : strtolower( $name );

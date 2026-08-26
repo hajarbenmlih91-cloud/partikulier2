@@ -56,7 +56,7 @@ class Partikulier_Localization {
 				return;
 			}
 
-					if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
+					if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_STATUS_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
 						// Forcer le cache des termes et meta pour éviter les N+1 dans les cartes.
 						$query->set( 'cache_results', true );
 						$query->set( 'update_post_term_cache', true );
@@ -750,6 +750,7 @@ class Partikulier_Localization {
 		}
 
 		$taxonomies[] = PARTIKULIER_ESTATIK_TYPE_TAXONOMY;
+		$taxonomies[] = PARTIKULIER_ESTATIK_STATUS_TAXONOMY;
 		$taxonomies[] = PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY;
 		$taxonomies[] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
 		return array_values( array_unique( $taxonomies ) );

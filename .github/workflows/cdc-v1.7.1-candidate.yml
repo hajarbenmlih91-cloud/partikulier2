@@ -2,10 +2,10 @@ name: cdc-v1.7.1-candidate
 
 on:
   push:
-    branches: ["implementation/cdc-v1.7.1"]
+    branches: ["implementation/cdc-v1.7.1", "automation/release-approval-gate-v1.7.1"]
     tags: ["v6.17.17"]
   pull_request:
-    branches: ["main", "implementation/cdc-v1.7.1"]
+    branches: ["main", "implementation/cdc-v1.7.1", "automation/release-approval-gate-v1.7.1"]
   workflow_dispatch:
 
 permissions:
@@ -118,7 +118,7 @@ jobs:
           sha256sum -c --strict vendor-artifacts/query-monitor-4.0.7.zip.sha256
           (cd vendor-artifacts && sha256sum -c --strict estatik-4.3.4.zip.sha256)
           npm ci --ignore-scripts --no-audit --no-fund
-          npx --no-install playwright install --with-deps chromium
+          npx --no-install playwright install --with-deps chromium firefox webkit
 
       - name: Run fresh environment and all candidate acceptance suites
         env:

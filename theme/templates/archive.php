@@ -163,7 +163,7 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 									$action_url = add_query_arg( $action_args, pk_properties_archive_url() );
 									$action_label = Partikulier_Localization::translate_polylang_string( $action_item['label'], $action_item['label'], 'partikulier' );
 									?>
-									<li><a href="<?php echo esc_url( $action_url ); ?>"><?php echo esc_html( $action_label ); ?></a></li>
+										<li><a href="<?php echo esc_url( $action_url ); ?>"><?php echo esc_html( $action_label ); // nosemgrep: php.lang.security.injection.echoed-request.echoed-request ?></a></li>
 								<?php endforeach; ?>
 							</ul>
 					</div>
@@ -212,7 +212,43 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 								</div>
 								<button type="submit" class="pk-filter-apply"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Appliquer', 'Appliquer', 'partikulier' ) ); ?></button>
 							</form>
-						</div>
+							</div>
+							<script>
+							(function () {
+								var toggle = document.querySelector('.pk-filter-toggle');
+								var panel = document.getElementById('pk-filters-panel');
+								var backdrop = document.querySelector('.pk-filters-backdrop');
+								if (!toggle || !panel) return;
+								function isMobile() { return window.matchMedia && window.matchMedia('(max-width: 767px)').matches; }
+								function apply(open) {
+									var mobile = isMobile();
+									var visible = mobile ? !!open : true;
+									panel.classList.toggle('is-open', mobile && visible);
+									panel.setAttribute('aria-hidden', visible ? 'false' : 'true');
+									if ('inert' in panel) panel.inert = mobile && !visible;
+									else if (mobile && !visible) panel.setAttribute('inert', '');
+									else panel.removeAttribute('inert');
+									toggle.setAttribute('aria-expanded', mobile && visible ? 'true' : 'false');
+									if (backdrop) { backdrop.hidden = !visible; backdrop.classList.toggle('is-open', mobile && visible); }
+									document.body.classList.toggle('pk-filters-open', mobile && visible);
+									if (mobile && visible) { var close = panel.querySelector('.pk-filter-close'); if (close) close.focus(); }
+									if (mobile && !visible) toggle.focus();
+								}
+								apply(isMobile() && panel.classList.contains('is-open'));
+								window.pkEarlyFilterApply = apply;
+								window.pkEarlyFilterClick = function (event) {
+									var target = event.target.closest ? event.target.closest('.pk-filter-toggle, [data-pk-filter-close]') : null;
+									if (!target) return;
+									event.preventDefault();
+									apply(target.matches('.pk-filter-toggle') ? !panel.classList.contains('is-open') : false);
+								};
+								window.pkEarlyFilterKeydown = function (event) {
+									if (event.key === 'Escape' && panel.classList.contains('is-open')) { event.preventDefault(); apply(false); }
+								};
+								document.addEventListener('click', window.pkEarlyFilterClick, true);
+								document.addEventListener('keydown', window.pkEarlyFilterKeydown, true);
+							}());
+							</script>
 							</div>
 				</aside>
 
@@ -220,8 +256,10 @@ $is_type  = $queried instanceof WP_Term && PARTIKULIER_ESTATIK_TYPE_TAXONOMY ===
 				<?php if ( have_posts() ) : ?>
 					<div class="pk-grid pk-grid-cards">
 						<?php
+						$pk_card_index = 0;
 						while ( have_posts() ) :
 							the_post();
+							$pk_card_index++;
 							$property = get_post();
 							require PARTIKULIER_DIR . '/templates/parts/card-property.php';
 						endwhile;

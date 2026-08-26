@@ -76,7 +76,7 @@ $pk_display_title = class_exists( 'Partikulier_Listing_I18n' ) ? Partikulier_Lis
 		$terrace_label = 'Oui' === $terrace ? Partikulier_Localization::translate_polylang_string( 'Terrasse', 'Terrasse', 'partikulier' ) . ( $terrace_surface ? ' · ' . $terrace_surface . ' ' . Partikulier_Localization::translate_polylang_string( 'm²', 'm²', 'partikulier' ) : '' ) : '';
 		$location  = Partikulier_Geo::location_string( $post->ID, $pk_language );
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
-	$actions   = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$actions   = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 	$action    = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
 
 // Image : galerie Estatik en premier, puis featured.

@@ -779,7 +779,7 @@ class Partikulier_Listing_I18n {
 		$source    = $source instanceof WP_Post ? $source : $post;
 		$type_terms = get_the_terms( $source->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
 		$type       = ( $type_terms && ! is_wp_error( $type_terms ) ) ? $type_terms[0]->name : 'Bien';
-		$cat_terms  = get_the_terms( $source->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+		$cat_terms  = get_the_terms( $source->ID, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 		$cat_name   = ( $cat_terms && ! is_wp_error( $cat_terms ) ) ? strtolower( remove_accents( $cat_terms[0]->name ) ) : '';
 		$action     = ( false !== strpos( $cat_name, 'lou' ) || false !== strpos( $cat_name, 'rent' ) || false !== strpos( $cat_name, 'locat' ) ) ? 'louer' : 'vendre';
 		$city       = '';

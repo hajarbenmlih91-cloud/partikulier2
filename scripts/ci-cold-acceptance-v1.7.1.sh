@@ -33,7 +33,10 @@ case "$DB_NAME" in ''|*[!A-Za-z0-9_]*) echo "DB_NAME invalide pour le reset froi
 sudo mariadb -e "DROP DATABASE IF EXISTS \`${DB_NAME}\`;" >/dev/null 2>&1 || true
 
 bash "$ROOT/scripts/install-tooling.sh"
-bash "$ROOT/scripts/install.sh" > "$ROOT/documentation/install-v${VERSION}-final.log"
+if ! bash "$ROOT/scripts/install.sh" 2>&1 | tee "$ROOT/documentation/install-v${VERSION}-final.log"; then
+  printf 'INSTALL_SCRIPT_FAILED=1\n' >&2
+  exit 1
+fi
 if [ "${PK_SERVER_MODE:-dev}" = "reference" ]; then
   PK_SERVER_LOG="$ROOT/documentation/server-v${VERSION}.log" PK_PHP_WORKERS="${PK_PHP_WORKERS:-4}" bash "$ROOT/scripts/start-reference-web.sh"
 else

@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PARTIKULIER_VERSION', '6.17.17' );
+define( 'PARTIKULIER_VERSION', '6.17.18' );
 
 add_filter(
     'language_attributes',
@@ -32,6 +32,7 @@ define( 'PARTIKULIER_URI', get_template_directory_uri() );
 define( 'PARTIKULIER_ESTATIK_POST_TYPE', 'properties' );
 define( 'PARTIKULIER_ESTATIK_TYPE_TAXONOMY', 'es_type' );
 define( 'PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY', 'es_category' );
+define( 'PARTIKULIER_ESTATIK_STATUS_TAXONOMY', 'es_status' );
 define( 'PARTIKULIER_ESTATIK_LOCATION_TAXONOMY', 'es_location' );
 
 /**

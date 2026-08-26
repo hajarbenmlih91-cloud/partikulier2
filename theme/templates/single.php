@@ -40,7 +40,7 @@ while ( have_posts() ) :
 			$price        = get_post_meta( get_the_ID(), 'es_property_price', true ) ?: get_post_meta( get_the_ID(), 'es_price', true );
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
 	$single_types = get_the_terms( get_the_ID(), PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
-	$single_actions = get_the_terms( get_the_ID(), PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$single_actions = get_the_terms( get_the_ID(), PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 			?>
 			<div class="pk-single-head">
 				<div class="pk-single-title-block">

@@ -19,7 +19,7 @@ class Partikulier_Setup {
 	/**
 	 * Taxonomies immobilières standard.
 	 */
-	const PROPERTY_TAX = array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	const PROPERTY_TAX = array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_STATUS_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
 
 	public static function init() {
 		add_action( 'after_setup_theme', array( __CLASS__, 'setup' ) );

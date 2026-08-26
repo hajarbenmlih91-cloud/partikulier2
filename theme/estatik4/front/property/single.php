@@ -80,7 +80,7 @@ $location = Partikulier_Geo::location_string( $post->ID );
 
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
 	$types   = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
-	$actions = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$actions = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 	$type    = ( ! is_wp_error( $types ) && $types ) ? $types[0]->name : __( 'Bien', 'partikulier' );
 	$action  = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
 
