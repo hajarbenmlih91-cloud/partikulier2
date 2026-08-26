@@ -28,6 +28,9 @@ require_once __DIR__ . '/src/Services.php';
  */
 function partikulier_core_should_load_rest(): bool
 {
+    if (PHP_SAPI === 'cli') {
+        return true;
+    }
     if (defined('REST_REQUEST') && REST_REQUEST) {
         return true;
     }
