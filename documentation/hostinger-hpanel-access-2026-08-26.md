@@ -27,3 +27,9 @@ WP Super Cache a été désactivé avec succès. WordPress affiche désormais le
 WP Super Cache a été supprimé avec succès. WordPress confirme 4 extensions restantes : Estatik, LiteSpeed Cache, Partikulier Core et Polylang. Le staging est revenu à son état de cache initial, sans changement du thème ou du design.
 
 Le plugin Partikulier Core a été remplacé avec succès par l’archive optimisée SHA-256 `c3d623cdbc960d55399f04b4e4882569cae2441e86d195f8bc4346c76cd8d6b2`. WordPress confirme « L’extension a bien été mise à jour ». L’état actif et le comportement REST doivent encore être vérifiés.
+
+Le bypass REST a été enregistré directement dans `functions.php` du thème actif final30 via CodeMirror et le formulaire WordPress avec nonce valide. L’édition porte uniquement sur le chemin `/partikulier/v1/listings`; aucun style, script, template, texte ou contenu n’a été modifié.
+
+Après enregistrement du bypass sur le thème actif, huit requêtes REST consécutives répondent HTTP 200 avec JSON valide (`data`, `page`), 21 annonces et `page=1`. TTFB : 3,157 / 2,967 / 2,865 / 3,328 / 2,817 / 3,343 / 2,853 / 3,014 s. HCDN est `HIT` sur les huit, mais le seuil `<800 ms` reste largement manqué. Le bypass préserve le contrat sans résoudre le délai réseau/upstream.
+
+Le core a été remplacé une seconde fois par l’archive `partikulier-core-rest-hook-fix-2026-08-26.zip`, SHA-256 `7b1f23e4e33d615da6bf08ced1a16b45f9c6bba3b8c75404f130381f9a3660c6`. Cette version conserve le lazy-load HTML mais charge les classes REST à `rest_api_init`, afin de supporter les appels `rest_do_request()` de la CI froide.

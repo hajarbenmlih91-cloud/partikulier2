@@ -41,7 +41,12 @@ function partikulier_core_should_load_rest(): bool
     return str_contains($request_uri, '/wp-json/') || isset($_GET['rest_route']);
 }
 
-if (partikulier_core_should_load_rest()) {
+function partikulier_core_load_rest_classes(): void
+{
+    static $loaded = false;
+    if ($loaded) {
+        return;
+    }
     require_once __DIR__ . '/src/AuditLogger.php';
     require_once __DIR__ . '/src/ListingPolicy.php';
     require_once __DIR__ . '/src/ListingService.php';
@@ -49,6 +54,11 @@ if (partikulier_core_should_load_rest()) {
     require_once __DIR__ . '/src/TranslationService.php';
     require_once __DIR__ . '/src/RateLimiter.php';
     require_once __DIR__ . '/src/RestController.php';
+    $loaded = true;
+}
+
+if (partikulier_core_should_load_rest()) {
+    partikulier_core_load_rest_classes();
 }
 
 use Partikulier\Core\Database\Migrator;
@@ -64,9 +74,19 @@ add_action('plugins_loaded', static function (): void {
     $GLOBALS['partikulier_core_jobs'] = new \Partikulier\Core\JobRunner();
     $GLOBALS['partikulier_core_jobs']->register();
     if (partikulier_core_should_load_rest()) {
+        partikulier_core_load_rest_classes();
         $GLOBALS['partikulier_core_rest'] = new RestController();
     }
 });
+
+// Supporte aussi les appels programmatiques à rest_do_request() depuis WP-CLI,
+// les tests PHP et les tâches internes, qui n’ont pas d’URI REST entrante.
+add_action('rest_api_init', static function (): void {
+    partikulier_core_load_rest_classes();
+    if (!isset($GLOBALS['partikulier_core_rest'])) {
+        $GLOBALS['partikulier_core_rest'] = new RestController();
+    }
+}, 1);
 
 register_activation_hook(__FILE__, static function (): void {
     (new Migrator())->migrate();

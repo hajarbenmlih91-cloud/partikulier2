@@ -38,3 +38,13 @@ Les TTFB observés après déploiement du core optimisé sont : 3,667 s, 3,467 s
 ## Décision technique
 
 La remédiation est déployée et sans changement de design. Elle ne justifie pas un PASS performance : le prochain levier doit être un profilage serveur Hostinger/PHP-FPM/MariaDB ou une configuration de cache HTML au niveau réellement servi par HCDN, accessible avec les droits hPanel appropriés.
+
+## Vérification front après édition staging
+
+Les pages `/fr/annonces/`, `/en/annonces/` et `/ar/annonces/` répondent HTTP 200 et conservent le body class `wp-theme-partikulier-cdc-v18-final30`. Chacune sert 21 cartes `pk-card pk-card-property`, 21 attributs `srcset` et 22 attributs `sizes`. Aucun fichier CSS, JavaScript ou template visuel n’a été modifié dans cette remédiation. Les TTFB front restent cependant élevés : 3,938 s FR, 3,100 s EN et 5,483 s AR.
+
+## Correction de compatibilité et seconde mesure
+
+Le premier déploiement du lazy-load échouait dans la CI froide parce que `core-contract.php` appelle `rest_do_request()` depuis WP-CLI sans URI REST. Le correctif a déplacé le chargement des classes REST sur `rest_api_init`, tout en conservant le lazy-load sur les pages HTML. Le run CI précédent a fourni la preuve du fatal WordPress ; le second ZIP corrigé a été déployé sur le staging.
+
+Après ce second déploiement, cinq réponses consécutives du endpoint REST sont HTTP 200, JSON valides, avec exactement `data` et `page`, 21 lignes et `page=1`. TTFB : 1,746 / 1,716 / 1,435 / 1,588 / 1,494 s. Le gain est réel par rapport aux mesures précédentes autour de 2,8–3,7 s, mais le contrat `<800 ms` reste FAIL.
