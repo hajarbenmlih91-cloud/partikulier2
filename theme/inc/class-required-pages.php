@@ -43,11 +43,22 @@ class Partikulier_Required_Pages {
 				'template' => 'templates/page-mes-annonces.php',
 				'content'  => '',
 			),
-			'favoris'             => array(
-				'title'    => __( 'Favoris', 'partikulier' ),
-				'template' => 'templates/page-favoris.php',
-				'content'  => '',
-			),
+							'favoris'             => array(
+					'title'    => __( 'Favoris', 'partikulier' ),
+					'template' => 'templates/page-favoris.php',
+					'content'  => '',
+				),
+				'faq'                 => array(
+					'title'    => __( 'Questions fréquentes', 'partikulier' ),
+					'template' => 'templates/page.php',
+					'content'  => '<h2>Comment publier une annonce ?</h2><p>Déposez votre bien gratuitement, renseignez ses informations et ajoutez des photos. Chaque annonce est vérifiée avant publication.</p><h2>Le contact est-il direct ?</h2><p>Oui. Partikulier met en relation les particuliers sans commission ni intermédiaire.</p>',
+				),
+				'contact'             => array(
+					'title'    => __( 'Contactez-nous', 'partikulier' ),
+					'template' => 'templates/page.php',
+					'content'  => '<p>Pour toute question concernant une annonce ou le fonctionnement de Partikulier, écrivez-nous à l’adresse indiquée dans le pied de page.</p>',
+				),
+
 		);
 	}
 

@@ -40,7 +40,7 @@ while ( have_posts() ) :
 			$price        = get_post_meta( get_the_ID(), 'es_property_price', true ) ?: get_post_meta( get_the_ID(), 'es_price', true );
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
 	$single_types = get_the_terms( get_the_ID(), PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
-	$single_actions = get_the_terms( get_the_ID(), PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$single_actions = get_the_terms( get_the_ID(), PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 			?>
 			<div class="pk-single-head">
 				<div class="pk-single-title-block">
@@ -107,7 +107,7 @@ while ( have_posts() ) :
 								<?php if ( $avif ) : ?>
 									<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 								<?php endif; ?>
-								<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" width="1600" height="900" loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
+								<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" width="1600" height="900" loading="eager" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
 							</picture>
 						<?php endif; ?>
 					<?php endforeach; ?>
@@ -192,7 +192,7 @@ while ( have_posts() ) :
 				</div>
 
 				<aside class="pk-single-sidebar">
-					<div class="pk-contact-card pk-contact-card--dark">
+					<div class="pk-contact-card pk-contact-card--dark" id="pk-contact-card">
 <p class="pk-contact-kicker"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact sécurisé', 'Contact sécurisé', 'partikulier' ) ); ?></p>
 							<h2 class="pk-contact-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Intéressé par ce bien ?', 'Intéressé par ce bien ?', 'partikulier' ) ); ?></h2>
 							<p class="pk-contact-note"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ) ); ?></p>

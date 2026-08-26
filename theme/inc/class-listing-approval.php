@@ -94,7 +94,7 @@ class Partikulier_Listing_Approval {
 
 		$pending = self::pending_listings();
 		$done    = isset( $_GET['pk_approved'] ) ? absint( $_GET['pk_approved'] ) : 0;
-		$creds   = get_transient( 'pk_last_credentials' );
+		$creds   = self::get_credentials_notice();
 		?>
 		<div class="wrap">
 			<h1><?php esc_html_e( 'Valider les annonces', 'partikulier' ); ?></h1>
@@ -109,9 +109,14 @@ class Partikulier_Listing_Approval {
 						<?php esc_html_e( 'Identifiant', 'partikulier' ); ?> : <strong><?php echo esc_html( $creds['login'] ); ?></strong><br>
 						<?php esc_html_e( 'Mot de passe', 'partikulier' ); ?> :
 						<strong><?php echo $creds['password'] ? esc_html( $creds['password'] ) : esc_html__( 'inchangé (déjà transmis précédemment)', 'partikulier' ); ?></strong><br>
-						<?php esc_html_e( 'Téléphone', 'partikulier' ); ?> : <?php echo esc_html( $creds['phone'] ); ?><br>
-						<?php esc_html_e( 'Envoi n8n', 'partikulier' ); ?> :
-						<?php echo $creds['sent'] ? esc_html__( 'transmis', 'partikulier' ) : esc_html__( 'non configuré — copiez les informations ci-dessus', 'partikulier' ); ?>
+					<?php esc_html_e( 'Téléphone', 'partikulier' ); ?> : <?php echo esc_html( $creds['phone'] ); ?><br>
+					<?php esc_html_e( 'Envoi n8n', 'partikulier' ); ?> :
+					<?php if ( ! empty( $creds['sent'] ) ) : ?>
+						<?php esc_html_e( 'transmis', 'partikulier' ); ?>
+					<?php else : ?>
+						<strong style="color:#b32d2e"><?php esc_html_e( 'échec ou non configuré', 'partikulier' ); ?></strong>
+						<?php if ( ! empty( $creds['error'] ) ) : ?> — <?php echo esc_html( $creds['error'] ); ?><?php endif; ?>
+					<?php endif; ?>
 					</p>
 				</div>
 				<?php delete_transient( 'pk_last_credentials' ); ?>
@@ -309,12 +314,7 @@ class Partikulier_Listing_Approval {
 			update_post_meta( $post_id, '_pk_credentials_resend_request_id', $request_id );
 			$sent        = self::notify_n8n( $post_id, $credentials, $request_id );
 
-		set_transient( 'pk_last_credentials', array(
-			'login'    => $credentials['login'],
-			'password' => $credentials['password'],
-			'phone'    => $credentials['phone'],
-			'sent'     => $sent,
-		), 5 * MINUTE_IN_SECONDS );
+		self::store_credentials_notice( $credentials, $sent, get_post_meta( $post_id, '_pk_n8n_error', true ) );
 
 		wp_safe_redirect( admin_url( 'admin.php?page=' . self::MENU_SLUG . '&pk_approved=' . $post_id ) );
 		exit;
@@ -338,18 +338,58 @@ class Partikulier_Listing_Approval {
 		$credentials = self::prepare_credentials( $post_id );
 		$sent        = self::notify_n8n( $post_id, $credentials );
 
-		set_transient( 'pk_last_credentials', array(
-			'login'    => $credentials['login'],
-			'password' => $credentials['password'],
-			'phone'    => $credentials['phone'],
-			'sent'     => $sent,
-		), 5 * MINUTE_IN_SECONDS );
+		self::store_credentials_notice( $credentials, $sent, get_post_meta( $post_id, '_pk_n8n_error', true ) );
 
 		if ( class_exists( 'Partikulier_Cache' ) && method_exists( 'Partikulier_Cache', 'purge_all' ) ) {
 			Partikulier_Cache::purge_all();
 		}
 
 		return $credentials;
+	}
+
+	/**
+	 * Stocke un avis admin à usage unique sans conserver le mot de passe en clair.
+	 * Le transient contient uniquement un ciphertext AES-GCM à durée courte.
+	 */
+	private static function store_credentials_notice( $credentials, $sent, $error = '' ) {
+		$data = array(
+			'login'    => (string) ( $credentials['login'] ?? '' ),
+			'password' => (string) ( $credentials['password'] ?? '' ),
+			'phone'    => (string) ( $credentials['phone'] ?? '' ),
+			'sent'     => (bool) $sent,
+			'error'    => (string) $error,
+		);
+		$key = hash( 'sha256', wp_salt( 'auth' ), true );
+		$iv  = function_exists( 'random_bytes' ) ? random_bytes( 12 ) : openssl_random_pseudo_bytes( 12 );
+		$tag = '';
+		$cipher = openssl_encrypt( wp_json_encode( $data ), 'aes-256-gcm', $key, OPENSSL_RAW_DATA, $iv, $tag );
+		if ( false !== $cipher && $tag ) {
+			set_transient( 'pk_last_credentials', array(
+				'cipher' => base64_encode( $cipher ),
+				'iv'     => base64_encode( $iv ),
+				'tag'    => base64_encode( $tag ),
+			), 5 * MINUTE_IN_SECONDS );
+		}
+	}
+
+	private static function get_credentials_notice() {
+		$stored = get_transient( 'pk_last_credentials' );
+		if ( is_array( $stored ) && array_key_exists( 'password', $stored ) ) {
+			// Supprime le format historique en clair sans le réafficher.
+			delete_transient( 'pk_last_credentials' );
+			return false;
+		}
+		if ( ! is_array( $stored ) || empty( $stored['cipher'] ) || empty( $stored['iv'] ) || empty( $stored['tag'] ) ) {
+			return false;
+		}
+		$key = hash( 'sha256', wp_salt( 'auth' ), true );
+		$json = openssl_decrypt( base64_decode( $stored['cipher'] ), 'aes-256-gcm', $key, OPENSSL_RAW_DATA, base64_decode( $stored['iv'] ), base64_decode( $stored['tag'] ) );
+		if ( false === $json ) {
+			delete_transient( 'pk_last_credentials' );
+			return false;
+		}
+		$data = json_decode( $json, true );
+		return is_array( $data ) ? $data : false;
 	}
 
 	/**
@@ -438,48 +478,56 @@ class Partikulier_Listing_Approval {
 	 * @return bool
 	 */
 	public static function notify_n8n( $post_id, $credentials, $request_id = '' ) {
-		$url = trim( (string) Partikulier_Settings::get( 'n8n_webhook_url' ) );
-		if ( ! $url ) {
+		if ( ! class_exists( 'Partikulier_N8n_Security' ) ) {
+			update_post_meta( $post_id, '_pk_n8n_error', __( 'Couche de sécurité n8n indisponible.', 'partikulier' ) );
+			update_post_meta( $post_id, '_pk_n8n_status', 'error' );
 			return false;
 		}
-
-		// wp_http_validate_url() refuse les adresses locales : parfait en
-		// production, bloquant pour un n8n auto-heberge sur le meme serveur.
-		// On verifie donc la forme, et on laisse WordPress gerer le reste.
+		$url = trim( (string) Partikulier_N8n_Security::get( 'n8n_webhook_url' ) );
 		$parts = wp_parse_url( $url );
-		if ( empty( $parts['scheme'] ) || empty( $parts['host'] ) || ! in_array( $parts['scheme'], array( 'http', 'https' ), true ) ) {
-			update_post_meta( $post_id, '_pk_n8n_error', __( 'URL de webhook invalide.', 'partikulier' ) );
-
+		if ( ! $url || empty( $parts['host'] ) || 'https' !== strtolower( (string) ( $parts['scheme'] ?? '' ) ) ) {
+			update_post_meta( $post_id, '_pk_n8n_error', __( 'Webhook n8n absent ou non HTTPS.', 'partikulier' ) );
+			update_post_meta( $post_id, '_pk_n8n_status', 'error' );
 			return false;
 		}
-
+		$body = wp_json_encode( self::payload( $post_id, $credentials, $request_id ), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES );
+		if ( false === $body ) {
+			update_post_meta( $post_id, '_pk_n8n_error', __( 'Payload n8n impossible à sérialiser.', 'partikulier' ) );
+			update_post_meta( $post_id, '_pk_n8n_status', 'error' );
+			return false;
+		}
+		$headers = Partikulier_N8n_Security::outgoing_headers( 'POST', $url, $body );
+		if ( is_wp_error( $headers ) ) {
+			update_post_meta( $post_id, '_pk_n8n_error', $headers->get_error_message() );
+			update_post_meta( $post_id, '_pk_n8n_status', 'error' );
+			return false;
+		}
+		update_post_meta( $post_id, '_pk_n8n_attempted_at', current_time( 'mysql', true ) );
 		$response = wp_remote_post( $url, array(
 			'timeout'  => 8,
 			'blocking' => true,
-			'headers'  => array(
-				'Content-Type'             => 'application/json',
-				'X-Partikulier-Automation' => (string) Partikulier_Settings::automation_api_secret(),
-			),
-				'body'     => wp_json_encode( self::payload( $post_id, $credentials, $request_id ) ),
+			'headers'  => $headers,
+			'body'     => $body,
 		) );
 
 		if ( is_wp_error( $response ) ) {
 			update_post_meta( $post_id, '_pk_n8n_error', $response->get_error_message() );
-
+			update_post_meta( $post_id, '_pk_n8n_status', 'error' );
 			return false;
 		}
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
-			if ( $code >= 200 && $code < 300 ) {
-				update_post_meta( $post_id, '_pk_n8n_sent', current_time( 'mysql' ) );
-				update_post_meta( $post_id, '_pk_credentials_resend_pending', current_time( 'mysql', true ) );
+		update_post_meta( $post_id, '_pk_n8n_response_code', $code );
+		if ( $code >= 200 && $code < 300 ) {
+			update_post_meta( $post_id, '_pk_n8n_sent', current_time( 'mysql', true ) );
+			update_post_meta( $post_id, '_pk_n8n_status', 'sent' );
+			update_post_meta( $post_id, '_pk_credentials_resend_pending', current_time( 'mysql', true ) );
 			delete_post_meta( $post_id, '_pk_n8n_error' );
-
 			return true;
 		}
 
 		update_post_meta( $post_id, '_pk_n8n_error', 'HTTP ' . $code );
-
+		update_post_meta( $post_id, '_pk_n8n_status', 'error' );
 		return false;
 	}
 

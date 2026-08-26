@@ -1,0 +1,150 @@
+{
+  "test_id": "A11Y-DOM-001",
+  "candidate_version": "6.17.18-final26",
+  "source_commit": "a4838531c6bdbbbebda6d564e92d632c22af67b2",
+  "source_ref": "local",
+  "run_id": "local",
+  "started_at_utc": "2026-08-26T02:54:02.923Z",
+  "finished_at_utc": "2026-08-26T02:54:02.923Z",
+  "command": "node scripts/test-accessibility.mjs",
+  "fixture": "FR/EN/AR home at mobile and desktop",
+  "status": "PASS",
+  "exit_code": 0,
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "tests": [
+    {
+      "id": "fr",
+      "locale": "fr",
+      "viewport": "375x667",
+      "url": "https://blanchedalmond-reindeer-376379.hostingersite.com/fr/",
+      "status": "PASS",
+      "http_status": 200,
+      "checks": {
+        "lang": "fr-FR",
+        "dir": "ltr",
+        "title": "Partkulier",
+        "unlabeled_buttons": 0,
+        "unlabeled_inputs": 0,
+        "images_without_alt": 0,
+        "visible_focusable": 134
+      },
+      "axe": {
+        "violations": 0,
+        "details": []
+      }
+    },
+    {
+      "id": "fr",
+      "locale": "fr",
+      "viewport": "1280x800",
+      "url": "https://blanchedalmond-reindeer-376379.hostingersite.com/fr/",
+      "status": "PASS",
+      "http_status": 200,
+      "checks": {
+        "lang": "fr-FR",
+        "dir": "ltr",
+        "title": "Partkulier",
+        "unlabeled_buttons": 0,
+        "unlabeled_inputs": 0,
+        "images_without_alt": 0,
+        "visible_focusable": 134
+      },
+      "axe": {
+        "violations": 0,
+        "details": []
+      }
+    },
+    {
+      "id": "en",
+      "locale": "en",
+      "viewport": "375x667",
+      "url": "https://blanchedalmond-reindeer-376379.hostingersite.com/en/",
+      "status": "PASS",
+      "http_status": 200,
+      "checks": {
+        "lang": "en-US",
+        "dir": "ltr",
+        "title": "Partkulier",
+        "unlabeled_buttons": 0,
+        "unlabeled_inputs": 0,
+        "images_without_alt": 0,
+        "visible_focusable": 134
+      },
+      "axe": {
+        "violations": 0,
+        "details": []
+      }
+    },
+    {
+      "id": "en",
+      "locale": "en",
+      "viewport": "1280x800",
+      "url": "https://blanchedalmond-reindeer-376379.hostingersite.com/en/",
+      "status": "PASS",
+      "http_status": 200,
+      "checks": {
+        "lang": "en-US",
+        "dir": "ltr",
+        "title": "Partkulier",
+        "unlabeled_buttons": 0,
+        "unlabeled_inputs": 0,
+        "images_without_alt": 0,
+        "visible_focusable": 134
+      },
+      "axe": {
+        "violations": 0,
+        "details": []
+      }
+    },
+    {
+      "id": "ar",
+      "locale": "ar",
+      "viewport": "375x667",
+      "url": "https://blanchedalmond-reindeer-376379.hostingersite.com/ar/",
+      "status": "PASS",
+      "http_status": 200,
+      "checks": {
+        "lang": "ar",
+        "dir": "rtl",
+        "title": "Partkulier",
+        "unlabeled_buttons": 0,
+        "unlabeled_inputs": 0,
+        "images_without_alt": 0,
+        "visible_focusable": 134
+      },
+      "axe": {
+        "violations": 0,
+        "details": []
+      }
+    },
+    {
+      "id": "ar",
+      "locale": "ar",
+      "viewport": "1280x800",
+      "url": "https://blanchedalmond-reindeer-376379.hostingersite.com/ar/",
+      "status": "PASS",
+      "http_status": 200,
+      "checks": {
+        "lang": "ar",
+        "dir": "rtl",
+        "title": "Partkulier",
+        "unlabeled_buttons": 0,
+        "unlabeled_inputs": 0,
+        "images_without_alt": 0,
+        "visible_focusable": 134
+      },
+      "axe": {
+        "violations": 0,
+        "details": []
+      }
+    }
+  ],
+  "artifacts": [
+    "/home/ubuntu/partikulier2/documentation/accessibility-live-final26-final.json"
+  ],
+  "limitations": [
+    "Automated DOM gate does not replace independent manual WCAG review"
+  ]
+}

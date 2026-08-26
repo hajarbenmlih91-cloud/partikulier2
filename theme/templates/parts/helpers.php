@@ -91,13 +91,41 @@ function pk_get_template( $slug ) {
  * fatale sous PHP 8 : ltrim() n'accepte pas un WP_Error.
  */
 if ( ! function_exists( 'pk_term_url' ) ) {
-	function pk_term_url( $term, $fallback = '' ) {
-		$link = get_term_link( $term );
-		if ( is_wp_error( $link ) || ! is_string( $link ) ) {
-			return $fallback ? $fallback : home_url( '/' );
+			function pk_term_url( $term, $fallback = '' ) {
+				if ( is_object( $term ) && isset( $term->taxonomy ) && PARTIKULIER_ESTATIK_LOCATION_TAXONOMY === $term->taxonomy ) {
+					$archive = function_exists( 'pk_properties_archive_url' ) ? pk_properties_archive_url() : home_url( '/' );
+					return add_query_arg( 'location', sanitize_title( (string) $term->slug ), $archive );
+				}
+				$link = get_term_link( $term );
+			if ( is_wp_error( $link ) || ! is_string( $link ) ) {
+				return $fallback ? $fallback : ( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) );
+			}
+
+			// Estatik renvoie parfois une taxonomie sans le préfixe Polylang.
+			// Reprendre le terme traduit puis préfixer explicitement le chemin
+			// garantit que le crawl reste dans la langue de la page courante.
+			if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
+				$language = sanitize_key( (string) pll_current_language( 'slug' ) );
+				if ( $language ) {
+					$term_id = is_object( $term ) && isset( $term->term_id ) ? (int) $term->term_id : 0;
+					if ( $term_id && function_exists( 'pll_get_term' ) ) {
+						$translated_id = (int) pll_get_term( $term_id, $language );
+						if ( $translated_id ) {
+							$translated_link = get_term_link( $translated_id, is_object( $term ) ? $term->taxonomy : '' );
+							if ( ! is_wp_error( $translated_link ) && is_string( $translated_link ) ) {
+								$link = $translated_link;
+							}
+						}
+					}
+					$path = (string) wp_parse_url( $link, PHP_URL_PATH );
+					if ( ! preg_match( '#^/' . preg_quote( $language, '#' ) . '(?:/|$)#', $path ) ) {
+						$link = pk_localized_home_url( $language ) . ltrim( $path, '/' );
+					}
+				}
+			}
+
+			return $link;
 		}
-		return $link;
-	}
 }
 
 /**

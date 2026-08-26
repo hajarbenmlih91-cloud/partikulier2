@@ -71,12 +71,13 @@ class Partikulier_JSONLD {
 		$type   = self::get_property_type( $post ); // House, Apartment, ...
 		$action = self::get_action( $post );        // Sell, Lease
 
+		$title       = self::localized_title( $post );
 		$description = Partikulier_SEO::description( $post );
 		if ( ! $description ) {
 			$description = sprintf(
 				/* translators: %s: titre de l'annonce */
 				__( 'Découvrez %s, une annonce immobilière publiée gratuitement entre particuliers sur Partikulier.', 'partikulier' ),
-				get_the_title( $post )
+				$title
 			);
 		}
 
@@ -84,7 +85,7 @@ class Partikulier_JSONLD {
 			'@id'            => $url . '#listing',
 			'@type'          => 'RealEstateListing',
 			'url'            => $url,
-			'name'           => get_the_title( $post ),
+			'name'           => $title,
 			'description'    => $description,
 			'datePosted'     => mysql2date( 'Y-m-d\TH:i:sP', $post->post_date_gmt ),
 			'dateModified'   => mysql2date( 'Y-m-d\TH:i:sP', $post->post_modified_gmt ),
@@ -97,7 +98,7 @@ class Partikulier_JSONLD {
 		$item = array(
 			'@id'   => $url . '#item',
 			'@type' => in_array( $type, array( 'House', 'Apartment', 'SingleFamilyResidence' ), true ) ? $type : 'RealEstateListing',
-			'name'  => get_the_title( $post ),
+			'name'  => $title,
 			'url'   => $url,
 		);
 		$rooms = self::get_meta( $post, 'es_property_total_rooms' ) ?: self::get_meta( $post, 'es_rooms' );
@@ -210,21 +211,22 @@ class Partikulier_JSONLD {
 			'no_found_rows'  => true,
 		) );
 
-		return self::itemlist_from_posts(
-			sprintf( 'Annonces immobilières à %s', $term->name ),
-			get_term_link( $term ),
-			$posts
-		);
+			$term_name = self::localized_place( $term->name );
+			return self::itemlist_from_posts(
+				self::localized_phrase( 'listings_in', $term_name ),
+					function_exists( 'pk_term_url' ) ? pk_term_url( $term ) : get_term_link( $term ),
+					$posts
+			);
 	}
 
 	private static function itemlist_graph_archive() {
 		global $wp_query;
 		$posts = isset( $wp_query->posts ) ? $wp_query->posts : array();
-		return self::itemlist_from_posts(
-			__( 'Annonces immobilières gratuites', 'partikulier' ),
-			pk_properties_archive_url(),
-			$posts
-		);
+			return self::itemlist_from_posts(
+				self::localized_phrase( 'archive' ),
+				pk_properties_archive_url(),
+				$posts
+			);
 	}
 
 	private static function itemlist_from_posts( $name, $url, $posts ) {
@@ -234,7 +236,7 @@ class Partikulier_JSONLD {
 				'@type'    => 'ListItem',
 				'position' => $i + 1,
 				'url'      => get_permalink( $post ),
-				'name'     => get_the_title( $post ),
+					'name'     => self::localized_title( $post ),
 			);
 		}
 		return array(
@@ -330,24 +332,24 @@ class Partikulier_JSONLD {
 			$locations = wp_get_object_terms( $post->ID, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY, array( 'number' => 1 ) );
 			if ( $locations && ! is_wp_error( $locations ) ) {
 				$location = $locations[0];
-				$crumbs[] = array( 'name' => $location->name, 'url' => get_term_link( $location ) );
+					$crumbs[] = array( 'name' => self::localized_place( $location->name ), 'url' => function_exists( 'pk_term_url' ) ? pk_term_url( $location ) : get_term_link( $location ) );
 			}
-			$crumbs[] = array( 'name' => get_the_title( $post ), 'url' => get_permalink( $post ) );
+			$crumbs[] = array( 'name' => self::localized_title( $post ), 'url' => get_permalink( $post ) );
 		} elseif ( is_tax() ) {
 			$term = get_queried_object();
-			$crumbs[] = array( 'name' => __( 'Annonces', 'partikulier' ), 'url' => pk_properties_archive_url() );
+			$crumbs[] = array( 'name' => self::localized_phrase( 'annonces' ), 'url' => pk_properties_archive_url() );
 			if ( $term instanceof WP_Term ) {
-				$crumbs[] = array( 'name' => $term->name, 'url' => get_term_link( $term ) );
+					$crumbs[] = array( 'name' => self::localized_place( $term->name ), 'url' => function_exists( 'pk_term_url' ) ? pk_term_url( $term ) : get_term_link( $term ) );
 			}
 		} elseif ( is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
-			$crumbs[] = array( 'name' => __( 'Annonces immobilières', 'partikulier' ), 'url' => pk_properties_archive_url() );
+			$crumbs[] = array( 'name' => self::localized_phrase( 'listings' ), 'url' => pk_properties_archive_url() );
 		} elseif ( is_page() ) {
 			$page = get_queried_object();
 			if ( $page->post_parent ) {
 				$parent = get_post( $page->post_parent );
-				$crumbs[] = array( 'name' => get_the_title( $parent ), 'url' => get_permalink( $parent ) );
+				$crumbs[] = array( 'name' => self::localized_title( $parent ), 'url' => get_permalink( $parent ) );
 			}
-			$crumbs[] = array( 'name' => get_the_title( $page ), 'url' => get_permalink( $page ) );
+			$crumbs[] = array( 'name' => self::localized_title( $page ), 'url' => get_permalink( $page ) );
 		}
 
 		return $crumbs;
@@ -388,8 +390,61 @@ class Partikulier_JSONLD {
 		return null;
 	}
 
+	private static function current_language() {
+		$lang = function_exists( 'pll_current_language' ) ? pll_current_language( 'slug' ) : 'fr';
+		return in_array( $lang, array( 'fr', 'en', 'ar' ), true ) ? $lang : 'fr';
+	}
+
+	private static function localized_title( $post ) {
+		$lang = self::current_language();
+		if ( class_exists( 'Partikulier_Listing_I18n' ) && method_exists( 'Partikulier_Listing_I18n', 'title_from_post' ) ) {
+			$title = Partikulier_Listing_I18n::title_from_post( $post, $lang );
+			if ( '' !== trim( (string) $title ) ) {
+				return $title;
+			}
+		}
+		return get_the_title( $post );
+	}
+
+	private static function localized_place( $name ) {
+		$lang = self::current_language();
+		if ( class_exists( 'Partikulier_Listing_I18n' ) && method_exists( 'Partikulier_Listing_I18n', 'localized_place' ) ) {
+			return Partikulier_Listing_I18n::localized_place( $name, $lang );
+		}
+		return $name;
+	}
+
+	private static function localized_term_name( $post, $tax ) {
+		$terms = get_the_terms( $post->ID, $tax );
+		if ( ! $terms || is_wp_error( $terms ) ) {
+			return null;
+		}
+		$term = reset( $terms );
+		$lang = self::current_language();
+		if ( 'fr' !== $lang && function_exists( 'pll_get_term' ) ) {
+			$translated_id = (int) pll_get_term( $term->term_id, $lang );
+			$translated    = $translated_id ? get_term( $translated_id, $tax ) : false;
+			if ( $translated && ! is_wp_error( $translated ) ) {
+				$term = $translated;
+			}
+		}
+		return self::localized_place( $term->name );
+	}
+
+	private static function localized_phrase( $key, $argument = '' ) {
+		$lang = self::current_language();
+		$phrases = array(
+			'archive'      => array( 'fr' => 'Annonces immobilières gratuites', 'en' => 'Free real estate listings', 'ar' => 'إعلانات عقارية مجانية' ),
+			'listings_in'  => array( 'fr' => 'Annonces immobilières à %s', 'en' => 'Real estate listings in %s', 'ar' => 'إعلانات عقارية في %s' ),
+			'listings'     => array( 'fr' => 'Annonces immobilières', 'en' => 'Real estate listings', 'ar' => 'الإعلانات العقارية' ),
+			'annonces'     => array( 'fr' => 'Annonces', 'en' => 'Listings', 'ar' => 'الإعلانات' ),
+		);
+		$text = $phrases[ $key ][ $lang ] ?? $phrases[ $key ]['fr'];
+		return '' !== $argument ? sprintf( $text, $argument ) : $text;
+	}
+
 	private static function get_address( $post ) {
-		$city     = self::term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+			$city     = self::localized_term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
 		$zip      = self::get_meta( $post, 'es_zip' ) ?: self::get_meta( $post, 'es_zip_code' );
 		$addr = array( '@type' => 'PostalAddress' );
 		if ( $zip ) { $addr['postalCode'] = $zip; }
@@ -400,9 +455,9 @@ class Partikulier_JSONLD {
 
 	private static function place_name( $post ) {
 		$parts = array_filter( array(
-			self::term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ),
-		) );
-		return $parts ? implode( ', ', $parts ) : get_the_title( $post );
+				self::localized_term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ),
+			) );
+			return $parts ? implode( ', ', $parts ) : self::localized_title( $post );
 	}
 
 	private static function term_name( $post, $tax ) {
@@ -434,7 +489,7 @@ class Partikulier_JSONLD {
 	}
 
 	private static function get_action( $post ) {
-		$name = self::term_name( $post, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+		$name = self::term_name( $post, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 		if ( ! $name ) {
 			return 'Sell';
 		}

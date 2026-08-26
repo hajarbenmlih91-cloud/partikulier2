@@ -27,13 +27,36 @@
 
 	/* ---------------------------------------------------------- etapes */
 
-	function showStep(n) {
-		steps.forEach(function (section) {
-			section.hidden = parseInt(section.dataset.step, 10) !== n;
-		});
-		var top = form.getBoundingClientRect().top + window.pageYOffset - 24;
-		window.scrollTo({ top: top, behavior: "smooth" });
-	}
+		var stepIndicators = Array.prototype.slice.call(form.querySelectorAll("[data-step-indicator]"));
+		var stepperStatus = document.getElementById("pk-stepper-status");
+
+		function updateStepper(n) {
+			stepIndicators.forEach(function (indicator) {
+				var step = parseInt(indicator.dataset.stepIndicator, 10);
+				indicator.classList.toggle("is-current", step === n);
+				indicator.classList.toggle("is-complete", step < n);
+				if (step === n) {
+					indicator.setAttribute("aria-current", "step");
+				} else {
+					indicator.removeAttribute("aria-current");
+				}
+			});
+			if (stepperStatus) {
+				var current = form.querySelector('[data-step-indicator="' + n + '"] .pk-stepper-label');
+				stepperStatus.textContent = n + " / " + stepIndicators.length + " — " + (current ? current.textContent : "");
+			}
+		}
+
+		function showStep(n) {
+			steps.forEach(function (section) {
+				section.hidden = parseInt(section.dataset.step, 10) !== n;
+			});
+			updateStepper(n);
+			var top = form.getBoundingClientRect().top + window.pageYOffset - 24;
+			window.scrollTo({ top: top, behavior: "smooth" });
+		}
+
+		updateStepper(1);
 
 	function fieldsOf(step) {
 		var section = form.querySelector('.pk-step[data-step="' + step + '"]');

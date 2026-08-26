@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PARTIKULIER_VERSION', '6.17.17' );
+define( 'PARTIKULIER_VERSION', '6.17.22' );
 
 add_filter(
     'language_attributes',
@@ -32,6 +32,7 @@ define( 'PARTIKULIER_URI', get_template_directory_uri() );
 define( 'PARTIKULIER_ESTATIK_POST_TYPE', 'properties' );
 define( 'PARTIKULIER_ESTATIK_TYPE_TAXONOMY', 'es_type' );
 define( 'PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY', 'es_category' );
+define( 'PARTIKULIER_ESTATIK_STATUS_TAXONOMY', 'es_status' );
 define( 'PARTIKULIER_ESTATIK_LOCATION_TAXONOMY', 'es_location' );
 
 /**
@@ -40,18 +41,39 @@ define( 'PARTIKULIER_ESTATIK_LOCATION_TAXONOMY', 'es_location' );
  * @return string
  */
 function pk_properties_archive_url() {
-	$url = get_post_type_archive_link( PARTIKULIER_ESTATIK_POST_TYPE );
-	if ( $url ) {
-		$parsed_host = wp_parse_url( $url, PHP_URL_HOST );
-		$invalid_host = in_array( $parsed_host, array( '0', '0.0.0.0', 'localhost' ), true );
-		if ( ! $invalid_host ) {
-			return $url;
+	// L’archive publique est un contrat du portail, pas un détail du slug
+	// retourné par Estatik. Construire cette URL explicitement évite les 404
+	// lorsque le plugin expose encore son ancien `/property/`.
+	if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_home_url' ) ) {
+		$language = sanitize_key( (string) pll_current_language( 'slug' ) );
+		if ( $language ) {
+			return pk_localized_home_url( $language ) . 'annonces/';
 		}
 	}
+	return home_url( '/annonces/' );
+}
 
-	// Estatik peut exposer une archive invalide avant sa configuration publique.
-	// La page WordPress /annonces/ reste le repli SEO et Polylang la traduira si liée.
-	return pk_page_url( 'annonces', '/annonces/' );
+/**
+ * Accueil localisé avec repli explicite si Polylang renvoie la racine.
+ *
+ * @param string $language Code de langue.
+ * @return string
+ */
+function pk_localized_home_url( $language = '' ) {
+	$language = sanitize_key( (string) $language );
+	if ( ! $language && function_exists( 'pll_current_language' ) ) {
+		$language = sanitize_key( (string) pll_current_language( 'slug' ) );
+	}
+	if ( ! $language ) {
+		return trailingslashit( home_url( '/' ) );
+	}
+
+	$url  = function_exists( 'pll_home_url' ) ? pll_home_url( $language ) : home_url( '/' . $language . '/' );
+	$path = (string) wp_parse_url( $url, PHP_URL_PATH );
+	if ( ! preg_match( '#(?:^|/)' . preg_quote( $language, '#' ) . '/?$#', untrailingslashit( $path ) ) ) {
+		$url = home_url( '/' . $language . '/' );
+	}
+	return trailingslashit( $url );
 }
 
 /**
@@ -78,7 +100,14 @@ add_filter( 'register_post_type_args', 'pk_properties_post_type_args', 20, 2 );
  * @return string
  */
 function pk_page_url( $slug, $fallback = '/' ) {
-	$page = get_page_by_path( trim( (string) $slug, '/' ), OBJECT, 'page' );
+	$slug = trim( (string) $slug, '/' );
+	$page = get_page_by_path( $slug, OBJECT, 'page' );
+	// Le provisioning du thème connaît les slugs canoniques et leurs alias
+	// historiques (par exemple deposer-une-annonce). Utiliser ce résolveur
+	// évite qu’un lien public retombe silencieusement sur une route obsolète.
+	if ( ! $page && class_exists( 'Partikulier_Required_Pages' ) ) {
+		$page = Partikulier_Required_Pages::find( $slug );
+	}
 	if ( $page && function_exists( 'pll_get_post' ) ) {
 		$translated_id = pll_get_post( $page->ID );
 		if ( $translated_id ) {
@@ -136,6 +165,17 @@ $partikulier_modules = array(
 	'/templates/parts/menu.php',
 	'/templates/parts/helpers.php',
 );
+
+// La collection REST du core ne rend aucun HTML et n’utilise aucun module du
+// thème. Éviter leur bootstrap sur cette route réduit le coût CPU sans
+// modifier les réponses, les routes front ou les contrats de présentation.
+$partikulier_rest_route = isset( $_GET['rest_route'] ) ? sanitize_text_field( (string) wp_unslash( $_GET['rest_route'] ) ) : '';
+$partikulier_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? (string) wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+$partikulier_core_listing_rest = str_contains( $partikulier_request_uri, '/wp-json/partikulier/v1/listings' )
+	|| str_starts_with( $partikulier_rest_route, '/partikulier/v1/listings' );
+if ( $partikulier_core_listing_rest ) {
+	$partikulier_modules = array();
+}
 
 foreach ( $partikulier_modules as $module ) {
 	$file = PARTIKULIER_DIR . $module;

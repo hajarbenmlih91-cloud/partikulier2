@@ -1,14 +1,15 @@
 {
   "name": "partikulier-dev",
-  "version": "6.17.16",
+  "version": "6.17.22",
   "private": true,
   "description": "Environnement de développement du thème Partikulier",
   "scripts": {
-    "setup": "npm install && npx playwright install chromium && npx playwright install-deps chromium",
+    "setup": "npm ci && npx playwright install chromium firefox webkit && npx playwright install-deps chromium",
     "test": "node scripts/visual.mjs",
     "test:rapide": "node scripts/rapide.mjs",
     "test:parcours": "node scripts/parcours.mjs",
     "test:audit": "node scripts/audit.mjs",
+    "test:ui-v1.8": "node scripts/test-ui-v1.8.mjs",
     "test:securite": "node scripts/securite.mjs",
     "test:baseline": "node scripts/visual.mjs baseline",
     "check": "bash scripts/check.sh",

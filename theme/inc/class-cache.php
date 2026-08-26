@@ -71,7 +71,7 @@ class Partikulier_Cache {
 				header( 'Cache-Control: public, max-age=' . self::TTL );
 				header( 'Vary: Accept-Encoding', false );
 			// Compression si le navigateur l'accepte et que la variante existe.
-			$accept = isset( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+			$accept = isset( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) : '';
 			if ( false !== strpos( $accept, 'br' ) && function_exists( 'brotli_uncompress' ) && file_exists( $cache_file . '.br' ) ) {
 				header( 'Content-Encoding: br' );
 				readfile( $cache_file . '.br' );
@@ -147,9 +147,9 @@ class Partikulier_Cache {
 		$files = glob( $dir . '/*.html' );
 		if ( $files ) {
 			foreach ( $files as $f ) {
-				@unlink( $f );
-				@unlink( $f . '.gz' );
-				@unlink( $f . '.br' );
+wp_delete_file( $f );
+						wp_delete_file( $f . '.gz' );
+						wp_delete_file( $f . '.br' );
 			}
 		}
 	}
@@ -160,7 +160,7 @@ class Partikulier_Cache {
 	 * systématiquement disponible pour is_page().
 	 */
 	private static function is_private_path() {
-		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
 		$path = trim( (string) $path, '/' );
 		if ( in_array( $path, array( 'sitemap.xml', 'robots.txt', 'xmlrpc.php' ), true ) ) {
 			return true;
@@ -180,8 +180,8 @@ class Partikulier_Cache {
 		$upload = wp_get_upload_dir();
 		$dir    = trailingslashit( $upload['basedir'] ) . self::DIR_NAME;
 
-		$host = isset( $_SERVER['HTTP_HOST'] ) ? preg_replace( '/[^a-z0-9.\-]/i', '', strtolower( $_SERVER['HTTP_HOST'] ) ) : 'default';
-		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) : '/';
+		$host = isset( $_SERVER['HTTP_HOST'] ) ? preg_replace( '/[^a-z0-9.\-]/i', '', strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) ) : 'default';
+		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '/';
 		$uri  = '/' === $uri ? 'index' : trim( str_replace( array( '..', '/' ), array( '', '_' ), $uri ), '_' );
 		$lang = '';
 		if ( defined( 'WPLANG' ) && WPLANG ) {
@@ -194,7 +194,7 @@ class Partikulier_Cache {
 	 * La requete courante est-elle cachable ?
 	 */
 			private static function is_root_request() {
-			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
 			return '/' === trailingslashit( (string) $path );
 		}
 
@@ -203,7 +203,7 @@ class Partikulier_Cache {
 			if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) ) {
 			return false;
 		}
-		if ( 'GET' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '' ) ) {
+		if ( 'GET' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) ) {
 			return false;
 		}
 		if ( ! empty( $_GET ) ) {
@@ -215,7 +215,7 @@ class Partikulier_Cache {
 			if ( self::is_private_path() || is_page( array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce', 'mes-annonces', 'mes-annonces-en', 'mes-annonces-ar' ) ) ) {
 				return false;
 			}
-		$cookie_header = isset( $_SERVER['HTTP_COOKIE'] ) ? (string) $_SERVER['HTTP_COOKIE'] : '';
+		$cookie_header = isset( $_SERVER['HTTP_COOKIE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_COOKIE'] ) ) : '';
 		if ( $cookie_header && preg_match( '/(?:wordpress_logged_in|wordpress_sec|wp-postpass|comment_author|pk_v_)=/i', $cookie_header ) ) {
 			return false;
 		}
@@ -233,9 +233,15 @@ class Partikulier_Cache {
 	 */
 	private static function response_sets_cookie() {
 		foreach ( headers_list() as $header ) {
-			if ( 0 === stripos( $header, 'Set-Cookie:' ) ) {
-				return true;
+			if ( 0 !== stripos( $header, 'Set-Cookie:' ) ) {
+				continue;
 			}
+			// La langue est déjà portée par l’URL /fr/, /en/ ou /ar/.
+			// Ce cookie Polylang ne rend donc pas le HTML partagé variable.
+			if ( preg_match( '/^Set-Cookie:\s*pll_language=/i', $header ) ) {
+				continue;
+			}
+			return true;
 		}
 		return false;
 	}

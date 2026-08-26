@@ -105,9 +105,9 @@ function pk_rebuild_values( $post ) {
 	$type_terms = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
 	$type_label = ( $type_terms && ! is_wp_error( $type_terms ) ) ? $type_terms[0]->name : 'Bien';
 
-	// Action : le nom du terme es_category dit vendre ou louer.
+	// Action : le nom du terme es_status dit vendre ou louer.
 	$action = 'vendre';
-	$cat    = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$cat    = wp_get_object_terms( $id, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 	if ( $cat && ! is_wp_error( $cat ) ) {
 		$name = function_exists( 'remove_accents' ) ? remove_accents( $cat[0]->name ) : $cat[0]->name;
 		$name = function_exists( 'mb_strtolower' ) ? mb_strtolower( $name ) : strtolower( $name );

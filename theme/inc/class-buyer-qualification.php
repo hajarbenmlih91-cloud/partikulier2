@@ -395,7 +395,7 @@ class Partikulier_Buyer_Qualification {
 			'price' => get_post_meta( $property_id, 'es_property_price', true ),
 			'location' => Partikulier_Geo::location_string( $property_id ),
 			'layout' => get_post_meta( $property_id, '_pk_bedrooms_label', true ),
-			'transaction' => implode( ', ', wp_get_object_terms( $property_id, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, array( 'fields' => 'names' ) ) ),
+			'transaction' => implode( ', ', wp_get_object_terms( $property_id, PARTIKULIER_ESTATIK_STATUS_TAXONOMY, array( 'fields' => 'names' ) ) ),
 		);
 	}
 
@@ -454,7 +454,11 @@ class Partikulier_Buyer_Qualification {
 			return '';
 		}
 		$key = hash( 'sha256', wp_salt( 'secure_auth' ), true );
-		return (string) openssl_decrypt( substr( $payload, 16 ), 'AES-256-CBC', $key, OPENSSL_RAW_DATA, substr( $payload, 0, 16 ) );
+		$decrypted = openssl_decrypt( substr( $payload, 16 ), 'AES-256-CBC', $key, OPENSSL_RAW_DATA, substr( $payload, 0, 16 ) );
+		if ( false === $decrypted ) {
+			return '';
+		}
+		return (string) $decrypted;
 	}
 }
 

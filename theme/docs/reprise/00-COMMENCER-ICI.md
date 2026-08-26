@@ -61,3 +61,16 @@ Ces règles viennent du client. Les enfreindre, c'est du travail à refaire.
 ## L'état actuel en une phrase
 
 Le thème est fonctionnel et livré : dépôt en 3 étapes, validation admin, publication trilingue, URL géographiques avec redirections 301, favoris, diagnostic intégré. Il reste trois chantiers de performance et de configuration, décrits dans `05-CHANTIERS-RESTANTS.md`.
+
+
+## Dernière campagne d’audit — 26 août 2026
+
+Le rapport **`07-AUDIT-10-PROMPTS-SIMULATIONS-2026-08-26.md`** contient les résultats réels des 10 audits et des 10 simulations exécutés sur le commit `2f626a3`. La décision reste **NO-GO** pour la certification finale. Avant toute nouvelle fonctionnalité, corriger les blocages P0 : accessibilité `aria-hidden-focus`, course de chargement du popup, source de vérité Estatik Vendre/Louer, performance, `package-lock.json` et CI d’installation froide. Le rapport distingue les tests passés, les échecs confirmés, les limitations de dataset et les problèmes de timing du navigateur.
+
+La campagne n’a créé, supprimé ni modifié aucune annonce et n’a utilisé aucun secret de production.
+
+| Document | Utilité |
+| --- | --- |
+| **07-AUDIT-10-PROMPTS-SIMULATIONS-2026-08-26.md** | Résultats de la dernière campagne réelle et corrections obligatoires |
+| **05-AUDIT-SENIOR-2026-08-25.md** | Audit senior initial et état de référence |
+| **Cahier-des-charges-correction-audit-Partikulier-v1.0.md** | CDC complet des corrections, tests et critères Go/No-Go |

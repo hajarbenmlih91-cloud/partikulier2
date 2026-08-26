@@ -21,6 +21,17 @@ if ( ! $post || empty( $post->ID ) ) {
 	return;
 }
 
+$pk_property_url = get_permalink( $post );
+if ( class_exists( 'Partikulier_Listing_URLs' ) ) {
+	$pk_property_url = Partikulier_Listing_URLs::filter_link( $pk_property_url, $post );
+}
+if ( function_exists( 'pll_current_language' ) && function_exists( 'pll_get_post' ) ) {
+	$pk_language = pll_current_language( 'slug' );
+	$pk_translated_id = $pk_language ? (int) pll_get_post( $post->ID, $pk_language ) : 0;
+	if ( $pk_translated_id ) {
+		$pk_property_url = get_permalink( $pk_translated_id );
+	}
+}
 
 $price    = get_post_meta( $post->ID, 'es_property_price', true ) ?: get_post_meta( $post->ID, 'es_price', true );
 $surface  = get_post_meta( $post->ID, 'es_property_area', true ) ?: get_post_meta( $post->ID, 'es_size', true );
@@ -69,7 +80,7 @@ $location = Partikulier_Geo::location_string( $post->ID );
 
 	// Optimisation senior : utiliser get_the_terms() pour beneficier du cache de WP_Query.
 	$types   = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
-	$actions = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+	$actions = get_the_terms( $post->ID, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 	$type    = ( ! is_wp_error( $types ) && $types ) ? $types[0]->name : __( 'Bien', 'partikulier' );
 	$action  = ( ! is_wp_error( $actions ) && $actions ) ? $actions[0]->name : '';
 
@@ -112,11 +123,14 @@ $gallery_ids = array();
 			$gallery_ids = array_map( 'absint', $stored_gallery );
 		}
 	}
-	$gallery_ids = array_slice( array_unique( $gallery_ids ), 0, 10 );
-$thumb       = get_post_thumbnail_id( $post );
-if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
-	array_unshift( $gallery_ids, $thumb );
-}
+	$gallery_ids = array_slice( array_unique( array_map( 'absint', $gallery_ids ) ), 0, 10 );
+	$thumb       = get_post_thumbnail_id( $post );
+	if ( $thumb && ! in_array( (int) $thumb, $gallery_ids, true ) ) {
+		array_unshift( $gallery_ids, (int) $thumb );
+	}
+	$gallery_ids = array_values( array_filter( $gallery_ids, static function ( $attachment_id ) {
+		return (bool) Partikulier_AVIF::valid_image_url( $attachment_id, 'pk-hero' );
+	} ) );
 ?>
 
 <article class="pk-single pk-single-estatik<?php echo $is_closed ? ' pk-single-closed' : ''; ?>" itemscope itemtype="https://schema.org/RealEstateListing">
@@ -153,7 +167,7 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 				<button type="button" class="pk-single-action pk-card-wishlist" data-post-id="<?php echo esc_attr( $post->ID ); ?>" aria-label="<?php esc_attr_e( 'Ajouter aux favoris', 'partikulier' ); ?>" aria-pressed="false">
 					<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
 				</button>
-				<button type="button" class="pk-single-action pk-single-share" data-url="<?php echo esc_url( get_permalink( $post ) ); ?>" data-title="<?php echo esc_attr( get_the_title( $post ) ); ?>" aria-label="<?php esc_attr_e( 'Partager cette annonce', 'partikulier' ); ?>">
+				<button type="button" class="pk-single-action pk-single-share" data-url="<?php echo esc_url( $pk_property_url ); ?>" data-title="<?php echo esc_attr( get_the_title( $post ) ); ?>" aria-label="<?php esc_attr_e( 'Partager cette annonce', 'partikulier' ); ?>">
 					<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>
 				</button>
 			</div>
@@ -180,7 +194,7 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 										<?php if ( $avif ) : ?>
 											<source type="image/avif" srcset="<?php echo esc_attr( $avif ); ?>">
 										<?php endif; ?>
-										<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="<?php echo 0 === $i ? 'eager' : 'lazy'; ?>" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
+										<img src="<?php echo esc_url( $img ); ?>" alt="<?php echo esc_attr( $alt ); ?>" loading="eager" decoding="async" <?php echo 0 === $i ? 'fetchpriority="high"' : ''; ?>>
 									</picture>
 									<?php if ( $is_closed ) : ?>
 										<span class="pk-photo-watermark" aria-hidden="true"><?php echo esc_html( $closed_label ); ?></span>
@@ -275,7 +289,7 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 			</div>
 
 			<aside class="pk-single-sidebar">
-				<div class="pk-contact-card pk-contact-card--dark">
+				<div class="pk-contact-card pk-contact-card--dark" id="pk-contact-card">
 <p class="pk-contact-kicker"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Contact sécurisé', 'Contact sécurisé', 'partikulier' ) ); ?></p>
 						<h2 class="pk-contact-title"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Intéressé par ce bien ?', 'Intéressé par ce bien ?', 'partikulier' ) ); ?></h2>
 						<p class="pk-contact-note"><?php echo esc_html( Partikulier_Localization::translate_polylang_string( 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'Envoyez cette annonce sur WhatsApp. Après vérification de votre demande, nous vous transmettons les coordonnées du propriétaire.', 'partikulier' ) ); ?></p>
@@ -312,7 +326,7 @@ if ( $thumb && ! in_array( $thumb, $gallery_ids, true ) ) {
 							// Repli quand aucun numero WhatsApp n'est encore configure :
 							// on garde un bouton actif (wa.me sans destinataire) pour ne pas
 							// laisser la carte de contact sans action, comme le preview.
-							$pk_wa_text = rawurlencode( sprintf( __( 'Bonjour, je suis intéressé par « %1$s » — %2$s', 'partikulier' ), get_the_title( $post ), get_permalink( $post ) ) );
+							$pk_wa_text = rawurlencode( sprintf( __( 'Bonjour, je suis intéressé par « %1$s » — %2$s', 'partikulier' ), get_the_title( $post ), $pk_property_url ) );
 							?>
 							<div class="pk-buyer-contact-flow">
 								<a class="pk-btn pk-btn-primary pk-btn-block pk-btn-whatsapp" href="https://wa.me/?text=<?php echo esc_attr( $pk_wa_text ); ?>" target="_blank" rel="noopener nofollow">

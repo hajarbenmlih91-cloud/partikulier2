@@ -13,6 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MATRIX = ROOT / "documentation" / "scope-matrix.csv"
 BLOCKING_IMPL = {"NOT_IMPLEMENTED", "NOT_COVERED", "DEPRECATED"}
 BLOCKING_TEST = {"FAIL", "NOT_RUN", "SKIPPED", "NO_BASELINE", "NON_REPRODUCIBLE", "BLOCKED"}
+PRODUCT_VERSION = os.environ.get("PK_VERSION", "6.17.22")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--output", default="documentation/qualification-v1.7.1.json")
@@ -45,12 +46,17 @@ def blockers(group):
 m0_blockers = blockers(m0)
 m1_blockers = blockers(m1)
 commercial_blockers = [r for r in m2 if r.get("capability") == "Commercial approval" and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
-capacity_blockers = [r for r in m1 if r.get("capability") in {"Load test 1000 listings", "HTTP p95 p99 gate"} and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
+capacity_capabilities = {
+    "Load test 1000 listings", "HTTP p95 p99 gate", "Capacity sustained reads", "Capacity burst reads",
+    "Capacity write API", "Capacity concurrent sessions", "Capacity CPU RSS saturation",
+}
+capacity_blockers = [r for r in m1 if r.get("capability") in capacity_capabilities and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
+upgrade_blockers = [r for r in m1 if r.get("capability") == f"Upgrade v6.17.16 to {PRODUCT_VERSION}" and (r.get("implementation_status") != "IMPLEMENTED" or r.get("test_status") != "PASS")]
 
 technical = "PASS" if not m0_blockers and not errors else "FAIL"
 ux_content = "PASS" if not m1_blockers and not errors else "FAIL"
 commercial = "PASS" if not commercial_blockers and not errors else "FAIL"
-ultra = "PASS" if technical == "PASS" and ux_content == "PASS" and commercial == "PASS" and not capacity_blockers else "FAIL"
+ultra = "PASS" if technical == "PASS" and ux_content == "PASS" and commercial == "PASS" and not capacity_blockers and not upgrade_blockers else "FAIL"
 
 if ultra == "PASS":
     decision = "ULTRA_PREMIUM"
@@ -62,7 +68,7 @@ else:
 payload = {
     "test_id": "QUALIFICATION-REPORT-001",
     "candidate_version": "1.7.1",
-    "product_version": "6.17.17",
+    "product_version": PRODUCT_VERSION,
     "source_commit": args.commit,
     "source_ref": os.environ.get("GITHUB_REF", "local"),
     "run_id": os.environ.get("GITHUB_RUN_ID", "local"),
@@ -70,19 +76,21 @@ payload = {
     "status": "PASS" if ultra == "PASS" and not errors else ("FAIL" if errors or technical == "FAIL" else "BLOCKED"),
     "decision": decision,
     "labels": {
-        "TECHNICAL_STATUS": technical,
+        "TECHNICAL_CANDIDATE_STATUS": technical,
+        "TECHNICAL_STATUS_LEGACY_ALIAS": technical,
         "RELEASE_STATUS": "CANDIDATE" if technical == "PASS" else "BLOCKED",
+        "FINAL_RELEASE": "PENDING_NOT_PUBLISHED",
         "TECHNICAL_RELEASE_CANDIDATE": technical,
         "UX_CONTENT": ux_content,
         "COMMERCIAL_RELEASE": commercial,
         "ULTRA_PREMIUM": ultra,
     },
     "scope_counts": {"M0": len(m0), "M1": len(m1), "M2": len(m2)},
-    "blockers": {"source": errors, "M0": m0_blockers, "M1": m1_blockers, "commercial": commercial_blockers, "capacity": capacity_blockers},
+    "blockers": {"source": errors, "M0": m0_blockers, "M1": m1_blockers, "commercial": commercial_blockers, "capacity": capacity_blockers, "upgrade": upgrade_blockers},
     "package_sha256": args.package_sha256 or None,
     "human_validation": "PENDING_NOT_SIMULATED",
     "release_policy": "No tag or release is authorized by this report alone.",
-    "status_semantics": "PASS means all qualification labels pass; BLOCKED means the report is valid but required scope or human approval remains outstanding.",
+    "status_semantics": "TECHNICAL_CANDIDATE_STATUS=PASS means automated technical candidate gates passed; RELEASE_STATUS=CANDIDATE means no final release is implied; BLOCKED means required scope or human approval remains outstanding.",
 }
 output = ROOT / args.output
 output.parent.mkdir(parents=True, exist_ok=True)

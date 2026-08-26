@@ -12,3 +12,4 @@ install.log
 ROUTER
 
 .runtime/
+vendor/

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<ruleset name="Partikulier WordPress security gate">
+  <description>Bounded WPCS security gate for the candidate PHP files. The legacy style audit remains available through phpcs.xml.dist.</description>
+  <arg name="basepath" value="."/>
+  <arg name="colors"/>
+  <config name="php_version" value="80300"/>
+  <config name="ignore_warnings_on_exit" value="1"/>
+
+  <file>theme/inc/class-avif.php</file>
+  <file>theme/inc/class-cache.php</file>
+  <file>theme/inc/class-listing-approval.php</file>
+  <file>scripts/reparer-taxonomies.php</file>
+
+  <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
+  <rule ref="WordPress.Security.NonceVerification"/>
+  <rule ref="WordPress.PHP.DiscouragedPHPFunctions"/>
+  <rule ref="WordPress.WP.AlternativeFunctions"/>
+</ruleset>

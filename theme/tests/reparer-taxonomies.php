@@ -2,12 +2,14 @@
 /**
  * Repare les termes mal classes entre les taxonomies Estatik.
  *
- * Probleme traite : des VILLES ont ete creees dans es_category (la taxonomie
- * des actions : A vendre / A louer). Resultat, le menu "Achat ou location"
+ * Probleme traite : des VILLES ont ete creees dans es_category, alors que la
+ * taxonomie canonique des actions est es_status (A vendre / A louer). Resultat,
+ * le menu "Achat ou location"
  * affiche des noms de villes, et le filtre par action ne fonctionne plus.
  *
  * Ce script :
  *   1. detecte les termes qui ressemblent a des villes dans es_category ;
+ *      les actions ne sont jamais supprimees de es_status ;
  *   2. verifie que la ville existe bien dans es_location, sinon la cree ;
  *   3. rattache les annonces concernees a es_location ;
  *   4. detache la ville de es_category (le terme peut ensuite etre supprime).
@@ -55,7 +57,7 @@ if ( ! $appliquer && defined( 'WP_CLI' ) ) {
 		|| ( isset( $GLOBALS['argv'] ) && in_array( '--appliquer', (array) $GLOBALS['argv'], true ) );
 }
 
-$TAX_ACTION   = defined( 'PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY' ) ? PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY : 'es_category';
+$TAX_ACTION   = defined( 'PARTIKULIER_ESTATIK_STATUS_TAXONOMY' ) ? PARTIKULIER_ESTATIK_STATUS_TAXONOMY : 'es_status';
 $TAX_VILLE    = defined( 'PARTIKULIER_ESTATIK_LOCATION_TAXONOMY' ) ? PARTIKULIER_ESTATIK_LOCATION_TAXONOMY : 'es_location';
 $TAX_TYPE     = defined( 'PARTIKULIER_ESTATIK_TYPE_TAXONOMY' ) ? PARTIKULIER_ESTATIK_TYPE_TAXONOMY : 'es_type';
 
