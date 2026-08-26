@@ -27,10 +27,14 @@ async function archiveCase(locale) {
     cards: document.querySelectorAll('.pk-card.pk-card-property').length,
     title: document.title,
     jsonld: [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent || ''),
+    logo_href: document.querySelector('a.pk-logo-text')?.href || document.querySelector('a.custom-logo-link')?.href || '',
     body_text: document.body.innerText,
   }));
-  const ok = nav.response?.status() === 200 && data.lang.toLowerCase().startsWith(locale) && data.dir === (locale === 'ar' ? 'rtl' : 'ltr') && data.cards > 0;
-  results.push({ test: `archive-${locale}`, status: ok ? 'PASS' : 'FAIL', http_status: nav.response?.status() || 0, networkidle: nav.networkidle, elapsed_ms: nav.elapsed_ms, data });
+  const expectedLogoPath = `/${locale}/`;
+  const logoPath = data.logo_href ? new URL(data.logo_href).pathname : '';
+  const logoOk = logoPath === expectedLogoPath;
+  const ok = nav.response?.status() === 200 && data.lang.toLowerCase().startsWith(locale) && data.dir === (locale === 'ar' ? 'rtl' : 'ltr') && data.cards > 0 && logoOk;
+  results.push({ test: `archive-${locale}`, status: ok ? 'PASS' : 'FAIL', http_status: nav.response?.status() || 0, networkidle: nav.networkidle, elapsed_ms: nav.elapsed_ms, data: { ...data, expected_logo_path: expectedLogoPath, logo_ok: logoOk } });
   await page.close();
 }
 
