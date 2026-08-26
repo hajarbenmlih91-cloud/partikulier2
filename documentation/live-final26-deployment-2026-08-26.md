@@ -28,3 +28,7 @@ Le commit `4a12222887e8be91a72a033762c5df70e998d1e1` a été poussé sur `automa
 Le gate axe final26 régénéré avec le SHA courant `a4838531c6bdbbbebda6d564e92d632c22af67b2` passe 6/6 sur FR/EN/AR, desktop/mobile : 0 violation axe, 0 bouton visible sans libellé, 0 champ visible sans libellé et 0 image sans alt. La limitation reste la revue WCAG humaine.
 
 Le contrôle dédié des trois premières fiches AR publiques passe 3/3 en Chromium : HTTP 200, `lang=ar`, `dir=rtl`, JSON-LD présent avec nom arabe et aucun `Saïdia`/`Annonces immobilières gratuites` dans le graphe contrôlé.
+
+## Semgrep final26
+
+Après le correctif du retour `false` d’`openssl_decrypt`, le scan ciblé final26 sur 8 fichiers métier passe à **0 finding** (`targeted_exit=0`). Le scan projet complet avec le ruleset `p/default` couvre 357 fichiers et remonte **49 findings bloquants** (`project_exit=1`), principalement dans des surfaces historiques hors périmètre corrigé. Le résultat global Semgrep reste donc **FAIL / NON VALIDÉ** ; il n’est pas masqué par le scan ciblé.
