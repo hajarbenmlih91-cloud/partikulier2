@@ -124,6 +124,11 @@ class Partikulier_Search_Filters {
 				continue;
 			}
 
+			if ( 'es_action' === $param && ! ctype_digit( $raw ) && ! in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
+				$unresolvable_action = true;
+				continue;
+			}
+
 				// Le formulaire utilise des slugs stables pour les actions. Si Estatik a un
 				// libelle different, retrouver son vrai terme avant de construire la tax_query.
 				if ( 'es_action' === $param && in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
@@ -152,7 +157,7 @@ class Partikulier_Search_Filters {
 				if ( ! $term || is_wp_error( $term ) ) {
 					// Ne jamais ignorer silencieusement un filtre transactionnel reconnu :
 					// sans terme resolu, retourner zero resultat plutot que les ventes completes.
-					if ( 'es_action' === $param && in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
+					if ( 'es_action' === $param ) {
 						$unresolvable_action = true;
 					}
 					continue;
