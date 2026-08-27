@@ -19,7 +19,7 @@ function partikulier_is_public_listings_get() {
     }
     $authorization = isset( $_SERVER['HTTP_AUTHORIZATION'] ) ? (string) $_SERVER['HTTP_AUTHORIZATION'] : '';
     $cookie        = isset( $_SERVER['HTTP_COOKIE'] ) ? (string) $_SERVER['HTTP_COOKIE'] : '';
-    if ( '' !== $authorization || preg_match( '/(?:wordpress_logged_in|wordpress_sec)=/i', $cookie ) ) {
+    if ( '' !== $authorization || preg_match( '/(?:wordpress_logged_in|wordpress_sec)_[^=]*=/i', $cookie ) ) {
         return false;
     }
 
@@ -28,7 +28,7 @@ function partikulier_is_public_listings_get() {
     $path  = (string) wp_parse_url( $uri, PHP_URL_PATH );
 
     return (bool) preg_match(
-        '#(?:^|/)wp-json/partikulier/v1/listings/?$#',
+        '#^/wp-json/partikulier/v1/listings/?$#',
         $path
     ) || (bool) preg_match(
         '#^/?partikulier/v1/listings/?$#',
