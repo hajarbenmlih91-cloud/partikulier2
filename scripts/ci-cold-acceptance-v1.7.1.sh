@@ -108,6 +108,15 @@ semgrep --version > "$ROOT/documentation/semgrep-version-v${VERSION}.txt"
 bash "$ROOT/scripts/check.sh" > "$ROOT/documentation/check-v${VERSION}.log"
 bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/documentation/provenance-v${VERSION}.log"
 
+# Query Monitor est un outil de diagnostic, pas une dépendance de production. Il reste actif pour les contrôles précédents, puis est désactivé juste avant la charge/capacity afin de mesurer le runtime applicatif sans son instrumentation par requête.
+if wp --path="$RUNTIME" plugin is-active query-monitor >/dev/null 2>&1; then
+  wp --path="$RUNTIME" plugin deactivate query-monitor >> "$ROOT/documentation/query-monitor-capacity-v${VERSION}.log" 2>&1
+fi
+if wp --path="$RUNTIME" plugin is-active query-monitor >/dev/null 2>&1; then
+  echo 'Query Monitor doit être inactif avant la capacity' >&2
+  exit 1
+fi
+printf 'QUERY_MONITOR_ACTIVE_BEFORE_CAPACITY=false\n' > "$ROOT/documentation/query-monitor-capacity-v${VERSION}.summary.log"
 PK_WP_DIR="$RUNTIME" PK_MIN_LISTINGS=1000 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/scripts/provision-load-fixture.php" > "$ROOT/documentation/load-fixture-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_BASE="$BASE" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" PK_LOAD_REPORT="$ROOT/documentation/load-test-v${VERSION}.json" bash "$ROOT/scripts/load-test-http.sh" > "$ROOT/documentation/load-test-v${VERSION}.log"
 capacity_exit=0
