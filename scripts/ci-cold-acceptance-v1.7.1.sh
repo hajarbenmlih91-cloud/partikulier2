@@ -67,6 +67,7 @@ wait_for_http
 wp --path="$RUNTIME" eval '$repository = new \Partikulier\Core\ListingRepository(); echo "SYNCED=" . $repository->syncEstatikProperties() . PHP_EOL;' --allow-root > "$ROOT/documentation/estatik-sync-v${VERSION}.log"
 
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/core-contract.php" > "$ROOT/documentation/core-contract-v${VERSION}.json"
+PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/rest-lite-scope.php" > "$ROOT/documentation/rest-lite-scope-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/partikulier-core/tests/services-contract.php" > "$ROOT/documentation/core-services-contract-v${VERSION}.json"
 PK_WP_DIR="$RUNTIME" PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" PK_RUN_ID="${GITHUB_RUN_ID:-local}" php "$ROOT/scripts/theme-contract.php" > "$ROOT/documentation/theme-contract-v${VERSION}.json"
 PK_VERSION="$VERSION" PK_COMMIT="$CI_COMMIT" node "$ROOT/scripts/routes-contract.mjs" > "$ROOT/documentation/routes-contract-v${VERSION}.json" 2> "$ROOT/documentation/routes-contract-v${VERSION}.summary.log"
@@ -132,6 +133,7 @@ bash "$ROOT/scripts/stamp-provenance.sh" "$VERSION" "$CI_COMMIT" > "$ROOT/docume
 for report in "$ROOT"/documentation/*"v${VERSION}".json; do jq empty "$report"; done
 jq -e '.passed == true and (.orders|length) == 3' "$ROOT/documentation/search-sorting-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/core-contract-v${VERSION}.json" >/dev/null
+jq -e '.status == "PASS" and .failed == 0 and .passed == .total and .total == 10' "$ROOT/documentation/rest-lite-scope-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/core-services-contract-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/theme-contract-v${VERSION}.json" >/dev/null
 jq -e '.failed == 0 and .passed == .total' "$ROOT/documentation/routes-contract-v${VERSION}.json" >/dev/null
