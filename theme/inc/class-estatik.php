@@ -154,7 +154,6 @@ add_action( 'wp_enqueue_scripts', function() { remove_action( 'wp_enqueue_script
 
 			foreach ( array( 'es-select2', 'select2', 'select2-js', 'es-slick', 'slick', 'slick-js', 'es-magnific', 'magnific-popup', 'es-datetime-picker', 'datetimepicker', 'jquery-ui-core', 'jquery-ui-datepicker', 'clipboard' ) as $handle ) {
 				wp_dequeue_script( $handle );
-				wp_deregister_script( $handle );
 			}
 		}
 
