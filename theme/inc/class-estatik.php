@@ -17,6 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Partikulier_Estatik {
 
 	public static function init() {
+		// Garantit les dépendances Estatik avant tout enqueue du framework.
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register_dependency_fallbacks' ), 0 );
+
 // Desactiver les styles dynamiques Estatik qui causent des requetes N+1.
 add_action( 'wp_enqueue_scripts', function() { remove_action( 'wp_enqueue_scripts', array( 'Es_Assets', 'frontend_assets' ) ); }, 1 );
 		if ( ! self::plugin_active() ) {
@@ -130,6 +133,27 @@ add_action( 'wp_enqueue_scripts', function() { remove_action( 'wp_enqueue_script
 	private static function plugin_installed() {
 		$plugins = get_plugins();
 		return isset( $plugins['estatik/estatik.php'] );
+	}
+
+	/**
+	 * Enregistre les dépendances Estatik si un autre composant les a retirées trop tôt.
+	 * Aucun script n'est forcé : les handles sont seulement rendus disponibles pour
+	 * les scripts Estatik qui les déclarent comme dépendances.
+	 *
+	 * @return void
+	 */
+	public static function register_dependency_fallbacks() {
+		if ( ! defined( 'ES_PLUGIN_URL' ) ) {
+			return;
+		}
+
+		$version = defined( 'ES_VERSION' ) ? ES_VERSION : null;
+		if ( ! wp_script_is( 'es-select2', 'registered' ) ) {
+			wp_register_script( 'es-select2', ES_PLUGIN_URL . 'common/select2/select2.full.min.js', array( 'jquery' ), $version );
+		}
+		if ( ! wp_script_is( 'es-datetime-picker', 'registered' ) ) {
+			wp_register_script( 'es-datetime-picker', ES_PLUGIN_URL . 'includes/classes/framework/assets/js/jquery.datetimepicker.full.min.js', array( 'jquery' ), $version );
+		}
 	}
 
 	/**
