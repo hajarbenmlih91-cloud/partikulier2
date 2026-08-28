@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the measurable O1-O22 acceptance contract and execution results."""
+"""Validate the measurable O1-O18 open-gates contract and execution results."""
 from __future__ import annotations
 
 import argparse
@@ -26,14 +26,14 @@ REQUIRED_OBJECTIVE_FIELDS = {
     "id", "name", "target", "required_evidence", "command", "expected_exit",
     "pass_rule", "environment_block_rule",
 }
-EXPECTED_IDS = {f"O{i}" for i in range(1, 23)}
+EXPECTED_IDS = {f"O{i}" for i in range(1, 19)}
 
 
 def validate_contract(contract: dict) -> list[str]:
     errors: list[str] = []
-    if contract.get("contract_id") != "partikulier-objectives-22":
+    if contract.get("contract_id") != "partikulier-open-gates-18":
         errors.append("contract_id_invalid")
-    if contract.get("contract_version") != "1.1.0":
+    if contract.get("contract_version") != "1.2.0":
         errors.append("contract_version_invalid")
     if set(contract.get("status_values", [])) != EXPECTED_STATUSES:
         errors.append("status_values_invalid")
@@ -42,10 +42,10 @@ def validate_contract(contract: dict) -> list[str]:
     if "Any status other than PASS" not in contract.get("global_rule", ""):
         errors.append("global_rule_missing_nonpass_block")
     objectives = contract.get("objectives")
-    if not isinstance(objectives, list) or len(objectives) != 22:
+    if not isinstance(objectives, list) or len(objectives) != 18:
         errors.append(f"objective_count_invalid:{len(objectives) if isinstance(objectives, list) else 'not-list'}")
         return errors
-    if contract.get("objective_count") != 22:
+    if contract.get("objective_count") != 18:
         errors.append("objective_count_field_invalid")
     seen: set[str] = set()
     for index, objective in enumerate(objectives):
@@ -119,7 +119,7 @@ def main() -> int:
         "status": "PASS" if not errors else "FAIL",
         "errors": errors,
         "exit_code_rule": EXPECTED_CODES,
-        "go_rule": "GO forbidden unless O1-O22 all have status PASS and exit_code 0.",
+        "go_rule": "GO forbidden unless O1-O18 all have status PASS and exit_code 0.",
     }
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     return 0 if not errors else 1

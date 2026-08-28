@@ -1,8 +1,18 @@
 {
-  "contract_id": "partikulier-objectives-22",
-  "contract_version": "1.1.0",
+  "contract_id": "partikulier-open-gates-18",
+  "contract_version": "1.2.0",
   "candidate_sha_required": "40-hex",
-  "status_values": ["PASS", "FAIL", "INVALID", "BLOCKED", "NOT_AUTHORIZED", "NOT_RUN", "INCONCLUSIVE", "PARTIAL", "MISSING"],
+  "status_values": [
+    "PASS",
+    "FAIL",
+    "INVALID",
+    "BLOCKED",
+    "NOT_AUTHORIZED",
+    "NOT_RUN",
+    "INCONCLUSIVE",
+    "PARTIAL",
+    "MISSING"
+  ],
   "exit_codes": {
     "PASS": 0,
     "FAIL": 1,
@@ -15,30 +25,254 @@
     "NOT_AUTHORIZED": 77
   },
   "global_rule": "Any status other than PASS, or any exit code other than 0, forbids GO.",
-  "environment_rule": "An unavailable route, browser, dependency, dataset, access, authorization or mismatched SHA is not PASS; report BLOCKED with exit 75 for an external dependency, NOT_AUTHORIZED with exit 77 for missing authorization, or INVALID/NOT_RUN with exit 2 when the evidence is incomplete or incoherent.",
-  "objective_count": 22,
+  "environment_rule": "An unavailable route, browser, dependency, dataset, access, authorization or mismatched SHA is not PASS; report BLOCKED with exit 75 for an external dependency, NOT_AUTHORIZED with exit 77 for missing authorization, or INVALID/NOT_RUN with exit 2 when evidence is incomplete or incoherent.",
+  "objective_count": 18,
   "objectives": [
-    {"id":"O1","name":"provenance-git","target":"CI SHA, package SHA and tested SHA are identical at 100%","required_evidence":["git-provenance.log","package-sha256.txt","staging-provenance.txt"],"command":"git rev-parse HEAD; git status --short; git diff; sha256sum package.zip; provenance check","expected_exit":0,"pass_rule":"Every required SHA and provenance reference is identical.","environment_block_rule":"Missing staging access => 77; incomplete evidence => 2."},
-    {"id":"O2","name":"diff-scope","target":"0 forbidden design or UX files modified","required_evidence":["diff-from-a58942c.log","file-review.md"],"command":"git diff --name-status a58942c..HEAD","expected_exit":0,"pass_rule":"No unauthorized CSS, template, asset, public text or UX file is modified.","environment_block_rule":"Incomplete diff => 2."},
-    {"id":"O3","name":"local-quality","target":"5/5 quality controls exit 0","required_evidence":["check.log","phpstan.log","git-diff-check.log","quality-summary.json"],"command":"check.sh; PHP lint; PHPStan; git diff --check; git diff --cached --check","expected_exit":0,"pass_rule":"All five controls exit 0.","environment_block_rule":"Missing dependency => 2."},
-    {"id":"O4","name":"public-routes","target":"4/4 public routes HTTP 200 and valid REST JSON","required_evidence":["public-routes.json","http-transcripts/"],"command":"HTTP matrix for home, archive, REST listings and REST root","expected_exit":0,"pass_rule":"All four routes satisfy status and JSON assertions.","environment_block_rule":"Staging unavailable => 75."},
-    {"id":"O5","name":"estatik-notice","target":"0 public WP_Scripts::add notices on 4/4 routes","required_evidence":["notice-scan.json","html-json-transcripts/"],"command":"Cache-busted and normal HTML/JSON requests with notice scan","expected_exit":0,"pass_rule":"Zero occurrence on every declared route.","environment_block_rule":"Staging test impossible => 75."},
-    {"id":"O6","name":"rest-lite-scope","target":"10/10 scope scenarios pass","required_evidence":["rest-scope.json","rest-scope.log"],"command":"Anonymous GET, authenticated/cookie/header requests, writes and other routes","expected_exit":0,"pass_rule":"All ten scenarios pass without exception.","environment_block_rule":"Missing scenario => 2."},
-    {"id":"O7","name":"rest-business-equivalence","target":"100% required fields identical or justified","required_evidence":["rest-equivalence.json","normalized-diff.json"],"command":"Normal/light REST comparison for sale, rental, pagination, locale, image, price, city, URL and JSON-LD","expected_exit":0,"pass_rule":"Every required field is identical or has a documented justification.","environment_block_rule":"Runtime unavailable => 75; incomplete comparison => 2."},
-    {"id":"O8","name":"sale-filter","target":"a-vendre includes the expected fixture, a-louer excludes it, unknown action returns 0","required_evidence":["filter-responses.json","fixture-ids.json","cleanup-journal.json"],"command":"Read-only localized HTTP/HTML assertions over the declared fixture","expected_exit":0,"pass_rule":"All inclusion, exclusion and field-preservation assertions pass for every required locale.","environment_block_rule":"Fixture or authorization absent => 77."},
-    {"id":"O9","name":"multilingual","target":"3/3 FR/EN/AR languages tested when required by the CDC","required_evidence":["fr-results.json","en-results.json","ar-results.json","locale-summary.json"],"command":"Complete localized route and data matrix","expected_exit":0,"pass_rule":"All required languages are tested and localized.","environment_block_rule":"Missing product decision or authorization => 77."},
-    {"id":"O10","name":"capacity-nominal","target":"10 RPS reads and 2 RPS writes with zero errors","required_evidence":["capacity-nominal.json","capacity-nominal.log"],"command":"Official 4-CPU CI capacity run","expected_exit":0,"pass_rule":"Both phases have zero errors and meet their declared targets.","environment_block_rule":"CI runtime unavailable => 75."},
-    {"id":"O11","name":"capacity-burst","target":"at least 24.75 RPS, p95 <= 1.5s, p99 <= 3s and CPU <= 80%","required_evidence":["capacity-burst.json","capacity-burst.log"],"command":"Official cold 4-CPU CI burst run","expected_exit":0,"pass_rule":"All four numerical criteria pass.","environment_block_rule":"4-CPU CI unavailable => 75."},
-    {"id":"O12","name":"capacity-saturation","target":"Complete 50 RPS saturation measurement with honest classification","required_evidence":["capacity-saturation.json","capacity-saturation.log"],"command":"50 RPS saturation probe with RPS, latency, CPU and RSS","expected_exit":0,"pass_rule":"Measurement is complete and classified; saturation is not relabeled nominal PASS.","environment_block_rule":"Probe impossible => 75."},
-    {"id":"O13","name":"ttfb-contract","target":"p95 <= 800ms on 4/4 routes with at least 20 measurements per route and source","required_evidence":["ttfb-summary.json","ttfb-raw.json","ttfb-phases.json"],"command":"Measure DNS, TCP, TLS, TTFB, total, HCDN and origin timings from two sources","expected_exit":0,"pass_rule":"Every route meets the p95 target and all phases are recorded.","environment_block_rule":"Second source or Hostinger unavailable => 75; otherwise failed target => 1."},
-    {"id":"O14","name":"ttfb-attribution","target":"100% of client/TLS/HCDN/proxy/origin chain attributed","required_evidence":["hostinger-ticket.txt","request-ids.txt","upstream-logs/","attribution-report.md"],"command":"Correlate client timestamps, HCDN IDs, proxy data, PHP-FPM and slow logs","expected_exit":0,"pass_rule":"A reproducible technical cause is proven, not hypothesized.","environment_block_rule":"Hostinger diagnostics unavailable => 75 and NO-GO."},
-    {"id":"O15","name":"visual-pixel","target":"30/30 scenarios with <= 0.5% diff and VISUAL_EXIT=0","required_evidence":["visual-contract.json","screenshots/","diff/","visual.log"],"command":"Run the pinned pixel contract against the 30 versioned scenarios","expected_exit":0,"pass_rule":"All 30 scenarios pass on the final SHA.","environment_block_rule":"Invalid baseline/comparator => 2; executed mismatch => 1."},
-    {"id":"O16","name":"official-baselines","target":"30 versioned PNGs and 30 concordant SHA256 hashes","required_evidence":["tests/baselines-6.17.22/SHA256SUMS","baseline-verification.log"],"command":"Verify manifest count and every file hash","expected_exit":0,"pass_rule":"All 30 files and hashes match.","environment_block_rule":"Missing manifest => 2."},
-    {"id":"O17","name":"human-visual-review","target":"One complete independent visual review signed","required_evidence":["visual-review-signoff.md"],"command":"Independent review of design, responsive, RTL and languages","expected_exit":0,"pass_rule":"Named reviewer, role, date, SHA, scope and reservations are signed.","environment_block_rule":"Reviewer unavailable => 77."},
-    {"id":"O18","name":"final-ci","target":"One final run on the final SHA with all required jobs exit 0 and none skipped","required_evidence":["ci-run-url.txt","ci-jobs.json","ci-logs/","ci-artifacts/"],"command":"Official final CI workflow on immutable final SHA","expected_exit":0,"pass_rule":"Static, UI, visual, capacity and upgrade all pass; no required job is skipped.","environment_block_rule":"CI unavailable => 75; any skipped required job is FAIL."},
-    {"id":"O19","name":"official-package","target":"CI package hash equals detached reproducible build hash","required_evidence":["package.zip","package-sha256.txt","reproducibility.json"],"command":"Download official package and rebuild detached from the same SHA","expected_exit":0,"pass_rule":"Hashes are identical and package is verified.","environment_block_rule":"Package job skipped => 75."},
-    {"id":"O20","name":"final-upgrade-rollback","target":"Upgrade, rollback and second idempotent pass succeed 100%","required_evidence":["upgrade.log","rollback.log","idempotence.log","upgrade-summary.json"],"command":"Run upgrade, rollback and second pass on the final package in disposable environments","expected_exit":0,"pass_rule":"Every assertion, hash, sentinel, data and setting check passes.","environment_block_rule":"Environment unavailable => 75."},
-    {"id":"O21","name":"staging-cleanup","target":"After explicit authorization, fixture 249 and media 250 are deleted and absent publicly","required_evidence":["cleanup-journal.json","cleanup-public-check.json"],"command":"Delete only after user authorization, then verify IDs and public absence","expected_exit":0,"pass_rule":"Both deletion and public absence checks pass after confirmation.","environment_block_rule":"Before authorization => 77; do not delete automatically."},
-    {"id":"O22","name":"final-signoffs","target":"8 named and dated signoffs","required_evidence":["signoffs/fr.md","signoffs/en.md","signoffs/ar.md","signoffs/wcag.md","signoffs/ux.md","signoffs/design.md","signoffs/operations.md","signoffs/product.md"],"command":"Collect independent FR, EN, AR, WCAG, UX, design, operations and product signoffs","expected_exit":0,"pass_rule":"All eight signoffs exist for the same final SHA.","environment_block_rule":"Responsible person unavailable => 77."}
+    {
+      "id": "O1",
+      "name": "provenance-git",
+      "target": "CI SHA, package SHA and tested SHA are identical at 100%",
+      "required_evidence": [
+        "git-provenance.log",
+        "package-sha256.txt",
+        "staging-provenance.txt"
+      ],
+      "command": "git rev-parse HEAD; git status --short; git diff; sha256sum package.zip; provenance check",
+      "expected_exit": 0,
+      "pass_rule": "Every required SHA and provenance reference is identical.",
+      "environment_block_rule": "Missing staging access => 77; incomplete evidence => 2."
+    },
+    {
+      "id": "O2",
+      "name": "diff-scope",
+      "target": "0 forbidden design or UX files modified",
+      "required_evidence": [
+        "diff-from-a58942c.log",
+        "file-review.md"
+      ],
+      "command": "git diff --name-status a58942c..HEAD",
+      "expected_exit": 0,
+      "pass_rule": "No unauthorized CSS, template, asset, public text or UX file is modified.",
+      "environment_block_rule": "Incomplete diff => 2."
+    },
+    {
+      "id": "O3",
+      "name": "local-quality",
+      "target": "5/5 quality controls exit 0",
+      "required_evidence": [
+        "check.log",
+        "phpstan.log",
+        "git-diff-check.log",
+        "quality-summary.json"
+      ],
+      "command": "check.sh; PHP lint; PHPStan; git diff --check; git diff --cached --check",
+      "expected_exit": 0,
+      "pass_rule": "All five controls exit 0.",
+      "environment_block_rule": "Missing dependency => 2."
+    },
+    {
+      "id": "O4",
+      "name": "public-routes",
+      "target": "4/4 public routes HTTP 200 and valid REST JSON",
+      "required_evidence": [
+        "public-routes.json",
+        "http-transcripts/"
+      ],
+      "command": "HTTP matrix for home, archive, REST listings and REST root",
+      "expected_exit": 0,
+      "pass_rule": "All four routes satisfy status and JSON assertions.",
+      "environment_block_rule": "Staging unavailable => 75."
+    },
+    {
+      "id": "O5",
+      "name": "estatik-notice",
+      "target": "0 public WP_Scripts::add notices on 4/4 routes",
+      "required_evidence": [
+        "notice-scan.json",
+        "html-json-transcripts/"
+      ],
+      "command": "Cache-busted and normal HTML/JSON requests with notice scan",
+      "expected_exit": 0,
+      "pass_rule": "Zero occurrence on every declared route.",
+      "environment_block_rule": "Staging test impossible => 75."
+    },
+    {
+      "id": "O6",
+      "name": "rest-lite-scope",
+      "target": "10/10 scope scenarios pass",
+      "required_evidence": [
+        "rest-scope.json",
+        "rest-scope.log"
+      ],
+      "command": "Anonymous GET, authenticated/cookie/header requests, writes and other routes",
+      "expected_exit": 0,
+      "pass_rule": "All ten scenarios pass without exception.",
+      "environment_block_rule": "Missing scenario => 2."
+    },
+    {
+      "id": "O7",
+      "name": "rest-business-equivalence",
+      "target": "100% required fields identical or justified",
+      "required_evidence": [
+        "rest-equivalence.json",
+        "normalized-diff.json"
+      ],
+      "command": "Normal/light REST comparison for sale, rental, pagination, locale, image, price, city, URL and JSON-LD",
+      "expected_exit": 0,
+      "pass_rule": "Every required field is identical or has a documented justification.",
+      "environment_block_rule": "Runtime unavailable => 75; incomplete comparison => 2."
+    },
+    {
+      "id": "O8",
+      "name": "sale-filter",
+      "target": "a-vendre includes the expected fixture, a-louer excludes it, unknown action returns 0",
+      "required_evidence": [
+        "filter-responses.json",
+        "fixture-ids.json",
+        "cleanup-journal.json"
+      ],
+      "command": "Read-only localized HTTP/HTML assertions over the declared fixture",
+      "expected_exit": 0,
+      "pass_rule": "All inclusion, exclusion and field-preservation assertions pass for every required locale.",
+      "environment_block_rule": "Fixture or authorization absent => 77."
+    },
+    {
+      "id": "O9",
+      "name": "multilingual",
+      "target": "3/3 FR/EN/AR languages tested when required by the CDC",
+      "required_evidence": [
+        "fr-results.json",
+        "en-results.json",
+        "ar-results.json",
+        "locale-summary.json"
+      ],
+      "command": "Complete localized route and data matrix",
+      "expected_exit": 0,
+      "pass_rule": "All required languages are tested and localized.",
+      "environment_block_rule": "Missing product decision or authorization => 77."
+    },
+    {
+      "id": "O10",
+      "name": "capacity-nominal",
+      "target": "10 RPS reads and 2 RPS writes with zero errors",
+      "required_evidence": [
+        "capacity-nominal.json",
+        "capacity-nominal.log"
+      ],
+      "command": "Official 4-CPU CI capacity run",
+      "expected_exit": 0,
+      "pass_rule": "Both phases have zero errors and meet their declared targets.",
+      "environment_block_rule": "CI runtime unavailable => 75."
+    },
+    {
+      "id": "O11",
+      "name": "capacity-burst",
+      "target": "at least 24.75 RPS, p95 <= 1.5s, p99 <= 3s and CPU <= 80%",
+      "required_evidence": [
+        "capacity-burst.json",
+        "capacity-burst.log"
+      ],
+      "command": "Official cold 4-CPU CI burst run",
+      "expected_exit": 0,
+      "pass_rule": "All four numerical criteria pass.",
+      "environment_block_rule": "4-CPU CI unavailable => 75."
+    },
+    {
+      "id": "O12",
+      "name": "capacity-saturation",
+      "target": "Complete 50 RPS saturation measurement with honest classification",
+      "required_evidence": [
+        "capacity-saturation.json",
+        "capacity-saturation.log"
+      ],
+      "command": "50 RPS saturation probe with RPS, latency, CPU and RSS",
+      "expected_exit": 0,
+      "pass_rule": "Measurement is complete and classified; saturation is not relabeled nominal PASS.",
+      "environment_block_rule": "Probe impossible => 75."
+    },
+    {
+      "id": "O13",
+      "name": "ttfb-contract",
+      "target": "p95 <= 800ms on 4/4 routes with at least 20 measurements per route and source",
+      "required_evidence": [
+        "ttfb-summary.json",
+        "ttfb-raw.json",
+        "ttfb-phases.json"
+      ],
+      "command": "Measure DNS, TCP, TLS, TTFB, total, HCDN and origin timings from two sources",
+      "expected_exit": 0,
+      "pass_rule": "Every route meets the p95 target and all phases are recorded.",
+      "environment_block_rule": "Second source or Hostinger unavailable => 75; otherwise failed target => 1."
+    },
+    {
+      "id": "O14",
+      "name": "ttfb-attribution",
+      "target": "100% of client/TLS/HCDN/proxy/origin chain attributed",
+      "required_evidence": [
+        "hostinger-ticket.txt",
+        "request-ids.txt",
+        "upstream-logs/",
+        "attribution-report.md"
+      ],
+      "command": "Correlate client timestamps, HCDN IDs, proxy data, PHP-FPM and slow logs",
+      "expected_exit": 0,
+      "pass_rule": "A reproducible technical cause is proven, not hypothesized.",
+      "environment_block_rule": "Hostinger diagnostics unavailable => 75 and NO-GO."
+    },
+    {
+      "id": "O15",
+      "name": "visual-pixel",
+      "target": "30/30 scenarios with <= 0.5% diff and VISUAL_EXIT=0",
+      "required_evidence": [
+        "visual-contract.json",
+        "screenshots/",
+        "diff/",
+        "visual.log"
+      ],
+      "command": "Run the pinned pixel contract against the 30 versioned scenarios",
+      "expected_exit": 0,
+      "pass_rule": "All 30 scenarios pass on the final SHA.",
+      "environment_block_rule": "Invalid baseline/comparator => 2; executed mismatch => 1."
+    },
+    {
+      "id": "O16",
+      "name": "official-baselines",
+      "target": "30 versioned PNGs and 30 concordant SHA256 hashes",
+      "required_evidence": [
+        "tests/baselines-6.17.22/SHA256SUMS",
+        "baseline-verification.log"
+      ],
+      "command": "Verify manifest count and every file hash",
+      "expected_exit": 0,
+      "pass_rule": "All 30 files and hashes match.",
+      "environment_block_rule": "Missing manifest => 2."
+    },
+    {
+      "id": "O17",
+      "name": "human-visual-review",
+      "target": "One complete independent visual review signed",
+      "required_evidence": [
+        "visual-review-signoff.md"
+      ],
+      "command": "Independent review of design, responsive, RTL and languages",
+      "expected_exit": 0,
+      "pass_rule": "Named reviewer, role, date, SHA, scope and reservations are signed.",
+      "environment_block_rule": "Reviewer unavailable => 77."
+    },
+    {
+      "id": "O18",
+      "name": "final-ci",
+      "target": "One final run on the final SHA with all required jobs exit 0 and none skipped",
+      "required_evidence": [
+        "ci-run-url.txt",
+        "ci-jobs.json",
+        "ci-logs/",
+        "ci-artifacts/"
+      ],
+      "command": "Official final CI workflow on immutable final SHA",
+      "expected_exit": 0,
+      "pass_rule": "Static, UI, visual, capacity and upgrade all pass; no required job is skipped.",
+      "environment_block_rule": "CI unavailable => 75; any skipped required job is FAIL."
+    }
   ]
 }

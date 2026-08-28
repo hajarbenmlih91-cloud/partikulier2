@@ -289,3 +289,14 @@ Les deux exigences supplémentaires sont obligatoires. **O21** impose de ne supp
 Le run CI `33132677584` sur `38135f9` reste un résultat historique du contrat précédent et ne constitue pas une certification O1–O22 : son pixel visual est `29/30`, son package est sauté et plusieurs objectifs externes ou humains restent ouverts. Les preuves de `3f9c8e70` ne peuvent pas certifier un SHA ultérieur.
 
 Pour chaque objectif O1–O22, le prochain dossier doit indiquer le statut, l’exit code, le SHA, la branche, l’environnement, la commande, la cible, le résultat mesuré, la preuve horodatée, la date UTC, le blocage éventuel et l’action suivante. Aucun terme comme « appliqué », « vérifié », « terminé » ou « conforme » ne vaut preuve sans ces éléments.
+
+
+## Addendum final — gates ouverts O1 à O18
+
+La spécification finale jointe remplace, pour la clôture courante, le périmètre O1–O22 par **18 objectifs ouverts O1–O18**. Les gates déjà PASS ne doivent pas être rejoués sans changement de SHA ou de périmètre. Le contrat machine-readable `documentation/objectives-contract-v1.0.json` est donc en version `1.2.0`, contient exactement 18 objectifs et utilise `0=PASS`, `1=FAIL`, `2=INVALID`, `75=BLOCKED` et `77=NOT AUTHORIZED`; les états non exécutés, inconclusifs, partiels ou manquants sont également bloquants et utilisent le code `2`.
+
+Le dernier run `33136743370` sur `fe297dd` reste la preuve automatisée de la CI précédente : il a obtenu 30/30 au pixel, capacity, upgrade et package PASS. Il ne prouve pas l’alignement staging, le TTFB, l’attribution Hostinger, les archives métier, les langues métier, la revue humaine, le rollback final, le nettoyage autorisé ou les signoffs. Aucun résultat de ce run ne doit être présenté comme preuve du staging resté sur `a58942c`.
+
+Le traitement prioritaire de `single-fr-desktop` reste limité à trois reproductions dans le même runtime, avec URL, viewport `1280×800`, seed, métadonnées galerie et médias identiques. Il est interdit de modifier CSS, template, asset ou baseline sans cause prouvée. Le nettoyage de la fixture 249 et du média 250 reste interdit avant autorisation explicite de l’utilisateur.
+
+Le GO final exige que O1–O18 soient tous PASS, sans job requis SKIPPED, avec le même SHA final, les preuves accessibles et les signoffs requis. Tout autre statut maintient automatiquement le NO-GO.
