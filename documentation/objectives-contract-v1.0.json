@@ -1,218 +1,44 @@
 {
-  "contract_id": "partikulier-objectives-20",
-  "contract_version": "1.0.0",
+  "contract_id": "partikulier-objectives-22",
+  "contract_version": "1.1.0",
   "candidate_sha_required": "40-hex",
-  "status_values": ["PASS", "FAIL", "BLOCKED", "INVALID", "NOT_RUN", "NOT_AUTHORIZED"],
+  "status_values": ["PASS", "FAIL", "INVALID", "BLOCKED", "NOT_AUTHORIZED", "NOT_RUN", "INCONCLUSIVE", "PARTIAL", "MISSING"],
   "exit_codes": {
     "PASS": 0,
     "FAIL": 1,
-    "BLOCKED": 2,
     "INVALID": 2,
-    "NOT_RUN": 3,
-    "NOT_AUTHORIZED": 3
+    "NOT_RUN": 2,
+    "INCONCLUSIVE": 2,
+    "PARTIAL": 2,
+    "MISSING": 2,
+    "BLOCKED": 75,
+    "NOT_AUTHORIZED": 77
   },
-  "global_rule": "Any FAIL, BLOCKED, INVALID, NOT_RUN or NOT_AUTHORIZED forbids GO.",
-  "environment_rule": "An unavailable route, browser, dependency, dataset, access, authorization or mismatched SHA is not PASS; it must be reported as BLOCKED/INVALID or NOT_RUN/NOT_AUTHORIZED with the mapped exit code.",
+  "global_rule": "Any status other than PASS, or any exit code other than 0, forbids GO.",
+  "environment_rule": "An unavailable route, browser, dependency, dataset, access, authorization or mismatched SHA is not PASS; report BLOCKED with exit 75 for an external dependency, NOT_AUTHORIZED with exit 77 for missing authorization, or INVALID/NOT_RUN with exit 2 when the evidence is incomplete or incoherent.",
+  "objective_count": 22,
   "objectives": [
-    {
-      "id": "AUDIT-01",
-      "name": "provenance-architecture-packaging",
-      "target": "local HEAD equals remote HEAD on the required 40-hex SHA; theme/style.css and theme/assets/css/style.css exist; unzip -t returns 0; two clean package builds have identical SHA-256",
-      "required_evidence": ["git-provenance.log", "package-build-1.zip", "package-build-2.zip", "SHA256SUMS"],
-      "command": "git rev-parse HEAD; git ls-remote; scripts/package-deterministic-v1.7.1.sh",
-      "expected_exit": 0,
-      "pass_rule": "All equality, presence, integrity and byte-identical rebuild assertions are true.",
-      "environment_block_rule": "Missing checkout, remote, package or build input => exit 2 and BLOCKED/INVALID."
-    },
-    {
-      "id": "AUDIT-02",
-      "name": "php-syntax",
-      "target": "100% of tracked PHP files in theme, partikulier-core and mu-plugins pass php -l; failed=0",
-      "required_evidence": ["php-lint.log", "php-lint-summary.json"],
-      "command": "find theme partikulier-core mu-plugins -name '*.php' -print0 | xargs -0 -n1 php -l",
-      "expected_exit": 0,
-      "pass_rule": "tested>0 and failed=0.",
-      "environment_block_rule": "PHP or source manifest unavailable => exit 2."
-    },
-    {
-      "id": "AUDIT-03",
-      "name": "javascript-syntax",
-      "target": "100% of JavaScript files in the declared build scope pass node --check; failed=0",
-      "required_evidence": ["javascript-lint.log", "javascript-lint-summary.json"],
-      "command": "node --check for every JS/MJS file in the declared manifest",
-      "expected_exit": 0,
-      "pass_rule": "Manifest is complete and failed=0.",
-      "environment_block_rule": "Node or manifest unavailable => exit 2."
-    },
-    {
-      "id": "AUDIT-04",
-      "name": "static-security",
-      "target": "Semgrep scans the declared PHP scope with 0 blocking findings and 0 scan errors",
-      "required_evidence": ["semgrep.json", "semgrep-version.txt", "ruleset-manifest.txt"],
-      "command": "semgrep --config <pinned-ruleset> --json --output semgrep.json <declared-scope>",
-      "expected_exit": 0,
-      "pass_rule": "results=0, errors=0 and no undocumented global exclusion.",
-      "environment_block_rule": "Semgrep/ruleset unavailable or scan truncated => exit 2."
-    },
-    {
-      "id": "AUDIT-05",
-      "name": "repository-secrets",
-      "target": "0 high-confidence operational secrets: private keys, API tokens, passwords, real cookies or SQL dumps",
-      "required_evidence": ["secret-scan.json", "secret-scan-allowlist.json", "secret-review.log"],
-      "command": "pinned secret scanner over tracked commit and declared history scope",
-      "expected_exit": 0,
-      "pass_rule": "No unallowlisted high-confidence secret match.",
-      "environment_block_rule": "Scanner, commit or history scope unavailable => exit 2; never request real secrets."
-    },
-    {
-      "id": "AUDIT-06",
-      "name": "public-rest-ajax-headers",
-      "target": "10/10 declared anonymous requests return their exact expected statuses; every declared write without auth/nonce returns 401 or 403; no sensitive data leaks",
-      "required_evidence": ["public-surface-matrix.json", "http-transcripts/", "headers.json"],
-      "command": "pinned HTTP matrix runner against the declared base URL",
-      "expected_exit": 0,
-      "pass_rule": "All 10 cases match status/body/header assertions.",
-      "environment_block_rule": "Base URL, declared route or response provenance unavailable => exit 2; 404 is not protection."
-    },
-    {
-      "id": "AUDIT-07",
-      "name": "estatik-data-and-filters",
-      "target": "Fixture 249 with media 250 is the only declared synthetic fixture; a-vendre includes exactly 1 fixture, a-louer includes 0, unknown action includes 0; type+city+action preserves city, image, badge, price and specs",
-      "required_evidence": ["fixture-249.json", "filter-responses.json", "cleanup-journal.json"],
-      "command": "read-only HTTP/HTML assertions against the declared fixture dataset",
-      "expected_exit": 0,
-      "pass_rule": "All inclusion, exclusion and field-preservation assertions are exact.",
-      "environment_block_rule": "Fixture, media, IDs or canonical dataset unavailable => exit 2; no new fixture without explicit authorization."
-    },
-    {
-      "id": "AUDIT-08",
-      "name": "arabic-localization-jsonld",
-      "target": "6/6 AR views have lang=ar, dir=rtl, at least one visible Arabic text, parseable JSON-LD and 0 forbidden French residue",
-      "required_evidence": ["ar-html/", "ar-jsonld.json", "ar-localization-summary.json"],
-      "command": "browser/HTTP locale matrix over the six declared AR views",
-      "expected_exit": 0,
-      "pass_rule": "All 6 views satisfy every assertion.",
-      "environment_block_rule": "AR route, JSON-LD or locale data unavailable => exit 2."
-    },
-    {
-      "id": "AUDIT-09",
-      "name": "ui-ux-responsive-cross-browser",
-      "target": "30/30 scenarios in each of Chromium, Firefox and WebKit; 90/90 HTTP/locale/direction, 90/90 image DOM, 90/90 link crawl and 96/96 responsive layouts",
-      "required_evidence": ["ui-summary-{browser}.json", "image-dom-{browser}.json", "link-crawl-{browser}.json", "responsive-{browser}.json", "screenshots/"],
-      "command": "scripts/test-ui-v1.8.mjs for chromium, firefox and webkit with pinned contract",
-      "expected_exit": 0,
-      "pass_rule": "All counters equal their targets and no scenario is ERROR.",
-      "environment_block_rule": "Any required browser, route or dependency unavailable => exit 2; do not substitute Chromium."
-    },
-    {
-      "id": "AUDIT-10",
-      "name": "automated-accessibility",
-      "target": "6/6 FR/EN/AR desktop/mobile views; 0 axe violations, 0 serious/critical violations, 0 unlabeled controls and 0 images without alt",
-      "required_evidence": ["accessibility.json", "axe-version.txt"],
-      "command": "scripts/test-accessibility.mjs",
-      "expected_exit": 0,
-      "pass_rule": "passed=6, failed=0 and every violation/control counter is zero.",
-      "environment_block_rule": "Axe, browser or route unavailable => exit 2; manual WCAG review remains separate."
-    },
-    {
-      "id": "SIM-01",
-      "name": "immediate-filter-click",
-      "target": "3/3 browsers: click after domcontentloaded opens panel with aria-hidden=false, is-open and aria-expanded=true",
-      "required_evidence": ["sim-01.json", "sim-01-trace/"],
-      "command": "targeted Playwright simulation with no artificial wait before click",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy all state assertions.",
-      "environment_block_rule": "Required browser or route unavailable => exit 2."
-    },
-    {
-      "id": "SIM-02",
-      "name": "post-javascript-filter-click",
-      "target": "3/3 browsers: readyState=complete, main.js observed HTTP 200, and panel state is open and coherent",
-      "required_evidence": ["sim-02.json", "sim-02-network.json"],
-      "command": "targeted Playwright simulation after load and main.js response",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy all readiness and state assertions.",
-      "environment_block_rule": "main.js, browser or route unavailable => exit 2."
-    },
-    {
-      "id": "SIM-03",
-      "name": "close-button",
-      "target": "3/3 browsers: close button leaves aria-hidden=true, no is-open class and closed backdrop",
-      "required_evidence": ["sim-03.json"],
-      "command": "targeted Playwright open/click-close simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers close correctly.",
-      "environment_block_rule": "Panel or close button unavailable => exit 2."
-    },
-    {
-      "id": "SIM-04",
-      "name": "escape-focus",
-      "target": "3/3 browsers: Escape closes panel and focus returns to filter toggle within 500ms",
-      "required_evidence": ["sim-04.json", "focus-trace.json"],
-      "command": "targeted Playwright keyboard simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy close and focus deadline.",
-      "environment_block_rule": "Keyboard, browser or panel unavailable => exit 2."
-    },
-    {
-      "id": "SIM-05",
-      "name": "filter-city-autocomplete",
-      "target": "3/3 browsers: query Marr returns HTTP 200 and at least 1 suggestion; selection sets non-empty hidden city value; no write request",
-      "required_evidence": ["sim-05.json", "sim-05-network.json"],
-      "command": "targeted Playwright autocomplete simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy all five assertions.",
-      "environment_block_rule": "Nonce test data, AJAX endpoint or city seed unavailable => exit 2."
-    },
-    {
-      "id": "SIM-06",
-      "name": "main-search-autocomplete",
-      "target": "3/3 browsers: query Marr returns HTTP 200 and selection sets #pk-s-city-value non-empty",
-      "required_evidence": ["sim-06.json", "sim-06-network.json"],
-      "command": "targeted Playwright main-search autocomplete simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy every assertion.",
-      "environment_block_rule": "Main search field or AJAX endpoint unavailable => exit 2."
-    },
-    {
-      "id": "SIM-07",
-      "name": "type-city-cumulative-filter",
-      "target": "3/3 browsers: at least 1 type option; selected type and city survive submit; final HTTP 200 URL contains both es_type and es_city",
-      "required_evidence": ["sim-07.json", "sim-07-url-transcripts.json"],
-      "command": "targeted Playwright type+city no-write simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers preserve both parameters and return HTTP 200.",
-      "environment_block_rule": "No localized type term, missing seed or route 404 => exit 2, not a silent PASS."
-    },
-    {
-      "id": "SIM-08",
-      "name": "reset-after-filter",
-      "target": "3/3 browsers: reset ends at exact /fr/annonces/ path, empty query string and HTTP 200",
-      "required_evidence": ["sim-08.json", "sim-08-url-transcripts.json"],
-      "command": "targeted Playwright filter/reset simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy path, query and status assertions.",
-      "environment_block_rule": "Reset link or route unavailable => exit 2."
-    },
-    {
-      "id": "SIM-09",
-      "name": "arabic-structured-data",
-      "target": "3/3 browsers: AR RTL view, visible Arabic text, parseable JSON-LD and 0 forbidden French residue",
-      "required_evidence": ["sim-09.json", "sim-09-jsonld.json"],
-      "command": "targeted Playwright AR/JSON-LD simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy all assertions.",
-      "environment_block_rule": "AR route or JSON-LD unavailable => exit 2."
-    },
-    {
-      "id": "SIM-10",
-      "name": "nonce-auth-reflection",
-      "target": "3/3 browsers: AJAX without nonce and anonymous write return 401/403; script payload is not reflected; no sensitive response data",
-      "required_evidence": ["sim-10.json", "sim-10-http-transcripts/"],
-      "command": "targeted Playwright/request security simulation",
-      "expected_exit": 0,
-      "pass_rule": "All 3 browsers satisfy all four assertions.",
-      "environment_block_rule": "Declared endpoint or base URL unavailable => exit 2; no real credentials."
-    }
+    {"id":"O1","name":"provenance-git","target":"CI SHA, package SHA and tested SHA are identical at 100%","required_evidence":["git-provenance.log","package-sha256.txt","staging-provenance.txt"],"command":"git rev-parse HEAD; git status --short; git diff; sha256sum package.zip; provenance check","expected_exit":0,"pass_rule":"Every required SHA and provenance reference is identical.","environment_block_rule":"Missing staging access => 77; incomplete evidence => 2."},
+    {"id":"O2","name":"diff-scope","target":"0 forbidden design or UX files modified","required_evidence":["diff-from-a58942c.log","file-review.md"],"command":"git diff --name-status a58942c..HEAD","expected_exit":0,"pass_rule":"No unauthorized CSS, template, asset, public text or UX file is modified.","environment_block_rule":"Incomplete diff => 2."},
+    {"id":"O3","name":"local-quality","target":"5/5 quality controls exit 0","required_evidence":["check.log","phpstan.log","git-diff-check.log","quality-summary.json"],"command":"check.sh; PHP lint; PHPStan; git diff --check; git diff --cached --check","expected_exit":0,"pass_rule":"All five controls exit 0.","environment_block_rule":"Missing dependency => 2."},
+    {"id":"O4","name":"public-routes","target":"4/4 public routes HTTP 200 and valid REST JSON","required_evidence":["public-routes.json","http-transcripts/"],"command":"HTTP matrix for home, archive, REST listings and REST root","expected_exit":0,"pass_rule":"All four routes satisfy status and JSON assertions.","environment_block_rule":"Staging unavailable => 75."},
+    {"id":"O5","name":"estatik-notice","target":"0 public WP_Scripts::add notices on 4/4 routes","required_evidence":["notice-scan.json","html-json-transcripts/"],"command":"Cache-busted and normal HTML/JSON requests with notice scan","expected_exit":0,"pass_rule":"Zero occurrence on every declared route.","environment_block_rule":"Staging test impossible => 75."},
+    {"id":"O6","name":"rest-lite-scope","target":"10/10 scope scenarios pass","required_evidence":["rest-scope.json","rest-scope.log"],"command":"Anonymous GET, authenticated/cookie/header requests, writes and other routes","expected_exit":0,"pass_rule":"All ten scenarios pass without exception.","environment_block_rule":"Missing scenario => 2."},
+    {"id":"O7","name":"rest-business-equivalence","target":"100% required fields identical or justified","required_evidence":["rest-equivalence.json","normalized-diff.json"],"command":"Normal/light REST comparison for sale, rental, pagination, locale, image, price, city, URL and JSON-LD","expected_exit":0,"pass_rule":"Every required field is identical or has a documented justification.","environment_block_rule":"Runtime unavailable => 75; incomplete comparison => 2."},
+    {"id":"O8","name":"sale-filter","target":"a-vendre includes the expected fixture, a-louer excludes it, unknown action returns 0","required_evidence":["filter-responses.json","fixture-ids.json","cleanup-journal.json"],"command":"Read-only localized HTTP/HTML assertions over the declared fixture","expected_exit":0,"pass_rule":"All inclusion, exclusion and field-preservation assertions pass for every required locale.","environment_block_rule":"Fixture or authorization absent => 77."},
+    {"id":"O9","name":"multilingual","target":"3/3 FR/EN/AR languages tested when required by the CDC","required_evidence":["fr-results.json","en-results.json","ar-results.json","locale-summary.json"],"command":"Complete localized route and data matrix","expected_exit":0,"pass_rule":"All required languages are tested and localized.","environment_block_rule":"Missing product decision or authorization => 77."},
+    {"id":"O10","name":"capacity-nominal","target":"10 RPS reads and 2 RPS writes with zero errors","required_evidence":["capacity-nominal.json","capacity-nominal.log"],"command":"Official 4-CPU CI capacity run","expected_exit":0,"pass_rule":"Both phases have zero errors and meet their declared targets.","environment_block_rule":"CI runtime unavailable => 75."},
+    {"id":"O11","name":"capacity-burst","target":"at least 24.75 RPS, p95 <= 1.5s, p99 <= 3s and CPU <= 80%","required_evidence":["capacity-burst.json","capacity-burst.log"],"command":"Official cold 4-CPU CI burst run","expected_exit":0,"pass_rule":"All four numerical criteria pass.","environment_block_rule":"4-CPU CI unavailable => 75."},
+    {"id":"O12","name":"capacity-saturation","target":"Complete 50 RPS saturation measurement with honest classification","required_evidence":["capacity-saturation.json","capacity-saturation.log"],"command":"50 RPS saturation probe with RPS, latency, CPU and RSS","expected_exit":0,"pass_rule":"Measurement is complete and classified; saturation is not relabeled nominal PASS.","environment_block_rule":"Probe impossible => 75."},
+    {"id":"O13","name":"ttfb-contract","target":"p95 <= 800ms on 4/4 routes with at least 20 measurements per route and source","required_evidence":["ttfb-summary.json","ttfb-raw.json","ttfb-phases.json"],"command":"Measure DNS, TCP, TLS, TTFB, total, HCDN and origin timings from two sources","expected_exit":0,"pass_rule":"Every route meets the p95 target and all phases are recorded.","environment_block_rule":"Second source or Hostinger unavailable => 75; otherwise failed target => 1."},
+    {"id":"O14","name":"ttfb-attribution","target":"100% of client/TLS/HCDN/proxy/origin chain attributed","required_evidence":["hostinger-ticket.txt","request-ids.txt","upstream-logs/","attribution-report.md"],"command":"Correlate client timestamps, HCDN IDs, proxy data, PHP-FPM and slow logs","expected_exit":0,"pass_rule":"A reproducible technical cause is proven, not hypothesized.","environment_block_rule":"Hostinger diagnostics unavailable => 75 and NO-GO."},
+    {"id":"O15","name":"visual-pixel","target":"30/30 scenarios with <= 0.5% diff and VISUAL_EXIT=0","required_evidence":["visual-contract.json","screenshots/","diff/","visual.log"],"command":"Run the pinned pixel contract against the 30 versioned scenarios","expected_exit":0,"pass_rule":"All 30 scenarios pass on the final SHA.","environment_block_rule":"Invalid baseline/comparator => 2; executed mismatch => 1."},
+    {"id":"O16","name":"official-baselines","target":"30 versioned PNGs and 30 concordant SHA256 hashes","required_evidence":["tests/baselines-6.17.22/SHA256SUMS","baseline-verification.log"],"command":"Verify manifest count and every file hash","expected_exit":0,"pass_rule":"All 30 files and hashes match.","environment_block_rule":"Missing manifest => 2."},
+    {"id":"O17","name":"human-visual-review","target":"One complete independent visual review signed","required_evidence":["visual-review-signoff.md"],"command":"Independent review of design, responsive, RTL and languages","expected_exit":0,"pass_rule":"Named reviewer, role, date, SHA, scope and reservations are signed.","environment_block_rule":"Reviewer unavailable => 77."},
+    {"id":"O18","name":"final-ci","target":"One final run on the final SHA with all required jobs exit 0 and none skipped","required_evidence":["ci-run-url.txt","ci-jobs.json","ci-logs/","ci-artifacts/"],"command":"Official final CI workflow on immutable final SHA","expected_exit":0,"pass_rule":"Static, UI, visual, capacity and upgrade all pass; no required job is skipped.","environment_block_rule":"CI unavailable => 75; any skipped required job is FAIL."},
+    {"id":"O19","name":"official-package","target":"CI package hash equals detached reproducible build hash","required_evidence":["package.zip","package-sha256.txt","reproducibility.json"],"command":"Download official package and rebuild detached from the same SHA","expected_exit":0,"pass_rule":"Hashes are identical and package is verified.","environment_block_rule":"Package job skipped => 75."},
+    {"id":"O20","name":"final-upgrade-rollback","target":"Upgrade, rollback and second idempotent pass succeed 100%","required_evidence":["upgrade.log","rollback.log","idempotence.log","upgrade-summary.json"],"command":"Run upgrade, rollback and second pass on the final package in disposable environments","expected_exit":0,"pass_rule":"Every assertion, hash, sentinel, data and setting check passes.","environment_block_rule":"Environment unavailable => 75."},
+    {"id":"O21","name":"staging-cleanup","target":"After explicit authorization, fixture 249 and media 250 are deleted and absent publicly","required_evidence":["cleanup-journal.json","cleanup-public-check.json"],"command":"Delete only after user authorization, then verify IDs and public absence","expected_exit":0,"pass_rule":"Both deletion and public absence checks pass after confirmation.","environment_block_rule":"Before authorization => 77; do not delete automatically."},
+    {"id":"O22","name":"final-signoffs","target":"8 named and dated signoffs","required_evidence":["signoffs/fr.md","signoffs/en.md","signoffs/ar.md","signoffs/wcag.md","signoffs/ux.md","signoffs/design.md","signoffs/operations.md","signoffs/product.md"],"command":"Collect independent FR, EN, AR, WCAG, UX, design, operations and product signoffs","expected_exit":0,"pass_rule":"All eight signoffs exist for the same final SHA.","environment_block_rule":"Responsible person unavailable => 77."}
   ]
 }

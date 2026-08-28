@@ -1,9 +1,9 @@
 # Objectifs strictement mesurables — 10 audits + 10 simulations
 
 **Projet :** Partikulier
-**Candidate de référence :** `3f9c8e70e439f11c403894e92ae46f529b9ad986`
+**Candidate de référence :** SHA final à renseigner par le run de clôture; le dernier SHA qualifié historiquement est `3f9c8e70e439f11c403894e92ae46f529b9ad986`, tandis que le contrat machine v1.1 est appliqué sur le prochain SHA dédié.
 **Branche :** `automation/capacity-apcu-a58942c`
-**Document source des 20 prompts :** [`07-AUDIT-10-PROMPTS-SIMULATIONS-2026-08-26.md`][1]
+**Document source :** spécification de clôture O1–O22 jointe et contrat machine `documentation/objectives-contract-v1.0.json`. Les sections historiques AUDIT-01…SIM-10 restent archivées; l’addendum O1–O22 ci-dessous prévaut pour la décision finale.
 **Règle générale :** aucun résultat non exécuté, partiel, local-only, non reproductible ou dépendant d’une autorisation absente ne peut être déclaré PASS.
 
 ## 1. Convention contractuelle commune
@@ -14,11 +14,12 @@ Chaque objectif doit produire un artefact horodaté contenant au minimum le SHA 
 |---:|---|---|
 | `0` | Contrôle exécuté intégralement et cible respectée | Peut être **PASS**, uniquement si toutes les assertions de l’objectif sont vraies |
 | `1` | Contrôle exécuté mais au moins une cible n’est pas respectée | **FAIL** bloquant |
-| `2` | Contrôle invalide ou environnement empêchant une mesure fiable : serveur indisponible, route absente alors qu’elle est requise, mauvais SHA, dataset incomplet, dépendance manquante | **BLOCKED/INVALID**, jamais PASS |
-| `3` | Contrôle non exécuté par absence d’autorisation, signoff, accès ou décision produit | **NOT RUN/NOT AUTHORIZED**, jamais PASS |
+| `2` | Contrôle invalide, incomplet, non exécuté ou incohérent | **INVALID/NOT RUN/INCONCLUSIVE/PARTIAL/MISSING**, jamais PASS |
+| `75` | Dépendance externe indisponible malgré une demande documentée | **BLOCKED**, jamais PASS |
+| `77` | Accès, autorisation, signoff ou décision produit manquante | **NOT AUTHORIZED**, jamais PASS |
 | autre | Erreur d’outillage non classée | **FAIL** jusqu’à diagnostic et rejeu propre |
 
-Une exécution interrompue par timeout, sortie tronquée, mauvais endpoint, mauvaise base, mauvais navigateur, mauvais SHA ou fixture absente est invalide. Le runner doit alors retourner `2`, joindre la cause et ne pas écrire `PASS` dans le JSON.
+Une exécution interrompue par timeout, sortie tronquée, mauvais endpoint, mauvaise base, mauvais navigateur, mauvais SHA ou fixture absente est invalide. Le runner retourne `2`, `75` ou `77` selon la cause, joint la preuve et n’écrit jamais `PASS` dans le JSON.
 
 ## 2. Les 10 audits
 
@@ -277,3 +278,14 @@ Un PASS local ne certifie pas le WordPress staging. Un PASS CI ne certifie pas u
 [5]: https://github.com/hajarbenmlih91-cloud/partikulier2/blob/automation/capacity-apcu-a58942c/scripts/visual.mjs "Contrat visuel et manifest"
 [6]: https://github.com/hajarbenmlih91-cloud/partikulier2/blob/automation/capacity-apcu-a58942c/scripts/test-capacity-envelope-v1.7.1.py "Harnais capacity"
 [7]: https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/ "WAI-ARIA Authoring Practices — Dialog Modal Pattern"
+
+
+## Addendum contractuel v1.1 — O1 à O22
+
+La spécification jointe « Mission de clôture — objectifs d’acceptation mesurables » est l’autorité de décision pour la version finale. Le contrat machine-readable `documentation/objectives-contract-v1.0.json` contient exactement 22 objectifs, O1 à O22, avec les codes `0` PASS, `1` FAIL, `2` INVALID/NOT RUN/INCONCLUSIVE/PARTIAL/MISSING, `75` BLOCKED et `77` NOT AUTHORIZED. Tout statut différent de PASS maintient automatiquement le NO-GO.
+
+Les deux exigences supplémentaires sont obligatoires. **O21** impose de ne supprimer les fixtures staging 249 et 250 qu’après autorisation explicite de l’utilisateur, puis de fournir le journal de suppression et la vérification publique d’absence. Avant cette autorisation, O21 est `NOT_AUTHORIZED`, exit `77`, et aucune suppression automatique n’est permise. **O22** impose huit signoffs nommés et datés pour les langues FR/EN/AR, WCAG, UX, design, opérations et produit/commercial, tous rattachés au même SHA final. L’absence d’un responsable produit ou d’un relecteur est `NOT_AUTHORIZED`, exit `77`.
+
+Le run CI `33132677584` sur `38135f9` reste un résultat historique du contrat précédent et ne constitue pas une certification O1–O22 : son pixel visual est `29/30`, son package est sauté et plusieurs objectifs externes ou humains restent ouverts. Les preuves de `3f9c8e70` ne peuvent pas certifier un SHA ultérieur.
+
+Pour chaque objectif O1–O22, le prochain dossier doit indiquer le statut, l’exit code, le SHA, la branche, l’environnement, la commande, la cible, le résultat mesuré, la preuve horodatée, la date UTC, le blocage éventuel et l’action suivante. Aucun terme comme « appliqué », « vérifié », « terminé » ou « conforme » ne vaut preuve sans ces éléments.
