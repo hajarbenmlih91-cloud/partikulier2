@@ -1,0 +1,218 @@
+{
+  "contract_id": "partikulier-objectives-20",
+  "contract_version": "1.0.0",
+  "candidate_sha_required": "40-hex",
+  "status_values": ["PASS", "FAIL", "BLOCKED", "INVALID", "NOT_RUN", "NOT_AUTHORIZED"],
+  "exit_codes": {
+    "PASS": 0,
+    "FAIL": 1,
+    "BLOCKED": 2,
+    "INVALID": 2,
+    "NOT_RUN": 3,
+    "NOT_AUTHORIZED": 3
+  },
+  "global_rule": "Any FAIL, BLOCKED, INVALID, NOT_RUN or NOT_AUTHORIZED forbids GO.",
+  "environment_rule": "An unavailable route, browser, dependency, dataset, access, authorization or mismatched SHA is not PASS; it must be reported as BLOCKED/INVALID or NOT_RUN/NOT_AUTHORIZED with the mapped exit code.",
+  "objectives": [
+    {
+      "id": "AUDIT-01",
+      "name": "provenance-architecture-packaging",
+      "target": "local HEAD equals remote HEAD on the required 40-hex SHA; theme/style.css and theme/assets/css/style.css exist; unzip -t returns 0; two clean package builds have identical SHA-256",
+      "required_evidence": ["git-provenance.log", "package-build-1.zip", "package-build-2.zip", "SHA256SUMS"],
+      "command": "git rev-parse HEAD; git ls-remote; scripts/package-deterministic-v1.7.1.sh",
+      "expected_exit": 0,
+      "pass_rule": "All equality, presence, integrity and byte-identical rebuild assertions are true.",
+      "environment_block_rule": "Missing checkout, remote, package or build input => exit 2 and BLOCKED/INVALID."
+    },
+    {
+      "id": "AUDIT-02",
+      "name": "php-syntax",
+      "target": "100% of tracked PHP files in theme, partikulier-core and mu-plugins pass php -l; failed=0",
+      "required_evidence": ["php-lint.log", "php-lint-summary.json"],
+      "command": "find theme partikulier-core mu-plugins -name '*.php' -print0 | xargs -0 -n1 php -l",
+      "expected_exit": 0,
+      "pass_rule": "tested>0 and failed=0.",
+      "environment_block_rule": "PHP or source manifest unavailable => exit 2."
+    },
+    {
+      "id": "AUDIT-03",
+      "name": "javascript-syntax",
+      "target": "100% of JavaScript files in the declared build scope pass node --check; failed=0",
+      "required_evidence": ["javascript-lint.log", "javascript-lint-summary.json"],
+      "command": "node --check for every JS/MJS file in the declared manifest",
+      "expected_exit": 0,
+      "pass_rule": "Manifest is complete and failed=0.",
+      "environment_block_rule": "Node or manifest unavailable => exit 2."
+    },
+    {
+      "id": "AUDIT-04",
+      "name": "static-security",
+      "target": "Semgrep scans the declared PHP scope with 0 blocking findings and 0 scan errors",
+      "required_evidence": ["semgrep.json", "semgrep-version.txt", "ruleset-manifest.txt"],
+      "command": "semgrep --config <pinned-ruleset> --json --output semgrep.json <declared-scope>",
+      "expected_exit": 0,
+      "pass_rule": "results=0, errors=0 and no undocumented global exclusion.",
+      "environment_block_rule": "Semgrep/ruleset unavailable or scan truncated => exit 2."
+    },
+    {
+      "id": "AUDIT-05",
+      "name": "repository-secrets",
+      "target": "0 high-confidence operational secrets: private keys, API tokens, passwords, real cookies or SQL dumps",
+      "required_evidence": ["secret-scan.json", "secret-scan-allowlist.json", "secret-review.log"],
+      "command": "pinned secret scanner over tracked commit and declared history scope",
+      "expected_exit": 0,
+      "pass_rule": "No unallowlisted high-confidence secret match.",
+      "environment_block_rule": "Scanner, commit or history scope unavailable => exit 2; never request real secrets."
+    },
+    {
+      "id": "AUDIT-06",
+      "name": "public-rest-ajax-headers",
+      "target": "10/10 declared anonymous requests return their exact expected statuses; every declared write without auth/nonce returns 401 or 403; no sensitive data leaks",
+      "required_evidence": ["public-surface-matrix.json", "http-transcripts/", "headers.json"],
+      "command": "pinned HTTP matrix runner against the declared base URL",
+      "expected_exit": 0,
+      "pass_rule": "All 10 cases match status/body/header assertions.",
+      "environment_block_rule": "Base URL, declared route or response provenance unavailable => exit 2; 404 is not protection."
+    },
+    {
+      "id": "AUDIT-07",
+      "name": "estatik-data-and-filters",
+      "target": "Fixture 249 with media 250 is the only declared synthetic fixture; a-vendre includes exactly 1 fixture, a-louer includes 0, unknown action includes 0; type+city+action preserves city, image, badge, price and specs",
+      "required_evidence": ["fixture-249.json", "filter-responses.json", "cleanup-journal.json"],
+      "command": "read-only HTTP/HTML assertions against the declared fixture dataset",
+      "expected_exit": 0,
+      "pass_rule": "All inclusion, exclusion and field-preservation assertions are exact.",
+      "environment_block_rule": "Fixture, media, IDs or canonical dataset unavailable => exit 2; no new fixture without explicit authorization."
+    },
+    {
+      "id": "AUDIT-08",
+      "name": "arabic-localization-jsonld",
+      "target": "6/6 AR views have lang=ar, dir=rtl, at least one visible Arabic text, parseable JSON-LD and 0 forbidden French residue",
+      "required_evidence": ["ar-html/", "ar-jsonld.json", "ar-localization-summary.json"],
+      "command": "browser/HTTP locale matrix over the six declared AR views",
+      "expected_exit": 0,
+      "pass_rule": "All 6 views satisfy every assertion.",
+      "environment_block_rule": "AR route, JSON-LD or locale data unavailable => exit 2."
+    },
+    {
+      "id": "AUDIT-09",
+      "name": "ui-ux-responsive-cross-browser",
+      "target": "30/30 scenarios in each of Chromium, Firefox and WebKit; 90/90 HTTP/locale/direction, 90/90 image DOM, 90/90 link crawl and 96/96 responsive layouts",
+      "required_evidence": ["ui-summary-{browser}.json", "image-dom-{browser}.json", "link-crawl-{browser}.json", "responsive-{browser}.json", "screenshots/"],
+      "command": "scripts/test-ui-v1.8.mjs for chromium, firefox and webkit with pinned contract",
+      "expected_exit": 0,
+      "pass_rule": "All counters equal their targets and no scenario is ERROR.",
+      "environment_block_rule": "Any required browser, route or dependency unavailable => exit 2; do not substitute Chromium."
+    },
+    {
+      "id": "AUDIT-10",
+      "name": "automated-accessibility",
+      "target": "6/6 FR/EN/AR desktop/mobile views; 0 axe violations, 0 serious/critical violations, 0 unlabeled controls and 0 images without alt",
+      "required_evidence": ["accessibility.json", "axe-version.txt"],
+      "command": "scripts/test-accessibility.mjs",
+      "expected_exit": 0,
+      "pass_rule": "passed=6, failed=0 and every violation/control counter is zero.",
+      "environment_block_rule": "Axe, browser or route unavailable => exit 2; manual WCAG review remains separate."
+    },
+    {
+      "id": "SIM-01",
+      "name": "immediate-filter-click",
+      "target": "3/3 browsers: click after domcontentloaded opens panel with aria-hidden=false, is-open and aria-expanded=true",
+      "required_evidence": ["sim-01.json", "sim-01-trace/"],
+      "command": "targeted Playwright simulation with no artificial wait before click",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy all state assertions.",
+      "environment_block_rule": "Required browser or route unavailable => exit 2."
+    },
+    {
+      "id": "SIM-02",
+      "name": "post-javascript-filter-click",
+      "target": "3/3 browsers: readyState=complete, main.js observed HTTP 200, and panel state is open and coherent",
+      "required_evidence": ["sim-02.json", "sim-02-network.json"],
+      "command": "targeted Playwright simulation after load and main.js response",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy all readiness and state assertions.",
+      "environment_block_rule": "main.js, browser or route unavailable => exit 2."
+    },
+    {
+      "id": "SIM-03",
+      "name": "close-button",
+      "target": "3/3 browsers: close button leaves aria-hidden=true, no is-open class and closed backdrop",
+      "required_evidence": ["sim-03.json"],
+      "command": "targeted Playwright open/click-close simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers close correctly.",
+      "environment_block_rule": "Panel or close button unavailable => exit 2."
+    },
+    {
+      "id": "SIM-04",
+      "name": "escape-focus",
+      "target": "3/3 browsers: Escape closes panel and focus returns to filter toggle within 500ms",
+      "required_evidence": ["sim-04.json", "focus-trace.json"],
+      "command": "targeted Playwright keyboard simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy close and focus deadline.",
+      "environment_block_rule": "Keyboard, browser or panel unavailable => exit 2."
+    },
+    {
+      "id": "SIM-05",
+      "name": "filter-city-autocomplete",
+      "target": "3/3 browsers: query Marr returns HTTP 200 and at least 1 suggestion; selection sets non-empty hidden city value; no write request",
+      "required_evidence": ["sim-05.json", "sim-05-network.json"],
+      "command": "targeted Playwright autocomplete simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy all five assertions.",
+      "environment_block_rule": "Nonce test data, AJAX endpoint or city seed unavailable => exit 2."
+    },
+    {
+      "id": "SIM-06",
+      "name": "main-search-autocomplete",
+      "target": "3/3 browsers: query Marr returns HTTP 200 and selection sets #pk-s-city-value non-empty",
+      "required_evidence": ["sim-06.json", "sim-06-network.json"],
+      "command": "targeted Playwright main-search autocomplete simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy every assertion.",
+      "environment_block_rule": "Main search field or AJAX endpoint unavailable => exit 2."
+    },
+    {
+      "id": "SIM-07",
+      "name": "type-city-cumulative-filter",
+      "target": "3/3 browsers: at least 1 type option; selected type and city survive submit; final HTTP 200 URL contains both es_type and es_city",
+      "required_evidence": ["sim-07.json", "sim-07-url-transcripts.json"],
+      "command": "targeted Playwright type+city no-write simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers preserve both parameters and return HTTP 200.",
+      "environment_block_rule": "No localized type term, missing seed or route 404 => exit 2, not a silent PASS."
+    },
+    {
+      "id": "SIM-08",
+      "name": "reset-after-filter",
+      "target": "3/3 browsers: reset ends at exact /fr/annonces/ path, empty query string and HTTP 200",
+      "required_evidence": ["sim-08.json", "sim-08-url-transcripts.json"],
+      "command": "targeted Playwright filter/reset simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy path, query and status assertions.",
+      "environment_block_rule": "Reset link or route unavailable => exit 2."
+    },
+    {
+      "id": "SIM-09",
+      "name": "arabic-structured-data",
+      "target": "3/3 browsers: AR RTL view, visible Arabic text, parseable JSON-LD and 0 forbidden French residue",
+      "required_evidence": ["sim-09.json", "sim-09-jsonld.json"],
+      "command": "targeted Playwright AR/JSON-LD simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy all assertions.",
+      "environment_block_rule": "AR route or JSON-LD unavailable => exit 2."
+    },
+    {
+      "id": "SIM-10",
+      "name": "nonce-auth-reflection",
+      "target": "3/3 browsers: AJAX without nonce and anonymous write return 401/403; script payload is not reflected; no sensitive response data",
+      "required_evidence": ["sim-10.json", "sim-10-http-transcripts/"],
+      "command": "targeted Playwright/request security simulation",
+      "expected_exit": 0,
+      "pass_rule": "All 3 browsers satisfy all four assertions.",
+      "environment_block_rule": "Declared endpoint or base URL unavailable => exit 2; no real credentials."
+    }
+  ]
+}

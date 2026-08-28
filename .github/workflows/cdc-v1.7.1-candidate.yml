@@ -57,6 +57,10 @@ jobs:
           python3 -m json.tool documentation/visual-scenarios-v1.7.1.json >/dev/null
           python3 -m json.tool documentation/schemas/visual-scenarios.schema.json >/dev/null
 
+      - name: Validate measurable objectives contract
+        run: |
+          python3 scripts/validate-objectives-v1.0.py documentation/objectives-contract-v1.0.json
+
       - name: Verify pinned dependencies and SBOM
         run: |
           bash scripts/verify-dependencies.sh documentation/dependency-manifest-v1.7.1.json
