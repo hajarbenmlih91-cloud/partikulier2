@@ -190,13 +190,16 @@ class Partikulier_Cache {
 			}
 		}
 
-		// Purge aussi l'index/accueil et l'archive
-		$home_matches = glob( $dir . '/*_index.html' );
-		if ( $home_matches ) {
-			foreach ( $home_matches as $f ) {
-				@unlink( $f );
-				@unlink( $f . '.gz' );
-				@unlink( $f . '.br' );
+		// Purge aussi l'index/accueil et l'archive de toutes les langues
+		$home_patterns = array( $dir . '/*_index.html', $dir . '/*_fr.html', $dir . '/*_en.html', $dir . '/*_ar.html', $dir . '/*_annonces.html' );
+		foreach ( $home_patterns as $p ) {
+			$matches = glob( $p );
+			if ( $matches ) {
+				foreach ( $matches as $f ) {
+					@unlink( $f );
+					@unlink( $f . '.gz' );
+					@unlink( $f . '.br' );
+				}
 			}
 		}
 	}
