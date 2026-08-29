@@ -345,7 +345,9 @@ class Partikulier_Listing_Approval {
 			'sent'     => $sent,
 		), 5 * MINUTE_IN_SECONDS );
 
-		if ( class_exists( 'Partikulier_Cache' ) && method_exists( 'Partikulier_Cache', 'purge_all' ) ) {
+		if ( class_exists( 'Partikulier_Cache' ) && method_exists( 'Partikulier_Cache', 'purge_post' ) ) {
+			Partikulier_Cache::purge_post( $post_id );
+		} elseif ( class_exists( 'Partikulier_Cache' ) && method_exists( 'Partikulier_Cache', 'purge_all' ) ) {
 			Partikulier_Cache::purge_all();
 		}
 

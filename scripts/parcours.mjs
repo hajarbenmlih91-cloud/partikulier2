@@ -1,6 +1,7 @@
 import { chromium } from 'playwright';
 
-const BASE = process.env.PK_BASE || 'http://localhost:8098';
+const PORT = process.env.PK_PORT || process.env.PORT || '8090';
+const BASE = process.env.PK_BASE || `http://localhost:${PORT}`;
 const VERSION = '6.17.8';
 
 const scenarios = [

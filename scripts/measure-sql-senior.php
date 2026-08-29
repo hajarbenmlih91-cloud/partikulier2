@@ -1,12 +1,17 @@
 <?php
 define('SAVEQUERIES', true);
-require_once '/home/ubuntu/wp-6172-final/wp-load.php';
+$root = dirname(__DIR__);
+$wp_load = file_exists($root . '/wp/wp-load.php') ? $root . '/wp/wp-load.php' : $root . '/wp-load.php';
+require_once $wp_load;
 
 global $wpdb;
 
 // Simulation du rendu de l'archive
 ob_start();
-include '/home/ubuntu/wp-6172-final/wp-content/themes/partikulier/templates/archive.php';
+$archive_template = get_template_directory() . '/templates/archive.php';
+if (file_exists($archive_template)) {
+    include $archive_template;
+}
 ob_end_clean();
 
 $count = count($wpdb->queries);
