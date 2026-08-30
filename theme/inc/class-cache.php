@@ -104,6 +104,18 @@ class Partikulier_Cache {
 	 * Stocke le HTML dans le fichier de cache (+ variantes compressees).
 	 */
 	public static function store_cache( $html ) {
+		// Une reponse qui redirige n'a aucun contenu a cacher : la stocker
+		// transforme la redirection en page blanche servie en HIT (mesure :
+		// fichier de 0 octet, X-Partikulier-Cache: HIT, plus aucun Location).
+		$pk_code = (int) http_response_code();
+		if ( $pk_code >= 300 && $pk_code < 400 ) {
+			return $html;
+		}
+		foreach ( headers_list() as $pk_header ) {
+			if ( 0 === stripos( $pk_header, 'Location:' ) ) {
+				return $html;
+			}
+		}
 		// Ne pas cacher une page avec la barre d'admin ou des erreurs.
 		if ( is_admin_bar_showing() || http_response_code() >= 400 || self::response_sets_cookie() || '' === trim( (string) $html ) ) {
 			return $html;
@@ -123,6 +135,7 @@ class Partikulier_Cache {
 		}
 
 		if ( @file_put_contents( $cache_file, $html ) !== false ) {
+			self::prune_expired( $dir );
 			if ( function_exists( 'gzencode' ) ) {
 				@file_put_contents( $cache_file . '.gz', gzencode( $html, 5 ) );
 			}
@@ -159,6 +172,20 @@ wp_delete_file( $f );
 	 * after_setup_theme, moment où la requête WordPress n’est pas encore
 	 * systématiquement disponible pour is_page().
 	 */
+	/**
+	 * Purge les entrees plus anciennes que deux TTL. Appelée sur les écritures
+	 * seulement : le dossier ne peut plus grossir indefiniment (variantes d'URL,
+	 * slugs renames, cles nees d'un Host etranger).
+	 */
+	private static function prune_expired( $dir ) {
+		$horizon = time() - ( 2 * self::TTL );
+		foreach ( (array) glob( $dir . '/*.html*' ) as $f ) {
+			if ( is_file( $f ) && filemtime( $f ) < $horizon ) {
+				wp_delete_file( $f );
+			}
+		}
+	}
+
 	private static function is_private_path() {
 		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
 		$path = trim( (string) $path, '/' );
