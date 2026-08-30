@@ -30,23 +30,48 @@ CACHE_DIR="$WP/wp-content/uploads/partikulier-cache"
 hdr(){ tr -d '\r' < "$1"; }
 cache_state(){ hdr "$1" | grep -io '^x-partikulier-cache: [a-z]*' | tail -1 | sed 's/.*: //'; }
 
-# --- auto-vérification : le test doit savoir ROUGIR sur un fichier volontairement cassé ---
+# --- auto-vérification : le test doit savoir ROUGIR sur un code volontairement cassé ---
+# La casse est appliquée au thème ACTIF de l'install (c'est lui que PHP charge) puis
+# restaurée immédiatement. Sans ce mode, un test peut être décoratif sans que
+# personne ne s'en aperçoive — c'est précisément le défaut relevé dans la PR #2.
 if [ "${1:-}" = "--self-check" ]; then
-  T=$(mktemp -d); SRC="$ROOT/theme/inc/class-cache.php"
-  [ -f "$SRC" ] || { err "source introuvable : $SRC"; exit 1; }
-  if ! grep -q "sanitize_key( wp_unslash( \$_SERVER\['REQUEST_METHOD'\]" "$SRC"; then
-    say "  [self-check] re-injection du bug dans une copie de travail : $SRC -> /tmp (le thème n'est pas modifié)"
-    sed "s/if ( 'GET' !== \$method ) {/if ( 'GET' !== ( isset( \$_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( \$_SERVER['REQUEST_METHOD'] ) ) : '' ) ) {/" "$SRC" > "$T/class-cache.php"
-    grep -q "sanitize_key( wp_unslash" "$T/class-cache.php" || { err "[self-check] la copie n'a pas reçu le bug : test inapplicable"; exit 1; }
-    cp "$SRC" "$T/originaire.php"
-    cp "$T/class-cache.php" "$SRC"
-    say "  [self-check] garde volontairement casse, execution du test…"
-    PK_WP_DIR="${PK_WP_DIR:-$WP}" bash "$0"; rc=$?
-    cp "$T/originaire.php" "$SRC"
-    if [ "$rc" -ne 0 ]; then say "  [self-check] OK : le test ROUGIT quand le garde est cassé (rc=$rc), fichier restauré"; rm -rf "$T"; exit 0
-    else err "[self-check] le test PASSE sur un code cassé : il est décoratif, il faut le corriger (rc=$rc)"; rm -rf "$T"; exit 1; fi
+  TDIR=$(wp --path="$WP" eval 'echo wp_get_theme()->get_stylesheet();' --allow-root 2>/dev/null | tail -1)
+  CDIR=$(wp --path="$WP" eval 'echo WP_CONTENT_DIR;' --allow-root 2>/dev/null | tail -1)
+  { [ -n "$TDIR" ] && [ -n "$CDIR" ]; } || { err "ne peut pas localiser le thème actif (wp-cli + PK_WP_DIR requis)"; exit 1; }
+  SRC="$CDIR/themes/$TDIR/inc/class-cache.php"
+  [ -f "$SRC" ] || { err "thème actif sans class-cache.php : $SRC"; exit 1; }
+  if grep -q "sanitize_key( wp_unslash( \$_SERVER\['REQUEST_METHOD'\]" "$SRC"; then
+    err "le thème actif contient déjà le bug : rien à injecter, auto-vérification inapplicable"
+    exit 1
   fi
-  say "  [self-check] le dépôt ne contient pas le motif : rien à réinjecter (le test n'a donc pas été éprouvé ici)"; exit 1
+  BK=$(mktemp) && cp "$SRC" "$BK" || { err "sauvegarde impossible"; exit 1; }
+  python3 -c '
+import sys
+p = sys.argv[1]
+s = open(p, encoding="utf-8").read()
+bug = "if ( \x27GET\x27 !== ( isset( \$_SERVER[\x27REQUEST_METHOD\x27] ) ? sanitize_key( wp_unslash( \$_SERVER[\x27REQUEST_METHOD\x27] ) ) : \x27\x27 ) ) {"
+for c in ("\t\tif ( \x27GET\x27 !== $method ) {", "\tif ( \x27GET\x27 !== $method ) {"):
+    if c in s:
+        open(p, "w", encoding="utf-8").write(s.replace(c, bug, 1))
+        sys.exit(0)
+sys.exit(3)
+' "$SRC"
+  case $? in
+    0) : ;;
+    *) err "injection impossible : forme du garde non reconnue dans $SRC"; cp "$BK" "$SRC"; rm -f "$BK"; exit 1 ;;
+  esac
+  say "  [self-check] garde cassé dans $SRC (1 s) puis restauration"
+  sleep 1
+  bash "$0"; rc=$?
+  cp "$BK" "$SRC" && rm -f "$BK"
+  r=$(grep -c "sanitize_key( wp_unslash( \$_SERVER\['REQUEST_METHOD'\]" "$SRC")
+  [ "$r" = 0 ] || err "[self-check] RESTAURATION ÉCHOUÉE sur $SRC : à réparer à la main"
+  if [ "$rc" -ne 0 ] && [ "$r" = 0 ]; then
+    say "  [self-check] OK : le test ROUGIT sur le code cassé (rc=$rc) et le fichier est restauré"
+    exit 0
+  fi
+  err "[self-check] le test PASSE sur un code cassé (rc=$rc) : il est décoratif, il faut le réécrire"
+  exit 1
 fi
 
 [ -n "${PK_WP_DIR:-}" ] || err "PK_WP_DIR manquant"
