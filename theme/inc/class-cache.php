@@ -135,13 +135,17 @@ class Partikulier_Cache {
 		}
 
 		if ( @file_put_contents( $cache_file, $html ) !== false ) {
-			self::prune_expired( $dir );
 			if ( function_exists( 'gzencode' ) ) {
 				@file_put_contents( $cache_file . '.gz', gzencode( $html, 5 ) );
 			}
 			if ( function_exists( 'brotli_compress' ) ) {
 				@file_put_contents( $cache_file . '.br', brotli_compress( $html, 5 ) );
 			}
+			// Purge apres TOUTES les ecritures, en excluant la cle en cours : un
+			// filemtime() en retard sur time() (FS a resolution 1 s, overlayfs du
+			// runner rendant 0, horloge de conteneur) ne doit pas faire disparaitre
+			// l'entree fraiche — symptome : MISS permanents en CI, PASS en local.
+			self::prune_expired( $dir, $cache_file );
 		}
 
 		header( 'X-Partikulier-Cache: MISS' );
@@ -177,10 +181,15 @@ wp_delete_file( $f );
 	 * seulement : le dossier ne peut plus grossir indefiniment (variantes d'URL,
 	 * slugs renames, cles nees d'un Host etranger).
 	 */
-	private static function prune_expired( $dir ) {
-		$horizon = time() - ( 2 * self::TTL );
+	private static function prune_expired( $dir, $keep = '' ) {
+		$now     = time();
+		$horizon = $now - ( 2 * self::TTL );
 		foreach ( (array) glob( $dir . '/*.html*' ) as $f ) {
-			if ( is_file( $f ) && filemtime( $f ) < $horizon ) {
+			if ( '' !== $keep && 0 === strpos( $f, $keep ) ) {
+				continue;
+			}
+			$m = (int) @filemtime( $f );
+			if ( is_file( $f ) && $m > 0 && $m < $now && $m < $horizon ) {
 				wp_delete_file( $f );
 			}
 		}
