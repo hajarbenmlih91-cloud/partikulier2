@@ -31,13 +31,13 @@ class Partikulier_Cache {
 		// Enregistrement du buffer de sortie pour generer le cache.
 		add_action( 'template_redirect', array( __CLASS__, 'start_caching' ), -1 );
 
-		// Purge ciblée pour les posts
+		// Purge ciblée pour les posts (save, delete, trash)
 		add_action( 'save_post', array( __CLASS__, 'purge_post' ), 10, 1 );
 		add_action( 'delete_post', array( __CLASS__, 'purge_post' ), 10, 1 );
 		add_action( 'wp_trash_post', array( __CLASS__, 'purge_post' ), 10, 1 );
 
-		// Hooks de purge globale pour les changements de structure (termes, thèmes, menus, options)
-		foreach ( array( 'transition_post_status', 'edited_term', 'create_term', 'delete_term', 'switch_theme', 'wp_update_nav_menu', 'customize_save_after' ) as $hook ) {
+		// Hooks de purge globale pour les réorganisations structurelles (termes, menus, thèmes)
+		foreach ( array( 'edited_term', 'create_term', 'delete_term', 'switch_theme', 'wp_update_nav_menu', 'customize_save_after' ) as $hook ) {
 			add_action( $hook, array( __CLASS__, 'purge_all' ) );
 		}
 
@@ -190,8 +190,25 @@ class Partikulier_Cache {
 			}
 		}
 
-		// Purge aussi l'index/accueil et l'archive de toutes les langues
-		$home_patterns = array( $dir . '/*_index.html', $dir . '/*_fr.html', $dir . '/*_en.html', $dir . '/*_ar.html', $dir . '/*_annonces.html' );
+		// Purge aussi l'index/accueil, les archives principales, paginées et géographiques
+		$home_patterns = array(
+			$dir . '/*_index.html',
+			$dir . '/*_fr.html',
+			$dir . '/*_en.html',
+			$dir . '/*_ar.html',
+			$dir . '/*_annonces*.html',
+			$dir . '/*_page_*.html',
+		);
+
+		// Si l'annonce a une ville définie, purger aussi les archives de cette ville
+		$city_name = get_post_meta( $post_id, '_pk_city_name', true );
+		if ( $city_name ) {
+			$city_slug = sanitize_title( $city_name );
+			if ( $city_slug ) {
+				$home_patterns[] = $dir . '/*' . $city_slug . '*.html';
+			}
+		}
+
 		foreach ( $home_patterns as $p ) {
 			$matches = glob( $p );
 			if ( $matches ) {
@@ -248,7 +265,8 @@ class Partikulier_Cache {
 			if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) ) {
 			return false;
 		}
-		if ( 'GET' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '' ) ) {
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) : '';
+		if ( 'GET' !== $method ) {
 			return false;
 		}
 		if ( ! empty( $_GET ) ) {
