@@ -228,7 +228,18 @@ wp_delete_file( $f );
 			}
 		}
 		$allowed = array_values( array_unique( (array) apply_filters( 'partikulier_cache_allowed_hosts', $allowed ) ) );
-		$host     = in_array( $host_raw, $allowed, true ) ? $host_raw : 'default';
+		// home_url() ne porte pas toujours le port (localhost vs localhost:8090) : sans normalisation,
+		// toute install sur port explicite retombe sur la cle 'default' et partage une entree unique
+		// (mesure : fichier default_fr_annonces.html alors que HTTP_HOST=localhost:8090).
+		$pk_name = static function ( $h ) {
+			$p = wp_parse_url( 'http://' . $h, PHP_URL_HOST );
+			return is_string( $p ) ? strtolower( $p ) : '';
+		};
+		$pk_allowed = array_unique( array_map( $pk_name, $allowed ) );
+		// Le nom du fichier reste sanitize (un 'host:port' contenant ':' est risueux sur
+		// certains FS/backup) : la cle conserve le port, mais sans caracteres speciaux.
+		$pk_ok      = ( '' !== $pk_name( $host_raw ) && in_array( $pk_name( $host_raw ), $pk_allowed, true ) );
+		$host       = $pk_ok ? preg_replace( '/[^a-z0-9.\-]/i', '', $host_raw ) : 'default';
 		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '/';
 		$uri  = '/' === $uri ? 'index' : trim( str_replace( array( '..', '/' ), array( '', '_' ), $uri ), '_' );
 		$lang = '';
