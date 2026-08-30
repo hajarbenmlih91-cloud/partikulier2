@@ -65,6 +65,11 @@ class Partikulier_Localization {
 					// Optimisation senior : forcer 24 par page sur l'archive pour respecter la grille responsive et limiter les requêtes N+1.
 					if ( ! is_admin() && ( $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax() ) ) {
 						$query->set( 'posts_per_page', 24 );
+						// Les bornes de pagination sont calculees par WordPress AVANT ce
+						// filtre (10 par page) : /annonces/page/2/ tombait donc en 404 avec
+						// 24 par page. On realigne explicitement la page demandee.
+						$query->set( 'page', null );
+						$query->set( 'paged', max( 1, (int) get_query_var( 'paged' ) ) );
 					}
 				}
 	}
