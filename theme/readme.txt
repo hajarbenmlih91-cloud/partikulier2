@@ -2,7 +2,7 @@
 
 Contributors: partikulier
 Tags: real-estate, property, listings, immobilier, performance, avif
-Requires at least: 6.0
+Requires at least: 6.2
 Tested up to: 7.1
 Requires PHP: 8.0
 Stable tag: 6.17.22

@@ -30,17 +30,6 @@ class Partikulier_SEO {
 			$location = self::geo_chain( $post );
 			$parts['title'] = wp_strip_all_tags( get_the_title( $post ) );
 			$parts['site']  = $location ? $location . ' | ' . $site : $site;
-		} elseif ( is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) ) {
-			// Estatik laisse son libelle d'archive brut sous les trois langues ; on
-			// reprend le libelle officiel du type de contenu (deja traduit par
-			// Estatik/le theme) et on le rend filtrable, sans inventer de chaine.
-			$pk_archive = get_post_type_object( PARTIKULIER_ESTATIK_POST_TYPE );
-			$pk_label   = $pk_archive instanceof WP_Post_Type ? (string) $pk_archive->labels->name : '';
-			$pk_label   = (string) apply_filters( 'partikulier_archive_title', $pk_label );
-			if ( '' !== trim( wp_strip_all_tags( $pk_label ) ) ) {
-				$parts['title'] = wp_strip_all_tags( $pk_label );
-				$parts['site']  = $site;
-			}
 		} elseif ( is_tax() ) {
 			$term = get_queried_object();
 			if ( $term instanceof WP_Term && in_array( $term->taxonomy, Partikulier_Setup::GEO_TAX, true ) ) {

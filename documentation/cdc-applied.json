@@ -1,0 +1,80 @@
+{
+ "tool": "cdc-apply.py",
+ "results": [
+  {
+   "id": "cache-redirect-guard",
+   "file": "theme/inc/class-cache.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "cache-expiry-prune",
+   "file": "theme/inc/class-cache.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "cache-expiry-prune-hook",
+   "file": "theme/inc/class-cache.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "cache-host-allowlist",
+   "file": "theme/inc/class-cache.php",
+   "status": "APPLIED"
+  },
+  {
+   "id": "pagination-paged-realign",
+   "file": "theme/inc/class-localization.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "jsonld-itemlist-total",
+   "file": "theme/inc/class-jsonld.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "jsonld-itemlist-total-2",
+   "file": "theme/inc/class-jsonld.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "jsonld-itemlist-total-3",
+   "file": "theme/inc/class-jsonld.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "jsonld-itemlist-found-posts",
+   "file": "theme/inc/class-jsonld.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "jsonld-itemlist-caller-total",
+   "file": "theme/inc/class-jsonld.php",
+   "status": "NOOP"
+  },
+  {
+   "id": "seo-archive-title",
+   "file": "theme/inc/class-seo.php",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "license-style",
+   "file": "theme/style.css",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "license-uri-style",
+   "file": "theme/style.css",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "text-domain",
+   "file": "theme/style.css",
+   "status": "ALREADY_DONE"
+  },
+  {
+   "id": "fixture-anchor",
+   "file": "scripts/install.sh",
+   "status": "ALREADY_DONE"
+  }
+ ]
+}
