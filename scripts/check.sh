@@ -77,6 +77,14 @@ fi
    echo "   script R6 ou exceptions absent"; FAIL=1
  fi
 
+# ------------------------------------------- test de non-régression du cache (CDC G2)
+ echo "── Cache de pages (test dynamique ; exige PK_WP_DIR + serveur)"
+ if [ -x "$ROOT/tests/test-cache-hit.sh" ] || [ -f "$ROOT/tests/test-cache-hit.sh" ]; then
+   bash "$ROOT/tests/test-cache-hit.sh" || FAIL=1
+ else
+   echo "   tests/test-cache-hit.sh absent" >&2; FAIL=1
+ fi
+
 # ------------------------------------------------------- régressions connues
  echo "── Régressions connues"
 
