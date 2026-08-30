@@ -222,7 +222,6 @@ class Partikulier_JSONLD {
 	private static function itemlist_graph_archive() {
 		global $wp_query;
 		$posts = isset( $wp_query->posts ) ? $wp_query->posts : array();
-		$total = isset( $wp_query->found_posts ) ? (int) $wp_query->found_posts : null;
 			return self::itemlist_from_posts(
 				self::localized_phrase( 'archive' ),
 				pk_properties_archive_url(),
@@ -230,8 +229,7 @@ class Partikulier_JSONLD {
 			);
 	}
 
-	private static function itemlist_from_posts( $name, $url, $posts, $total = null ) {
-		$total = ( null === $total ) ? count( $posts ) : (int) $total;
+	private static function itemlist_from_posts( $name, $url, $posts ) {
 		$items = array();
 		foreach ( $posts as $i => $post ) {
 			$items[] = array(
@@ -245,9 +243,7 @@ class Partikulier_JSONLD {
 			'@type'     => 'ItemList',
 			'url'       => $url,
 			'name'      => $name,
-			// schema.org : pour une liste paginee, numberOfItems porte la liste
-			// entiere ; les entrees visibles restent limitees a itemListElement.
-			'numberOfItems' => $total,
+			'numberOfItems' => count( $posts ),
 			'itemListElement' => $items,
 		);
 	}
