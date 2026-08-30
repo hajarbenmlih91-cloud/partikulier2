@@ -203,7 +203,11 @@ wp_delete_file( $f );
 			if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) ) {
 			return false;
 		}
-		if ( 'GET' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? sanitize_key( wp_unslash( $_SERVER['REQUEST_METHOD'] ) ) : '' ) ) {
+		// Le verbe HTTP est en majuscules par la RFC 9110 : sanitize_key() le
+		// minuscule et rend ce test toujours vrai, donc le module n'est jamais
+		// execute (regression introduite par le commit 4038040).
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) : '';
+		if ( 'GET' !== $method ) {
 			return false;
 		}
 		if ( ! empty( $_GET ) ) {
