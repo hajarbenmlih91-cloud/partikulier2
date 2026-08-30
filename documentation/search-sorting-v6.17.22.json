@@ -1,0 +1,386 @@
+{
+    "version": "6.17.22",
+    "passed": true,
+    "errors": [],
+    "orders": {
+        "price-asc": {
+            "count": 24,
+            "passed": true,
+            "rows": [
+                {
+                    "id": 35,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 29,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 23,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 17,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 11,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 36,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 30,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 24,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 18,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 12,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 38,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 32,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 26,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 20,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 14,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 33,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 27,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 21,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 15,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 9,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 37,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 31,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 25,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 19,
+                    "price": 2850000,
+                    "surface": 98
+                }
+            ]
+        },
+        "price-desc": {
+            "count": 24,
+            "passed": true,
+            "rows": [
+                {
+                    "id": 34,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 28,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 22,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 16,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 10,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 37,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 31,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 25,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 19,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 13,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 33,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 27,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 21,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 15,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 9,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 38,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 32,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 26,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 20,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 14,
+                    "price": 850000,
+                    "surface": 28
+                },
+                {
+                    "id": 36,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 30,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 24,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 18,
+                    "price": 12500,
+                    "surface": 110
+                }
+            ]
+        },
+        "surface-desc": {
+            "count": 24,
+            "passed": true,
+            "rows": [
+                {
+                    "id": 34,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 28,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 22,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 16,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 10,
+                    "price": 3750000,
+                    "surface": 124
+                },
+                {
+                    "id": 36,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 30,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 24,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 18,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 12,
+                    "price": 12500,
+                    "surface": 110
+                },
+                {
+                    "id": 37,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 31,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 25,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 19,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 13,
+                    "price": 2850000,
+                    "surface": 98
+                },
+                {
+                    "id": 33,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 27,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 21,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 15,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 9,
+                    "price": 1280000,
+                    "surface": 72
+                },
+                {
+                    "id": 35,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 29,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 23,
+                    "price": 9500,
+                    "surface": 52
+                },
+                {
+                    "id": 17,
+                    "price": 9500,
+                    "surface": 52
+                }
+            ]
+        }
+    },
+    "fixture_minimum_rows": 6
+}
