@@ -15,16 +15,38 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Partikulier_Header {
 
+	public static function init() {
+		add_filter( 'wp_nav_menu_objects', array( __CLASS__, 'localize_archive_items' ), 20, 2 );
+	}
+
+	public static function localize_archive_items( $items, $args ) {
+		foreach ( $items as $item ) {
+				$path = (string) wp_parse_url( $item->url, PHP_URL_PATH );
+				if ( '/' === untrailingslashit( $path ) && function_exists( 'pk_localized_home_url' ) ) {
+					$item->url = pk_localized_home_url();
+					continue;
+				}
+				if ( preg_match( '#/(?:property|annonces)(?:/page/([0-9]+))?/?$#', $path, $match ) ) {
+				$item->url = pk_properties_archive_url();
+				if ( ! empty( $match[1] ) ) {
+					$item->url = trailingslashit( $item->url ) . 'page/' . absint( $match[1] ) . '/';
+				}
+			}
+		}
+		return $items;
+	}
+
 	public static function fallback_menu( $args ) {
 		$items = array(
-			home_url( '/' )                                 => __( 'Accueil', 'partikulier' ),
+			( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) ) => __( 'Accueil', 'partikulier' ),
 			pk_properties_archive_url()                     => __( 'Annonces', 'partikulier' ),
 				pk_page_url( 'deposer', '/deposer/' ) => __( 'Déposer une annonce', 'partikulier' ),
 		);
 		$items = array_filter( $items );
 		echo '<ul class="' . esc_attr( $args['menu_class'] ) . '">';
 		foreach ( $items as $url => $label ) {
-				$is_current = ( untrailingslashit( $url ) === untrailingslashit( home_url( add_query_arg( array() ) ) ) );
+				$current_home = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
+				$is_current = ( untrailingslashit( $url ) === untrailingslashit( $current_home ) );
 			printf(
 				'<li class="pk-menu-item%s"><a href="%s">%s</a></li>',
 				$is_current ? ' pk-current' : '',
@@ -35,6 +57,8 @@ class Partikulier_Header {
 		echo '</ul>';
 	}
 }
+
+Partikulier_Header::init();
 
 /**
  * Walker de menu legere : classes BEM, pas de JS requis (dropdowns en CSS).

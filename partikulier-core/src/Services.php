@@ -94,7 +94,14 @@ final class JobRunner
     public function register(): void
     {
         add_action('partikulier_core_cleanup', [$this, 'cleanup']);
+        add_action('partikulier_core_sync_estatik', [$this, 'syncEstatik']);
         if (!wp_next_scheduled('partikulier_core_cleanup')) wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'partikulier_core_cleanup');
+        if (!wp_next_scheduled('partikulier_core_sync_estatik')) wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', 'partikulier_core_sync_estatik');
+    }
+
+    public function syncEstatik(): void
+    {
+        (new ListingRepository())->syncEstatikProperties();
     }
 
     public function cleanup(): void

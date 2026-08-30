@@ -29,7 +29,8 @@ Définies en tête de `functions.php`. **Ne jamais écrire les chaînes en dur a
 PARTIKULIER_VERSION                     '6.13.0'
 PARTIKULIER_ESTATIK_POST_TYPE           'properties'
 PARTIKULIER_ESTATIK_TYPE_TAXONOMY       'es_type'       // studio, appartement, villa…
-PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY   'es_category'   // à vendre / à louer
+PARTIKULIER_ESTATIK_STATUS_TAXONOMY     'es_status'     // à vendre / à louer
+PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY   'es_category'   // villes/termes historiques à assainir
 PARTIKULIER_ESTATIK_LOCATION_TAXONOMY   'es_location'   // villes ET quartiers (taxonomie plate)
 ```
 

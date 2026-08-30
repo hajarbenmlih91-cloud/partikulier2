@@ -3,6 +3,7 @@
 import argparse
 import hashlib
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -16,6 +17,7 @@ EXPECTED = {f"{page}-{locale}-{viewport}" for page in PAGES for locale in LOCALE
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--require-baselines", action="store_true")
+parser.add_argument("--version", default=os.environ.get("PK_VERSION", "6.17.22"))
 args = parser.parse_args()
 errors = []
 
@@ -56,7 +58,8 @@ for index, scenario in enumerate(scenarios):
     if scenario.get("expected_dir") != expected_dir: errors.append(f"direction_mismatch:{sid}")
     if scenario.get("expected_http") != 200: errors.append(f"expected_http_not_200:{sid}")
     baseline = scenario.get("baseline", "")
-    if baseline != f"tests/baselines-6.17.17/{sid}.png": errors.append(f"baseline_path_mismatch:{sid}")
+    expected_baseline_dir = f"tests/baselines-{args.version}"
+    if baseline != f"{expected_baseline_dir}/{sid}.png": errors.append(f"baseline_path_mismatch:{sid}")
     if args.require_baselines:
         baseline_path = ROOT / baseline
         if not baseline_path.is_file() or baseline_path.stat().st_size == 0:

@@ -5,7 +5,7 @@ namespace Partikulier\Core\Database;
 
 final class Schema
 {
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.1.0';
 
     /** @return array<string, string> */
     public static function statements(string $prefix): array
@@ -27,6 +27,9 @@ final class Schema
                 PRIMARY KEY (id),
                 UNIQUE KEY external_id (external_id),
                 KEY status_locale (status, locale),
+                KEY status_locale_created (status, locale, created_at, id),
+                KEY status_locale_price (status, locale, price, id),
+                KEY status_locale_area (status, locale, area, id),
                 KEY owner_status (owner_user_id, status),
                 KEY search_order (status, price, area)
             ) {$GLOBALS['wpdb']->get_charset_collate()};",

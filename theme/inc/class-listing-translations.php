@@ -313,8 +313,9 @@ class Partikulier_Listing_Translations {
 		// Taxonomies : Polylang peut avoir des termes par langue, on tente la
 		// traduction du terme et on retombe sur le terme source sinon.
 		$taxonomies = array(
-			PARTIKULIER_ESTATIK_TYPE_TAXONOMY,
-			PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY,
+PARTIKULIER_ESTATIK_TYPE_TAXONOMY,
+				PARTIKULIER_ESTATIK_STATUS_TAXONOMY,
+				PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY,
 			PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
 		);
 		foreach ( $taxonomies as $taxonomy ) {

@@ -13,7 +13,7 @@ import zipfile
 from pathlib import Path
 from typing import Any
 
-VERSION = "6.17.17"
+VERSION = "6.17.22"
 SHA40 = re.compile(r"^[0-9a-f]{40}$")
 SHA64 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -95,7 +95,10 @@ def safe_extract(tar_path: Path, destination: Path) -> None:
             target = (destination / member.name).resolve()
             if target != destination.resolve() and destination.resolve() not in target.parents:
                 fail(f"unsafe path in evidence archive: {member.name}")
-        archive.extractall(destination)
+        for member in members:
+            if member.issym() or member.islnk():
+                fail(f"links are not allowed in evidence archive: {member.name}")
+            archive.extract(member, destination)
 
 
 def evidence_json(evidence_root: Path, name: str) -> tuple[Path, dict[str, Any]]:
@@ -138,7 +141,7 @@ def main() -> int:
                 fail("deterministic ZIP integrity test failed")
             names = set(archive.namelist())
             required = {
-                "documentation/candidate-6.17.17.json",
+                "documentation/candidate-6.17.22.json",
                 "documentation/capacity-envelope.json",
                 "documentation/scope-matrix.csv",
                 "documentation/visual-scenarios-v1.7.1.json",
@@ -146,7 +149,7 @@ def main() -> int:
             missing = sorted(required - names)
             if missing:
                 fail(f"deterministic ZIP missing required stable inputs: {missing}")
-            candidate = json.loads(archive.read("documentation/candidate-6.17.17.json"))
+            candidate = json.loads(archive.read("documentation/candidate-6.17.22.json"))
             assert_equal(candidate.get("source_commit"), args.commit, "ZIP candidate source_commit")
             assert_equal(candidate.get("volatile_evidence"), "sidecar", "ZIP candidate volatile_evidence")
             checks.append({"id": "PACKAGE-CONTENT-001", "status": "PASS", "required_files": sorted(required)})
@@ -156,12 +159,12 @@ def main() -> int:
             safe_extract(evidence, evidence_root)
 
             evidence_specs = {
-                "accessibility-v6.17.17.json": (6, "accessibility"),
-                "core-contract-v6.17.17.json": (8, "core"),
-                "core-services-contract-v6.17.17.json": (7, "services"),
-                "theme-contract-v6.17.17.json": (6, "theme"),
-                "routes-contract-v6.17.17.json": (16, "routes"),
-                "visual-contract-v6.17.17.json": (30, "visual"),
+                "accessibility-v6.17.22.json": (6, "accessibility"),
+                "core-contract-v6.17.22.json": (8, "core"),
+                "core-services-contract-v6.17.22.json": (7, "services"),
+                "theme-contract-v6.17.22.json": (6, "theme"),
+                "routes-contract-v6.17.22.json": (16, "routes"),
+                "visual-contract-v6.17.22.json": (30, "visual"),
             }
             loaded: dict[str, dict[str, Any]] = {}
             for filename, (total, label) in evidence_specs.items():
@@ -171,7 +174,7 @@ def main() -> int:
                 assert_pass_counts(data, total, label)
             checks.append({"id": "CONTRACT-COUNTS-001", "status": "PASS", "counts": {k: v[0] for k, v in evidence_specs.items()}})
 
-            hmac_path, hmac = evidence_json(evidence_root, "hmac-http-v6.17.17.json")
+            hmac_path, hmac = evidence_json(evidence_root, "hmac-http-v6.17.22.json")
             assert_commit_run(hmac, args.commit, args.run_id, "hmac")
             assert_equal(hmac.get("rounds"), 5, "hmac.rounds")
             assert_equal(len(hmac.get("rounds_detail", [])), 5, "hmac.rounds_detail")
@@ -182,7 +185,7 @@ def main() -> int:
             assert_equal(len(negative.get("details", [])), 4, "hmac.negative.details")
             checks.append({"id": "HMAC-HTTP-001", "status": "PASS", "rounds": 5, "negative_401": 4})
 
-            _, semgrep = evidence_json(evidence_root, "semgrep-v6.17.17.json")
+            _, semgrep = evidence_json(evidence_root, "semgrep-v6.17.22.json")
             assert_commit_run(semgrep, args.commit, args.run_id, "semgrep")
             acceptance = semgrep.get("acceptance") or {}
             for key in ("targets_scanned", "raw_targets_scanned"):
@@ -191,7 +194,7 @@ def main() -> int:
             assert_equal(acceptance.get("errors_count"), 0, "semgrep.acceptance.errors_count")
             checks.append({"id": "SEMGREP-001", "status": "PASS", "raw_targets": 66, "blocking_findings": 0})
 
-            _, sql = evidence_json(evidence_root, "sql-v6.17.17-summary.json")
+            _, sql = evidence_json(evidence_root, "sql-v6.17.22-summary.json")
             assert_commit_run(sql, args.commit, args.run_id, "sql")
             runs = sql.get("runs") or []
             assert_equal(len(runs), 3, "sql.runs.length")
@@ -201,12 +204,12 @@ def main() -> int:
             assert_equal(sql.get("all_below_threshold"), True, "sql.all_below_threshold")
             checks.append({"id": "SQL-001", "status": "PASS", "runs": runs, "threshold": 56})
 
-            _, fixture = evidence_json(evidence_root, "load-fixture-v6.17.17.json")
+            _, fixture = evidence_json(evidence_root, "load-fixture-v6.17.22.json")
             assert_commit_run(fixture, args.commit, args.run_id, "load_fixture")
             assert_equal(fixture.get("status"), "PASS", "load_fixture.status")
             if not isinstance(fixture.get("after"), int) or fixture["after"] < 1000:
                 fail(f"load_fixture.after below 1000: {fixture.get('after')!r}")
-            _, load = evidence_json(evidence_root, "load-test-v6.17.17.json")
+            _, load = evidence_json(evidence_root, "load-test-v6.17.22.json")
             assert_commit_run(load, args.commit, args.run_id, "load_test")
             assert_equal(load.get("status"), "PASS", "load_test.status")
             metrics = load.get("metrics") or {}
@@ -220,7 +223,10 @@ def main() -> int:
             assert_equal(str(qualification.get("run_id")), str(args.run_id), "qualification.run_id")
             assert_equal(qualification.get("package_sha256"), package_sha, "qualification.package_sha256")
             labels = qualification.get("labels") or {}
-            assert_equal(labels.get("TECHNICAL_STATUS"), "PASS", "qualification.TECHNICAL_STATUS")
+            technical_status = labels.get("TECHNICAL_CANDIDATE_STATUS", labels.get("TECHNICAL_STATUS"))
+            assert_equal(technical_status, "PASS", "qualification.TECHNICAL_CANDIDATE_STATUS")
+            if "TECHNICAL_STATUS" in labels:
+                assert_equal(labels.get("TECHNICAL_STATUS"), "PASS", "qualification.TECHNICAL_STATUS")
             assert_equal(labels.get("RELEASE_STATUS"), "CANDIDATE", "qualification.RELEASE_STATUS")
             assert_equal(labels.get("TECHNICAL_RELEASE_CANDIDATE"), "PASS", "qualification.TECHNICAL_RELEASE_CANDIDATE")
             assert_equal(qualification.get("human_validation"), "PENDING_NOT_SIMULATED", "qualification.human_validation")

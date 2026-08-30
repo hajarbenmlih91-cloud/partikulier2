@@ -249,7 +249,7 @@ foreach($d as $x){ list($t,$c,$ty,$ca,$p,$a,$b)=$x;
     for pid in $IDS; do
       G=""
       for k in 0 1 2; do
-        n=$(( (i+k-1) % 6 + 1 ))
+        n=$(( (pid + k - 1) % 6 + 1 )) # ancre sur l'ID : fixture identique d'une install a l'autre
         aid=$(wp media import /tmp/imgs/h$n.jpg --post_id=$pid --porcelain 2>/dev/null | tail -1)
         [ -n "$aid" ] && G="$G${G:+,}$aid"
         [ "$k" = "0" ] && wp post meta update $pid _thumbnail_id "$aid" >/dev/null 2>&1

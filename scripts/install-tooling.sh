@@ -47,7 +47,7 @@ if [ "$node_major" != "$NODE_MAJOR" ]; then
   exit 2
 fi
 npm ci --no-audit --no-fund
-npx --no-install playwright install chromium
+npx --no-install playwright install chromium firefox webkit
 
 printf '\nTOOLING_COMPLETE=1\n'
 printf 'PHP_VERSION=%s\n' "$(php -r 'echo PHP_VERSION;')"

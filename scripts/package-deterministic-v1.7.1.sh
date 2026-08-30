@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
+PK_BUNDLE="${PK_BUNDLE:-full}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VERSION="${1:?Usage: package-deterministic-v1.7.1.sh <product-version>}"
 COMMIT="${PK_COMMIT:-$(git -C "$ROOT" rev-parse HEAD 2>/dev/null || true)}"
@@ -16,12 +17,16 @@ cp -a "$ROOT/theme" "$STAGE/theme"
 cp -a "$ROOT/partikulier-core" "$STAGE/partikulier-core"
 cp -a "$ROOT/mu-plugins" "$STAGE/mu-plugins"
 cp -a "$ROOT/scripts" "$STAGE/scripts"
-cp -a "$ROOT/vendor-artifacts" "$STAGE/vendor-artifacts"
+PK_BUNDLE="${PK_BUNDLE:-full}"
+if [ "${PK_BUNDLE:-full}" != client ]; then cp -a "$ROOT/vendor-artifacts" "$STAGE/vendor-artifacts"; fi
 cp -a "$ROOT/.semgrep" "$STAGE/.semgrep"
-cp -a "$ROOT/.github/workflows" "$STAGE/.github/workflows"
+if [ "${PK_BUNDLE:-full}" != client ]; then cp -a "$ROOT/.github/workflows" "$STAGE/.github/workflows"; fi
 cp -a "$ROOT/tests/routes-contract.json" "$STAGE/tests/routes-contract.json"
-if [ -d "$ROOT/tests/baselines-$VERSION" ]; then cp -a "$ROOT/tests/baselines-$VERSION" "$STAGE/tests/baselines-$VERSION"; fi
-for file in package.json package-lock.json; do [ -f "$ROOT/$file" ] && cp -a "$ROOT/$file" "$STAGE/$file"; done
+if [ "${PK_BUNDLE:-full}" != client ] && [ -d "$ROOT/tests/baselines-$VERSION" ]; then cp -a "$ROOT/tests/baselines-$VERSION" "$STAGE/tests/baselines-$VERSION"; fi
+for file in package.json package-lock.json; do
+  if [ "${PK_BUNDLE:-full}" = client ] && [ "$file" = package-lock.json ]; then continue; fi
+  [ -f "$ROOT/$file" ] && cp -a "$ROOT/$file" "$STAGE/$file"
+done
 [ -d "$ROOT/assets-demo" ] && cp -a "$ROOT/assets-demo" "$STAGE/assets-demo"
 for file in \
   'Cahierdeschargescontractuel—PartikulierUltra-Premiumv1.7.md' \

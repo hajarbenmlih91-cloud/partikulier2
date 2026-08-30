@@ -1,0 +1,6 @@
+fr cold http=200 dns=0.080268 connect=0.080475 ttfb=2.846540 total=3.813097 bytes=157621
+fr hot http=200 dns=0.062266 connect=0.062454 ttfb=2.806518 total=4.939092 bytes=157611
+en cold http=200 dns=0.069981 connect=0.070262 ttfb=2.873181 total=4.801945 bytes=155356
+en hot http=200 dns=0.346243 connect=0.346473 ttfb=3.064327 total=4.104011 bytes=155346
+ar cold http=200 dns=0.075279 connect=0.075522 ttfb=2.764766 total=3.811075 bytes=170525
+ar hot http=200 dns=0.093899 connect=0.094103 ttfb=3.152141 total=4.966446 bytes=170515

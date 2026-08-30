@@ -71,7 +71,7 @@ class Partikulier_Cache {
 				header( 'Cache-Control: public, max-age=' . self::TTL );
 				header( 'Vary: Accept-Encoding', false );
 			// Compression si le navigateur l'accepte et que la variante existe.
-			$accept = isset( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ? $_SERVER['HTTP_ACCEPT_ENCODING'] : '';
+			$accept = isset( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_ACCEPT_ENCODING'] ) ) : '';
 			if ( false !== strpos( $accept, 'br' ) && function_exists( 'brotli_uncompress' ) && file_exists( $cache_file . '.br' ) ) {
 				header( 'Content-Encoding: br' );
 				readfile( $cache_file . '.br' );
@@ -104,6 +104,18 @@ class Partikulier_Cache {
 	 * Stocke le HTML dans le fichier de cache (+ variantes compressees).
 	 */
 	public static function store_cache( $html ) {
+		// Une reponse qui redirige n'a aucun contenu a cacher : la stocker
+		// transforme la redirection en page blanche servie en HIT (mesure :
+		// fichier de 0 octet, X-Partikulier-Cache: HIT, plus aucun Location).
+		$pk_code = (int) http_response_code();
+		if ( $pk_code >= 300 && $pk_code < 400 ) {
+			return $html;
+		}
+		foreach ( headers_list() as $pk_header ) {
+			if ( 0 === stripos( $pk_header, 'Location:' ) ) {
+				return $html;
+			}
+		}
 		// Ne pas cacher une page avec la barre d'admin ou des erreurs.
 		if ( is_admin_bar_showing() || http_response_code() >= 400 || self::response_sets_cookie() || '' === trim( (string) $html ) ) {
 			return $html;
@@ -129,6 +141,11 @@ class Partikulier_Cache {
 			if ( function_exists( 'brotli_compress' ) ) {
 				@file_put_contents( $cache_file . '.br', brotli_compress( $html, 5 ) );
 			}
+			// Purge apres TOUTES les ecritures, en excluant la cle en cours : un
+			// filemtime() en retard sur time() (FS a resolution 1 s, overlayfs du
+			// runner rendant 0, horloge de conteneur) ne doit pas faire disparaitre
+			// l'entree fraiche — symptome : MISS permanents en CI, PASS en local.
+			self::prune_expired( $dir, $cache_file );
 		}
 
 		header( 'X-Partikulier-Cache: MISS' );
@@ -147,9 +164,9 @@ class Partikulier_Cache {
 		$files = glob( $dir . '/*.html' );
 		if ( $files ) {
 			foreach ( $files as $f ) {
-				@unlink( $f );
-				@unlink( $f . '.gz' );
-				@unlink( $f . '.br' );
+wp_delete_file( $f );
+						wp_delete_file( $f . '.gz' );
+						wp_delete_file( $f . '.br' );
 			}
 		}
 	}
@@ -159,8 +176,27 @@ class Partikulier_Cache {
 	 * after_setup_theme, moment où la requête WordPress n’est pas encore
 	 * systématiquement disponible pour is_page().
 	 */
+	/**
+	 * Purge les entrees plus anciennes que deux TTL. Appelée sur les écritures
+	 * seulement : le dossier ne peut plus grossir indefiniment (variantes d'URL,
+	 * slugs renames, cles nees d'un Host etranger).
+	 */
+	private static function prune_expired( $dir, $keep = '' ) {
+		$now     = time();
+		$horizon = $now - ( 2 * self::TTL );
+		foreach ( (array) glob( $dir . '/*.html*' ) as $f ) {
+			if ( '' !== $keep && 0 === strpos( $f, $keep ) ) {
+				continue;
+			}
+			$m = (int) @filemtime( $f );
+			if ( is_file( $f ) && $m > 0 && $m < $now && $m < $horizon ) {
+				wp_delete_file( $f );
+			}
+		}
+	}
+
 	private static function is_private_path() {
-		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+		$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
 		$path = trim( (string) $path, '/' );
 		if ( in_array( $path, array( 'sitemap.xml', 'robots.txt', 'xmlrpc.php' ), true ) ) {
 			return true;
@@ -180,8 +216,31 @@ class Partikulier_Cache {
 		$upload = wp_get_upload_dir();
 		$dir    = trailingslashit( $upload['basedir'] ) . self::DIR_NAME;
 
-		$host = isset( $_SERVER['HTTP_HOST'] ) ? preg_replace( '/[^a-z0-9.\-]/i', '', strtolower( $_SERVER['HTTP_HOST'] ) ) : 'default';
-		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH ) : '/';
+		$host_raw = isset( $_SERVER['HTTP_HOST'] ) ? strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		// La cle ne doit jamais etre derivee d'un en-tete Host libre : un hote
+		// arbitraire cree une entree etrangere (mesure : 10 hotes = 20 fichiers,
+		// puis un HIT sans Location sur ces hotes). Seuls l'hote de home_url() et
+		// ceux declares (constante ou filtre) sont des cles valides.
+		$allowed = array( strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) ) );
+		foreach ( preg_split( '/[\s,]+/', (string) ( defined( 'PK_ALLOWED_CACHE_HOSTS' ) ? constant( 'PK_ALLOWED_CACHE_HOSTS' ) : '' ) ) as $extra ) {
+			if ( '' !== $extra ) {
+				$allowed[] = $extra;
+			}
+		}
+		$allowed = array_values( array_unique( (array) apply_filters( 'partikulier_cache_allowed_hosts', $allowed ) ) );
+		// home_url() ne porte pas toujours le port (localhost vs localhost:8090) : sans normalisation,
+		// toute install sur port explicite retombe sur la cle 'default' et partage une entree unique
+		// (mesure : fichier default_fr_annonces.html alors que HTTP_HOST=localhost:8090).
+		$pk_name = static function ( $h ) {
+			$p = wp_parse_url( 'http://' . $h, PHP_URL_HOST );
+			return is_string( $p ) ? strtolower( $p ) : '';
+		};
+		$pk_allowed = array_unique( array_map( $pk_name, $allowed ) );
+		// Le nom du fichier reste sanitize (un 'host:port' contenant ':' est risueux sur
+		// certains FS/backup) : la cle conserve le port, mais sans caracteres speciaux.
+		$pk_ok      = ( '' !== $pk_name( $host_raw ) && in_array( $pk_name( $host_raw ), $pk_allowed, true ) );
+		$host       = $pk_ok ? preg_replace( '/[^a-z0-9.\-]/i', '', $host_raw ) : 'default';
+		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '/';
 		$uri  = '/' === $uri ? 'index' : trim( str_replace( array( '..', '/' ), array( '', '_' ), $uri ), '_' );
 		$lang = '';
 		if ( defined( 'WPLANG' ) && WPLANG ) {
@@ -194,7 +253,7 @@ class Partikulier_Cache {
 	 * La requete courante est-elle cachable ?
 	 */
 			private static function is_root_request() {
-			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( wp_unslash( $_SERVER['REQUEST_URI'] ), PHP_URL_PATH ) : '';
+			$path = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '';
 			return '/' === trailingslashit( (string) $path );
 		}
 
@@ -203,7 +262,11 @@ class Partikulier_Cache {
 			if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) ) {
 			return false;
 		}
-		if ( 'GET' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '' ) ) {
+		// Le verbe HTTP est en majuscules par la RFC 9110 : sanitize_key() le
+		// minuscule et rend ce test toujours vrai, donc le module n'est jamais
+		// execute (regression introduite par le commit 4038040).
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) : '';
+		if ( 'GET' !== $method ) {
 			return false;
 		}
 		if ( ! empty( $_GET ) ) {
@@ -215,7 +278,7 @@ class Partikulier_Cache {
 			if ( self::is_private_path() || is_page( array( 'deposer', 'deposer-en', 'deposer-ar', 'deposer-une-annonce', 'deposer-annonce', 'mes-annonces', 'mes-annonces-en', 'mes-annonces-ar' ) ) ) {
 				return false;
 			}
-		$cookie_header = isset( $_SERVER['HTTP_COOKIE'] ) ? (string) $_SERVER['HTTP_COOKIE'] : '';
+		$cookie_header = isset( $_SERVER['HTTP_COOKIE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_COOKIE'] ) ) : '';
 		if ( $cookie_header && preg_match( '/(?:wordpress_logged_in|wordpress_sec|wp-postpass|comment_author|pk_v_)=/i', $cookie_header ) ) {
 			return false;
 		}
@@ -233,9 +296,15 @@ class Partikulier_Cache {
 	 */
 	private static function response_sets_cookie() {
 		foreach ( headers_list() as $header ) {
-			if ( 0 === stripos( $header, 'Set-Cookie:' ) ) {
-				return true;
+			if ( 0 !== stripos( $header, 'Set-Cookie:' ) ) {
+				continue;
 			}
+			// La langue est déjà portée par l’URL /fr/, /en/ ou /ar/.
+			// Ce cookie Polylang ne rend donc pas le HTML partagé variable.
+			if ( preg_match( '/^Set-Cookie:\s*pll_language=/i', $header ) ) {
+				continue;
+			}
+			return true;
 		}
 		return false;
 	}

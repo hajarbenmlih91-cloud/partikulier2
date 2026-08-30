@@ -50,7 +50,7 @@ class Partikulier_SEO {
 	 */
 	public static function geo_chain( $post ) {
 		$location = self::term_name( $post, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
-		$category = self::term_name( $post, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY );
+		$category = self::term_name( $post, PARTIKULIER_ESTATIK_STATUS_TAXONOMY );
 		$type     = self::term_name( $post, PARTIKULIER_ESTATIK_TYPE_TAXONOMY );
 		$context  = trim( implode( ' ', array_filter( array( $category, $type ) ) ) );
 
@@ -132,7 +132,7 @@ class Partikulier_SEO {
 				if ( count( $existing ) > 1 ) {
 					$default = function_exists( 'pll_default_language' ) ? pll_default_language() : 'fr';
 					if ( ! empty( $existing[ $default ] ) && 'publish' === get_post_status( $existing[ $default ] ) ) {
-						printf( '<link rel="alternate" hreflang="x-default" href="%s">%s', esc_url( get_permalink( $existing[ $default ] ) ), "\\n" );
+						printf( '<link rel="alternate" hreflang="x-default" href="%s">%s', esc_url( get_permalink( $existing[ $default ] ) ), "\n" );
 					}
 					return;
 				}

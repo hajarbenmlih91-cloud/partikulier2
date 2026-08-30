@@ -12,6 +12,12 @@ const allCases = [
 ];
 const cases = process.env.PK_ONLY_LANG ? allCases.filter((item) => item.lang === process.env.PK_ONLY_LANG) : allCases;
 if (process.env.PK_ONLY_LANG && cases.length !== 1) throw new Error(`Unsupported PK_ONLY_LANG: ${process.env.PK_ONLY_LANG}`);
+const cacheBust = process.env.PK_CACHE_BUST ? `pkqa=${encodeURIComponent(process.env.PK_CACHE_BUST)}` : '';
+function requestUrl(path) {
+  if (!cacheBust) return base + path;
+  const separator = path.includes('?') ? '&' : '?';
+  return base + path + separator + cacheBust;
+}
 const browser = await chromium.launch({ headless: true });
 const results = [];
 for (const c of cases) {
@@ -19,7 +25,7 @@ for (const c of cases) {
   const page = await context.newPage();
   const row = { lang: c.lang, passed: true, failures: [], screens: [] };
   async function check(name, path, fn) {
-    const response = await page.goto(base + path, { waitUntil: 'domcontentloaded', timeout: 20000 });
+    const response = await page.goto(requestUrl(path), { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(300);
     const finalStatus = response?.status() ?? 0;
     const data = await fn();

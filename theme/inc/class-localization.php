@@ -56,7 +56,7 @@ class Partikulier_Localization {
 				return;
 			}
 
-					if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
+					if ( $query->get( 'post_type' ) === PARTIKULIER_ESTATIK_POST_TYPE || $query->is_post_type_archive( PARTIKULIER_ESTATIK_POST_TYPE ) || $query->is_tax( array( PARTIKULIER_ESTATIK_TYPE_TAXONOMY, PARTIKULIER_ESTATIK_STATUS_TAXONOMY, PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) ) {
 						// Forcer le cache des termes et meta pour éviter les N+1 dans les cartes.
 						$query->set( 'cache_results', true );
 						$query->set( 'update_post_term_cache', true );
@@ -300,17 +300,40 @@ class Partikulier_Localization {
 	 */
 			public static function translate_taxonomy_label( $label ) {
 			$map = array(
-				'A louer' => array( 'fr' => 'A louer', 'en' => 'For rent', 'ar' => 'للإيجار' ),
-				'A vendre' => array( 'fr' => 'A vendre', 'en' => 'For sale', 'ar' => 'للبيع' ),
-				'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
-				'Appartements' => array( 'fr' => 'Appartements', 'en' => 'Apartments', 'ar' => 'شقق' ),
-				'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
-				'Maisons' => array( 'fr' => 'Maisons', 'en' => 'Houses', 'ar' => 'منازل' ),
-				'Rabat' => array( 'fr' => 'Rabat', 'en' => 'Rabat', 'ar' => 'الرباط' ),
-				'Casablanca' => array( 'fr' => 'Casablanca', 'en' => 'Casablanca', 'ar' => 'الدار البيضاء' ),
+					'A louer' => array( 'fr' => 'A louer', 'en' => 'For rent', 'ar' => 'للإيجار' ),
+					'A vendre' => array( 'fr' => 'A vendre', 'en' => 'For sale', 'ar' => 'للبيع' ),
+					'Appartement' => array( 'fr' => 'Appartement', 'en' => 'Apartment', 'ar' => 'شقة' ),
+					'Appartements' => array( 'fr' => 'Appartements', 'en' => 'Apartments', 'ar' => 'شقق' ),
+					'Maison' => array( 'fr' => 'Maison', 'en' => 'House', 'ar' => 'منزل' ),
+					'Maisons' => array( 'fr' => 'Maisons', 'en' => 'Houses', 'ar' => 'منازل' ),
+					'Villa' => array( 'fr' => 'Villa', 'en' => 'Villa', 'ar' => 'فيلا' ),
+					'Terrain' => array( 'fr' => 'Terrain', 'en' => 'Land', 'ar' => 'أرض' ),
+					'Parking' => array( 'fr' => 'Parking', 'en' => 'Parking', 'ar' => 'موقف سيارات' ),
+					'Immeuble' => array( 'fr' => 'Immeuble', 'en' => 'Building', 'ar' => 'عمارة' ),
+					'Local' => array( 'fr' => 'Local', 'en' => 'Commercial space', 'ar' => 'محل تجاري' ),
+					'Bureau' => array( 'fr' => 'Bureau', 'en' => 'Office', 'ar' => 'مكتب' ),
+					'Rabat' => array( 'fr' => 'Rabat', 'en' => 'Rabat', 'ar' => 'الرباط' ),
+					'Casablanca' => array( 'fr' => 'Casablanca', 'en' => 'Casablanca', 'ar' => 'الدار البيضاء' ),
+					'Marrakech' => array( 'fr' => 'Marrakech', 'en' => 'Marrakech', 'ar' => 'مراكش' ),
+					'Tanger' => array( 'fr' => 'Tanger', 'en' => 'Tangier', 'ar' => 'طنجة' ),
+					'Fès' => array( 'fr' => 'Fès', 'en' => 'Fez', 'ar' => 'فاس' ),
+					'Agadir' => array( 'fr' => 'Agadir', 'en' => 'Agadir', 'ar' => 'أكادير' ),
 			);
 			$language = self::current_language();
-			return isset( $map[ $label ][ $language ] ) ? $map[ $label ][ $language ] : $label;
+			if ( isset( $map[ $label ][ $language ] ) ) {
+				return $map[ $label ][ $language ];
+			}
+			if ( 'fr' !== $language && class_exists( 'Partikulier_Listing_I18n' ) ) {
+				$type_label = Partikulier_Listing_I18n::localized_type( $label, $language );
+				if ( $type_label !== $label ) {
+					return $type_label;
+				}
+				$place_label = Partikulier_Listing_I18n::localized_place( $label, $language );
+				if ( $place_label !== $label ) {
+					return $place_label;
+				}
+			}
+			return $label;
 		}
 
 		public static function translate_public_string( $string ) {
@@ -392,7 +415,14 @@ class Partikulier_Localization {
 				'Ouvrir le menu' => array( 'fr' => 'Ouvrir le menu', 'en' => 'Open menu', 'ar' => 'فتح القائمة' ),
 				'Menu principal' => array( 'fr' => 'Menu principal', 'en' => 'Main menu', 'ar' => 'القائمة الرئيسية' ),
 				'Choisir la langue' => array( 'fr' => 'Choisir la langue', 'en' => 'Choose language', 'ar' => 'اختر اللغة' ),
-				'À propos' => array( 'fr' => 'À propos', 'en' => 'About', 'ar' => 'عن الموقع' ),
+					'À propos' => array( 'fr' => 'À propos', 'en' => 'About', 'ar' => 'عن الموقع' ),
+					'Étapes de publication' => array( 'fr' => 'Étapes de publication', 'en' => 'Listing steps', 'ar' => 'خطوات نشر الإعلان' ),
+					'Étape 1' => array( 'fr' => 'Étape 1', 'en' => 'Step 1', 'ar' => 'الخطوة 1' ),
+					'Étape 2' => array( 'fr' => 'Étape 2', 'en' => 'Step 2', 'ar' => 'الخطوة 2' ),
+					'Étape 3' => array( 'fr' => 'Étape 3', 'en' => 'Step 3', 'ar' => 'الخطوة 3' ),
+					'Qui publie l’annonce ?' => array( 'fr' => 'Qui publie l’annonce ?', 'en' => 'Who is posting?', 'ar' => 'من ينشر الإعلان؟' ),
+					'Les informations du bien' => array( 'fr' => 'Les informations du bien', 'en' => 'Property details', 'ar' => 'معلومات العقار' ),
+					'Votre aperçu' => array( 'fr' => 'Votre aperçu', 'en' => 'Your preview', 'ar' => 'المعاينة' ),
 				'Aide' => array( 'fr' => 'Aide', 'en' => 'Help', 'ar' => 'مساعدة' ),
 				'Questions fréquentes' => array( 'fr' => 'Questions fréquentes', 'en' => 'Frequently asked questions', 'ar' => 'الأسئلة الشائعة' ),
 				'Contactez-nous' => array( 'fr' => 'Contactez-nous', 'en' => 'Contact us', 'ar' => 'اتصل بنا' ),
@@ -430,7 +460,14 @@ class Partikulier_Localization {
 					'Prix croissant' => array( 'fr' => 'Prix croissant', 'en' => 'Price: Low to High', 'ar' => 'السعر: من الأقل للأعلى' ),
 					'Prix décroissant' => array( 'fr' => 'Prix décroissant', 'en' => 'Price: High to Low', 'ar' => 'السعر: من الأعلى للأقل' ),
 					'Surface décroissante' => array( 'fr' => 'Surface décroissante', 'en' => 'Area: High to Low', 'ar' => 'المساحة: من الأعلى للأقل' ),
-					'Filtres' => array( 'fr' => 'Filtres', 'en' => 'Filters', 'ar' => 'تصفية' ),
+						'Filtres' => array( 'fr' => 'Filtres', 'en' => 'Filters', 'ar' => 'تصفية' ),
+						'Affiner la recherche' => array( 'fr' => 'Affiner la recherche', 'en' => 'Refine search', 'ar' => 'تصفية البحث' ),
+						'Filtres actifs' => array( 'fr' => 'filtres actifs', 'en' => 'active filters', 'ar' => 'مرشحات نشطة' ),
+						'Fermer' => array( 'fr' => 'Fermer', 'en' => 'Close', 'ar' => 'إغلاق' ),
+						'Réinitialiser' => array( 'fr' => 'Réinitialiser', 'en' => 'Reset', 'ar' => 'إعادة ضبط' ),
+						'Appliquer' => array( 'fr' => 'Appliquer', 'en' => 'Apply', 'ar' => 'تطبيق' ),
+						'Transaction' => array( 'fr' => 'Transaction', 'en' => 'Transaction', 'ar' => 'المعاملة' ),
+						'Ville' => array( 'fr' => 'Ville', 'en' => 'City', 'ar' => 'المدينة' ),
 					'Budget maximum' => array( 'fr' => 'Budget maximum', 'en' => 'Maximum budget', 'ar' => 'الميزانية القصوى' ),
 					'APPLIQUER' => array( 'fr' => 'APPLIQUER', 'en' => 'APPLY', 'ar' => 'تطبيق' ),
 					'Villes populaires' => array( 'fr' => 'Villes populaires', 'en' => 'Popular cities', 'ar' => 'مدن شعبية' ),
@@ -713,6 +750,7 @@ class Partikulier_Localization {
 		}
 
 		$taxonomies[] = PARTIKULIER_ESTATIK_TYPE_TAXONOMY;
+		$taxonomies[] = PARTIKULIER_ESTATIK_STATUS_TAXONOMY;
 		$taxonomies[] = PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY;
 		$taxonomies[] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
 		return array_values( array_unique( $taxonomies ) );

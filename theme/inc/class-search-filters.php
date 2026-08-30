@@ -26,7 +26,7 @@ class Partikulier_Search_Filters {
 	 */
 	private static function taxonomy_map() {
 		return array(
-			'es_action' => PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY,
+			'es_action' => PARTIKULIER_ESTATIK_STATUS_TAXONOMY,
 			'es_type'   => PARTIKULIER_ESTATIK_TYPE_TAXONOMY,
 			'es_city'   => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
 		);
@@ -97,10 +97,21 @@ class Partikulier_Search_Filters {
 				break;
 		}
 
-		// --- Filtres de taxonomie (achat/location, type de bien, ville) ---
-		$tax_query = (array) $query->get( 'tax_query' );
+			// --- Filtres de taxonomie (achat/location, type de bien, ville) ---
+			$existing_tax_query = $query->get( 'tax_query' );
+			if ( $existing_tax_query instanceof WP_Tax_Query ) {
+				$tax_query = $existing_tax_query->queries;
+				if ( ! empty( $existing_tax_query->relation ) ) {
+					$tax_query['relation'] = $existing_tax_query->relation;
+				}
+			} else {
+				$tax_query = (array) $existing_tax_query;
+			}
 
-		foreach ( self::taxonomy_map() as $param => $taxonomy ) {
+			$taxonomy_map = self::taxonomy_map();
+			$taxonomy_map['location'] = PARTIKULIER_ESTATIK_LOCATION_TAXONOMY;
+			$unresolvable_action = false;
+			foreach ( $taxonomy_map as $param => $taxonomy ) {
 			if ( empty( $_GET[ $param ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				continue;
 			}
@@ -113,15 +124,44 @@ class Partikulier_Search_Filters {
 				continue;
 			}
 
-			// Le formulaire envoie un slug ; Estatik peut envoyer un term ID.
-			$is_id = ctype_digit( $raw );
+			if ( 'es_action' === $param && ! ctype_digit( $raw ) && ! in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
+				$unresolvable_action = true;
+				continue;
+			}
+
+				// Le formulaire utilise des slugs stables pour les actions. Si Estatik a un
+				// libelle different, retrouver son vrai terme avant de construire la tax_query.
+				if ( 'es_action' === $param && in_array( $raw, array( 'a-vendre', 'a-louer' ), true ) ) {
+					$needles = 'a-louer' === $raw ? array( 'louer', 'location', 'rent' ) : array( 'vend', 'vente', 'sale' );
+					$action_terms = get_terms( array( 'taxonomy' => $taxonomy, 'hide_empty' => false ) );
+					if ( ! is_wp_error( $action_terms ) ) {
+						foreach ( $action_terms as $action_term ) {
+							$action_name = function_exists( 'remove_accents' ) ? remove_accents( $action_term->name ) : $action_term->name;
+							$action_name = function_exists( 'mb_strtolower' ) ? mb_strtolower( $action_name ) : strtolower( $action_name );
+							foreach ( $needles as $needle ) {
+								if ( false !== strpos( $action_name, $needle ) ) {
+									$raw = $action_term->slug;
+									break 2;
+								}
+							}
+						}
+					}
+				}
+
+				// Le formulaire envoie un slug ; Estatik peut envoyer un term ID.
+				$is_id = ctype_digit( $raw );
 			$term  = $is_id
 				? get_term( (int) $raw, $taxonomy )
 				: get_term_by( 'slug', $raw, $taxonomy );
 
-			if ( ! $term || is_wp_error( $term ) ) {
-				continue;
-			}
+				if ( ! $term || is_wp_error( $term ) ) {
+					// Ne jamais ignorer silencieusement un filtre transactionnel reconnu :
+					// sans terme resolu, retourner zero resultat plutot que les ventes completes.
+					if ( 'es_action' === $param ) {
+						$unresolvable_action = true;
+					}
+					continue;
+				}
 
 			$tax_query[] = array(
 				'taxonomy'         => $taxonomy,
@@ -131,12 +171,33 @@ class Partikulier_Search_Filters {
 			);
 		}
 
-		if ( count( $tax_query ) > 1 ) {
-			$tax_query['relation'] = 'AND';
-		}
-		if ( ! empty( $tax_query ) ) {
-			$query->set( 'tax_query', $tax_query );
-		}
+			// Les routes /[lang]/location/{slug}/ transmettent une query var interne,
+			// tandis que les liens de l’interface utilisent ?location={slug}.
+			$city_slug = sanitize_title( (string) $query->get( 'pk_city_slug' ) );
+			if ( '' === $city_slug && ! empty( $_GET['location'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$city_slug = sanitize_title( wp_unslash( $_GET['location'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			}
+			if ( '' !== $city_slug && taxonomy_exists( PARTIKULIER_ESTATIK_LOCATION_TAXONOMY ) ) {
+				$city_term = get_term_by( 'slug', $city_slug, PARTIKULIER_ESTATIK_LOCATION_TAXONOMY );
+				if ( $city_term ) {
+					$tax_query[] = array(
+						'taxonomy'         => PARTIKULIER_ESTATIK_LOCATION_TAXONOMY,
+						'field'            => 'term_id',
+						'terms'            => (int) $city_term->term_id,
+						'include_children' => true,
+					);
+				}
+			}
+
+			if ( $unresolvable_action ) {
+				$query->set( 'post__in', array( 0 ) );
+			}
+			if ( count( $tax_query ) > 1 ) {
+				$tax_query['relation'] = 'AND';
+			}
+			if ( ! empty( $tax_query ) ) {
+				$query->set( 'tax_query', $tax_query );
+			}
 
 		// --- Budget maximum ---
 		$price_max = isset( $_GET['es_price_max'] ) ? (int) $_GET['es_price_max'] : 0; // phpcs:ignore WordPress.Security.NonceVerification.Recommended

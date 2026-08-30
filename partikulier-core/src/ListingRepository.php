@@ -32,8 +32,47 @@ final class ListingRepository
         $page = max(1, $page);
         $perPage = min(100, max(1, $perPage));
         $offset = ($page - 1) * $perPage;
+
+        // APCu est strictement optionnel : en présence d’un cache partagé par
+        // worker, il évite de refaire la même lecture publique pendant une
+        // courte fenêtre. Sans l’extension, le chemin SQL reste inchangé.
+        $cacheKey = $this->searchCacheKey($locale, $order, $page, $perPage);
+        if (self::apcuAvailable()) {
+            $found = false;
+            $cached = apcu_fetch($cacheKey, $found);
+            if ($found && is_array($cached)) {
+                return $cached;
+            }
+        }
+
         $sql = 'SELECT id, owner_user_id, external_id, status, locale, title, description, price, area, created_at, updated_at FROM ' . $wpdb->prefix . 'pk_listings WHERE status = %s AND locale = %s ORDER BY ' . $orderBy . ' LIMIT %d OFFSET %d';
-        return $wpdb->get_results($wpdb->prepare($sql, 'published', sanitize_key($locale), $perPage, $offset), ARRAY_A) ?: [];
+        $rows = $wpdb->get_results($wpdb->prepare($sql, 'published', sanitize_key($locale), $perPage, $offset), ARRAY_A) ?: [];
+        if (self::apcuAvailable()) {
+            apcu_store($cacheKey, $rows, 2);
+        }
+        return $rows;
+    }
+
+    private function searchCacheKey(string $locale, string $order, int $page, int $perPage): string
+    {
+        $version = self::apcuAvailable() ? (int) (apcu_fetch('pk_listing_search_version') ?: 1) : 1;
+        return 'pk_listing_search_' . $version . '_' . md5(sanitize_key($locale) . '|' . $order . '|' . $page . '|' . $perPage);
+    }
+
+    private static function apcuAvailable(): bool
+    {
+        return function_exists('apcu_enabled') && apcu_enabled() && function_exists('apcu_fetch') && function_exists('apcu_store');
+    }
+
+    private function invalidateSearchCache(): void
+    {
+        if (!self::apcuAvailable() || !function_exists('apcu_inc')) {
+            return;
+        }
+        $nextVersion = apcu_inc('pk_listing_search_version');
+        if (!is_int($nextVersion)) {
+            apcu_store('pk_listing_search_version', 2, 0);
+        }
     }
 
     public function syncEstatikProperties(): int
@@ -82,6 +121,10 @@ final class ListingRepository
             'created_at' => $now,
             'updated_at' => $now,
         ], ['%d', '%s', '%s', '%s', '%s', '%s', '%f', '%f', '%s', '%s']);
-        return $ok ? (int) $wpdb->insert_id : new WP_Error('listing_insert_failed', __('Création impossible.', 'partikulier-core'), ['status' => 500]);
+        if (!$ok) {
+            return new WP_Error('listing_insert_failed', __('Création impossible.', 'partikulier-core'), ['status' => 500]);
+        }
+        $this->invalidateSearchCache();
+        return (int) $wpdb->insert_id;
     }
 }

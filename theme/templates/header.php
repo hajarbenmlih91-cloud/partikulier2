@@ -30,7 +30,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <a class="pk-skip-link" href="#main-content"><?php esc_html_e( 'Aller au contenu', 'partikulier' ); ?></a>
 
 <!-- Topbar style Woo Shop -->
-<div class="pk-topbar" role="banner">
+<div class="pk-topbar" role="complementary" aria-label="<?php esc_attr_e( 'Informations de contact', 'partikulier' ); ?>">
 	<div class="pk-container pk-topbar-inner">
 		<span class="pk-topbar-promo"><?php echo esc_html( Partikulier_Settings::get( 'topbar_text' ) ); ?></span>
 		<div class="pk-topbar-contact">
@@ -52,10 +52,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 			// Marque en texte : pas d'image, donc nette a toutes les resolutions,
 			// traduisible, selectionnable, et sans requete HTTP supplementaire.
 			// Un logo televerse dans Personnaliser reste prioritaire s'il y en a un.
-			if ( function_exists( 'the_custom_logo' ) && has_custom_logo() ) {
-				the_custom_logo();
+				if ( function_exists( 'get_custom_logo' ) && has_custom_logo() ) {
+					$pk_logo_html = get_custom_logo();
+					$pk_logo_home = function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' );
+						$pk_logo_href_pattern = '/' . 'href' . '="[^"]*"' . '/';
+						$pk_logo_html = preg_replace( $pk_logo_href_pattern, 'href' . '="' . esc_url( $pk_logo_home ) . '"', (string) $pk_logo_html, 1 );
+					echo $pk_logo_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			} else {
-				$pk_home = esc_url( home_url( '/' ) );
+				$pk_home = esc_url( function_exists( 'pk_localized_home_url' ) ? pk_localized_home_url() : home_url( '/' ) );
 				$pk_name = get_bloginfo( 'name' );
 				?>
 			<a class="pk-logo-text" href="<?php echo $pk_home; // phpcs:ignore ?>" rel="home" aria-label="<?php echo esc_attr( sprintf( __( '%s, retour a l accueil', 'partikulier' ), $pk_name ) ); ?>">
@@ -154,20 +158,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 	</div>
 
-	<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
-		<div class="pk-container">
-			<?php
-			wp_nav_menu( array(
-				'theme_location' => 'main',
-				'container'      => false,
-				'menu_class'     => 'pk-menu',
-				'depth'          => 2,
-				'fallback_cb'    => array( 'Partikulier_Header', 'fallback_menu' ),
-				'walker'         => new Partikulier_Menu_Walker(),
-			) );
-			?>
-			</div>
-		</nav>
+
+
 
 		<div class="pk-mobile-menu" id="pk-mobile-menu" hidden>
 		<?php
@@ -180,6 +172,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 		) );
 		?>
 	</div>
-</header>
+
+	</header>
+
+<nav class="pk-main-nav" aria-label="<?php esc_attr_e( 'Menu principal', 'partikulier' ); ?>">
+	<div class="pk-container">
+		<?php
+		wp_nav_menu( array(
+			'theme_location' => 'main',
+			'container'      => false,
+			'menu_class'     => 'pk-menu',
+			'depth'          => 2,
+			'fallback_cb'    => array( 'Partikulier_Header', 'fallback_menu' ),
+			'walker'         => new Partikulier_Menu_Walker(),
+		) );
+		?>
+	</div>
+</nav>
 
 <main id="main-content" class="pk-main">

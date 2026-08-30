@@ -14,9 +14,12 @@ for (const item of [
   const fontRequests = [];
   page.on('request', (r) => { if (/NotoSansArabic|Noto.Sans.Arabic/i.test(r.url())) fontRequests.push(r.url()); });
   try {
-    await page.goto(`${base}${item.path}`, { waitUntil: 'networkidle', timeout: 30000 });
+    await page.goto(`${base}${item.path}`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const data = await page.evaluate(async () => {
-      await document.fonts.ready;
+      await Promise.race([
+        document.fonts.ready,
+        new Promise((resolve) => setTimeout(resolve, 5000)),
+      ]);
       const probe = document.createElement('span');
       probe.lang = 'ar';
       probe.textContent = 'العربية';

@@ -84,12 +84,14 @@ class Partikulier_AVIF {
 			return true;
 		}
 		if ( file_exists( $avif ) && 0 === filesize( $avif ) ) {
-			@unlink( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.unlink_unlink
+			wp_delete_file( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations
+
 		}
 		if ( wp_image_editor_supports( array( 'mime_type' => 'image/avif' ) ) ) {
 			$editor = wp_get_image_editor( $file );
 			if ( ! is_wp_error( $editor ) ) {
-				$result = $editor->save( $avif, 'image/avif', array( 'quality' => self::QUALITY ) );
+					$editor->set_quality( self::QUALITY );
+					$result = $editor->save( $avif, 'image/avif' );
 				if ( ! is_wp_error( $result ) && ! empty( $result['path'] ) && file_exists( $result['path'] ) && filesize( $result['path'] ) > 0 ) {
 					return true;
 				}
@@ -100,7 +102,12 @@ class Partikulier_AVIF {
 			return true;
 		}
 
-		return self::convert_with_vips( $file, $avif );
+		$converted = self::convert_with_vips( $file, $avif );
+		if ( ! $converted && file_exists( $avif ) && 0 === filesize( $avif ) ) {
+			wp_delete_file( $avif ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations
+
+		}
+		return $converted;
 	}
 
 	/**
@@ -115,7 +122,8 @@ class Partikulier_AVIF {
 		$command = escapeshellarg( $binary ) . ' --min 25 --max 25 ' . escapeshellarg( $file ) . ' ' . escapeshellarg( $avif ) . ' 2>&1';
 		$output = array();
 		$code   = 1;
-		@exec( $command, $output, $code ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+		@exec( $command, $output, $code ); // nosemgrep: php.lang.security.exec-use.exec-use -- binaire absolu, chemin média et cible protégés par escapeshellarg
+
 
 		return 0 === $code && file_exists( $avif ) && filesize( $avif ) > 0;
 	}
@@ -134,7 +142,8 @@ class Partikulier_AVIF {
 		$command = escapeshellarg( $binary ) . ' copy ' . escapeshellarg( $file ) . ' ' . escapeshellarg( $target ) . ' 2>&1';
 		$output = array();
 		$code   = 1;
-		@exec( $command, $output, $code ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec
+		@exec( $command, $output, $code ); // nosemgrep: php.lang.security.exec-use.exec-use -- binaire absolu, chemin média et cible protégés par escapeshellarg
+
 
 		return 0 === $code && file_exists( $avif ) && filesize( $avif ) > 0;
 	}
@@ -256,14 +265,46 @@ class Partikulier_AVIF {
 			return false;
 		}
 
+		/**
+		 * Retourne une URL d’image uniquement si la ressource locale est non vide
+		 * et décodable. Les URLs externes restent soumises au contrôle navigateur.
+		 *
+		 * @param int    $attachment_id Identifiant media.
+		 * @param string $size Taille WordPress.
+		 * @return string|false
+		 */
+		public static function valid_image_url( $attachment_id, $size = 'thumbnail' ) {
+			$image = wp_get_attachment_image_src( (int) $attachment_id, $size );
+			if ( ! is_array( $image ) || empty( $image[0] ) ) {
+				return false;
+			}
+
+			$upload = wp_get_upload_dir();
+			if ( ! empty( $upload['baseurl'] ) && 0 === strpos( $image[0], $upload['baseurl'] ) ) {
+				$path = str_replace( $upload['baseurl'], $upload['basedir'], $image[0] );
+				if ( ! is_file( $path ) || filesize( $path ) <= 0 || ( function_exists( 'getimagesize' ) && false === @getimagesize( $path ) ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+					return false;
+				}
+			}
+
+			return $image[0];
+		}
+
 		public static function avif_path_for_url( $url ) {
-		$avif_url = $url . '.avif';
+			// Certains hébergements servent les fichiers `.avif` avec `text/plain`.
+			// Dans ce cas, le navigateur peut parfois décoder l’octet mais le contrat
+			// image exige un MIME image valide. Le fallback WebP/JPEG reste donc la
+			// livraison par défaut ; l’AVIF n’est activé qu’après vérification serveur.
+			if ( ! defined( 'PARTIKULIER_ENABLE_AVIF_DELIVERY' ) || ! PARTIKULIER_ENABLE_AVIF_DELIVERY ) {
+				return false;
+			}
+			$avif_url = $url . '.avif';
 		// Verifier l'existence physique (upload dir local).
 		$upload = wp_get_upload_dir();
 		$base   = $upload['baseurl'];
 		if ( 0 === strpos( $avif_url, $base ) ) {
 			$path = str_replace( $base, $upload['basedir'], $avif_url );
-			if ( file_exists( $path ) ) {
+			if ( file_exists( $path ) && filesize( $path ) > 0 ) {
 				return $avif_url;
 			}
 		}

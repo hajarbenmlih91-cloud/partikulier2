@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<ruleset name="Partikulier changed PHP quality">
+  <description>Bounded WordPress Coding Standards gate for the current candidate.</description>
+  <arg name="basepath" value="."/>
+  <arg name="colors"/>
+  <arg name="parallel" value="4"/>
+  <config name="php_version" value="80300"/>
+
+  <file>theme/inc/class-avif.php</file>
+  <file>theme/inc/class-cache.php</file>
+  <file>theme/inc/class-listing-approval.php</file>
+  <file>scripts/reparer-taxonomies.php</file>
+
+  <rule ref="WordPress"/>
+  <rule ref="WordPress-Core"/>
+  <rule ref="WordPress-Extra"/>
+</ruleset>

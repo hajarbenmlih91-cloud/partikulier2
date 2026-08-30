@@ -259,7 +259,7 @@ class Partikulier_Page_Doctor {
 		}
 
 		// Le formulaire de recherche depend de la taxonomie des actions.
-		$actions = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_CATEGORY_TAXONOMY, 'hide_empty' => false ) );
+		$actions = get_terms( array( 'taxonomy' => PARTIKULIER_ESTATIK_STATUS_TAXONOMY, 'hide_empty' => false ) );
 		$bad     = class_exists( 'Partikulier_Upgrade_Wizard' ) ? Partikulier_Upgrade_Wizard::misplaced_terms() : array();
 		if ( $bad ) {
 			$names = wp_list_pluck( array_slice( $bad, 0, 6 ), 'name' );

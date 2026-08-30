@@ -1,0 +1,40 @@
+request=1 time_starttransfer=3.666591 time_total=3.999223 http=200
+HTTP/2 200
+content-type: application/json; charset=UTF-8
+x-litespeed-cache: miss
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: MISS
+request=2 time_starttransfer=3.466892 time_total=3.898229 http=200
+HTTP/2 200
+content-type: application/json; charset=UTF-8
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: MISS
+request=3 time_starttransfer=3.257143 time_total=3.473603 http=200
+HTTP/2 200
+content-type: application/json; charset=UTF-8
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: MISS
+request=4 time_starttransfer=3.676969 time_total=4.019567 http=200
+HTTP/2 200
+content-type: application/json; charset=UTF-8
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: MISS
+request=5 time_starttransfer=2.822985 time_total=3.119830 http=200
+HTTP/2 200
+content-type: application/json; charset=UTF-8
+x-litespeed-cache: hit
+platform: hostinger
+server: hcdn
+x-hcdn-cache-status: HIT
+/tmp/rest-lazy-1.json json_ok
+/tmp/rest-lazy-2.json json_ok
+/tmp/rest-lazy-3.json json_ok
+/tmp/rest-lazy-4.json json_ok
+/tmp/rest-lazy-5.json json_ok

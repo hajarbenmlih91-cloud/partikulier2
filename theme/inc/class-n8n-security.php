@@ -126,6 +126,39 @@ class Partikulier_N8n_Security {
 		return array_filter( $keys );
 	}
 
+	/**
+	 * Construit les headers d’un webhook sortant signé.
+	 * Le corps exact et le chemin du webhook entrent dans la signature afin
+	 * qu’un nœud n8n puisse rejeter une requête rejouée ou altérée.
+	 *
+	 * @param string $method Méthode HTTP.
+	 * @param string $url URL complète du webhook.
+	 * @param string $body Corps JSON exact.
+	 * @return array|WP_Error
+	 */
+	public static function outgoing_headers( $method, $url, $body ) {
+		$keys = self::secret_keys();
+		if ( empty( $keys ) ) {
+			return new WP_Error( 'pk_n8n_secret_missing', __( 'Secret n8n non configuré.', 'partikulier' ) );
+		}
+		$key_id = (string) array_key_first( $keys );
+		$secret = (string) $keys[ $key_id ];
+		$parts = wp_parse_url( $url );
+		$path = (string) ( $parts['path'] ?? '/' );
+		if ( ! empty( $parts['query'] ) ) {
+			$path .= '?' . $parts['query'];
+		}
+		$timestamp = (string) time();
+		$canonical = strtoupper( (string) $method ) . "\n" . $path . "\n" . $timestamp . "\n" . (string) $body;
+		return array(
+			'Content-Type'             => 'application/json',
+			'X-Partikulier-Automation' => $secret,
+			'X-Partikulier-Timestamp'  => $timestamp,
+			'X-Partikulier-Key-Id'     => $key_id,
+			'X-Partikulier-Signature'  => 'sha256=' . hash_hmac( 'sha256', $canonical, self::hmac_key( $secret ) ),
+		);
+	}
+
 	public static function check_automation_secret( WP_REST_Request $request ) {
 		$keys = self::secret_keys();
 		$secret = self::get( 'automation_api_secret' );
@@ -165,7 +198,7 @@ class Partikulier_N8n_Security {
 		if ( $valid && $secret_for_key ) {
 			$path = (string) $request->get_route();
 			$canonical = strtoupper( $request->get_method() ) . "\n" . $path . "\n" . $timestamp . "\n" . $request->get_body();
-			$expected = 'sha256=' . hash_hmac( 'sha256', $canonical, base64_decode( $secret_for_key ) );
+				$expected = 'sha256=' . hash_hmac( 'sha256', $canonical, self::hmac_key( $secret_for_key ) );
 			$valid = hash_equals( $expected, $signature );
 		}
 		
@@ -251,6 +284,21 @@ class Partikulier_N8n_Security {
 			<tr><th><?php esc_html_e( 'Consentement WhatsApp', 'partikulier' ); ?></th><td><textarea name="pk_n8n[consent_text]" rows="4" class="large-text"><?php echo esc_textarea( $s['consent_text'] ?? '' ); ?></textarea></td></tr>
 			<tr><th><?php esc_html_e( 'Canal WhatsApp', 'partikulier' ); ?></th><td><input class="regular-text" type="url" name="pk_n8n[channel_url]" value="<?php echo esc_attr( $s['channel_url'] ?? '' ); ?>"></td></tr></table><p><button class="button button-primary"><?php esc_html_e( 'Enregistrer', 'partikulier' ); ?></button></p></form></div>
 		<?php
+	}
+
+	private static function hmac_key( $secret ) {
+		$secret = trim( (string) $secret );
+		$decoded = base64_decode( $secret, true );
+		if ( is_string( $decoded ) && strlen( $decoded ) >= 32 ) {
+			return $decoded;
+		}
+		if ( preg_match( '/^[a-f0-9]{64,}$/i', $secret ) ) {
+			$hex = hex2bin( substr( $secret, 0, strlen( $secret ) - ( strlen( $secret ) % 2 ) ) );
+			if ( false !== $hex && strlen( $hex ) >= 32 ) {
+				return $hex;
+			}
+		}
+		return $secret;
 	}
 
 	private static function is_strong_secret( $secret ) {

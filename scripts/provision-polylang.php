@@ -37,6 +37,16 @@ $pages = array(
         'en' => array('title' => 'Favorites', 'slug' => 'favoris-en', 'template' => 'templates/page-favoris.php'),
         'ar' => array('title' => 'المفضلة', 'slug' => 'favoris-ar', 'template' => 'templates/page-favoris.php'),
     ),
+    'faq' => array(
+        'fr' => array('title' => 'Questions fréquentes', 'slug' => 'faq', 'template' => 'templates/page.php', 'content' => '<h2>Comment publier une annonce ?</h2><p>Déposez votre bien gratuitement, renseignez ses informations et ajoutez des photos. Chaque annonce est vérifiée avant publication.</p><h2>Le contact est-il direct ?</h2><p>Oui. Partikulier met en relation les particuliers sans commission ni intermédiaire.</p>'),
+        'en' => array('title' => 'Frequently asked questions', 'slug' => 'faq-en', 'template' => 'templates/page.php', 'content' => '<h2>How do I publish a listing?</h2><p>Submit your property for free, add its details and upload photos. Each listing is reviewed before publication.</p><h2>Is contact direct?</h2><p>Yes. Partikulier connects private owners and buyers without commission or middlemen.</p>'),
+        'ar' => array('title' => 'الأسئلة الشائعة', 'slug' => 'faq-ar', 'template' => 'templates/page.php', 'content' => '<h2>كيف أنشر إعلاناً؟</h2><p>أضف عقارك مجاناً، وأدخل معلوماته وأرفق الصور. تتم مراجعة كل إعلان قبل نشره.</p><h2>هل التواصل مباشر؟</h2><p>نعم. يربط Partikulier بين المالكين والمشترين مباشرة دون عمولة أو وسيط.</p>'),
+    ),
+    'contact' => array(
+        'fr' => array('title' => 'Contactez-nous', 'slug' => 'contact', 'template' => 'templates/page.php', 'content' => '<p>Pour toute question concernant une annonce ou le fonctionnement de Partikulier, écrivez-nous à l’adresse indiquée dans le pied de page.</p>'),
+        'en' => array('title' => 'Contact us', 'slug' => 'contact-us', 'template' => 'templates/page.php', 'content' => '<p>For questions about a listing or Partikulier, write to us at the address shown in the footer.</p>'),
+        'ar' => array('title' => 'اتصل بنا', 'slug' => 'اتصل-بنا', 'template' => 'templates/page.php', 'content' => '<p>لأي سؤال حول إعلان أو طريقة عمل Partikulier، راسلنا على العنوان الظاهر في أسفل الصفحة.</p>'),
+    ),
 );
 foreach ($pages as $translations) {
     $ids = array();
