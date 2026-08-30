@@ -31,12 +31,15 @@ class Partikulier_Cache {
 		// Enregistrement du buffer de sortie pour generer le cache.
 		add_action( 'template_redirect', array( __CLASS__, 'start_caching' ), -1 );
 
-		// Hooks de purge.
-		foreach ( array( 'save_post', 'delete_post', 'transition_post_status', 'edited_term', 'create_term', 'delete_term', 'switch_theme', 'wp_update_nav_menu', 'customize_save_after' ) as $hook ) {
+		// Purge ciblée pour les posts (save, delete, trash)
+		add_action( 'save_post', array( __CLASS__, 'purge_post' ), 10, 1 );
+		add_action( 'delete_post', array( __CLASS__, 'purge_post' ), 10, 1 );
+		add_action( 'wp_trash_post', array( __CLASS__, 'purge_post' ), 10, 1 );
+
+		// Hooks de purge globale pour les réorganisations structurelles (termes, menus, thèmes)
+		foreach ( array( 'edited_term', 'create_term', 'delete_term', 'switch_theme', 'wp_update_nav_menu', 'customize_save_after' ) as $hook ) {
 			add_action( $hook, array( __CLASS__, 'purge_all' ) );
 		}
-			// Purge aussi après une mise à jour du site dans l’admin.
-			add_action( 'wp_trash_post', array( __CLASS__, 'purge_all' ) );
 
 			// Les options peuvent être créées via add_option() : le hook
 			// update_option_* ne se déclenche alors pas. Les deux familles sont
@@ -155,6 +158,70 @@ class Partikulier_Cache {
 	}
 
 	/**
+	 * Purge granulaire : supprime uniquement le cache d'un contenu specifique
+	 * et des pages listes directement impactees.
+	 *
+	 * @param int $post_id ID du post modifie.
+	 */
+	public static function purge_post( $post_id ) {
+		$url = get_permalink( $post_id );
+		if ( ! $url ) {
+			self::purge_all();
+			return;
+		}
+
+		$upload = wp_get_upload_dir();
+		$dir    = trailingslashit( $upload['basedir'] ) . self::DIR_NAME;
+		if ( ! is_dir( $dir ) ) {
+			return;
+		}
+
+		$path = wp_parse_url( $url, PHP_URL_PATH );
+		if ( $path ) {
+			$sanitized = trim( str_replace( array( '..', '/' ), array( '', '_' ), $path ), '_' );
+			$pattern   = $dir . '/*_' . $sanitized . '.html';
+			$matches   = glob( $pattern );
+			if ( $matches ) {
+				foreach ( $matches as $f ) {
+					@unlink( $f );
+					@unlink( $f . '.gz' );
+					@unlink( $f . '.br' );
+				}
+			}
+		}
+
+		// Purge aussi l'index/accueil, les archives principales, paginées et géographiques
+		$home_patterns = array(
+			$dir . '/*_index.html',
+			$dir . '/*_fr.html',
+			$dir . '/*_en.html',
+			$dir . '/*_ar.html',
+			$dir . '/*_annonces*.html',
+			$dir . '/*_page_*.html',
+		);
+
+		// Si l'annonce a une ville définie, purger aussi les archives de cette ville
+		$city_name = get_post_meta( $post_id, '_pk_city_name', true );
+		if ( $city_name ) {
+			$city_slug = sanitize_title( $city_name );
+			if ( $city_slug ) {
+				$home_patterns[] = $dir . '/*' . $city_slug . '*.html';
+			}
+		}
+
+		foreach ( $home_patterns as $p ) {
+			$matches = glob( $p );
+			if ( $matches ) {
+				foreach ( $matches as $f ) {
+					@unlink( $f );
+					@unlink( $f . '.gz' );
+					@unlink( $f . '.br' );
+				}
+			}
+		}
+	}
+
+	/**
 	 * Exclut les parcours privés et les endpoints techniques dès
 	 * after_setup_theme, moment où la requête WordPress n’est pas encore
 	 * systématiquement disponible pour is_page().
@@ -198,7 +265,8 @@ class Partikulier_Cache {
 			if ( is_admin() || wp_doing_ajax() || wp_doing_cron() || ( defined( 'DONOTCACHEPAGE' ) && DONOTCACHEPAGE ) ) {
 			return false;
 		}
-		if ( 'GET' !== ( isset( $_SERVER['REQUEST_METHOD'] ) ? $_SERVER['REQUEST_METHOD'] : '' ) ) {
+		$method = isset( $_SERVER['REQUEST_METHOD'] ) ? strtoupper( (string) $_SERVER['REQUEST_METHOD'] ) : '';
+		if ( 'GET' !== $method ) {
 			return false;
 		}
 		if ( ! empty( $_GET ) ) {

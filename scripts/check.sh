@@ -74,6 +74,14 @@ fi
    echo "   script R6 ou exceptions absent"; FAIL=1
  fi
 
+# ------------------------------------------------ test de non-régression cache (G2)
+ echo "── Test de non-régression du Cache (P1/G2)"
+ if [ -f "$ROOT/tests/test-cache-hit.sh" ]; then
+   bash "$ROOT/tests/test-cache-hit.sh" || FAIL=1
+ else
+   echo "   test-cache-hit.sh introuvable"; FAIL=1
+ fi
+
 # ------------------------------------------------------- régressions connues
  echo "── Régressions connues"
 

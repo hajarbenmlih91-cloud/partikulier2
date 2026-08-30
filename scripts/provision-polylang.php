@@ -49,7 +49,13 @@ foreach ( $pages as $base => $slugs ) {
             ) );
             $post = get_post( $post_id );
         }
-        $model->set_post_language( $post->ID, $lang );
+        if ( function_exists( 'pll_set_post_language' ) ) {
+            pll_set_post_language( $post->ID, $lang );
+        } elseif ( method_exists( $model, 'set_post_language' ) ) {
+            $model->set_post_language( $post->ID, $lang );
+        } elseif ( isset( $model->post ) && method_exists( $model->post, 'set_language' ) ) {
+            $model->post->set_language( $post->ID, $lang );
+        }
         $translations[$lang] = $post->ID;
     }
     pll_save_post_translations( $translations );
