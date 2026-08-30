@@ -207,7 +207,19 @@ wp_delete_file( $f );
 		$upload = wp_get_upload_dir();
 		$dir    = trailingslashit( $upload['basedir'] ) . self::DIR_NAME;
 
-		$host = isset( $_SERVER['HTTP_HOST'] ) ? preg_replace( '/[^a-z0-9.\-]/i', '', strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) ) : 'default';
+		$host_raw = isset( $_SERVER['HTTP_HOST'] ) ? strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) ) : '';
+		// La cle ne doit jamais etre derivee d'un en-tete Host libre : un hote
+		// arbitraire cree une entree etrangere (mesure : 10 hotes = 20 fichiers,
+		// puis un HIT sans Location sur ces hotes). Seuls l'hote de home_url() et
+		// ceux declares (constante ou filtre) sont des cles valides.
+		$allowed = array( strtolower( (string) wp_parse_url( home_url( '/' ), PHP_URL_HOST ) ) );
+		foreach ( preg_split( '/[\s,]+/', (string) ( defined( 'PK_ALLOWED_CACHE_HOSTS' ) ? constant( 'PK_ALLOWED_CACHE_HOSTS' ) : '' ) ) as $extra ) {
+			if ( '' !== $extra ) {
+				$allowed[] = $extra;
+			}
+		}
+		$allowed = array_values( array_unique( (array) apply_filters( 'partikulier_cache_allowed_hosts', $allowed ) ) );
+		$host     = in_array( $host_raw, $allowed, true ) ? $host_raw : 'default';
 		$uri  = isset( $_SERVER['REQUEST_URI'] ) ? wp_parse_url( sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ), PHP_URL_PATH ) : '/';
 		$uri  = '/' === $uri ? 'index' : trim( str_replace( array( '..', '/' ), array( '', '_' ), $uri ), '_' );
 		$lang = '';
